@@ -1,0 +1,7 @@
+ASSET_PREFIX=stag
+BUNDLE_IDENTIFIER=com.memorylovers.myapp.stag
+BUNDLE_NAME=Stag: MyApp
+BUNDLE_DISPLAY_NAME=Stag: MyApp
+LAUNCH_SCREEN_STORYBOARD=LaunchScreen.storyboard
+ADMOB_APP_ID=ca-app-pub-3940256099942544~1458002511
+GOOGLE_OAUTH_REVERSED_CLIENT_ID=com.googleusercontent.apps.272104754808-eugk96pvgvh22c5f8q8efkpnd2j3lt3c

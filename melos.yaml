@@ -1,0 +1,20 @@
+name: one_day_price
+packages:
+  - app
+
+command:
+  clean:
+    hooks:
+      post: |
+        melos exec --flutter -- "flutter clean"
+        melos exec --flutter --file-exists="ios/Podfile.lock" -- "cd ios && rm Podfile.lock"
+  version:
+    branch: main
+    releaseUrl: true
+
+scripts:
+  bootstrap: flutter pub get
+
+  clean: melos exec -- flutter clean
+
+sdkPath: .fvm/flutter_sdk

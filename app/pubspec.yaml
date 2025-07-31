@@ -1,0 +1,138 @@
+name: myapp
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl:
+
+  # state management
+  hooks_riverpod: ^2.6.1
+  flutter_hooks:
+  riverpod_annotation:
+  freezed_annotation:
+  json_annotation:
+
+  # routing
+  go_router: ^15.0.0
+
+  # font
+  google_fonts: ^6.2.1
+
+  # payment
+  purchases_flutter: ^8.7.3
+
+  # ads
+  google_mobile_ads: ^6.0.0
+  advertising_id: ^2.7.1
+  app_tracking_transparency: ^2.0.6
+
+  # i18n
+  slang: ^4.7.1
+  slang_flutter:
+
+  # logging
+  talker: ^4.7.2
+  talker_dio_logger:
+  talker_flutter:
+  talker_riverpod_logger:
+
+  # core
+  shared_preferences: ^2.5.3
+  package_info_plus: ^8.0.0
+  connectivity_plus: ^6.0.3
+  share_plus: ^10.1.4
+  device_info_plus: ^11.3.0
+  url_launcher: ^6.2.6
+  collection: ^1.17.2
+  nanoid2: ^2.0.1
+  ulid4d: ^2.0.0
+  shortid: ^0.1.2
+
+  # firebase and auth
+  firebase_core: ^3.12.1
+  firebase_auth:
+  firebase_analytics:
+  # firebase_messaging:
+  firebase_crashlytics:
+  cloud_firestore:
+  firebase_app_check:
+  # firebase_storage:
+  # cloud_functions:
+  # firebase_performance:
+  # firebase_in_app_messaging:
+  # firebase_database:
+  firebase_remote_config:
+  google_sign_in:
+
+  # http client
+  dio: ^5.8.0
+  # retrofit: ^4.1.0
+
+  # datetime
+  clock: ^1.1.1
+  timezone: ^0.10.0
+  flutter_timezone: ^4.1.0
+  # relative_time: ^5.0.0
+
+  # widget utils
+  flutter_svg:
+  gap: ^3.0.1
+  # twemoji_v2: ^0.5.3
+  # bordered_text: ^2.0.0
+
+  # animation
+  animations: ^2.0.11
+  flutter_animate: ^4.5.2
+  # lottie: ^3.1.2
+
+  # audio
+  # audioplayers: ^6.0.0
+
+  # widgetbook
+  widgetbook: ^3.10.2
+  widgetbook_annotation:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # lint
+  custom_lint:
+  flutter_lints:
+  riverpod_lint:
+
+  # generator
+  build_runner: ^2.4.15
+  build_verify:
+  freezed:
+  json_serializable:
+  riverpod_generator:
+  slang_build_runner:
+  go_router_builder:
+  flutter_gen_runner:
+
+  # test utils
+  fake_async: ^1.3.2
+  fake_cloud_firestore: ^3.1.0
+
+  # setup: flavor
+  flutter_flavorizr:
+
+  # widgetbook
+  widgetbook_generator:
+
+flutter:
+  uses-material-design: true
+
+  # flutter_gen configuration
+  assets:
+    - assets/google_fonts/
+    - assets/icons/

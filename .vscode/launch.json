@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "app Dev-Debug",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--flavor=dev"
+      ]
+    },
+    {
+      "name": "app Stag-Debug",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--flavor=stag"
+      ]
+    },
+    {
+      "name": "app Prod-Debug",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--flavor=prod"
+      ]
+    },
+    {
+      "name": "app Dev-Release",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": [
+        "--flavor=dev"
+      ]
+    },
+    {
+      "name": "widgetbook:internal",
+      "cwd": "app",
+      "program": "lib/widgetbook.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--device-id=chrome"
+      ]
+    },
+    {
+      "name": "widgetbook",
+      "cwd": "widgetbook",
+      "program": "lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--device-id=chrome"
+      ]
+    }
+  ]
+}

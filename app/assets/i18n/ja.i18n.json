@@ -1,0 +1,39 @@
+{
+  "app": {
+    "name": "マイアプリ"
+  },
+  "common": {
+    "retry": "Retry",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "create": "Create"
+  },
+  "error": {
+    "unexpected": "エラーが発生しました"
+  },
+  "login": {
+    "title": "ログイン",
+    "googleSignIn": "Googleでログイン",
+    "appleSignIn": "Appleでログイン",
+    "anonymousSignIn": "ログインなしではじめる"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "payment": "Subscription",
+    "contact": "Contact Us"
+  },
+  "payment": {
+    "title": "プレミアムプラン",
+    "description": "プレミアムでより多くの機能を開放しよう"
+  },
+  "forceUpdate": {
+    "title": "更新のお知らせ",
+    "desc": "新しいバージョンのアプリが利用可能です。ストアより更新ください",
+    "label": "今すぐ更新"
+  }
+}

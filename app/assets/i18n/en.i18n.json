@@ -1,0 +1,39 @@
+{
+  "app": {
+    "name": "MyApp"
+  },
+  "common": {
+    "retry": "Retry",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "create": "Create"
+  },
+  "error": {
+    "unexpected": "An Unexpected Error has occurred"
+  },
+  "login": {
+    "title": "Login",
+    "googleSignIn": "Sign in with Google",
+    "appleSignIn": "Sign in with Apple",
+    "anonymousSignIn": "Continue as Guest"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "payment": "Subscription",
+    "contact": "Contact Us"
+  },
+  "payment": {
+    "title": "Subscription",
+    "description": "Upgrade to premium for more features"
+  },
+  "forceUpdate": {
+    "title": "Please Update",
+    "desc": "A new version of the app is available. Please update from the store.",
+    "label": "Update Now"
+  }
+}

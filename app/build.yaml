@@ -1,0 +1,36 @@
+global_options:
+  # freezed:
+  #   runs_before:
+  #     - json_serializable
+  # json_serializable:
+  #   runs_before:
+  #     - retrofit_generator
+
+targets:
+  $default:
+    builders:
+      # https://pub.dev/packages/slang
+      slang_build_runner:
+        options:
+          base_locale: en
+          fallback_strategy: base_locale
+          translate_var: i18n
+          input_directory: assets/i18n
+          output_directory: lib/_gen/i18n
+          timestamp: false
+
+      # https://pub.dev/packages/flutter_gen_runner
+      flutter_gen:
+        options:
+          output: lib/_gen/assets
+          integrations:
+            image: true
+            flutter_svg: true
+            rive: false
+            lottie: false
+          # fonts:
+          #   enabled: true
+          # colors:
+          #   enabled: true
+          #   inputs:
+          #     - assets/color/colors.xml # Optional

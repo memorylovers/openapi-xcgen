@@ -1,0 +1,5 @@
+# CN=SuttoStock, OU=Company, O="Memory Lovers, LLC.", ST=Tokyo, C=JP
+storePassword=
+keyPassword=
+keyAlias=
+storeFile=./upload-keystore.jks

@@ -1,0 +1,26 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_relative_imports: true
+    require_trailing_commas: false
+
+formatter:
+  page_width: 80
+
+analyzer:
+  plugins:
+    - custom_lint
+  exclude:
+    - "**/bin/cache/**"
+    - "**/plugins/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/firebase_options*.dart"
+    - "build/**"
+    - "ios/**"
+    - "android/**"
+    - "assets/**"
+    - "coverage/**"
+    - ".dart_tool/**"
+    - "**/_gen/**"

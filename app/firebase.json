@@ -1,0 +1,120 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "buildConfigurations": {
+          "android/app/src/dev": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:android:6795356ba7d0508bcc278d",
+            "fileOutput": "android/app/src/dev/google-services.json"
+          },
+          "android/app/src/stag": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:android:3792b779cd15cd4ecc278d",
+            "fileOutput": "android/app/src/stag/google-services.json"
+          },
+          "android/app/src/prod": {
+            "projectId": "memorylovers-myapp-prod",
+            "appId": "1:249468482016:android:105cafee1bf1c91fe3fb85",
+            "fileOutput": "android/app/src/prod/google-services.json"
+          }
+        },
+        "default": {
+          "projectId": "memorylovers-myapp-prod",
+          "appId": "1:249468482016:android:d8e388151596533be3fb85",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "memorylovers-myapp-prod",
+          "appId": "1:249468482016:ios:72319fc0c6717212e3fb85",
+          "uploadDebugSymbols": true,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        },
+        "buildConfigurations": {
+          "Debug-dev": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:ios:3f891a356a871a93cc278d",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/dev/GoogleService-Info.plist"
+          },
+          "Release-dev": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:ios:3f891a356a871a93cc278d",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/dev/GoogleService-Info.plist"
+          },
+          "Profile-dev": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:ios:3f891a356a871a93cc278d",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/dev/GoogleService-Info.plist"
+          },
+          "Debug-stag": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:ios:013e16c3bbfc917acc278d",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/stag/GoogleService-Info.plist"
+          },
+          "Release-stag": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:ios:013e16c3bbfc917acc278d",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/stag/GoogleService-Info.plist"
+          },
+          "Profile-stag": {
+            "projectId": "memorylovers-myapp-stag",
+            "appId": "1:272104754808:ios:013e16c3bbfc917acc278d",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/stag/GoogleService-Info.plist"
+          },
+          "Debug-prod": {
+            "projectId": "memorylovers-myapp-prod",
+            "appId": "1:249468482016:ios:72319fc0c6717212e3fb85",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/prod/GoogleService-Info.plist"
+          },
+          "Release-prod": {
+            "projectId": "memorylovers-myapp-prod",
+            "appId": "1:249468482016:ios:72319fc0c6717212e3fb85",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/prod/GoogleService-Info.plist"
+          },
+          "Profile-prod": {
+            "projectId": "memorylovers-myapp-prod",
+            "appId": "1:249468482016:ios:72319fc0c6717212e3fb85",
+            "uploadDebugSymbols": true,
+            "fileOutput": "ios/Runner/prod/GoogleService-Info.plist"
+          }
+        }
+      },
+      "dart": {
+        "lib/_environment/firebase_options_dev.dart": {
+          "projectId": "memorylovers-myapp-stag",
+          "configurations": {
+            "android": "1:272104754808:android:6795356ba7d0508bcc278d",
+            "ios": "1:272104754808:ios:3f891a356a871a93cc278d",
+            "web": "1:272104754808:web:f096e7632915c64bcc278d"
+          }
+        },
+        "lib/_environment/firebase_options_stag.dart": {
+          "projectId": "memorylovers-myapp-stag",
+          "configurations": {
+            "android": "1:272104754808:android:6795356ba7d0508bcc278d",
+            "ios": "1:272104754808:ios:013e16c3bbfc917acc278d",
+            "web": "1:272104754808:web:f096e7632915c64bcc278d"
+          }
+        },
+        "lib/_environment/firebase_options_prod.dart": {
+          "projectId": "memorylovers-myapp-prod",
+          "configurations": {
+            "android": "1:249468482016:android:d8e388151596533be3fb85",
+            "ios": "1:249468482016:ios:72319fc0c6717212e3fb85",
+            "web": "1:249468482016:web:ad1420b260d6e491e3fb85"
+          }
+        }
+      }
+    }
+  }
+}

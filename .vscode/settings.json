@@ -1,0 +1,41 @@
+{
+  "dart.flutterSdkPath": ".fvm/versions/3.29.3",
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.codeActionsOnSave": {
+      "quickfix.insertSemicolon": "always",
+      "source.organizeImports": "always",
+      "source.addMissingImports": "always",
+      "source.fixAll": "always"
+    }
+  },
+  "search.exclude": {
+    "**/.fvm": true,
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true
+  },
+  "markdownlint.config": {
+    "MD029": false,
+    "MD040": false,
+    "MD041": false
+  },
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 10,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Use conventional commit message format and japanese."
+    }
+  ]
+}
