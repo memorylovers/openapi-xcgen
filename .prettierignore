@@ -1,0 +1,16 @@
+# 依存関係
+node_modules/
+pnpm-lock.yaml
+
+# ビルド成果物
+dist/
+build/
+
+# playground
+playground/
+
+# OS files
+.DS_Store
+
+# markdownlint-cli2で管理するため除外
+*.md
