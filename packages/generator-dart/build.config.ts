@@ -8,6 +8,6 @@ export default defineBuildConfig({
       minify: true,
     },
   },
-  entries: ["src/index", "src/cli"],
+  entries: ["src/index"],
   externals: ["@openapi-xcgen/core", "openapi-types"],
 });
