@@ -37,7 +37,7 @@
 - **依存**: なし
 - **完了条件**: 全ての型ガード関数のテストがパス
 
-### Task 1.2: HTTPメソッドのユーティリティ
+### Task 1.2: HTTPメソッドのユーティリティ ✅ 完了
 
 - **テストファイル**: `packages/core/tests/utils/http.test.ts`
 - **実装ファイル**: `packages/core/src/utils/http.ts`
@@ -55,7 +55,7 @@
 - **依存**: なし
 - **完了条件**: HTTPメソッド関連のユーティリティテストがパス
 
-### Task 1.3: パスユーティリティ
+### Task 1.3: パスユーティリティ ✅ 完了
 
 - **テストファイル**: `packages/core/tests/utils/path.test.ts`
 - **実装ファイル**: `packages/core/src/utils/path.ts`
