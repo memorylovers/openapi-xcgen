@@ -10,7 +10,6 @@ export default [
       "**/dist/**",
       "**/coverage/**",
       "**/node_modules/**",
-      "**/tests/**",
       "*.config.ts",
       "*.config.mjs",
     ],
@@ -18,11 +17,9 @@ export default [
   js.configs.recommended,
   {
     files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+    ignores: ["**/tests/**"],
     languageOptions: {
       parser: typescriptParser,
-      parserOptions: {
-        project: ["./tsconfig.json"],
-      },
     },
     plugins: {
       "@typescript-eslint": typescript,

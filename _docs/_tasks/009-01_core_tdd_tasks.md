@@ -19,7 +19,7 @@
 
 ## Phase 1: 基本型定義とユーティリティ（依存なし）
 
-### Task 1.1: 型ガード関数の実装
+### Task 1.1: 型ガード関数の実装 ✅️ 完了
 
 - **テストファイル**: `packages/core/tests/types/guards.test.ts`
 - **実装ファイル**: `packages/core/src/types/guards.ts`

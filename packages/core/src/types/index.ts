@@ -20,17 +20,6 @@ export type ServerObject = OpenAPIV3_1.ServerObject;
 export type InfoObject = OpenAPIV3_1.InfoObject;
 export type TagObject = OpenAPIV3_1.TagObject;
 
-// HTTPメソッド
-export type HTTPMethod =
-  | "get"
-  | "put"
-  | "post"
-  | "delete"
-  | "options"
-  | "head"
-  | "patch"
-  | "trace";
-
 // Re-export guard functions
 export {
   isReferenceObject,
