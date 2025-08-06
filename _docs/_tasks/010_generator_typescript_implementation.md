@@ -4,6 +4,10 @@
 
 `@openapi-xcgen/generator-typescript`パッケージのソースコード実装を行います。
 
+## ステータス
+
+- 状態: 未実施
+
 ## 前提条件
 
 - タスク004（TypeScript生成器環境構築）が完了していること
