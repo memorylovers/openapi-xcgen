@@ -11,5 +11,5 @@
     "MD047": true // single-trailing-newline
   },
   // Ignore patterns
-  "ignores": ["node_modules/**", "dist/**", "build/**", "playground/**"]
+  "ignores": ["**/node_modules/**", "**/dist/**", "**/build/**", "**/playground/**", "pnpm-lock.yaml"]
 }
