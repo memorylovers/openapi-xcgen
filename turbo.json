@@ -26,7 +26,8 @@
       "dependsOn": ["^lint"],
       "cache": true
     },
-    "format": {
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"],
       "cache": false
     },
     "clean": {

@@ -6,7 +6,9 @@
 
 ## ステータス
 
-- 状態: 未実施
+- 状態: 完了
+- 完了日: 2025-08-06
+- 備考: ESLint設定のみ実施。Husky、GitHub Actions、Changesetsは除外
 
 ## 前提条件
 
