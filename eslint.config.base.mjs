@@ -10,6 +10,7 @@ export default [
       "**/dist/**",
       "**/coverage/**",
       "**/node_modules/**",
+      "**/tests/**",
       "*.config.ts",
       "*.config.mjs",
     ],
