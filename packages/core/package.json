@@ -33,19 +33,19 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@apidevtools/swagger-parser": "^10.1.0",
+    "@apidevtools/swagger-parser": "^12.0.0",
     "@types/json-schema": "^7.0.15",
     "citty": "^0.1.6",
     "consola": "^3.4.2",
     "defu": "^6.1.4",
-    "pathe": "^1.1.2"
+    "pathe": "^2.0.3"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
-    "typescript": "^5.8.3",
+    "@types/node": "^24.2.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
     "unbuild": "^3.6.0",
-    "vitest": "^3.2.4",
-    "prettier": "^3.6.2"
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "openapi-types": "^12.1.3"
