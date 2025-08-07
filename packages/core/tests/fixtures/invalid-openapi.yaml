@@ -1,0 +1,6 @@
+# Valid YAML but invalid OpenAPI
+openapi: "2.0.0"  # Invalid version (should be 3.x.x)
+info:
+  # Missing required 'title' field
+  version: 1.0.0
+# Missing required 'paths' field
