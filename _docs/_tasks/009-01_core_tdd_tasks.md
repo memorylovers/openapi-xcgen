@@ -76,7 +76,7 @@
 
 ## Phase 2: Parser実装（外部ライブラリのラッパー）
 
-### Task 2.1: ParserError クラス
+### Task 2.1: ParserError クラス ✅ 完了
 
 - **テストファイル**: `packages/core/tests/parser/error.test.ts`
 - **実装ファイル**: `packages/core/src/parser/error.ts`
