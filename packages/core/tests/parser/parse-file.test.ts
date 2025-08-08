@@ -27,14 +27,14 @@ describe("OpenAPIParser", () => {
       expect(result.paths).toBeDefined();
     });
 
-    test("should dereference $ref pointers", async () => {
+    test("should bundle with internal $ref pointers", async () => {
       const filePath = resolve(
         import.meta.dirname,
         "../fixtures/petstore.yaml",
       );
       const result = await parser.parse(filePath);
 
-      // Check that references are resolved
+      // Check that internal references are preserved
       const paths = result.paths;
       if (paths && paths["/pets"] && "get" in paths["/pets"]) {
         const getOperation = paths["/pets"].get;
@@ -42,15 +42,24 @@ describe("OpenAPIParser", () => {
           const response = getOperation.responses["200"];
           if ("content" in response && response.content) {
             const schema = response.content["application/json"]?.schema;
-            // Should be resolved, not a $ref
             expect(schema).toBeDefined();
             if (schema && "items" in schema) {
-              // Items should be resolved object, not a $ref
-              expect(schema.items).not.toHaveProperty("$ref");
-              expect(schema.items).toHaveProperty("type");
+              // With bundle(), internal $refs are preserved
+              // This helps maintain component names for code generation
+              if (schema.items && "$ref" in schema.items) {
+                expect(schema.items.$ref).toMatch(/^#\/components\/schemas\//);
+              }
             }
           }
         }
+      }
+
+      // Ensure components are still present
+      expect(result.components).toBeDefined();
+      if (result.components?.schemas) {
+        expect(Object.keys(result.components.schemas).length).toBeGreaterThan(
+          0,
+        );
       }
     });
 

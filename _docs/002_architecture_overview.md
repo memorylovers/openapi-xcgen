@@ -34,17 +34,18 @@ openapi-xcgen/
 
 **責務:**
 
-- OpenAPIドキュメントのパース・バリデーション
+- OpenAPIドキュメントのパース（@apidevtools/swagger-parserのbundleメソッド使用）
 - CLI基盤機能（cittyベース）
 - 共通ユーティリティ（文字列変換、ファイル書き込み等）
 - 再利用可能なCLIコマンド定義
+- 中間表現（IR）への変換
 
 **主要なエクスポート:**
 
 ```typescript
-// パーサー・バリデーター
-export { parseOpenAPIDocument, validateOpenAPIDocument } from "./parser.js";
-export { resolveSchemas, resolvePaths } from "./resolver.js";
+// パーサー（bundleメソッドで$refを内部参照として保持）
+export { parseOpenAPIDocument } from "./parser.js";
+// バリデーションは@apidevtools/swagger-parserが内部で実行
 
 // CLI基盤
 export { createGenerateCommand, createValidateCommand } from "./cli/commands.js";

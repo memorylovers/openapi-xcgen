@@ -61,19 +61,18 @@ OpenAPI仕様書からTypeScript/Dartコードを生成するための、各コ�
                               ↓
 ┌──────────────────────────────────────────────────────────┐
 │                       Core Engine                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
-│  │    Parser    │→ │  Validator   │→ │   Resolver   │   │
-│  │              │  │              │  │              │   │
-│  │ ·OpenAPI    │  │ ·Schema      │  │ ·$ref        │   │
-│  │ ·YAML/JSON  │  │ ·Constraints │  │ ·Components  │   │
-│  │ ·URL/File   │  │ ·Types       │  │ ·Paths       │   │
-│  └──────────────┘  └──────────────┘  └──────────────┘   │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │                    Parser                         │   │
+│  │  - OpenAPI parse with bundle()                    │   │
+│  │  - Validation by @apidevtools/swagger-parser      │   │
+│  │  - Preserve $refs as internal references          │   │
+│  └──────────────────────────────────────────────────┘   │
 │                              ↓                            │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │              Advanced Transformer                 │   │
-│  │  - Extract Models, Enums, Unions                  │   │
+│  │  - Extract Models, Enums, Unions from components  │   │
+│  │  - Resolve $refs while preserving names           │   │
 │  │  - Group Services by Tags                         │   │
-│  │  - Resolve All Types                              │   │
 │  │  - Analyze Dependencies                           │   │
 │  └──────────────────────────────────────────────────┘   │
 │                              ↓                            │
@@ -376,7 +375,7 @@ export interface DartOptions {
 }
 ```
 
-#### 1.2 parser.ts - OpenAPIパーサー
+#### 1.2 parser.ts - OpenAPIパーサー（簡素化版）
 
 ```typescript
 import SwaggerParser from '@apidevtools/swagger-parser';
@@ -387,66 +386,34 @@ export class OpenAPIParser {
   private logger = consola.withTag('parser');
 
   /**
-   * OpenAPI仕様書をパース
+   * OpenAPI仕様書をパースしてバンドル
+   * bundleメソッドを使用して$refを内部参照として保持
+   * これによりコンポーネント名を保持したままコード生成が可能
    */
   async parse(input: string | URL): Promise<OpenAPIDocument> {
     this.logger.info(`Parsing OpenAPI document from: ${input}`);
     
     try {
-      // SwaggerParserは既にOpenAPIV3またはOpenAPIV3_1のDocumentを返す
-      const api = await SwaggerParser.validate(input);
-      return api as OpenAPIDocument;
-    } catch (error) {
-      this.logger.error('Failed to parse OpenAPI document:', error);
-      throw new ParserError(`Failed to parse OpenAPI document: ${error.message}`);
-    }
-  }
-
-  /**
-   * 文字列からパース
-   */
-  async parseFromString(content: string): Promise<OpenAPIDocument> {
-    this.logger.info('Parsing OpenAPI document from string');
-    
-    try {
-      const api = await SwaggerParser.validate(content);
-      return api as OpenAPIDocument;
-    } catch (error) {
-      this.logger.error('Failed to parse OpenAPI document:', error);
-      throw new ParserError(`Failed to parse OpenAPI document: ${error.message}`);
-    }
-  }
-
-  /**
-   * OpenAPI仕様書をパースして参照を解決
-   */
-  async dereference(input: string | URL): Promise<OpenAPIDocument> {
-    this.logger.info(`Parsing and dereferencing OpenAPI document from: ${input}`);
-    
-    try {
-      // dereferenceは$refを全て解決した状態のドキュメントを返す
-      const api = await SwaggerParser.dereference(input);
-      return api as OpenAPIDocument;
-    } catch (error) {
-      this.logger.error('Failed to dereference OpenAPI document:', error);
-      throw new ParserError(`Failed to dereference OpenAPI document: ${error.message}`);
-    }
-  }
-
-  /**
-   * OpenAPI仕様書をバンドル（外部参照を内部参照に変換）
-   */
-  async bundle(input: string | URL): Promise<OpenAPIDocument> {
-    this.logger.info(`Bundling OpenAPI document from: ${input}`);
-    
-    try {
+      // bundleメソッド: $refを内部参照として保持
+      // バリデーションも同時に実行される
       const api = await SwaggerParser.bundle(input);
+      
+      // OpenAPIバージョン確認
+      const openapiVersion = (api as any).openapi;
+      if (!openapiVersion || !openapiVersion.startsWith('3.')) {
+        throw new ParserError(`Invalid OpenAPI version: ${openapiVersion}. Only OpenAPI 3.x is supported.`);
+      }
+      
       return api as OpenAPIDocument;
     } catch (error) {
-      this.logger.error('Failed to bundle OpenAPI document:', error);
-      throw new ParserError(`Failed to bundle OpenAPI document: ${error.message}`);
+      this.logger.error('Failed to parse OpenAPI document:', error);
+      throw new ParserError(`Failed to parse OpenAPI document: ${error.message}`);
     }
   }
+  
+  // YAGNI原則に基づき、以下のメソッドは実装しない:
+  // - parseFromString: ファイルパースで十分
+  // - dereference: bundleでコンポーネント名を保持
 }
 
 export class ParserError extends Error {
@@ -457,257 +424,34 @@ export class ParserError extends Error {
 }
 ```
 
-#### 1.3 validator.ts - バリデーション
+#### 1.3 validator.ts - バリデーション（スキップ）
 
 ```typescript
-import type { 
-  OpenAPIDocument, 
-  SchemaObject, 
-  PathItemObject,
-  isOpenAPIV3Document,
-  isOpenAPIV3_1Document 
-} from './types';
-
-export interface ValidationResult {
-  valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationWarning[];
-}
-
-export interface ValidationError {
-  path: string;
-  message: string;
-  severity: 'error';
-}
-
-export interface ValidationWarning {
-  path: string;
-  message: string;
-  severity: 'warning';
-}
-
-export class SchemaValidator {
-  /**
-   * OpenAPIドキュメント全体をバリデート
-   */
-  validateDocument(doc: OpenAPIDocument): ValidationResult {
-    const errors: ValidationError[] = [];
-    const warnings: ValidationWarning[] = [];
-
-    // 基本構造のチェック
-    if (!doc.info?.title) {
-      errors.push({
-        path: 'info.title',
-        message: 'API title is required',
-        severity: 'error',
-      });
-    }
-
-    if (!doc.info?.version) {
-      errors.push({
-        path: 'info.version',
-        message: 'API version is required',
-        severity: 'error',
-      });
-    }
-
-    // パスのバリデーション
-    if (doc.paths) {
-      Object.entries(doc.paths).forEach(([path, pathItem]) => {
-        const pathResult = this.validatePath(pathItem);
-        errors.push(...pathResult.errors);
-        warnings.push(...pathResult.warnings);
-      });
-    }
-
-    // コンポーネントのバリデーション
-    if (doc.components?.schemas) {
-      Object.entries(doc.components.schemas).forEach(([name, schema]) => {
-        const schemaResult = this.validateSchema(schema);
-        errors.push(...schemaResult.errors);
-        warnings.push(...schemaResult.warnings);
-      });
-    }
-
-    return {
-      valid: errors.length === 0,
-      errors,
-      warnings,
-    };
-  }
-
-  /**
-   * スキーマのバリデーション
-   */
-  validateSchema(schema: SchemaObject): ValidationResult {
-    const errors: ValidationError[] = [];
-    const warnings: ValidationWarning[] = [];
-
-    // 型チェック
-    if (!schema.type && !schema.$ref && !schema.oneOf && !schema.anyOf && !schema.allOf) {
-      warnings.push({
-        path: 'schema',
-        message: 'Schema should specify a type',
-        severity: 'warning',
-      });
-    }
-
-    // プロパティのチェック
-    if (schema.type === 'object' && schema.properties) {
-      Object.entries(schema.properties).forEach(([propName, propSchema]) => {
-        if (!propSchema.type && !propSchema.$ref) {
-          warnings.push({
-            path: `properties.${propName}`,
-            message: `Property "${propName}" should specify a type`,
-            severity: 'warning',
-          });
-        }
-      });
-    }
-
-    return {
-      valid: errors.length === 0,
-      errors,
-      warnings,
-    };
-  }
-
-  /**
-   * パスアイテムのバリデーション
-   */
-  validatePath(path: PathItemObject): ValidationResult {
-    const errors: ValidationError[] = [];
-    const warnings: ValidationWarning[] = [];
-
-    // 各HTTPメソッドのチェック
-    const methods = ['get', 'post', 'put', 'delete', 'patch', 'options', 'head'];
-    
-    methods.forEach(method => {
-      const operation = path[method];
-      if (operation) {
-        if (!operation.operationId) {
-          warnings.push({
-            path: `${method}.operationId`,
-            message: `Operation should have an operationId`,
-            severity: 'warning',
-          });
-        }
-
-        if (!operation.responses || Object.keys(operation.responses).length === 0) {
-          errors.push({
-            path: `${method}.responses`,
-            message: `Operation must define at least one response`,
-            severity: 'error',
-          });
-        }
-      }
-    });
-
-    return {
-      valid: errors.length === 0,
-      errors,
-      warnings,
-    };
-  }
-}
+// YAGNI原則に基づき、独立したバリデーターは実装しない
+// @apidevtools/swagger-parserがbundle()メソッド内で
+// OpenAPI仕様のバリデーションを自動的に実行してくれる
+// 
+// 必要になった場合のみ、カスタムバリデーションを追加
+// 例: 特定の命名規則チェック、カスタムルールなど
 ```
 
-#### 1.4 resolver.ts - 参照解決
+#### 1.4 resolver.ts - 参照解決（スキップ）
 
 ```typescript
-import type { OpenAPIDocument, ComponentsObject, PathItemObject } from './types';
-
-export interface ResolvedDocument extends OpenAPIDocument {
-  resolved: boolean;
-  references: Map<string, any>;
-}
-
-export class ReferenceResolver {
-  private references: Map<string, any> = new Map();
-
-  /**
-   * $ref参照を解決
-   */
-  resolveRefs(doc: OpenAPIDocument): ResolvedDocument {
-    const resolved = this.deepResolve(doc, doc);
-    
-    return {
-      ...resolved,
-      resolved: true,
-      references: this.references,
-    };
-  }
-
-  /**
-   * コンポーネント参照を解決
-   */
-  resolveComponentRef(ref: string, components: ComponentsObject): any {
-    if (!ref.startsWith('#/components/')) {
-      throw new Error(`Invalid component reference: ${ref}`);
-    }
-
-    const path = ref.replace('#/components/', '').split('/');
-    let current: any = components;
-
-    for (const segment of path) {
-      current = current[segment];
-      if (!current) {
-        throw new Error(`Component not found: ${ref}`);
-      }
-    }
-
-    return current;
-  }
-
-  /**
-   * パスを解決
-   */
-  resolvePath(path: string, doc: OpenAPIDocument): PathItemObject {
-    const pathItem = doc.paths[path];
-    if (!pathItem) {
-      throw new Error(`Path not found: ${path}`);
-    }
-
-    return this.deepResolve(pathItem, doc);
-  }
-
-  /**
-   * 深い参照解決
-   */
-  private deepResolve(obj: any, root: OpenAPIDocument): any {
-    if (obj === null || obj === undefined) {
-      return obj;
-    }
-
-    if (typeof obj !== 'object') {
-      return obj;
-    }
-
-    if (Array.isArray(obj)) {
-      return obj.map(item => this.deepResolve(item, root));
-    }
-
-    // $ref参照の解決
-    if (obj.$ref) {
-      const cached = this.references.get(obj.$ref);
-      if (cached) {
-        return cached;
-      }
-
-      const resolved = this.resolveComponentRef(obj.$ref, root.components);
-      this.references.set(obj.$ref, resolved);
-      return this.deepResolve(resolved, root);
-    }
-
-    // オブジェクトの再帰的解決
-    const resolved: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      resolved[key] = this.deepResolve(value, root);
-    }
-
-    return resolved;
-  }
-}
+// YAGNI原則に基づき、独立したResolverクラスは実装しない
+// 
+// 参照解決の機能は：
+// 1. bundle()メソッドが$refを内部参照として保持
+// 2. Transformer内で必要に応じて$refを解決
+//    - コンポーネント名を保持しながら解決
+//    - ヘルパー関数で十分
+// 
+// 例: Transformer内のヘルパー関数
+// private resolveRef(ref: string, doc: OpenAPIDocument): { name: string, schema: any } {
+//   const name = ref.split('/').pop();
+//   // componentsからスキーマを取得
+//   return { name, schema };
+// }
 ```
 
 #### 1.5 transformer.ts - 中間表現への変換
@@ -738,28 +482,27 @@ import { ReferenceResolver } from './resolver';
 import type { OpenAPIV3_1 } from 'openapi-types';
 
 export class AdvancedTransformer {
-  private resolver: ReferenceResolver;
   private models: Map<string, Model> = new Map();
   private enums: Map<string, Enum> = new Map();
   private unions: Map<string, UnionType> = new Map();
   private typeRegistry: Map<string, ResolvedType> = new Map();
 
   constructor() {
-    this.resolver = new ReferenceResolver();
+    // Resolverクラスは不要、bundle()後のドキュメントを処理
   }
 
   /**
    * OpenAPIドキュメントを中間表現に変換
+   * bundle()メソッドで$refが内部参照として保持されたドキュメントを処理
    */
   transform(doc: OpenAPIDocument): IntermediateRepresentation {
-    // 1. すべての$refを解決
-    const resolved = this.resolver.resolveRefs(doc);
+    // 1. components配下を探索してモデル・型を収集
     
     // 2. スキーマからモデル、Enum、Unionを抽出
-    this.extractComponents(resolved.components);
+    this.extractComponents(doc.components);
     
     // 3. パスをサービスごとにグループ化
-    const services = this.groupIntoServices(resolved.paths);
+    const services = this.groupIntoServices(doc.paths);
     
     // 4. 各エンドポイントの型を完全に解決
     services.forEach(service => {
@@ -789,12 +532,14 @@ export class AdvancedTransformer {
 
   /**
    * コンポーネントを抽出（モデル、Enum、Union）
+   * bundle()後のcomponentsには全てのコンポーネントが定義されている
    */
   private extractComponents(components?: ComponentsObject): void {
     if (!components?.schemas) return;
 
     Object.entries(components.schemas).forEach(([name, schemaOrRef]) => {
-      // 参照オブジェクトの場合はスキップ（resolverで解決済みのはず）
+      // bundle()後なので、components内に$refは存在しない
+      // 名前付きでスキーマを処理
       if (!isReferenceObject(schemaOrRef)) {
         this.processSchema(name, schemaOrRef as SchemaObject);
       }
@@ -881,6 +626,8 @@ export class AdvancedTransformer {
 
   /**
    * 型を解決
+   * bundle()後でも$refは内部参照として残っているため、
+   * コンポーネント名を抽出して型を解決
    */
   private resolveType(schema: SchemaObject | OpenAPIV3_1.ReferenceObject): ResolvedType {
     // キャッシュチェック
@@ -891,9 +638,10 @@ export class AdvancedTransformer {
 
     let resolvedType: ResolvedType;
 
-    // 参照の場合
+    // 参照の場合（#/components/schemas/Pet など）
     if (schema.$ref) {
-      const refName = this.extractRefName(schema.$ref);
+      const refName = this.extractRefName(schema.$ref); // "Pet"を抽出
+      // コンポーネント名を保持したまま型を解決
       if (this.models.has(refName)) {
         resolvedType = { kind: 'model', modelName: refName };
       } else if (this.enums.has(refName)) {
@@ -1662,21 +1410,14 @@ import type { GeneratorConfig } from './types';
 
 /**
  * コード生成のメインエントリーポイント
- * 3層アーキテクチャに基づく処理フロー
+ * シンプルな3層アーキテクチャ
  */
 export async function generateCode(config: GeneratorConfig): Promise<void> {
-  // Layer 1: Parse & Validate
-  // OpenAPI仕様書をパースして生の構造を取得
+  // Layer 1: Parse
+  // OpenAPI仕様書をパースしてbundle
+  // バリデーションは@apidevtools/swagger-parserが内部で実行
   const parser = new OpenAPIParser();
-  const document = await parser.parse(config.input);
-  
-  // バリデーション
-  const validator = new SchemaValidator();
-  const validation = validator.validateDocument(document);
-  
-  if (!validation.valid) {
-    throw new ValidationError('Document validation failed', validation.errors);
-  }
+  const document = await parser.parse(config.input); // bundle() + バリデーション
   
   // Layer 2: Transform
   // 生のOpenAPI構造をコード生成に最適化された中間表現に変換

@@ -95,7 +95,7 @@
 - **依存**: なし
 - **完了条件**: エラークラスのテストがパス
 
-### Task 2.2: OpenAPIParser - ファイルパース
+### Task 2.2: OpenAPIParser - ファイルパース ✅ 完了
 
 - **テストファイル**: `packages/core/tests/parser/parse-file.test.ts`
 - **実装ファイル**: `packages/core/src/parser/index.ts`
@@ -114,7 +114,7 @@
 - **依存**: @apidevtools/swagger-parser, Task 2.1
 - **完了条件**: ファイルパーステストがパス
 
-### Task 2.3: OpenAPIParser - 文字列パース
+### Task 2.3: OpenAPIParser - 文字列パース ⏭️ スキップ (YAGNI原則により不要)
 
 - **テストファイル**: `packages/core/tests/parser/parse-string.test.ts`
 - **実装ファイル**: `packages/core/src/parser/index.ts`
@@ -139,7 +139,7 @@
 - **依存**: Task 2.2
 - **完了条件**: 文字列パーステストがパス
 
-### Task 2.4: OpenAPIParser - エラーハンドリング
+### Task 2.4: OpenAPIParser - エラーハンドリング ⏭️ スキップ (Task 2.2で実装済み)
 
 - **テストファイル**: `packages/core/tests/parser/error-handling.test.ts`
 - **実装ファイル**: `packages/core/src/parser/index.ts`
@@ -158,9 +158,9 @@
 
 ---
 
-## Phase 3: Validator実装（純粋な検証ロジック）
+## Phase 3: Validator実装（純粋な検証ロジック） ⏭️ スキップ (@apidevtools/swagger-parserが提供)
 
-### Task 3.1: ValidationResult型とヘルパー
+### Task 3.1: ValidationResult型とヘルパー ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/validator/result.test.ts`
 - **実装ファイル**: `packages/core/src/validator/result.ts`
@@ -178,7 +178,7 @@
 - **依存**: なし
 - **完了条件**: ValidationResult関連のテストがパス
 
-### Task 3.2: SchemaValidator - 基本構造検証
+### Task 3.2: SchemaValidator - 基本構造検証 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/validator/basic.test.ts`
 - **実装ファイル**: `packages/core/src/validator/index.ts`
@@ -200,7 +200,7 @@
 - **依存**: Task 3.1
 - **完了条件**: 基本構造の検証テストがパス
 
-### Task 3.3: SchemaValidator - パス検証
+### Task 3.3: SchemaValidator - パス検証 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/validator/paths.test.ts`
 - **実装ファイル**: `packages/core/src/validator/index.ts`
@@ -220,7 +220,7 @@
 - **依存**: Task 3.2
 - **完了条件**: パス検証テストがパス
 
-### Task 3.4: SchemaValidator - スキーマ検証
+### Task 3.4: SchemaValidator - スキーマ検証 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/validator/schemas.test.ts`
 - **実装ファイル**: `packages/core/src/validator/index.ts`
@@ -241,9 +241,9 @@
 
 ---
 
-## Phase 4: Resolver実装（参照解決）
+## Phase 4: Resolver実装（参照解決） ⏭️ スキップ (bundle()で処理、Transformer内で解決)
 
-### Task 4.1: ReferenceResolver - 基本構造
+### Task 4.1: ReferenceResolver - 基本構造 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/resolver/basic.test.ts`
 - **実装ファイル**: `packages/core/src/resolver/index.ts`
@@ -261,7 +261,7 @@
 - **依存**: なし
 - **完了条件**: 基本構造のテストがパス
 
-### Task 4.2: ReferenceResolver - コンポーネント参照解決
+### Task 4.2: ReferenceResolver - コンポーネント参照解決 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/resolver/component-ref.test.ts`
 - **実装ファイル**: `packages/core/src/resolver/index.ts`
@@ -284,7 +284,7 @@
 - **依存**: Task 4.1
 - **完了条件**: コンポーネント参照解決テストがパス
 
-### Task 4.3: ReferenceResolver - 深い参照解決
+### Task 4.3: ReferenceResolver - 深い参照解決 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/resolver/deep-resolve.test.ts`
 - **実装ファイル**: `packages/core/src/resolver/index.ts`
@@ -310,7 +310,7 @@
 - **依存**: Task 4.2
 - **完了条件**: 深い参照解決テストがパス
 
-### Task 4.4: ReferenceResolver - 循環参照対応
+### Task 4.4: ReferenceResolver - 循環参照対応 ⏭️ スキップ
 
 - **テストファイル**: `packages/core/tests/resolver/circular.test.ts`
 - **実装ファイル**: `packages/core/src/resolver/index.ts`

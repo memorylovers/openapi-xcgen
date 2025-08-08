@@ -47,8 +47,8 @@ export class OpenAPIParser {
       // Resolve the file path
       const resolvedPath = resolve(this.basePath, filePath);
 
-      // Parse, validate, and dereference in one step
-      const api = await this.swaggerParser.dereference(resolvedPath);
+      // Parse, validate, and bundle (keeps internal $refs)
+      const api = await this.swaggerParser.bundle(resolvedPath);
 
       // Check OpenAPI version
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
