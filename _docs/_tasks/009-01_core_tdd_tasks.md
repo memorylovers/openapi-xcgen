@@ -17,615 +17,143 @@
 
 ---
 
-## Phase 1: 基本型定義とユーティリティ（依存なし）
+## 完了済みタスク
 
-### Task 1.1: 型ガード関数の実装 ✅️ 完了
+### Phase 1: 基本型定義とユーティリティ ✅ 完了
 
-- **テストファイル**: `packages/core/tests/types/guards.test.ts`
-- **実装ファイル**: `packages/core/src/types/guards.ts`
-- **テスト内容**:
+| タスク | 実装ファイル | テストファイル |
+|--------|------------|--------------|
+| Task 1.1: 型ガード関数 | `src/types/guards.ts` | `tests/types/guards.test.ts` |
+| Task 1.2: HTTPメソッドユーティリティ | `src/utils/http.ts` | `tests/utils/http.test.ts` |
+| Task 1.3: パスユーティリティ | `src/utils/path.ts` | `tests/utils/path.test.ts` |
 
-  ```typescript
-  // Red: isReferenceObject()のテスト
-  test('should identify reference object', () => {
-    expect(isReferenceObject({ $ref: '#/components/schemas/User' })).toBe(true);
-    expect(isReferenceObject({ type: 'string' })).toBe(false);
-    expect(isReferenceObject(null)).toBe(false);
-  });
-  ```
+### Phase 2: Parser実装 ✅ 完了
 
-- **依存**: なし
-- **完了条件**: 全ての型ガード関数のテストがパス
-
-### Task 1.2: HTTPメソッドのユーティリティ ✅ 完了
-
-- **テストファイル**: `packages/core/tests/utils/http.test.ts`
-- **実装ファイル**: `packages/core/src/utils/http.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: isValidHTTPMethod()のテスト
-  test('should validate HTTP methods', () => {
-    expect(isValidHTTPMethod('GET')).toBe(true);
-    expect(isValidHTTPMethod('get')).toBe(true);
-    expect(isValidHTTPMethod('INVALID')).toBe(false);
-  });
-  ```
-
-- **依存**: なし
-- **完了条件**: HTTPメソッド関連のユーティリティテストがパス
-
-### Task 1.3: パスユーティリティ ✅ 完了
-
-- **テストファイル**: `packages/core/tests/utils/path.test.ts`
-- **実装ファイル**: `packages/core/src/utils/path.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: extractPathParams()のテスト
-  test('should extract path parameters', () => {
-    expect(extractPathParams('/users/{id}/posts/{postId}')).toEqual(['id', 'postId']);
-    expect(extractPathParams('/users')).toEqual([]);
-  });
-  ```
-
-- **依存**: なし
-- **完了条件**: パス操作関連のテストがパス
+| タスク | 実装ファイル | テストファイル |
+|--------|------------|--------------|
+| Task 2.1: ParserError クラス | `src/parser/error.ts` | `tests/parser/error.test.ts` |
+| Task 2.2: OpenAPIParser | `src/parser/openapi-parser.ts` | `tests/parser/parse-file.test.ts` |
 
 ---
 
-## Phase 2: Parser実装（外部ライブラリのラッパー）
+## スキップしたタスク（YAGNI原則）
 
-### Task 2.1: ParserError クラス ✅ 完了
+### Phase 2: Parser関連
 
-- **テストファイル**: `packages/core/tests/parser/error.test.ts`
-- **実装ファイル**: `packages/core/src/parser/error.ts`
-- **テスト内容**:
+- **Task 2.3**: 文字列パース - ファイルパースで十分
+- **Task 2.4**: エラーハンドリング - Task 2.2で実装済み
 
-  ```typescript
-  // Red: ParserErrorのテスト
-  test('should create parser error with message', () => {
-    const error = new ParserError('Failed to parse');
-    expect(error.message).toBe('Failed to parse');
-    expect(error.name).toBe('ParserError');
-    expect(error instanceof Error).toBe(true);
-  });
-  ```
+### Phase 3: Validator実装 ⏭️ スキップ
 
-- **依存**: なし
-- **完了条件**: エラークラスのテストがパス
+- @apidevtools/swagger-parserが全バリデーション機能を提供
 
-### Task 2.2: OpenAPIParser - ファイルパース ✅ 完了
+### Phase 4: Resolver実装 ⏭️ スキップ  
 
-- **テストファイル**: `packages/core/tests/parser/parse-file.test.ts`
-- **実装ファイル**: `packages/core/src/parser/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: ファイルパースのテスト（モックを使用）
-  test('should parse valid OpenAPI file', async () => {
-    const parser = new OpenAPIParser();
-    const result = await parser.parse('./fixtures/petstore.yaml');
-    expect(result.openapi).toMatch(/^3\./);
-    expect(result.info.title).toBeDefined();
-  });
-  ```
-
-- **依存**: @apidevtools/swagger-parser, Task 2.1
-- **完了条件**: ファイルパーステストがパス
-
-### Task 2.3: OpenAPIParser - 文字列パース ⏭️ スキップ (YAGNI原則により不要)
-
-- **テストファイル**: `packages/core/tests/parser/parse-string.test.ts`
-- **実装ファイル**: `packages/core/src/parser/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: 文字列パースのテスト
-  test('should parse OpenAPI string', async () => {
-    const yamlString = `
-      openapi: 3.1.0
-      info:
-        title: Test API
-        version: 1.0.0
-      paths: {}
-    `;
-    const parser = new OpenAPIParser();
-    const result = await parser.parseFromString(yamlString);
-    expect(result.info.title).toBe('Test API');
-  });
-  ```
-
-- **依存**: Task 2.2
-- **完了条件**: 文字列パーステストがパス
-
-### Task 2.4: OpenAPIParser - エラーハンドリング ⏭️ スキップ (Task 2.2で実装済み)
-
-- **テストファイル**: `packages/core/tests/parser/error-handling.test.ts`
-- **実装ファイル**: `packages/core/src/parser/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: エラーハンドリングのテスト
-  test('should throw ParserError for invalid file', async () => {
-    const parser = new OpenAPIParser();
-    await expect(parser.parse('./not-exist.yaml')).rejects.toThrow(ParserError);
-  });
-  ```
-
-- **依存**: Task 2.2, Task 2.3
-- **完了条件**: エラーケースのテストがパス
+- bundle()メソッドで$refを内部参照として保持
+- Transformer内で必要に応じて解決
 
 ---
 
-## Phase 3: Validator実装（純粋な検証ロジック） ⏭️ スキップ (@apidevtools/swagger-parserが提供)
+## 未実施タスク
 
-### Task 3.1: ValidationResult型とヘルパー ⏭️ スキップ
+### Phase 5: Transformer実装（中間表現への変換）
 
-- **テストファイル**: `packages/core/tests/validator/result.test.ts`
-- **実装ファイル**: `packages/core/src/validator/result.ts`
-- **テスト内容**:
+#### Task 5.0: IR型定義
 
-  ```typescript
-  // Red: ValidationResultのヘルパーテスト
-  test('should create validation error', () => {
-    const error = createValidationError('info.title', 'Title is required');
-    expect(error.path).toBe('info.title');
-    expect(error.severity).toBe('error');
-  });
-  ```
+- **テストファイル**: なし（型定義のため）
+- **実装ファイル**: `packages/core/src/types/ir.ts`
+- **設計ドキュメント**: `_docs/_tasks/009-02_ir_design.md`
+- **実装内容**: IntermediateRepresentation及び関連型の定義
 
-- **依存**: なし
-- **完了条件**: ValidationResult関連のテストがパス
-
-### Task 3.2: SchemaValidator - 基本構造検証 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/validator/basic.test.ts`
-- **実装ファイル**: `packages/core/src/validator/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: 基本検証のテスト
-  test('should validate required fields', () => {
-    const validator = new SchemaValidator();
-    const doc = { openapi: '3.1.0', paths: {} };
-    const result = validator.validateDocument(doc);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ path: 'info.title' })
-    );
-  });
-  ```
-
-- **依存**: Task 3.1
-- **完了条件**: 基本構造の検証テストがパス
-
-### Task 3.3: SchemaValidator - パス検証 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/validator/paths.test.ts`
-- **実装ファイル**: `packages/core/src/validator/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: パス検証のテスト
-  test('should validate path operations', () => {
-    const validator = new SchemaValidator();
-    const pathItem = { get: { responses: {} } };
-    const result = validator.validatePath(pathItem);
-    expect(result.valid).toBe(false);
-    expect(result.errors[0].message).toContain('at least one response');
-  });
-  ```
-
-- **依存**: Task 3.2
-- **完了条件**: パス検証テストがパス
-
-### Task 3.4: SchemaValidator - スキーマ検証 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/validator/schemas.test.ts`
-- **実装ファイル**: `packages/core/src/validator/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: スキーマ検証のテスト
-  test('should validate schema objects', () => {
-    const validator = new SchemaValidator();
-    const schema = { type: 'object', properties: {} };
-    const result = validator.validateSchema(schema);
-    expect(result.valid).toBe(true);
-  });
-  ```
-
-- **依存**: Task 3.2
-- **完了条件**: スキーマ検証テストがパス
-
----
-
-## Phase 4: Resolver実装（参照解決） ⏭️ スキップ (bundle()で処理、Transformer内で解決)
-
-### Task 4.1: ReferenceResolver - 基本構造 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/resolver/basic.test.ts`
-- **実装ファイル**: `packages/core/src/resolver/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: リゾルバーの基本テスト
-  test('should create resolver with cache', () => {
-    const resolver = new ReferenceResolver();
-    expect(resolver).toBeDefined();
-    // キャッシュが空であることを確認
-  });
-  ```
-
-- **依存**: なし
-- **完了条件**: 基本構造のテストがパス
-
-### Task 4.2: ReferenceResolver - コンポーネント参照解決 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/resolver/component-ref.test.ts`
-- **実装ファイル**: `packages/core/src/resolver/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: コンポーネント参照解決のテスト
-  test('should resolve component reference', () => {
-    const resolver = new ReferenceResolver();
-    const components = {
-      schemas: {
-        User: { type: 'object', properties: { id: { type: 'string' } } }
-      }
-    };
-    const result = resolver.resolveComponentRef('#/components/schemas/User', components);
-    expect(result.type).toBe('object');
-  });
-  ```
-
-- **依存**: Task 4.1
-- **完了条件**: コンポーネント参照解決テストがパス
-
-### Task 4.3: ReferenceResolver - 深い参照解決 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/resolver/deep-resolve.test.ts`
-- **実装ファイル**: `packages/core/src/resolver/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: ネストした参照の解決テスト
-  test('should resolve nested references', () => {
-    const resolver = new ReferenceResolver();
-    const doc = {
-      components: {
-        schemas: {
-          Pet: { $ref: '#/components/schemas/Animal' },
-          Animal: { type: 'object', properties: { name: { type: 'string' } } }
-        }
-      }
-    };
-    const resolved = resolver.resolveRefs(doc);
-    expect(resolved.resolved).toBe(true);
-  });
-  ```
-
-- **依存**: Task 4.2
-- **完了条件**: 深い参照解決テストがパス
-
-### Task 4.4: ReferenceResolver - 循環参照対応 ⏭️ スキップ
-
-- **テストファイル**: `packages/core/tests/resolver/circular.test.ts`
-- **実装ファイル**: `packages/core/src/resolver/index.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: 循環参照のテスト
-  test('should handle circular references', () => {
-    const resolver = new ReferenceResolver();
-    const doc = {
-      components: {
-        schemas: {
-          Node: {
-            type: 'object',
-            properties: {
-              children: { type: 'array', items: { $ref: '#/components/schemas/Node' } }
-            }
-          }
-        }
-      }
-    };
-    expect(() => resolver.resolveRefs(doc)).not.toThrow();
-  });
-  ```
-
-- **依存**: Task 4.3
-- **完了条件**: 循環参照のテストがパス
-
----
-
-## Phase 5: Transformer実装（中間表現への変換）
-
-### Task 5.1: AdvancedTransformer - 基本構造
+#### Task 5.1: AdvancedTransformer - 基本構造
 
 - **テストファイル**: `packages/core/tests/transformer/basic.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**:
+- **テスト内容**: トランスフォーマーのインスタンス作成
 
-  ```typescript
-  // Red: トランスフォーマーの基本テスト
-  test('should create transformer', () => {
-    const transformer = new AdvancedTransformer();
-    expect(transformer).toBeDefined();
-  });
-  ```
-
-- **依存**: Task 4.4（Resolver完了）
-- **完了条件**: 基本構造のテストがパス
-
-### Task 5.2: Model抽出
+#### Task 5.2: Model抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-models.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**:
+- **テスト内容**: componentsからモデル定義を抽出
 
   ```typescript
-  // Red: モデル抽出のテスト
-  test('should extract models from schemas', () => {
-    const transformer = new AdvancedTransformer();
-    const doc = {
-      openapi: '3.1.0',
-      info: { title: 'Test', version: '1.0.0' },
-      paths: {},
-      components: {
-        schemas: {
-          User: {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              name: { type: 'string' }
-            },
-            required: ['id']
-          }
-        }
-      }
-    };
-    const ir = transformer.transform(doc);
-    expect(ir.models).toHaveLength(1);
-    expect(ir.models[0].name).toBe('User');
-    expect(ir.models[0].properties).toHaveLength(2);
-  });
+  // 期待される動作
+  const ir = transformer.transform(doc);
+  expect(ir.models[0].name).toBe('User');
+  expect(ir.models[0].properties).toHaveLength(2);
   ```
 
-- **依存**: Task 5.1
-- **完了条件**: モデル抽出テストがパス
-
-### Task 5.3: Enum抽出
+#### Task 5.3: Enum抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-enums.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**:
+- **テスト内容**: Enum型の抽出と変換
 
-  ```typescript
-  // Red: Enum抽出のテスト
-  test('should extract enums from schemas', () => {
-    const transformer = new AdvancedTransformer();
-    const doc = {
-      components: {
-        schemas: {
-          Status: {
-            type: 'string',
-            enum: ['active', 'inactive', 'pending']
-          }
-        }
-      }
-    };
-    const ir = transformer.transform(doc);
-    expect(ir.enums).toHaveLength(1);
-    expect(ir.enums[0].name).toBe('Status');
-    expect(ir.enums[0].values).toHaveLength(3);
-  });
-  ```
-
-- **依存**: Task 5.2
-- **完了条件**: Enum抽出テストがパス
-
-### Task 5.4: Union型抽出
+#### Task 5.4: Union型抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-unions.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**:
+- **テスト内容**: oneOf/anyOfからUnion型を生成
 
-  ```typescript
-  // Red: Union型抽出のテスト
-  test('should extract union types', () => {
-    const transformer = new AdvancedTransformer();
-    const doc = {
-      components: {
-        schemas: {
-          Pet: {
-            oneOf: [
-              { $ref: '#/components/schemas/Cat' },
-              { $ref: '#/components/schemas/Dog' }
-            ]
-          }
-        }
-      }
-    };
-    const ir = transformer.transform(doc);
-    expect(ir.unions).toHaveLength(1);
-    expect(ir.unions[0].name).toBe('Pet');
-  });
-  ```
-
-- **依存**: Task 5.3
-- **完了条件**: Union型抽出テストがパス
-
-### Task 5.5: Service/Endpoint抽出
+#### Task 5.5: Service/Endpoint抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-services.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**:
+- **テスト内容**: パスをタグごとにサービスとしてグループ化
 
   ```typescript
-  // Red: サービス抽出のテスト
-  test('should group endpoints by tags', () => {
-    const transformer = new AdvancedTransformer();
-    const doc = {
-      paths: {
-        '/users': {
-          get: {
-            tags: ['users'],
-            operationId: 'getUsers',
-            responses: { '200': { description: 'OK' } }
-          }
-        },
-        '/users/{id}': {
-          get: {
-            tags: ['users'],
-            operationId: 'getUser',
-            responses: { '200': { description: 'OK' } }
-          }
-        }
-      }
-    };
-    const ir = transformer.transform(doc);
-    expect(ir.services).toHaveLength(1);
-    expect(ir.services[0].name).toBe('users');
-    expect(ir.services[0].endpoints).toHaveLength(2);
-  });
+  // 期待される動作
+  const ir = transformer.transform(doc);
+  expect(ir.services[0].name).toBe('users');
+  expect(ir.services[0].endpoints).toHaveLength(2);
   ```
 
-- **依存**: Task 5.4
-- **完了条件**: サービス抽出テストがパス
-
-### Task 5.6: 型解決
+#### Task 5.6: 型解決
 
 - **テストファイル**: `packages/core/tests/transformer/resolve-types.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
 - **テスト内容**:
+  - プリミティブ型の解決
+  - 配列型の解決
+  - $ref参照の解決（コンポーネント名を保持）
 
-  ```typescript
-  // Red: 型解決のテスト
-  test('should resolve primitive types', () => {
-    const transformer = new AdvancedTransformer();
-    const result = transformer.resolveType({ type: 'string', format: 'email' });
-    expect(result.kind).toBe('primitive');
-    expect(result.primitive).toBe('string');
-    expect(result.format).toBe('email');
-  });
-
-  test('should resolve array types', () => {
-    const transformer = new AdvancedTransformer();
-    const result = transformer.resolveType({ 
-      type: 'array', 
-      items: { type: 'string' } 
-    });
-    expect(result.kind).toBe('array');
-    expect(result.arrayType.kind).toBe('primitive');
-  });
-  ```
-
-- **依存**: Task 5.5
-- **完了条件**: 型解決テストがパス
-
-### Task 5.7: 依存関係解析
+#### Task 5.7: 依存関係解析
 
 - **テストファイル**: `packages/core/tests/transformer/dependencies.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
+- **テスト内容**: モデル間の依存関係を解析してimports配列を生成
+
+#### Task 5.8: インラインスキーマ抽出
+
+- **テストファイル**: `packages/core/tests/transformer/inline-schemas.test.ts`
+- **実装ファイル**: `packages/core/src/transformer/index.ts`
 - **テスト内容**:
+  - requestBodyのインラインスキーマ抽出
+  - responsesのインラインスキーマ抽出
+  - ネストされたインラインオブジェクトの再帰的抽出
+  - 一意の名前生成（パス+メソッド or operationIdベース）
+  - 名前の衝突回避
 
-  ```typescript
-  // Red: 依存関係解析のテスト
-  test('should analyze model dependencies', () => {
-    const transformer = new AdvancedTransformer();
-    const doc = {
-      components: {
-        schemas: {
-          User: {
-            type: 'object',
-            properties: {
-              address: { $ref: '#/components/schemas/Address' }
-            }
-          },
-          Address: {
-            type: 'object',
-            properties: {
-              street: { type: 'string' }
-            }
-          }
-        }
-      }
-    };
-    const ir = transformer.transform(doc);
-    const userModel = ir.models.find(m => m.name === 'User');
-    expect(userModel.imports).toContain('Address');
-  });
-  ```
+### Phase 6: 統合とCLI
 
-- **依存**: Task 5.6
-- **完了条件**: 依存関係解析テストがパス
-
----
-
-## Phase 6: 統合とCLI
-
-### Task 6.1: generateCode関数
+#### Task 6.1: generateCode関数
 
 - **テストファイル**: `packages/core/tests/generate.test.ts`
 - **実装ファイル**: `packages/core/src/index.ts`
-- **テスト内容**:
+- **テスト内容**: エンドツーエンドの統合テスト
 
-  ```typescript
-  // Red: 統合テスト
-  test('should generate code from OpenAPI', async () => {
-    const config = {
-      input: './fixtures/petstore.yaml',
-      output: './output',
-      language: 'typescript'
-    };
-    await generateCode(config);
-    // ファイルが生成されたことを確認
-  });
-  ```
-
-- **依存**: Phase 1-5 完了
-- **完了条件**: エンドツーエンドのテストがパス
-
-### Task 6.2: CLIコマンド実装
+#### Task 6.2: CLIコマンド実装
 
 - **テストファイル**: `packages/core/tests/cli/commands.test.ts`
 - **実装ファイル**: `packages/core/src/cli/commands.ts`
-- **テスト内容**:
+- **テスト内容**: コマンドライン引数のパース
 
-  ```typescript
-  // Red: CLIコマンドのテスト
-  test('should parse command arguments', () => {
-    const args = ['--input', 'api.yaml', '--output', './gen', '--language', 'ts'];
-    const parsed = parseArgs(args);
-    expect(parsed.input).toBe('api.yaml');
-    expect(parsed.output).toBe('./gen');
-    expect(parsed.language).toBe('ts');
-  });
-  ```
-
-- **依存**: Task 6.1
-- **完了条件**: CLIコマンドのテストがパス
-
-### Task 6.3: 設定ファイル読み込み
+#### Task 6.3: 設定ファイル読み込み
 
 - **テストファイル**: `packages/core/tests/cli/config.test.ts`
 - **実装ファイル**: `packages/core/src/cli/config.ts`
-- **テスト内容**:
-
-  ```typescript
-  // Red: 設定ロードのテスト
-  test('should load config file', async () => {
-    const config = await loadConfig('./fixtures/xcgen.config.ts');
-    expect(config.input).toBeDefined();
-    expect(config.output).toBeDefined();
-  });
-  ```
-
-- **依存**: Task 6.2
-- **完了条件**: 設定ファイル読み込みテストがパス
+- **テスト内容**: xcgen.config.tsの読み込み
 
 ---
 
@@ -660,18 +188,6 @@ export default defineConfig({
     }
   }
 });
-```
-
-### テストスクリプト
-
-```json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
-  }
-}
 ```
 
 ---
