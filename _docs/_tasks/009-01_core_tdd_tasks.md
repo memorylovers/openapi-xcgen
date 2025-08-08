@@ -63,7 +63,7 @@
 - **テストファイル**: なし（型定義のため）
 - **実装ファイル**: `packages/core/src/types/ir.ts`
 - **設計ドキュメント**: `_docs/_tasks/009-02_ir_design.md`
-- **実装内容**: IntermediateRepresentation及び関連型の定義
+- **実装内容**: XcgenIR及び関連型の定義
 
 #### Task 5.1: AdvancedTransformer - 基本構造
 
@@ -71,11 +71,11 @@
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
 - **テスト内容**: トランスフォーマーのインスタンス作成
 
-#### Task 5.2: Model抽出
+#### Task 5.2: IRModel抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-models.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**: componentsからモデル定義を抽出
+- **テスト内容**: componentsからIRModel定義を抽出
 
   ```typescript
   // 期待される動作
@@ -84,19 +84,19 @@
   expect(ir.models[0].properties).toHaveLength(2);
   ```
 
-#### Task 5.3: Enum抽出
+#### Task 5.3: IREnum抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-enums.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**: Enum型の抽出と変換
+- **テスト内容**: IREnum型の抽出と変換
 
-#### Task 5.4: Union型抽出
+#### Task 5.4: IRUnion型抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-unions.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
-- **テスト内容**: oneOf/anyOfからUnion型を生成
+- **テスト内容**: oneOf/anyOfからIRUnion型を生成
 
-#### Task 5.5: Service/Endpoint抽出
+#### Task 5.5: IRService/IREndpoint抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-services.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`

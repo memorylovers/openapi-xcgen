@@ -2,7 +2,7 @@
 
 ## 概要
 
-OpenAPI仕様書からコード生成に最適化された中間表現（Intermediate Representation）への変換設計。
+OpenAPI仕様書からコード生成に最適化された中間表現（Intermediate Representation, XcgenIR）への変換設計。
 bundle()メソッドで$refを保持したOpenAPIドキュメントから、コード生成に必要な情報を抽出・整理する。
 
 ## 1. 設計原則
@@ -25,14 +25,14 @@ bundle()メソッドで$refを保持したOpenAPIドキュメントから、コ�
 ### 2.1 全体構造
 
 ```
-IntermediateRepresentation
-├── metadata: APIMetadata          # API基本情報
-├── models: Model[]                # データモデル
-├── enums: Enum[]                  # 列挙型
-├── unions: UnionType[]            # Union型
-├── services: Service[]            # APIサービス（タグでグループ化）
-├── servers: Server[]              # サーバー情報
-└── security?: SecurityScheme[]    # セキュリティ定義
+XcgenIR
+├── metadata: IRMetadata           # API基本情報
+├── models: IRModel[]              # データモデル
+├── enums: IREnum[]                # 列挙型
+├── unions: IRUnion[]              # Union型
+├── services: IRService[]          # APIサービス（タグでグループ化）
+├── servers: IRServer[]            # サーバー情報
+└── security?: IRSecurityScheme[]  # セキュリティ定義
 ```
 
 ### 2.2 型の関係図
@@ -42,14 +42,14 @@ IntermediateRepresentation
            |
            | transform()
            ↓
-    IntermediateRepresentation
+    XcgenIR
            |
     ┌──────┴──────┬──────────┬──────────┐
     ↓             ↓          ↓          ↓
-  Models       Enums     Services   Unions
+  IRModels    IREnums    IRServices  IRUnions
     |            |          |          |
-    ├─Property   └─EnumValue├─Endpoint └─ResolvedType
-    └─ResolvedType          └─Parameter
+    ├─IRProperty └─IREnumValue├─IREndpoint └─IRResolvedType
+    └─IRResolvedType        └─IRParameter
          ↑                       ↑
          └───────────────────────┘
               (型の参照)
@@ -57,17 +57,17 @@ IntermediateRepresentation
 
 ### 2.3 主要な型定義
 
-#### IntermediateRepresentation
+#### XcgenIR
 
 ```typescript
-export interface IntermediateRepresentation {
-  metadata: APIMetadata;
-  models: Model[];
-  enums: Enum[];
-  unions: UnionType[];
-  services: Service[];
-  servers: Server[];
-  security?: SecurityScheme[];
+export interface XcgenIR {
+  metadata: IRMetadata;
+  models: IRModel[];
+  enums: IREnum[];
+  unions: IRUnion[];
+  services: IRService[];
+  servers: IRServer[];
+  security?: IRSecurityScheme[];
 }
 ```
 
@@ -76,10 +76,10 @@ export interface IntermediateRepresentation {
 - フラットな構造で各生成器がアクセスしやすい
 - componentsの階層構造を排除
 
-#### ResolvedType
+#### IRResolvedType
 
 ```typescript
-export interface ResolvedType {
+export interface IRResolvedType {
   kind: 'primitive' | 'model' | 'enum' | 'array' | 'map' | 'union' | 'any';
   
   // primitive
@@ -92,9 +92,9 @@ export interface ResolvedType {
   unionName?: string;
   
   // complex
-  arrayType?: ResolvedType;
-  mapValueType?: ResolvedType;
-  unionTypes?: ResolvedType[];
+  arrayType?: IRResolvedType;
+  mapValueType?: IRResolvedType;
+  unionTypes?: IRResolvedType[];
 }
 ```
 
@@ -111,15 +111,15 @@ export interface ResolvedType {
 ```
 1. Components探索（Phase 1）
    └─→ schemas配下を巡回
-       ├─→ enum配列あり → Enum抽出
-       ├─→ oneOf/anyOf → UnionType抽出
-       └─→ type: object → Model抽出
+       ├─→ enum配列あり → IREnum抽出
+       ├─→ oneOf/anyOf → IRUnion抽出
+       └─→ type: object → IRModel抽出
 
 2. Paths探索（Phase 2）
    └─→ 各パスのoperationを巡回
-       ├─→ tagsでグループ化 → Service作成
-       ├─→ 各operation → Endpoint作成
-       └─→ インラインスキーマ検出 → 一意の名前を生成してModel作成
+       ├─→ tagsでグループ化 → IRService作成
+       ├─→ 各operation → IREndpoint作成
+       └─→ インラインスキーマ検出 → 一意の名前を生成してIRModel作成
            ├─→ requestBodyのインラインオブジェクト
            ├─→ responsesのインラインオブジェクト
            └─→ ネストされたインラインオブジェクト（再帰的に探索）
@@ -127,7 +127,7 @@ export interface ResolvedType {
 3. 型解決
    └─→ $refを見つけたら
        ├─→ コンポーネント名を抽出（例: "#/components/schemas/Pet" → "Pet"）
-       └─→ ResolvedTypeに名前を設定（modelName: "Pet"）
+       └─→ IRResolvedTypeに名前を設定（modelName: "Pet"）
 ```
 
 ### 3.2 $ref解決の実装
@@ -153,14 +153,14 @@ private resolveRef(ref: string): { name: string, type: 'model' | 'enum' | 'union
 ```typescript
 // OK: 名前による参照なので問題なし
 interface User {
-  friends: ResolvedType; // { kind: 'array', arrayType: { kind: 'model', modelName: 'User' } }
+  friends: IRResolvedType; // { kind: 'array', arrayType: { kind: 'model', modelName: 'User' } }
 }
 ```
 
 #### discriminator
 
 ```typescript
-interface UnionType {
+interface IRUnion {
   discriminator?: string; // 判別子プロパティ名
 }
 // oneOfでdiscriminatorが指定されている場合に設定
@@ -192,10 +192,10 @@ interface UnionType {
 
 ```typescript
 class Transformer {
-  private componentModels: Map<string, Model> = new Map();
-  private inlineModels: Map<string, Model> = new Map();
+  private componentModels: Map<string, IRModel> = new Map();
+  private inlineModels: Map<string, IRModel> = new Map();
   
-  transform(doc: OpenAPIDocument): IntermediateRepresentation {
+  transform(doc: OpenAPIDocument): XcgenIR {
     // Phase 1: Components探索
     this.extractComponentModels(doc.components);
     
@@ -327,11 +327,11 @@ private ensureUniqueName(baseName: string): string {
 
 ```typescript
 // packages/core/src/types/ir.ts
-export interface IntermediateRepresentation {
-  models: Model[];
+export interface XcgenIR {
+  models: IRModel[];
 }
 
-export interface Model {
+export interface IRModel {
   name: string;
 }
 ```
@@ -339,12 +339,12 @@ export interface Model {
 ### Step 2: 基本的な変換（TDD Green）
 
 ```typescript
-export interface Model {
+export interface IRModel {
   name: string;
-  properties: Property[];
+  properties: IRProperty[];
 }
 
-export interface Property {
+export interface IRProperty {
   name: string;
   type: string; // 最初はシンプルに
   required: boolean;
@@ -353,9 +353,9 @@ export interface Property {
 
 ### Step 3: 完全な実装（TDD Refactor）
 
-- ResolvedType導入
-- Enum/Union追加
-- Service/Endpoint追加
+- IRResolvedType導入
+- IREnum/IRUnion追加
+- IRService/IREndpoint追加
 - バリデーション情報追加
 
 ## 5. テスト戦略
@@ -388,7 +388,7 @@ test('should create transformer', () => {
 });
 ```
 
-#### Task 5.2: Model抽出
+#### Task 5.2: IRModel抽出
 
 ```typescript
 test('should extract models', () => {
@@ -401,9 +401,9 @@ test('should extract models', () => {
 
 #### Task 5.3-5.7: 各機能のテスト
 
-- Enum抽出テスト
-- Union型テスト
-- Service/Endpoint抽出テスト
+- IREnum抽出テスト
+- IRUnion型テスト
+- IRService/IREndpoint抽出テスト
 - 型解決テスト
 - 依存関係解析テスト
 
@@ -522,25 +522,25 @@ test('should transform complete OpenAPI document', () => {
   - [ ] クラス作成
   - [ ] 空のtransform()メソッド
 
-- [ ] Task 5.2: Model抽出
+- [ ] Task 5.2: IRModel抽出
   - [ ] components.schemas巡回
-  - [ ] Model型への変換
+  - [ ] IRModel型への変換
 
-- [ ] Task 5.3: Enum抽出
+- [ ] Task 5.3: IREnum抽出
   - [ ] enum配列の検出
-  - [ ] Enum型への変換
+  - [ ] IREnum型への変換
 
-- [ ] Task 5.4: Union型抽出
+- [ ] Task 5.4: IRUnion型抽出
   - [ ] oneOf/anyOf検出
-  - [ ] UnionType作成
+  - [ ] IRUnion作成
 
-- [ ] Task 5.5: Service/Endpoint抽出
+- [ ] Task 5.5: IRService/IREndpoint抽出
   - [ ] paths巡回
   - [ ] tagsによるグループ化
 
 - [ ] Task 5.6: 型解決
   - [ ] $ref解決ロジック
-  - [ ] ResolvedType完全実装
+  - [ ] IRResolvedType完全実装
 
 - [ ] Task 5.7: 依存関係解析
   - [ ] imports配列生成
