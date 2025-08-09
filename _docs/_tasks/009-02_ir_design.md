@@ -35,6 +35,16 @@ XcgenIR
 └── security?: IRSecurityScheme[]  # セキュリティ定義
 ```
 
+#### ファイル構造（実装済み）
+
+```
+packages/core/src/types/ir/
+├── index.ts      # XcgenIRと全型の再エクスポート
+├── data.ts       # データモデル関連（IRModel, IREnum, IRUnion, IRType等）
+├── api.ts        # API関連（IRService, IREndpoint, IRParameter等）
+└── config.ts     # 設定関連（IRMetadata, IRServer, IRSecurityScheme等）
+```
+
 ### 2.2 型の関係図
 
 ```
@@ -48,11 +58,11 @@ XcgenIR
     ↓             ↓          ↓          ↓
   IRModels    IREnums    IRServices  IRUnions
     |            |          |          |
-    ├─IRProperty └─IREnumValue├─IREndpoint └─IRResolvedType
-    └─IRResolvedType        └─IRParameter
+    ├─IRProperty └─IREnumValue├─IREndpoint └─IRType
+    └─IRType               └─IRParameter
          ↑                       ↑
          └───────────────────────┘
-              (型の参照)
+              (型の参照: IRRef)
 ```
 
 ### 2.3 主要な型定義
@@ -76,32 +86,52 @@ export interface XcgenIR {
 - フラットな構造で各生成器がアクセスしやすい
 - componentsの階層構造を排除
 
-#### IRResolvedType
+#### IRType（判別共用体）
 
 ```typescript
-export interface IRResolvedType {
-  kind: 'primitive' | 'model' | 'enum' | 'array' | 'map' | 'union' | 'any';
-  
-  // primitive
-  primitive?: 'string' | 'number' | 'integer' | 'boolean' | 'null';
+// プリミティブ型
+export interface IRPrimitive {
+  kind: "primitive";
+  type: "string" | "number" | "integer" | "boolean";
   format?: string;
-  
-  // references (名前で参照)
-  modelName?: string;
-  enumName?: string;
-  unionName?: string;
-  
-  // complex
-  arrayType?: IRResolvedType;
-  mapValueType?: IRResolvedType;
-  unionTypes?: IRResolvedType[];
+  nullable?: boolean;
 }
+
+// 型への参照（統一）
+export interface IRRef {
+  kind: "ref";
+  name: string;  // "User", "Status", "Pet" など
+  nullable?: boolean;
+}
+
+// 配列型
+export interface IRArray {
+  kind: "array";
+  itemType: IRType;
+  nullable?: boolean;
+}
+
+// マップ型
+export interface IRMap {
+  kind: "map";
+  valueType: IRType;
+  nullable?: boolean;
+}
+
+// any型
+export interface IRAny {
+  kind: "any";
+  nullable?: boolean;
+}
+
+// 判別共用体
+export type IRType = IRPrimitive | IRRef | IRArray | IRMap | IRAny;
 ```
 
 **設計理由**:
 
-- `kind`による判別でTypeScriptの型ナローイングを活用
-- 名前による参照で循環参照を回避
+- 判別共用体（discriminated union）で型安全性を向上
+- IRRefで全ての参照を統一（探索時に実際の型を判別）
 - 再帰的な型定義で複雑な型も表現可能
 
 ## 3. 変換ロジック設計
@@ -133,16 +163,24 @@ export interface IRResolvedType {
 ### 3.2 $ref解決の実装
 
 ```typescript
-private resolveRef(ref: string): { name: string, type: 'model' | 'enum' | 'union' } {
+private resolveRef(ref: string): IRRef {
   // "#/components/schemas/Pet" → "Pet"
-  const name = ref.split('/').pop();
+  const name = ref.split('/').pop()!;
   
-  // 名前から型を判別（事前にcomponents探索で収集済み）
-  if (this.models.has(name)) return { name, type: 'model' };
-  if (this.enums.has(name)) return { name, type: 'enum' };
-  if (this.unions.has(name)) return { name, type: 'union' };
+  // IRRefを返す（実際の型は探索時に判別）
+  return {
+    kind: "ref",
+    name: name
+  };
+}
+
+// 実際の型判別は別の箇所で実施
+private resolveRefType(name: string): 'model' | 'enum' | 'union' {
+  if (this.models.has(name)) return 'model';
+  if (this.enums.has(name)) return 'enum';
+  if (this.unions.has(name)) return 'union';
   
-  throw new Error(`Unknown reference: ${ref}`);
+  throw new Error(`Unknown reference: ${name}`);
 }
 ```
 
@@ -153,7 +191,7 @@ private resolveRef(ref: string): { name: string, type: 'model' | 'enum' | 'union
 ```typescript
 // OK: 名前による参照なので問題なし
 interface User {
-  friends: IRResolvedType; // { kind: 'array', arrayType: { kind: 'model', modelName: 'User' } }
+  friends: IRProperty; // type: { kind: 'array', itemType: { kind: 'ref', name: 'User' } }
 }
 ```
 
@@ -323,40 +361,60 @@ private ensureUniqueName(baseName: string): string {
 
 ## 4. 段階的実装計画
 
-### Step 1: 最小限のIR型（TDD Red）
+### Step 1: IR型定義 ✅ 完了
+
+**実装済みの主要な型**:
 
 ```typescript
-// packages/core/src/types/ir.ts
+// packages/core/src/types/ir/index.ts
 export interface XcgenIR {
+  metadata: IRMetadata;
   models: IRModel[];
+  enums: IREnum[];
+  unions: IRUnion[];
+  services: IRService[];
+  servers: IRServer[];
+  security?: IRSecurityScheme[];
 }
+
+// packages/core/src/types/ir/data.ts
+export type IRType = IRPrimitive | IRRef | IRArray | IRMap | IRAny;
 
 export interface IRModel {
   name: string;
-}
-```
-
-### Step 2: 基本的な変換（TDD Green）
-
-```typescript
-export interface IRModel {
-  name: string;
+  description?: string;
   properties: IRProperty[];
 }
 
 export interface IRProperty {
   name: string;
-  type: string; // 最初はシンプルに
+  description?: string;
+  type: IRType;
   required: boolean;
+  defaultValue?: unknown;
+  deprecated?: boolean;
+  validation?: IRValidation;
 }
 ```
 
-### Step 3: 完全な実装（TDD Refactor）
+### Step 2: Transformer基本構造（次の実装ステップ）
 
-- IRResolvedType導入
-- IREnum/IRUnion追加
-- IRService/IREndpoint追加
-- バリデーション情報追加
+```typescript
+// packages/core/src/transformer/openapi-transformer.ts
+export class OpenAPITransformer {
+  transform(doc: OpenAPIDocument): XcgenIR {
+    // TODO: 実装
+  }
+}
+```
+
+### Step 3: 今後の実装ステップ
+
+- [ ] Transformerクラスの実装
+- [ ] Components探索ロジック
+- [ ] Paths探索ロジック
+- [ ] インラインスキーマ抽出
+- [ ] 型解決ロジック
 
 ## 5. テスト戦略
 
@@ -513,10 +571,15 @@ test('should transform complete OpenAPI document', () => {
 
 ## 6. 実装チェックリスト
 
-- [ ] Task 5.0: IR型定義作成
-  - [ ] `src/types/ir.ts` 作成
-  - [ ] 基本的な型定義
-  - [ ] エクスポート設定
+- [x] Task 5.0: IR型定義作成 ✅ 完了
+  - [x] `src/types/ir/` ディレクトリ作成
+  - [x] `data.ts` - データモデル関連
+  - [x] `api.ts` - APIエンドポイント関連
+  - [x] `config.ts` - 設定・メタデータ関連
+  - [x] `index.ts` - 統合エクスポート
+  - [x] 判別共用体（IRType）の実装
+  - [x] type aliasの追加（MimeType, IRContentMap等）
+  - [x] インライン型の分離（IRContact, IRLicense等）
 
 - [ ] Task 5.1: Transformer基本構造
   - [ ] クラス作成
@@ -553,7 +616,24 @@ test('should transform complete OpenAPI document', () => {
   - [ ] 一意の名前生成ロジック
   - [ ] 名前の衝突回避処理
 
-## 7. 今後の拡張ポイント
+## 7. 実装済みの設計決定
+
+### 7.1 bundle()メソッドの採用
+
+- dereference()ではなくbundle()を使用
+- $refを保持し、コンポーネント名を保存
+
+### 7.2 判別共用体の採用
+
+- IRTypeを判別共用体として実装
+- 型安全性とコードの明確性を向上
+
+### 7.3 型の分離と整理
+
+- インライン型定義を独立した型に分離
+- Record型をtype aliasに変換（意図を明確化）
+
+## 8. 今後の拡張ポイント
 
 ### 7.1 追加可能な機能
 

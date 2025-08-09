@@ -52,26 +52,25 @@
 - bundle()メソッドで$refを内部参照として保持
 - Transformer内で必要に応じて解決
 
+### Phase 5: IR型定義 ✅ 完了
+
+| タスク | 実装ファイル | 備考 |
+|--------|------------|------|
+| Task 5.0: IR型定義 | `src/types/ir/index.ts`, `src/types/ir/data.ts`, `src/types/ir/api.ts`, `src/types/ir/config.ts` | 判別共用体として実装、IRRefで参照を統一、type alias追加 |
+
 ---
 
 ## 未実施タスク
 
-### Phase 5: Transformer実装（中間表現への変換）
+### Phase 6: Transformer実装（中間表現への変換）
 
-#### Task 5.0: IR型定義
-
-- **テストファイル**: なし（型定義のため）
-- **実装ファイル**: `packages/core/src/types/ir.ts`
-- **設計ドキュメント**: `_docs/_tasks/009-02_ir_design.md`
-- **実装内容**: XcgenIR及び関連型の定義
-
-#### Task 5.1: AdvancedTransformer - 基本構造
+#### Task 6.1: OpenAPITransformer - 基本構造
 
 - **テストファイル**: `packages/core/tests/transformer/basic.test.ts`
-- **実装ファイル**: `packages/core/src/transformer/index.ts`
+- **実装ファイル**: `packages/core/src/transformer/openapi-transformer.ts`
 - **テスト内容**: トランスフォーマーのインスタンス作成
 
-#### Task 5.2: IRModel抽出
+#### Task 6.2: IRModel抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-models.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
@@ -84,19 +83,19 @@
   expect(ir.models[0].properties).toHaveLength(2);
   ```
 
-#### Task 5.3: IREnum抽出
+#### Task 6.3: IREnum抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-enums.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
 - **テスト内容**: IREnum型の抽出と変換
 
-#### Task 5.4: IRUnion型抽出
+#### Task 6.4: IRUnion型抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-unions.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
 - **テスト内容**: oneOf/anyOfからIRUnion型を生成
 
-#### Task 5.5: IRService/IREndpoint抽出
+#### Task 6.5: IRService/IREndpoint抽出
 
 - **テストファイル**: `packages/core/tests/transformer/extract-services.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
@@ -109,7 +108,7 @@
   expect(ir.services[0].endpoints).toHaveLength(2);
   ```
 
-#### Task 5.6: 型解決
+#### Task 6.6: 型解決
 
 - **テストファイル**: `packages/core/tests/transformer/resolve-types.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
@@ -118,13 +117,13 @@
   - 配列型の解決
   - $ref参照の解決（コンポーネント名を保持）
 
-#### Task 5.7: 依存関係解析
+#### Task 6.7: 依存関係解析
 
 - **テストファイル**: `packages/core/tests/transformer/dependencies.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
 - **テスト内容**: モデル間の依存関係を解析してimports配列を生成
 
-#### Task 5.8: インラインスキーマ抽出
+#### Task 6.8: インラインスキーマ抽出
 
 - **テストファイル**: `packages/core/tests/transformer/inline-schemas.test.ts`
 - **実装ファイル**: `packages/core/src/transformer/index.ts`
@@ -135,15 +134,15 @@
   - 一意の名前生成（パス+メソッド or operationIdベース）
   - 名前の衝突回避
 
-### Phase 6: 統合とCLI
+### Phase 7: 統合とCLI
 
-#### Task 6.1: generateCode関数
+#### Task 7.1: generateCode関数
 
 - **テストファイル**: `packages/core/tests/generate.test.ts`
 - **実装ファイル**: `packages/core/src/index.ts`
 - **テスト内容**: エンドツーエンドの統合テスト
 
-#### Task 6.2: CLIコマンド実装
+#### Task 7.2: CLIコマンド実装
 
 - **テストファイル**: `packages/core/tests/cli/commands.test.ts`
 - **実装ファイル**: `packages/core/src/cli/commands.ts`

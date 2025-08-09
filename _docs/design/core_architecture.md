@@ -28,10 +28,10 @@ OpenAPI仕様書からTypeScript/Dartコードを生成するための、各コ�
 ┌─────────────────────────────────────────────────────────┐
 │              Transformation Layer                        │
 │  ┌─────────────────────────────────────────────────┐    │
-│  │   IntermediateRepresentation (Optimized for     │    │
-│  │                Code Generation)                  │    │
-│  │  - Fully resolved types (no $refs)              │    │
-│  │  - Flattened component lists                    │    │
+│  │         XcgenIR (Optimized for                  │    │
+│  │           Code Generation)                       │    │
+│  │  - IRRef for unified references                  │    │
+│  │  - Discriminated union types (IRType)            │    │
 │  │  - Services grouped by tags                     │    │
 │  │  - Complete dependency graph                    │    │
 │  └─────────────────────────────────────────────────┘    │
@@ -69,17 +69,17 @@ OpenAPI仕様書からTypeScript/Dartコードを生成するための、各コ�
 │  └──────────────────────────────────────────────────┘   │
 │                              ↓                            │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │              Advanced Transformer                 │   │
+│  │              OpenAPITransformer                   │   │
 │  │  - Extract Models, Enums, Unions from components  │   │
-│  │  - Resolve $refs while preserving names           │   │
+│  │  - Handle inline schemas with auto-naming         │   │
 │  │  - Group Services by Tags                         │   │
 │  │  - Analyze Dependencies                           │   │
 │  └──────────────────────────────────────────────────┘   │
 │                              ↓                            │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │         Intermediate Representation (IR)          │   │
+│  │            XcgenIR (Intermediate Representation)  │   │
 │  │  - Flat component lists                           │   │
-│  │  - Fully resolved types                           │   │
+│  │  - IRType with discriminated unions               │   │
 │  │  - Service-oriented structure                     │   │
 │  └──────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────┘
@@ -148,12 +148,12 @@ export function isOpenAPIV3_1Document(doc: OpenAPIDocument): doc is OpenAPIV3_1.
 }
 ```
 
-##### Layer 2: Intermediate Representation (コード生成用に最適化)
+##### Layer 2: XcgenIR (コード生成用に最適化)
 
 ```typescript
-// コード生成に特化した中間表現
-export interface IntermediateRepresentation {
-  metadata: APIMetadata;
+// packages/core/src/types/ir/index.ts
+export interface XcgenIR {
+  metadata: IRMetadata;
   
   // フラットなコンポーネントリスト（完全に解決済み）
   models: Model[];           // すべてのモデル定義

@@ -22,7 +22,45 @@ export type TagObject = OpenAPIV3_1.TagObject;
 
 // Re-export guard functions
 export {
-  isReferenceObject,
-  isOpenAPIV3Document,
   isOpenAPIV3_1Document,
+  isOpenAPIV3Document,
+  isReferenceObject,
 } from "./guards";
+
+// Re-export IR types
+export type {
+  IRAny,
+  IRApiKeyConfig,
+  IRArray,
+  IRContact,
+  IRContentMap,
+  IREndpoint,
+  IREnum,
+  IREnumValue,
+  IRHttpMethod,
+  IRLicense,
+  IRMap,
+  IRMetadata,
+  IRModel,
+  IROAuth2Flow,
+  IROAuth2Flows,
+  IROAuth2ScopeMap,
+  IRParameter,
+  IRPrimitive,
+  IRProperty,
+  IRRef,
+  IRRequestBody,
+  IRResponse,
+  IRResponseHeader,
+  IRResponseHeaderMap,
+  IRSecurityScheme,
+  IRServer,
+  IRServerVariable,
+  IRServerVariableMap,
+  IRService,
+  IRType,
+  IRUnion,
+  IRValidation,
+  MimeType,
+  XcgenIR,
+} from "./ir/index";

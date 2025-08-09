@@ -35,17 +35,30 @@ openapi-xcgen/
 **責務:**
 
 - OpenAPIドキュメントのパース（@apidevtools/swagger-parserのbundleメソッド使用）
+  - bundle()メソッドにより$refを内部参照として保持
+  - コンポーネント名を保存したままコード生成が可能
 - CLI基盤機能（cittyベース）
 - 共通ユーティリティ（文字列変換、ファイル書き込み等）
 - 再利用可能なCLIコマンド定義
-- 中間表現（IR）への変換
+- 中間表現（XcgenIR）への変換
 
 **主要なエクスポート:**
 
 ```typescript
 // パーサー（bundleメソッドで$refを内部参照として保持）
-export { parseOpenAPIDocument } from "./parser.js";
-// バリデーションは@apidevtools/swagger-parserが内部で実行
+export { OpenAPIParser } from "./parser/openapi-parser.js";
+
+// 中間表現（IR）型定義
+export type {
+  XcgenIR,
+  IRModel,
+  IREnum,
+  IRUnion,
+  IRService,
+  IREndpoint,
+  IRType,
+  // ... その他のIR型
+} from "./types/ir/index.js";
 
 // CLI基盤
 export { createGenerateCommand, createValidateCommand } from "./cli/commands.js";
@@ -54,6 +67,22 @@ export { writeGeneratedFiles, getPackageInfo } from "./cli/utils.js";
 // ユーティリティ
 export { toPascalCase, toCamelCase, toKebabCase } from "./utils/case.js";
 ```
+
+**中間表現（XcgenIR）の構造:**
+
+```typescript
+export interface XcgenIR {
+  metadata: IRMetadata;        // API基本情報
+  models: IRModel[];           // データモデル
+  enums: IREnum[];            // 列挙型
+  unions: IRUnion[];          // Union型
+  services: IRService[];      // APIサービス（タグでグループ化）
+  servers: IRServer[];        // サーバー情報
+  security?: IRSecurityScheme[]; // セキュリティ定義
+}
+```
+
+IR型は判別共用体（discriminated union）を採用し、型安全性を向上させています。
 
 ### @openapi-xcgen/generator-typescript
 
