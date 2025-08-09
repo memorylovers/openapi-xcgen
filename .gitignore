@@ -681,6 +681,7 @@ doc/api/
 ## Custom
 .claude/
 .claude/settings.local.json
+.serena/cache/
 
 # Turbo
 .turbo
