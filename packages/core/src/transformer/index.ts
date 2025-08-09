@@ -1,1 +1,1 @@
-export { transform } from "./openapi-transformer";
+export { transform } from "./transformer";

@@ -1,11 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { OpenAPIParser } from "../../src/parser";
+import { parse } from "../../src/parser";
 import { transform } from "../../src/transformer";
 
 describe("transform", () => {
   test("should transform OpenAPI document with complete structure", async () => {
-    const parser = new OpenAPIParser();
-    const doc = await parser.parse("./tests/fixtures/petstore.yaml");
+    const doc = await parse("./tests/fixtures/petstore.yaml");
     const result = transform(doc);
 
     // 構造の確認
