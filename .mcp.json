@@ -11,9 +11,7 @@
         "--context",
         "ide-assistant",
         "--enable-web-dashboard",
-        "False",
-        "--project",
-        "/Users/fujiuray/ghq-repos/github.com/memorylovers/openapi-xcgen"
+        "False"
       ],
       "env": {}
     }
