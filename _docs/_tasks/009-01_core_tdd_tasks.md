@@ -64,17 +64,20 @@
 
 ### Phase 6: Transformer実装（中間表現への変換）
 
-#### Task 6.1: OpenAPITransformer - 基本構造
+#### Task 6.1: OpenAPITransformer - 基本構造 ✅ 完了
 
 - **テストファイル**: `packages/core/tests/transformer/basic.test.ts`
-- **実装ファイル**: `packages/core/src/transformer/openapi-transformer.ts`
-- **テスト内容**: トランスフォーマーのインスタンス作成
+- **実装ファイル**: `packages/core/src/transformer/transformer.ts`（関数ベースで実装）
+- **テスト内容**: transform関数とmetadata抽出
+- **完了日**: 2025-08-10
+- **詳細**: [009-04_task6.1_transformer_impl.md](./009-04_task6.1_transformer_impl.md)
 
-#### Task 6.2: IRModel抽出
+#### Task 6.2: IRModel抽出 🚧 実施中
 
 - **テストファイル**: `packages/core/tests/transformer/extract-models.test.ts`
-- **実装ファイル**: `packages/core/src/transformer/index.ts`
+- **実装ファイル**: `packages/core/src/transformer/extractors/model-extractor.ts`
 - **テスト内容**: componentsからIRModel定義を抽出
+- **詳細**: [009-05_task6.2_model_extractor_impl.md](./009-05_task6.2_model_extractor_impl.md)
 
   ```typescript
   // 期待される動作
