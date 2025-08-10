@@ -29,8 +29,74 @@ describe("transform", () => {
       "https://opensource.org/licenses/MIT",
     );
 
-    // 空配列の初期化確認（将来実装される部分）
-    expect(result.models).toEqual([]);
+    // モデルの抽出確認
+    expect(result.models).toHaveLength(3);
+
+    // Pet model
+    expect(result.models[0]).toEqual({
+      name: "Pet",
+      description: undefined,
+      properties: [
+        {
+          name: "id",
+          type: { kind: "primitive", type: "integer", format: "int64" },
+          required: true,
+          description: undefined,
+        },
+        {
+          name: "name",
+          type: { kind: "primitive", type: "string", format: undefined },
+          required: true,
+          description: undefined,
+        },
+        {
+          name: "tag",
+          type: { kind: "primitive", type: "string", format: undefined },
+          required: false,
+          description: undefined,
+        },
+      ],
+    });
+
+    // NewPet model
+    expect(result.models[1]).toEqual({
+      name: "NewPet",
+      description: undefined,
+      properties: [
+        {
+          name: "name",
+          type: { kind: "primitive", type: "string", format: undefined },
+          required: true,
+          description: undefined,
+        },
+        {
+          name: "tag",
+          type: { kind: "primitive", type: "string", format: undefined },
+          required: false,
+          description: undefined,
+        },
+      ],
+    });
+
+    // Error model
+    expect(result.models[2]).toEqual({
+      name: "Error",
+      description: undefined,
+      properties: [
+        {
+          name: "code",
+          type: { kind: "primitive", type: "integer", format: "int32" },
+          required: true,
+          description: undefined,
+        },
+        {
+          name: "message",
+          type: { kind: "primitive", type: "string", format: undefined },
+          required: true,
+          description: undefined,
+        },
+      ],
+    });
     expect(result.enums).toEqual([]);
     expect(result.unions).toEqual([]);
     expect(result.services).toEqual([]);

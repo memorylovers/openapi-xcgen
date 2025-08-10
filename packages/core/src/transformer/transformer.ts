@@ -1,5 +1,5 @@
 import type { OpenAPIDocument, XcgenIR } from "../types";
-import { extractMetadata } from "./extractors";
+import { extractMetadata, extractModels } from "./extractors";
 
 /**
  * Transform OpenAPI document to XcgenIR
@@ -9,7 +9,7 @@ import { extractMetadata } from "./extractors";
 export function transform(doc: OpenAPIDocument): XcgenIR {
   return {
     metadata: extractMetadata(doc),
-    models: [],
+    models: extractModels(doc),
     enums: [],
     unions: [],
     services: [],
