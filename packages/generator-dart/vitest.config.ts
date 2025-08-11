@@ -4,9 +4,5 @@ export default defineProject({
   test: {
     globals: true,
     environment: "node",
-    includeSource: ["src/**/*.{ts,tsx}"],
-  },
-  define: {
-    "import.meta.vitest": "undefined",
   },
 });

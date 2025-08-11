@@ -4,9 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
+    // プロジェクトモードを有効化（workspace は非推奨）
+    projects: ["packages/*/vitest.config.ts"],
   },
-  // Uncomment to use workspace mode
-  // workspace: [
-  //   "packages/*/vitest.config.ts"
-  // ]
 });

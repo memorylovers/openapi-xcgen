@@ -1,13 +1,13 @@
-import { resolve } from "pathe";
+import { dirname } from "pathe";
 import { describe, expect, test } from "vitest";
 import { PARSER_ERROR_CODES } from "../../src/errors/codes";
 import { parse } from "../../src/parser";
 import { XcgenParserError } from "../../src/parser/error";
+import { FIXTURES } from "../utils/fixtures";
 
 describe("parse", () => {
   test("should parse valid OpenAPI YAML file", async () => {
-    const filePath = resolve(import.meta.dirname, "../fixtures/petstore.yaml");
-    const result = await parse(filePath);
+    const result = await parse(FIXTURES.PETSTORE);
 
     expect(result).toBeDefined();
     expect(result.openapi).toMatch(/^3\./);
@@ -18,8 +18,7 @@ describe("parse", () => {
   });
 
   test("should bundle with internal $ref pointers", async () => {
-    const filePath = resolve(import.meta.dirname, "../fixtures/petstore.yaml");
-    const result = await parse(filePath);
+    const result = await parse(FIXTURES.PETSTORE);
 
     // Check that internal references are preserved
     const paths = result.paths;
@@ -49,7 +48,7 @@ describe("parse", () => {
   });
 
   test("should throw XcgenParserError for non-existent file", async () => {
-    const filePath = resolve(import.meta.dirname, "../fixtures/not-exist.yaml");
+    const filePath = "/path/to/not-exist.yaml";
 
     await expect(parse(filePath)).rejects.toThrow(XcgenParserError);
     await expect(parse(filePath)).rejects.toThrow(
@@ -60,10 +59,8 @@ describe("parse", () => {
   });
 
   test("should throw XcgenParserError for invalid YAML syntax", async () => {
-    const filePath = resolve(import.meta.dirname, "../fixtures/invalid.yaml");
-
-    await expect(parse(filePath)).rejects.toThrow(XcgenParserError);
-    await expect(parse(filePath)).rejects.toThrow(
+    await expect(parse(FIXTURES.INVALID)).rejects.toThrow(XcgenParserError);
+    await expect(parse(FIXTURES.INVALID)).rejects.toThrow(
       expect.objectContaining({
         code: PARSER_ERROR_CODES.SYNTAX_ERROR,
       }),
@@ -71,17 +68,13 @@ describe("parse", () => {
   });
 
   test("should throw XcgenParserError for invalid OpenAPI format", async () => {
-    const invalidOpenAPIPath = resolve(
-      import.meta.dirname,
-      "../fixtures/invalid-openapi.yaml",
+    await expect(parse(FIXTURES.INVALID_OPENAPI)).rejects.toThrow(
+      XcgenParserError,
     );
-
-    await expect(parse(invalidOpenAPIPath)).rejects.toThrow(XcgenParserError);
   });
 
-  test("should handle relative paths", async () => {
-    const relativePath = "./tests/fixtures/petstore.yaml";
-    const result = await parse(relativePath);
+  test("should handle absolute paths", async () => {
+    const result = await parse(FIXTURES.PETSTORE);
 
     expect(result).toBeDefined();
     expect(result.info.title).toBe("Petstore API");
@@ -90,7 +83,7 @@ describe("parse", () => {
   test("should accept basePath option", async () => {
     const filePath = "petstore.yaml";
     const result = await parse(filePath, {
-      basePath: resolve(import.meta.dirname, "../fixtures"),
+      basePath: dirname(FIXTURES.PETSTORE),
     });
     expect(result).toBeDefined();
     expect(result.info.title).toBe("Petstore API");
