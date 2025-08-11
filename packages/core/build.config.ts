@@ -6,6 +6,9 @@ export default defineBuildConfig({
     emitCJS: true,
     esbuild: {
       minify: true,
+      define: {
+        "import.meta.vitest": "undefined",
+      },
     },
   },
   entries: ["src/index"],

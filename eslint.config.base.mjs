@@ -17,9 +17,13 @@ export default [
   js.configs.recommended,
   {
     files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
-    ignores: ["**/tests/**"],
+    ignores: ["**/tests/**/*.ts", "**/tests/**/*.tsx"],
     languageOptions: {
       parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
     },
     plugins: {
       "@typescript-eslint": typescript,
@@ -27,6 +31,41 @@ export default [
     },
     rules: {
       ...typescript.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "prettier/prettier": "error",
+    },
+  },
+  {
+    files: ["**/tests/**/*.ts", "**/tests/**/*.tsx"],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
+    plugins: {
+      "@typescript-eslint": typescript,
+      prettier: prettierPlugin,
+    },
+    rules: {
+      ...typescript.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": "error",
       "prettier/prettier": "error",
     },
   },

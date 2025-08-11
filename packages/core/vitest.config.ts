@@ -4,5 +4,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
+    includeSource: ["src/**/*.{ts,tsx}"],
+  },
+  define: {
+    "import.meta.vitest": "undefined",
   },
 });
