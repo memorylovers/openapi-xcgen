@@ -25,6 +25,48 @@ t-wada推奨のRed-Green-Refactorサイクルに従う：
 2. **Green**: テストを通す最小限の実装
 3. **Refactor**: コードを改善（テストは常にGreen）
 
+### テスト戦略
+
+#### In-sourceテスティング
+
+実装とテストを同じファイルに配置し、`import.meta.vitest`を使用：
+
+```typescript
+// src/transformer/helpers/is-primitive-type.ts
+export function isPrimitiveType(type: unknown): boolean {
+  return ["string", "number", "integer", "boolean"].includes(type as string);
+}
+
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+  
+  describe("isPrimitiveType", () => {
+    it("should return true for primitive types", () => {
+      expect(isPrimitiveType("string")).toBe(true);
+    });
+  });
+}
+```
+
+#### 外部依存のモック化
+
+```typescript
+// consolaのモック化例
+const { vi } = import.meta.vitest;
+
+it("should warn for invalid types", () => {
+  const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+  
+  const result = visitPrimitive({ type: "array" });
+  
+  expect(result).toBe(null);
+  expect(warnSpy).toHaveBeenCalledWith("Invalid type for primitive visitor: array");
+  
+  warnSpy.mockRestore(); // クリーンアップ
+});
+```
+
 ### 実装アプローチ
 
 - 外側から内側へ（インターフェースから実装詳細へ）
@@ -88,6 +130,62 @@ pnpm lint:fix    # Lintエラーの自動修正
 - インポートパスは`.js`拡張子を使用（ESM対応）
 - エラーメッセージは具体的で実行可能な内容にする
 
+### 命名規約
+
+#### 関数命名
+
+- **Visitor関数**: `visit〇〇` (例: `visitPrimitive`, `visitType`)
+- **Helper関数**: 動詞で始まる (例: `isPrimitiveType`, `extractRefName`)
+- **変換関数**: `〇〇To△△` (例: `schemaToIR`)
+
+#### ファイル命名
+
+- **Visitor**: `〇〇-visitor.ts` (例: `primitive-visitor.ts`)
+- **Helper**: 機能を表す動詞句 (例: `is-primitive-type.ts`)
+- kebab-caseを使用
+
+#### 型定義
+
+- **インターフェース**: `I〇〇` は使わず、素直な名前 (例: `SchemaObject`)
+- **型エイリアス**: 互換性のための拡張時は`With〇〇` (例: `SchemaObjectWithNullable`)
+- **IR型**: `IR〇〇` プレフィックス (例: `IRPrimitive`, `IRType`)
+
+#### ドキュメントコメント
+
+```typescript
+/**
+ * プリミティブ型のSchemaObjectをIRPrimitiveに変換
+ * @param schema - 変換対象のスキーマ
+ * @returns IRPrimitive型の結果、無効な場合はnull
+ * 
+ * @example OpenAPI YAML
+ * ```yaml
+ * name:
+ *   type: string
+ * ```
+ */
+```
+
+### エラーハンドリング戦略
+
+- **例外を投げない**: `throw`の代わりに`consola.warn`で警告を出し、`null`を返す
+- **エラーメッセージ**: "Invalid"を使用（"Expected"より明確で実行可能）
+- **null伝播**: 下位のvisitorが`null`を返した場合、上位も`null`を返す
+- **戻り値の型**: Visitor関数は`IRType | null`のようなnull許容型を返す
+
+```typescript
+// ❌ Bad: 例外を投げる
+if (!isPrimitiveType(schema.type)) {
+  throw new Error(`Expected primitive type, got: ${schema.type}`);
+}
+
+// ✅ Good: 警告とnull返却
+if (!isPrimitiveType(schema.type)) {
+  consola.warn(`Invalid type for primitive visitor: ${schema.type}`);
+  return null;
+}
+```
+
 ## プロジェクト要件
 
 ### 環境要件
@@ -112,11 +210,20 @@ packages/
 │   │   ├── parser/           # OpenAPIパーサー
 │   │   │   └── parser.ts     # parse()関数
 │   │   ├── transformer/      # IR変換器
-│   │   │   ├── transformer.ts
-│   │   │   └── extractors/   # 機能別抽出器
+│   │   │   ├── visitors/     # Visitorパターン実装（1非終端記号1ファイル）
+│   │   │   │   ├── primitive-visitor.ts  # プリミティブ型処理
+│   │   │   │   ├── type-visitor.ts       # 汎用型解決
+│   │   │   │   └── ...                   # その他のvisitor
+│   │   │   ├── helpers/      # 共通ヘルパー関数（1関数1ファイル）
+│   │   │   │   ├── is-primitive-type.ts  # プリミティブ型判定
+│   │   │   │   ├── extract-ref-name.ts   # $ref名抽出
+│   │   │   │   └── ...                   # その他のヘルパー
+│   │   │   ├── context.ts    # Visitorコンテキスト管理
+│   │   │   ├── types.ts      # Visitor型定義
+│   │   │   └── index.ts      # エクスポート
 │   │   └── types/
 │   │       └── ir/           # 中間表現型定義
-│   └── tests/                # Vitestテスト
+│   └── tests/                # 統合テストのみ（単体テストはin-source）
 ├── generator-typescript/      # TypeScript生成器
 └── generator-dart/           # Dart生成器
 ```

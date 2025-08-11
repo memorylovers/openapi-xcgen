@@ -77,13 +77,163 @@ packages/core/src/transformer/
 └── index.ts
 ```
 
+## ファイル設計方針
+
+### 基本原則：責任の粒度による分類
+
+#### Visitor層（1非終端記号1ファイル）
+
+```
+visitors/
+├── schema-visitor.ts         # <schema-object>の処理
+├── primitive-visitor.ts      # プリミティブ型特化処理
+├── array-visitor.ts          # <array-schema>の処理
+├── object-visitor.ts         # <object-schema>の処理
+├── reference-visitor.ts      # <reference-object>の処理
+└── ...
+```
+
+**設計理由**：
+
+- BNF非終端記号 = 1つの責任単位
+- OpenAPI仕様書の構造と1:1で対応
+- 関連する処理をまとめて凝集度を高める
+- 仕様書を読みながらコードを理解しやすい
+
+#### Helper層（1関数1ファイル）
+
+```
+helpers/
+├── is-primitive-type.ts      # プリミティブ型判定
+├── extract-ref-name.ts       # $ref名抽出
+├── to-upper-snake-case.ts    # enum値変換
+├── extract-name.ts           # パスから名前抽出
+└── ...
+```
+
+**設計理由**：
+
+- 複数のvisitorから使われる汎用関数
+- 単一責任で純粋関数として実装
+- Tree-shaking効率の最大化
+- 個別にテスト・再利用可能
+
+### ファイル構造のパターン
+
+#### Visitorファイルの構造
+
+```typescript
+// visitors/schema-visitor.ts
+
+// 型定義（必要に応じて）
+type SchemaVisitorOptions = { ... };
+
+/**
+ * <schema-object>を処理するvisitor関数
+ * @param schema - OpenAPI SchemaObject
+ * @param context - Visitor実行コンテキスト
+ * @returns IRType型の結果
+ */
+export function visitSchema(
+  schema: SchemaObject | ReferenceObject,
+  context: VisitorContext
+): VisitorResult<IRType> {
+  // メイン処理
+}
+
+// visitor固有のヘルパー（外部公開しない）
+function handlePrimitiveSchema(schema: SchemaObject): IRPrimitive {
+  // schema-visitor専用の処理
+}
+
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+  
+  describe("visitSchema", () => {
+    // visitSchemaのテスト
+  });
+  
+  describe("handlePrimitiveSchema", () => {
+    // 内部関数のテストも可能
+  });
+}
+```
+
+#### Helperファイルの構造
+
+```typescript
+// helpers/is-primitive-type.ts
+
+/**
+ * プリミティブ型かどうかを判定
+ * @param type - 判定対象の型
+ * @returns プリミティブ型の場合true
+ */
+export function isPrimitiveType(type: unknown): boolean {
+  return ["string", "number", "integer", "boolean"].includes(type as string);
+}
+
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+  
+  describe("isPrimitiveType", () => {
+    it("should return true for primitive types", () => {
+      expect(isPrimitiveType("string")).toBe(true);
+      expect(isPrimitiveType("number")).toBe(true);
+      expect(isPrimitiveType("integer")).toBe(true);
+      expect(isPrimitiveType("boolean")).toBe(true);
+    });
+    
+    it("should return false for non-primitive types", () => {
+      expect(isPrimitiveType("array")).toBe(false);
+      expect(isPrimitiveType("object")).toBe(false);
+      expect(isPrimitiveType(undefined)).toBe(false);
+    });
+  });
+}
+```
+
+### テスト戦略の変更
+
+#### in-source testingを基本とする
+
+- 実装とテストを同じファイルに配置
+- `if (import.meta.vitest)`ブロックでテストを記述
+- 変更時にテストの見落としを防ぐ
+- コードとテストの一貫性を保つ
+
+#### 外部テストファイルは統合テストのみ
+
+- `tests/transformer/integration/`に配置
+- 複数のvisitorを組み合わせた動作確認
+- 実際のOpenAPIドキュメントを使用したE2Eテスト
+
+### メリット
+
+1. **明確な責任分離**: ファイル名から機能が明確
+2. **保守性向上**: 変更箇所が限定的で影響範囲が明確
+3. **Tree-shaking最適化**: 必要な関数のみインポート可能
+4. **テストの局所性**: コードとテストが同じ場所
+5. **仕様との対応**: BNF仕様書とコードが1:1対応
+
 ## TDD実装計画
+
+### 実装済みファイル
+
+✅ **完了済み**:
+
+- `src/transformer/visitors/primitive-visitor.ts` - プリミティブ型処理
+- `src/transformer/visitors/type-visitor.ts` - 汎用型解決（null返却対応）
+- `src/transformer/helpers/is-primitive-type.ts` - プリミティブ型判定
+- `src/transformer/helpers/extract-ref-name.ts` - $ref名抽出
 
 ### Phase 1: Schema Object処理（Day 1-3）
 
 最も基礎となるSchema Objectから開始（JSON Schema 2020-12準拠）。
 
-#### Step 1: プリミティブ型（Red → Green → Refactor）
+#### Step 1: プリミティブ型（Red → Green → Refactor） ✅ 完了
 
 ```typescript
 // Red: テストファースト
@@ -786,6 +936,47 @@ packages/core/tests/transformer/
 ```
 
 ## 実装時の注意点
+
+### エラーハンドリング戦略
+
+#### null返却パターン
+
+Visitor関数は例外を投げずに、警告とnull返却で対応：
+
+```typescript
+export function visitPrimitive(
+  schema: SchemaObjectWithNullable,
+): IRPrimitive | null {  // null許容型
+  if (!isPrimitiveType(schema.type)) {
+    consola.warn(`Invalid type for primitive visitor: ${schema.type}`);
+    return null;  // 例外ではなくnullを返す
+  }
+  // 正常処理...
+}
+```
+
+#### null伝播
+
+下位のvisitorがnullを返した場合、上位も適切にnullを伝播：
+
+```typescript
+export function visitType(schema: SchemaObjectWithNullable): IRType | null {
+  if (schema.type === "array" && schema.items) {
+    const itemType = visitType(schema.items);
+    if (itemType === null) {
+      return null;  // 配列の要素型が無効な場合は全体もnull
+    }
+    return { kind: "array", itemType } as IRArray;
+  }
+  // ...
+}
+```
+
+#### エラーメッセージの設計
+
+- **明確性**: "Invalid"を使用（"Expected"より実行可能）
+- **文脈情報**: どのvisitorで、どんな値が問題かを明示
+- **実行可能**: ユーザーが何をすべきか理解できる内容
 
 ### 循環参照の処理
 
