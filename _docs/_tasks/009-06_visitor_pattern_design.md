@@ -1,11 +1,26 @@
-# Task 009-06: 関数ベースVisitorパターンによる実装設計
+# Task 009-06: Visitorパターンによるtransformer実装（TDD）
 
 ## 概要
 
-OpenAPIドキュメントのトラバース処理を、関数ベースのVisitorパターンで新規設計する。
-現在のパーサーコンビネータ方式とは独立した、代替アプローチとして設計。
+OpenAPIドキュメント（parser出力）を中間表現（IR）に変換するtransformerレイヤーを、関数ベースのVisitorパターンとTDD（Test-Driven Development）で実装する。
+
+### 位置づけ
+
+- **レイヤー**: `packages/core/src/transformer/`として実装
+- **入力**: OpenAPIDocument（parserの出力、$ref保持）
+- **出力**: XcgenIR（中間表現）
+- **準拠**: OpenAPI v3.1 / JSON Schema 2020-12
 
 ## 設計原則
+
+### 開発手法
+
+- **TDD（Test-Driven Development）**: Red-Green-Refactorサイクル
+  1. **Red**: 失敗するテストを書く
+  2. **Green**: テストを通す最小限の実装
+  3. **Refactor**: コードを改善（テストは常にGreen）
+
+### アーキテクチャ原則
 
 - **Tree-shaking対応**: クラスを使用せず、関数ベースで実装
 - **純粋関数**: 副作用なし、同じ入力で同じ出力を保証
@@ -13,359 +28,630 @@ OpenAPIドキュメントのトラバース処理を、関数ベースのVisitor
 - **型安全性**: TypeScriptの型システムを最大限活用
 - **テスタビリティ**: 各Visitor関数を独立してテスト可能
 
-## アーキテクチャ設計
+## OpenAPI v3.1準拠のディレクトリ構造
 
-### 1. 型定義
+### 設計原則：非終端記号 = Visitor
 
-```typescript
-// Visitor Context - トラバース中の状態を管理
-interface VisitorContext {
-  path: string[];          // 現在のパス（例: ["components", "schemas", "User"]）
-  parent?: SchemaObject;   // 親スキーマ
-  root: OpenAPIDocument;   // ルートドキュメント
-  visited: Set<string>;    // 訪問済みの$refを記録（循環参照対策）
-}
+BNF仕様の各非終端記号に対して1つのVisitorファイルを対応させるフラットな構造。
 
-// Visitor Result - 訪問結果
-type VisitorResult<T> = {
-  value: T;
-  continue: boolean;  // トラバースを続けるか
-  children?: T[];     // 子要素の結果
-};
-
-// Schema Visitor - スキーマ訪問関数
-type SchemaVisitor<T> = (
-  schema: SchemaObject | ReferenceObject,
-  context: VisitorContext
-) => VisitorResult<T> | null;
-
-// Document Visitor - ドキュメント全体の訪問関数
-type DocumentVisitor<T> = {
-  enterDocument?: (doc: OpenAPIDocument) => T;
-  exitDocument?: (doc: OpenAPIDocument, results: T[]) => T;
-  
-  enterSchema?: SchemaVisitor<T>;
-  exitSchema?: SchemaVisitor<T>;
-  
-  enterProperty?: (name: string, schema: SchemaObject, ctx: VisitorContext) => T;
-  exitProperty?: (name: string, schema: SchemaObject, results: T[], ctx: VisitorContext) => T;
-  
-  visitReference?: (ref: string, ctx: VisitorContext) => T;
-  visitPrimitive?: (type: string, format?: string, ctx: VisitorContext) => T;
-  visitArray?: (items: SchemaObject, ctx: VisitorContext) => T;
-};
+```
+packages/core/src/transformer/
+├── types.ts                        # Visitor型定義
+├── context.ts                      # Context管理
+├── traverser.ts                    # トラバース関数
+├── visitors/
+│   ├── openapi-visitor.ts          # <openapi-object>
+│   ├── info-visitor.ts             # <info-object>
+│   ├── servers-visitor.ts          # <servers-array>
+│   ├── server-visitor.ts           # <server-object>
+│   ├── paths-visitor.ts            # <paths-object>
+│   ├── path-item-visitor.ts        # <path-item-object>
+│   ├── operation-visitor.ts        # <operation-object>
+│   ├── parameter-visitor.ts        # <parameter-object>
+│   ├── request-body-visitor.ts     # <request-body-object>
+│   ├── responses-visitor.ts        # <responses-object>
+│   ├── response-visitor.ts         # <response-object>
+│   ├── media-type-visitor.ts       # <media-type-object>
+│   ├── schema-visitor.ts           # <schema-object> ※統一
+│   ├── discriminator-visitor.ts    # <discriminator-object>
+│   ├── components-visitor.ts       # <components-object>
+│   ├── security-scheme-visitor.ts  # <security-scheme-object>
+│   ├── tags-visitor.ts             # <tags-array>
+│   ├── tag-visitor.ts              # <tag-object>
+│   ├── reference-visitor.ts        # <reference-object>
+│   └── index.ts
+│
+├── helpers/                        # 共通ヘルパー関数
+│   ├── type-resolver.ts           # 型解決ロジック
+│   ├── ref-extractor.ts           # $ref名抽出
+│   ├── validation-extractor.ts    # バリデーション情報抽出
+│   ├── enum-detector.ts           # enum検出・変換
+│   └── model-classifier.ts        # モデル/enum/union分類
+│
+├── combinators/                    # Visitor組み合わせユーティリティ
+│   ├── compose.ts                  # Visitor合成
+│   ├── filter.ts                   # フィルタリング
+│   └── map.ts                      # 結果変換
+│
+├── transformer.ts                  # メインエントリポイント
+└── index.ts
 ```
 
-### 2. トラバーサル関数
+## TDD実装計画
+
+### Phase 1: Schema Object処理（Day 1-3）
+
+最も基礎となるSchema Objectから開始（JSON Schema 2020-12準拠）。
+
+#### Step 1: プリミティブ型（Red → Green → Refactor）
 
 ```typescript
-// メイントラバース関数
-function traverseDocument<T>(
-  doc: OpenAPIDocument,
-  visitor: DocumentVisitor<T>
-): T[] {
-  const results: T[] = [];
-  const context: VisitorContext = {
-    path: [],
-    root: doc,
-    visited: new Set()
-  };
-  
-  // Document開始
-  if (visitor.enterDocument) {
-    results.push(visitor.enterDocument(doc));
-  }
-  
-  // components.schemasをトラバース
-  if (doc.components?.schemas) {
-    const schemaResults = traverseSchemas(doc.components.schemas, visitor, context);
-    results.push(...schemaResults);
-  }
-  
-  // Document終了
-  if (visitor.exitDocument) {
-    results.push(visitor.exitDocument(doc, results));
-  }
-  
-  return results;
+// Red: テストファースト
+// tests/transformer/schema/primitive.test.ts
+describe("visitPrimitive", () => {
+  it("should convert string schema to IRPrimitive", () => {
+    const schema: SchemaObject = { type: "string" };
+    const result = visitPrimitive(schema);
+    expect(result).toEqual({
+      kind: "primitive",
+      type: "string"
+    });
+  });
+});
+
+// Green: 最小限の実装
+// src/transformer/visitors/schema/type-resolver.ts
+export function visitPrimitive(schema: SchemaObject): IRPrimitive {
+  return { kind: "primitive", type: schema.type as any };
 }
 
-// スキーマトラバース関数
-function traverseSchema<T>(
-  schema: SchemaObject | ReferenceObject,
-  visitor: DocumentVisitor<T>,
+// Refactor: format対応、nullable対応などを追加
+```
+
+#### Step 2: format付きプリミティブ
+
+```typescript
+// Red
+it("should handle format property", () => {
+  const schema: SchemaObject = { 
+    type: "string", 
+    format: "email" 
+  };
+  const result = visitPrimitive(schema);
+  expect(result).toEqual({
+    kind: "primitive",
+    type: "string",
+    format: "email"
+  });
+});
+```
+
+#### Step 3: $ref参照
+
+```typescript
+// Red
+it("should resolve $ref to IRRef", () => {
+  const schema: ReferenceObject = { 
+    $ref: "#/components/schemas/User" 
+  };
+  const result = resolveType(schema);
+  expect(result).toEqual({
+    kind: "ref",
+    name: "User"
+  });
+});
+```
+
+#### Step 4: 配列型
+
+```typescript
+// Red
+it("should handle array type", () => {
+  const schema: SchemaObject = {
+    type: "array",
+    items: { type: "string" }
+  };
+  const result = resolveType(schema);
+  expect(result).toEqual({
+    kind: "array",
+    items: {
+      kind: "primitive",
+      type: "string"
+    }
+  });
+});
+```
+
+### Phase 2: Components.schemas処理（Day 4-6）
+
+#### Step 5: Components処理
+
+```typescript
+// Red
+describe("components-visitor", () => {
+  it("should extract models from components.schemas", () => {
+    const components: ComponentsObject = {
+      schemas: {
+        User: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            name: { type: "string" }
+          },
+          required: ["id"]
+        }
+      }
+    };
+    const result = visitComponents(components, createContext());
+    expect(result.models).toHaveLength(1);
+    expect(result.models[0]).toEqual({
+      name: "User",
+      properties: [
+        { name: "id", type: { kind: "primitive", type: "integer" }, required: true },
+        { name: "name", type: { kind: "primitive", type: "string" }, required: false }
+      ]
+    });
+  });
+});
+
+// Green: visitComponents実装
+// src/transformer/visitors/components-visitor.ts
+export function visitComponents(
+  components: ComponentsObject,
   context: VisitorContext
-): T | null {
-  // $ref処理
-  if (isReferenceObject(schema)) {
-    if (visitor.visitReference) {
-      return visitor.visitReference(schema.$ref, context);
-    }
-    return null;
-  }
+): ComponentsResult {
+  const result = {
+    models: [],
+    enums: [],
+    unions: []
+  };
   
-  // スキーマ開始
-  let result: T | null = null;
-  if (visitor.enterSchema) {
-    const visitorResult = visitor.enterSchema(schema, context);
-    if (visitorResult && !visitorResult.continue) {
-      return visitorResult.value;
-    }
-    result = visitorResult?.value ?? null;
-  }
-  
-  // 型別処理
-  switch (schema.type) {
-    case "object":
-      if (schema.properties && visitor.enterProperty) {
-        const propResults = traverseProperties(schema.properties, visitor, context);
-        // 結果を集約
-      }
-      break;
+  if (components.schemas) {
+    Object.entries(components.schemas).forEach(([name, schema]) => {
+      const schemaContext = {
+        ...context,
+        path: [...context.path, 'components', 'schemas', name]
+      };
       
-    case "array":
-      if (schema.items && visitor.visitArray) {
-        result = visitor.visitArray(schema.items, context);
-      }
-      break;
+      const schemaResult = visitSchema(schema, schemaContext);
       
-    case "string":
-    case "number":
-    case "integer":
-    case "boolean":
-      if (visitor.visitPrimitive) {
-        result = visitor.visitPrimitive(schema.type, schema.format, context);
-      }
-      break;
-  }
-  
-  // スキーマ終了
-  if (visitor.exitSchema) {
-    const visitorResult = visitor.exitSchema(schema, context);
-    result = visitorResult?.value ?? result;
+      // 結果を適切な配列に振り分け（helpers/model-classifier.ts）
+      classifySchemaResult(schemaResult.value, name, result);
+    });
   }
   
   return result;
 }
 ```
 
-### 3. Visitor関数の実装例
+#### Step 6: Enum定義
 
 ```typescript
-// モデル抽出Visitor
-const modelExtractorVisitor: DocumentVisitor<IRModel | null> = {
-  enterSchema: (schema, context) => {
-    // object型のスキーマをモデルとして抽出
-    if (schema.type === "object" && context.path.length > 0) {
-      const modelName = context.path[context.path.length - 1];
-      return {
-        value: {
-          name: modelName,
-          description: schema.description,
-          properties: []
-        },
-        continue: true  // プロパティも処理
-      };
-    }
-    return { value: null, continue: true };
-  },
+// Red
+it("should extract enum from schema with enum property", () => {
+  const schema: SchemaObject = {
+    type: "string",
+    enum: ["pending", "approved", "rejected"]
+  };
+  const context = createContext({ 
+    path: ['components', 'schemas', 'Status'] 
+  });
+  const result = visitSchema(schema, context);
+  expect(result.value).toEqual({
+    kind: "enum",
+    name: "Status",
+    type: "string",
+    values: [
+      { name: "PENDING", value: "pending" },
+      { name: "APPROVED", value: "approved" },
+      { name: "REJECTED", value: "rejected" }
+    ]
+  });
+});
+
+// Green: helpers/enum-detector.ts に実装
+// src/transformer/helpers/enum-detector.ts
+export function detectEnum(
+  schema: SchemaObject,
+  name: string
+): IREnum | null {
+  if (!schema.enum) return null;
   
-  enterProperty: (name, schema, context) => {
-    // プロパティを抽出
-    return {
-      name,
-      type: resolveType(schema),
-      required: isRequired(name, context.parent),
-      description: schema.description
-    };
-  },
-  
-  visitReference: (ref, context) => {
-    // $ref参照を解決
-    return {
-      kind: "ref",
-      name: extractRefName(ref)
-    };
-  },
-  
-  visitPrimitive: (type, format) => {
-    // プリミティブ型を変換
-    return {
-      kind: "primitive",
-      type: mapPrimitiveType(type),
-      format
-    };
-  }
-};
-```
-
-## 実装ディレクトリ構造
-
-```
-packages/core/src/visitor/
-├── types.ts              # Visitor型定義
-├── traverser.ts          # トラバース関数
-├── context.ts            # Context管理
-├── visitors/
-│   ├── model-visitor.ts  # モデル抽出Visitor
-│   ├── type-visitor.ts   # 型解決Visitor
-│   ├── property-visitor.ts # プロパティ抽出Visitor
-│   └── index.ts
-├── combinators/          # Visitor組み合わせユーティリティ
-│   ├── compose.ts        # Visitor合成
-│   ├── filter.ts         # フィルタリング
-│   └── map.ts           # 結果変換
-└── index.ts
-```
-
-## 利点と特徴
-
-### 利点
-
-1. **デバッグの容易性**
-   - トラバースの流れが明確
-   - 各段階でのログ出力が簡単
-   - スタックトレースが追いやすい
-
-2. **拡張性**
-   - 新しいVisitor関数を追加しやすい
-   - 既存のVisitorを組み合わせて新機能を実現
-
-3. **保守性**
-   - 処理の流れが直感的
-   - 各Visitorの責任が明確
-   - テストが書きやすい
-
-4. **パフォーマンス**
-   - 不要なトラバースをスキップ可能（continueフラグ）
-   - 訪問済み管理で循環参照を効率的に処理
-
-### 現在の実装との比較
-
-| 項目 | パーサーコンビネータ | Visitorパターン |
-|------|---------------------|-----------------|
-| Tree-shaking | ◎ 優秀 | ◎ 優秀（関数ベース） |
-| デバッグ | △ 複雑 | ◎ 容易 |
-| 学習曲線 | △ 急 | ○ 緩やか |
-| 拡張性 | ○ 良好 | ◎ 優秀 |
-| テスト | ◎ 優秀 | ◎ 優秀 |
-| 型安全性 | ◎ 優秀 | ◎ 優秀 |
-
-## 実装ステップ
-
-### Phase 1: 基礎実装（1週間）
-
-- [ ] 型定義の作成
-- [ ] 基本的なトラバース関数
-- [ ] Contextの管理機能
-- [ ] ユニットテスト
-
-### Phase 2: Visitor実装（1週間）
-
-- [ ] モデル抽出Visitor
-- [ ] 型解決Visitor
-- [ ] プロパティ抽出Visitor
-- [ ] 統合テスト
-
-### Phase 3: 高度な機能（3日）
-
-- [ ] Visitor組み合わせユーティリティ
-- [ ] 循環参照対策
-- [ ] エラーハンドリング
-- [ ] パフォーマンステスト
-
-### Phase 4: 最適化（3日）
-
-- [ ] パフォーマンス最適化
-- [ ] メモリ使用量の最適化
-- [ ] ベンチマーク作成
-- [ ] ドキュメント作成
-
-## 実装ガイドライン
-
-### 1. ファイル構造
-
-- **1関数1ファイル原則**: 各Visitor関数は独立したファイルに実装
-- **index.tsでエクスポート**: 各ディレクトリのindex.tsで公開APIを管理
-- **明確な命名**: ファイル名は関数名と一致（kebab-case）
-
-### 2. テスト配置
-
-- **in-sourceテスト**: 単体テストは`if (import.meta.vitest)`ブロックで同じファイル内に記載
-- **統合テスト**: `packages/core/tests/visitor/`配下に配置
-- **カバレッジ目標**: 各関数100%のテストカバレッジ
-
-### 3. ドキュメンテーション
-
-```typescript
-/**
- * スキーマを訪問して型情報を抽出
- * 
- * object型のスキーマからプロパティ情報を収集し、
- * ネストしたオブジェクトは別モデルとして抽出
- * 
- * @example OpenAPI YAML
- * ```yaml
- * User:
- *   type: object
- *   properties:
- *     id:
- *       type: integer
- *     address:
- *       type: object
- *       properties:
- *         street:
- *           type: string
- * ```
- * 
- * @example 出力
- * ```typescript
- * // Userモデル
- * { name: "User", properties: [...] }
- * // UserAddressモデル（ネストから抽出）
- * { name: "UserAddress", properties: [...] }
- * ```
- */
-```
-
-### 4. コメント規約
-
-```typescript
-// WHY: 訪問済みチェックで循環参照を防止
-if (context.visited.has(schemaId)) return null;
-
-// WHAT: プロパティごとに型を解決
-for (const [name, prop] of Object.entries(schema.properties)) {
-  // ネストしたオブジェクトは別モデルとして処理する必要があるため
-  if (prop.type === "object" && prop.properties) {
-    // ...
-  }
+  return {
+    name,
+    type: schema.type as "string" | "number",
+    values: schema.enum.map(value => ({
+      value,
+      name: toUpperSnakeCase(String(value))
+    }))
+  };
 }
 ```
 
-### 5. in-sourceテストの例
+#### Step 7: Union型（oneOf/anyOf）
 
 ```typescript
-// packages/core/src/visitor/visitors/model-visitor.ts
-
-export function createModelVisitor(): DocumentVisitor<IRModel | null> {
-  return {
-    enterSchema: (schema, context) => {
-      // object型のスキーマのみモデルとして抽出
-      if (schema.type !== "object" || context.path.length === 0) {
-        return { value: null, continue: true };
-      }
-      
-      const modelName = context.path[context.path.length - 1];
-      return {
-        value: {
-          name: modelName,
-          description: schema.description,
-          properties: []
-        },
-        continue: true
-      };
+// Red
+it("should extract union from oneOf", () => {
+  const schema: SchemaObject = {
+    oneOf: [
+      { $ref: "#/components/schemas/Cat" },
+      { $ref: "#/components/schemas/Dog" }
+    ],
+    discriminator: {
+      propertyName: "type"
     }
+  };
+  const context = createContext({
+    path: ['components', 'schemas', 'Pet']
+  });
+  const result = visitSchema(schema, context);
+  expect(result.value).toEqual({
+    kind: "union",
+    name: "Pet",
+    types: [
+      { kind: "ref", name: "Cat" },
+      { kind: "ref", name: "Dog" }
+    ],
+    discriminator: "type"
+  });
+});
+
+// Green: schema-visitor.ts で処理
+// src/transformer/visitors/schema-visitor.ts
+if (schema.oneOf || schema.anyOf) {
+  const types = (schema.oneOf || schema.anyOf).map(s => {
+    const subContext = { ...context, path: [...context.path, 'oneOf'] };
+    return visitSchema(s, subContext).value;
+  });
+  
+  const discriminator = schema.discriminator?.propertyName;
+  
+  return {
+    value: {
+      kind: 'union',
+      name: extractName(context.path),
+      types,
+      discriminator
+    },
+    continue: false
+  };
+}
+```
+
+### Phase 3: Paths/Operation処理（Day 7-9）
+
+#### Step 8: 単純なGETエンドポイント
+
+```typescript
+// Red
+describe("paths-visitor", () => {
+  it("should extract GET operation", () => {
+    const paths: PathsObject = {
+      "/pets": {
+        get: {
+          operationId: "listPets",
+          tags: ["pets"],
+          responses: {
+            "200": {
+              description: "Success",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: { $ref: "#/components/schemas/Pet" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+    const context = createContext();
+    const result = visitPaths(paths, context);
+    expect(result.services).toHaveLength(1);
+    expect(result.services[0].name).toBe("pets");
+    expect(result.services[0].endpoints).toHaveLength(1);
+  });
+});
+
+// Green: paths-visitor.ts に実装
+// src/transformer/visitors/paths-visitor.ts
+export function visitPaths(
+  paths: PathsObject,
+  context: VisitorContext
+): PathsResult {
+  const serviceMap = new Map<string, IRService>();
+  
+  Object.entries(paths).forEach(([path, pathItem]) => {
+    const pathContext = {
+      ...context,
+      path: [...context.path, 'paths', path]
+    };
+    
+    const endpoints = visitPathItem(pathItem, pathContext);
+    
+    // タグでグループ化
+    endpoints.forEach(endpoint => {
+      const tag = endpoint.tags?.[0] || 'default';
+      if (!serviceMap.has(tag)) {
+        serviceMap.set(tag, {
+          name: tag,
+          endpoints: []
+        });
+      }
+      serviceMap.get(tag)!.endpoints.push(endpoint);
+    });
+  });
+  
+  return { services: Array.from(serviceMap.values()) };
+}
+```
+
+#### Step 9: パラメータ付きOperation
+
+```typescript
+// Red
+it("should extract path and query parameters", () => {
+  const operation: OperationObject = {
+    operationId: "getPet",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: { type: "integer" }
+      },
+      {
+        name: "detailed",
+        in: "query",
+        schema: { type: "boolean" }
+      }
+    ]
+  };
+  const context = createContext({
+    method: "GET",
+    pathTemplate: "/pets/{id}"
+  });
+  const result = visitOperation(operation, context);
+  expect(result.pathParams).toHaveLength(1);
+  expect(result.queryParams).toHaveLength(1);
+});
+
+// Green: operation-visitor.ts に実装
+// src/transformer/visitors/operation-visitor.ts
+export function visitOperation(
+  operation: OperationObject,
+  context: VisitorContext
+): IREndpoint {
+  const endpoint: IREndpoint = {
+    operationId: operation.operationId!,
+    method: context.method as IRHttpMethod,
+    path: context.pathTemplate,
+    tags: operation.tags,
+    summary: operation.summary,
+    description: operation.description,
+    pathParams: [],
+    queryParams: [],
+    headerParams: [],
+    responses: []
+  };
+  
+  // パラメータ処理
+  if (operation.parameters) {
+    operation.parameters.forEach(param => {
+      const paramContext = {
+        ...context,
+        path: [...context.path, 'parameters']
+      };
+      const irParam = visitParameter(param, paramContext);
+      
+      switch (irParam.in) {
+        case 'path':
+          endpoint.pathParams.push(irParam);
+          break;
+        case 'query':
+          endpoint.queryParams.push(irParam);
+          break;
+        case 'header':
+          endpoint.headerParams.push(irParam);
+          break;
+      }
+    });
+  }
+  
+  return endpoint;
+}
+```
+
+### Phase 4: Document全体の統合（Day 10-11）
+
+#### Step 10: 完全なOpenAPIドキュメント
+
+```typescript
+// Red
+describe("transformer", () => {
+  it("should transform complete OpenAPI 3.1 document", () => {
+    const doc: OpenAPIDocument = {
+      openapi: "3.1.0",
+      info: {
+        title: "Pet Store API",
+        version: "1.0.0"
+      },
+      servers: [
+        { url: "https://api.example.com" }
+      ],
+      paths: {
+        "/pets": {
+          get: {
+            operationId: "listPets",
+            tags: ["pets"],
+            parameters: [
+              {
+                name: "limit",
+                in: "query",
+                schema: { type: "integer", minimum: 1, maximum: 100 }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "List of pets",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Pet" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      components: {
+        schemas: {
+          Pet: {
+            type: "object",
+            properties: {
+              id: { type: "integer", format: "int64" },
+              name: { type: "string" },
+              status: {
+                type: "string",
+                enum: ["available", "pending", "sold"]
+              }
+            },
+            required: ["id", "name"]
+          }
+        }
+      }
+    };
+
+    const ir = transform(doc);
+    
+    expect(ir.metadata.title).toBe("Pet Store API");
+    expect(ir.metadata.version).toBe("1.0.0");
+    expect(ir.servers).toHaveLength(1);
+    expect(ir.models).toHaveLength(1);
+    expect(ir.services).toHaveLength(1);
+    expect(ir.enums).toHaveLength(1); // statusのenum
+  });
+});
+
+// Green: transformer.ts メインエントリポイント
+// src/transformer/transformer.ts
+import { visitOpenAPI } from './visitors/openapi-visitor';
+
+export function transform(doc: OpenAPIDocument): XcgenIR {
+  const context = createContext();
+  return visitOpenAPI(doc, context);
+}
+
+// src/transformer/visitors/openapi-visitor.ts
+export function visitOpenAPI(
+  doc: OpenAPIDocument,
+  context: VisitorContext
+): XcgenIR {
+  const ir: XcgenIR = {
+    metadata: visitInfo(doc.info, context),
+    servers: doc.servers ? visitServers(doc.servers, context) : [],
+    models: [],
+    enums: [],
+    unions: [],
+    services: []
+  };
+  
+  // Components処理
+  if (doc.components) {
+    const componentsResult = visitComponents(doc.components, context);
+    ir.models.push(...componentsResult.models);
+    ir.enums.push(...componentsResult.enums);
+    ir.unions.push(...componentsResult.unions);
+  }
+  
+  // Paths処理
+  if (doc.paths) {
+    const pathsResult = visitPaths(doc.paths, context);
+    ir.services.push(...pathsResult.services);
+  }
+  
+  return ir;
+}
+```
+
+### Phase 5: 最適化とリファクタリング（Day 12）
+
+- パフォーマンス最適化
+- メモリ使用量の削減
+- コードの整理と重複の除去
+
+## 実装ガイドライン
+
+### TDDサイクルの実践
+
+1. **Red（5分）**
+   - 失敗するテストを書く
+   - 期待される動作を明確に定義
+
+2. **Green（10分）**
+   - テストを通す最小限の実装
+   - ハードコードでも構わない
+
+3. **Refactor（5分）**
+   - コードの重複を除去
+   - 命名を改善
+   - 構造を整理
+
+### in-sourceテストの活用
+
+```typescript
+// src/transformer/visitors/schema-visitor.ts
+import { resolveType } from '../helpers/type-resolver';
+import { detectEnum } from '../helpers/enum-detector';
+import { visitReference } from './reference-visitor';
+import { isReferenceObject } from '../../types/guards';
+
+export function visitSchema(
+  schema: SchemaObject | ReferenceObject,
+  context: VisitorContext
+): VisitorResult<IRType> {
+  // $ref処理は reference-visitor に委譲
+  if (isReferenceObject(schema)) {
+    return visitReference(schema, context);
+  }
+
+  // enum検出
+  if (schema.enum) {
+    const name = extractName(context.path);
+    return {
+      value: detectEnum(schema, name),
+      continue: false
+    };
+  }
+
+  // oneOf/anyOf処理
+  if (schema.oneOf || schema.anyOf) {
+    const types = (schema.oneOf || schema.anyOf).map(s => {
+      const subContext = { ...context, path: [...context.path, 'oneOf'] };
+      return visitSchema(s, subContext).value;
+    });
+    
+    return {
+      value: {
+        kind: 'union',
+        name: extractName(context.path),
+        types,
+        discriminator: schema.discriminator?.propertyName
+      },
+      continue: false
+    };
+  }
+
+  // 基本的な型解決はヘルパーに委譲
+  return {
+    value: resolveType(schema),
+    continue: schema.type === 'object' // objectの場合はpropertiesも処理
   };
 }
 
@@ -373,82 +659,238 @@ export function createModelVisitor(): DocumentVisitor<IRModel | null> {
 if (import.meta.vitest) {
   const { it, expect, describe } = import.meta.vitest;
 
-  describe("createModelVisitor", () => {
-    it("should extract object schema as model", () => {
-      const visitor = createModelVisitor();
-      const schema = { 
-        type: "object", 
-        description: "Test model" 
-      } as SchemaObject;
-      const context = {
-        path: ["components", "schemas", "User"],
-        root: {} as OpenAPIDocument,
-        visited: new Set()
+  describe("visitSchema", () => {
+    it("should handle enum schema", () => {
+      const schema: SchemaObject = {
+        type: "string",
+        enum: ["pending", "approved", "rejected"]
       };
+      const context = createContext();
+      const result = visitSchema(schema, context);
       
-      const result = visitor.enterSchema?.(schema, context);
-      
-      expect(result?.value).toEqual({
-        name: "User",
-        description: "Test model",
-        properties: []
-      });
-      expect(result?.continue).toBe(true);
+      expect(result.value.kind).toBe("enum");
+      expect(result.continue).toBe(false);
     });
 
-    it("should return null for non-object types", () => {
-      const visitor = createModelVisitor();
-      const schema = { type: "string" } as SchemaObject;
-      const context = {
-        path: ["components", "schemas", "StringType"],
-        root: {} as OpenAPIDocument,
-        visited: new Set()
+    it("should handle object schema", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "integer" }
+        }
       };
+      const context = createContext();
+      const result = visitSchema(schema, context);
       
-      const result = visitor.enterSchema?.(schema, context);
-      
-      expect(result?.value).toBeNull();
-      expect(result?.continue).toBe(true);
+      expect(result.value.kind).toBe("object");
+      expect(result.continue).toBe(true); // propertiesも処理する
     });
   });
 }
+
+// src/transformer/helpers/type-resolver.ts
+export function resolveType(schema: SchemaObject): IRType {
+  // プリミティブ型
+  if (['string', 'number', 'integer', 'boolean'].includes(schema.type)) {
+    return {
+      kind: 'primitive',
+      type: schema.type,
+      format: schema.format
+    };
+  }
+  
+  // 配列型
+  if (schema.type === 'array' && schema.items) {
+    return {
+      kind: 'array',
+      items: resolveType(schema.items as SchemaObject)
+    };
+  }
+  
+  // オブジェクト型
+  if (schema.type === 'object') {
+    return {
+      kind: 'object',
+      properties: schema.properties ? {} : undefined
+    };
+  }
+  
+  // その他はany
+  return { kind: 'any' };
+}
+```
+
+### コーディング規約
+
+1. **関数名**: 動詞で始める（`visitSchema`, `resolveType`, `extractModels`）
+2. **ファイル名**: kebab-case（`schema-visitor.ts`）
+3. **型定義**: PascalCase（`VisitorContext`, `SchemaVisitor`）
+4. **定数**: UPPER_SNAKE_CASE（`MAX_DEPTH`）
+
+## テスト戦略
+
+### テストの種類
+
+1. **単体テスト**（in-source）
+   - 各Visitor関数の振る舞い
+   - 純粋関数として独立テスト
+   - カバレッジ100%目標
+
+2. **統合テスト**（`tests/transformer/`）
+   - 実際のOpenAPIドキュメント
+   - エンドツーエンドの変換
+   - fixtures/petstore.yamlを使用
+
+3. **スナップショットテスト**
+   - 生成されるIRの一貫性
+   - リグレッション防止
+
+### テストファイル構造
+
+```
+packages/core/tests/transformer/
+├── unit/                       # 単体テスト
+│   ├── context.test.ts
+│   ├── traverser.test.ts
+│   ├── visitors/
+│   │   ├── openapi-visitor.test.ts
+│   │   ├── info-visitor.test.ts
+│   │   ├── servers-visitor.test.ts
+│   │   ├── paths-visitor.test.ts
+│   │   ├── path-item-visitor.test.ts
+│   │   ├── operation-visitor.test.ts
+│   │   ├── parameter-visitor.test.ts
+│   │   ├── request-body-visitor.test.ts
+│   │   ├── responses-visitor.test.ts
+│   │   ├── response-visitor.test.ts
+│   │   ├── media-type-visitor.test.ts
+│   │   ├── schema-visitor.test.ts
+│   │   ├── discriminator-visitor.test.ts
+│   │   ├── components-visitor.test.ts
+│   │   ├── security-scheme-visitor.test.ts
+│   │   ├── tags-visitor.test.ts
+│   │   ├── tag-visitor.test.ts
+│   │   └── reference-visitor.test.ts
+│   └── helpers/
+│       ├── type-resolver.test.ts
+│       ├── ref-extractor.test.ts
+│       ├── validation-extractor.test.ts
+│       ├── enum-detector.test.ts
+│       └── model-classifier.test.ts
+├── integration/                # 統合テスト
+│   ├── petstore.test.ts
+│   ├── complex-schemas.test.ts
+│   └── edge-cases.test.ts
+└── snapshots/                  # スナップショット
+    └── __snapshots__/
 ```
 
 ## 実装時の注意点
 
-1. **循環参照の処理**
-   - visitedセットで訪問済みを管理
-   - 深さ制限の実装も検討
+### 循環参照の処理
 
-2. **エラーハンドリング**
-   - 各Visitorでのエラーを適切に伝播
-   - 部分的な失敗を許容する設計
+```typescript
+interface VisitorContext {
+  visited: Set<string>;  // 訪問済み$refを記録
+  depth: number;         // 現在の深さ
+  maxDepth: number;      // 最大深さ制限
+}
 
-3. **メモリ効率**
-   - 大規模なOpenAPIドキュメントでも効率的に動作
-   - 不要な中間オブジェクトの生成を避ける
+function visitSchema(schema: SchemaObject, context: VisitorContext) {
+  // 循環参照チェック
+  const schemaId = getSchemaId(schema);
+  if (context.visited.has(schemaId)) {
+    return createCircularReference(schemaId);
+  }
+  
+  // 深さ制限チェック
+  if (context.depth >= context.maxDepth) {
+    return createDepthLimitExceeded();
+  }
+  
+  // 訪問を記録
+  context.visited.add(schemaId);
+  context.depth++;
+  
+  // 処理...
+  
+  context.depth--;
+}
+```
 
-4. **型安全性**
-   - TypeScriptの型推論を最大限活用
-   - 型ガードを適切に使用
+### エラーハンドリング
 
-## テスト戦略
+```typescript
+class TransformerError extends Error {
+  constructor(
+    message: string,
+    public path: string[],
+    public cause?: unknown
+  ) {
+    super(message);
+    this.name = 'TransformerError';
+  }
+}
 
-1. **単体テスト**
-   - 各Visitor関数を独立してテスト
-   - トラバース関数のエッジケース
+function safeVisit<T>(
+  visitor: () => T,
+  context: VisitorContext
+): T | null {
+  try {
+    return visitor();
+  } catch (error) {
+    console.warn(`Error at path ${context.path.join('.')}: ${error}`);
+    return null;
+  }
+}
+```
 
-2. **統合テスト**
-   - 実際のOpenAPIドキュメントでテスト
-   - 複雑なネスト構造の処理
+## BNF非終端記号とVisitorの対応表
 
-3. **パフォーマンステスト**
-   - 大規模ドキュメントでの処理時間
-   - メモリ使用量の測定
+| BNF非終端記号 | Visitor File | IR Type Output |
+|--------------|--------------|----------------|
+| `<openapi-object>` | openapi-visitor.ts | XcgenIR（ルート） |
+| `<info-object>` | info-visitor.ts | IRMetadata |
+| `<servers-array>` | servers-visitor.ts | IRServer[] |
+| `<server-object>` | server-visitor.ts | IRServer |
+| `<paths-object>` | paths-visitor.ts | IRService[] |
+| `<path-item-object>` | path-item-visitor.ts | IREndpoint[] |
+| `<operation-object>` | operation-visitor.ts | IREndpoint |
+| `<parameter-object>` | parameter-visitor.ts | IRParameter |
+| `<request-body-object>` | request-body-visitor.ts | IRRequestBody |
+| `<responses-object>` | responses-visitor.ts | IRResponse[] |
+| `<response-object>` | response-visitor.ts | IRResponse |
+| `<media-type-object>` | media-type-visitor.ts | IRContentMap |
+| `<schema-object>` | schema-visitor.ts | IRType |
+| `<discriminator-object>` | discriminator-visitor.ts | discriminator情報 |
+| `<components-object>` | components-visitor.ts | models/enums/unions |
+| `<security-scheme-object>` | security-scheme-visitor.ts | IRSecurityScheme |
+| `<tags-array>` | tags-visitor.ts | タグ情報 |
+| `<tag-object>` | tag-visitor.ts | タグメタデータ |
+| `<reference-object>` | reference-visitor.ts | IRRef |
 
-4. **比較テスト**
-   - 現在の実装と同じ結果を生成することを確認
+## 期待される成果
+
+1. **高品質なコード**
+   - テストカバレッジ100%
+   - 型安全性の保証
+   - エッジケースの網羅
+
+2. **保守性**
+   - 明確な責任分離
+   - 拡張可能な設計
+   - 充実したドキュメント
+
+3. **パフォーマンス**
+   - 効率的なトラバース
+   - メモリ使用量の最適化
+   - Tree-shakingによる軽量化
+
+4. **開発効率**
+   - TDDによる確実な進捗
+   - リファクタリングの安全性
+   - デバッグの容易性
 
 ## まとめ
 
-関数ベースのVisitorパターンは、現在のパーサーコンビネータ方式の利点（Tree-shaking、純粋関数）を維持しながら、デバッグの容易性と拡張性を向上させる設計です。実装の複雑さを軽減し、保守性を高めることが期待できます。
+関数ベースのVisitorパターンとTDDの組み合わせにより、OpenAPI v3.1仕様に完全準拠した高品質なtransformer実装を実現します。段階的な実装とテストファーストのアプローチにより、確実で保守性の高いコードベースを構築できます。
