@@ -1,5 +1,13 @@
 # Task 009-06: Visitorパターンによるtransformer実装（TDD）
 
+## 実装状況
+
+- **Phase 1**: ✅ 完了 - Schema Object処理（プリミティブ型、配列型、$ref参照）
+- **Phase 2**: 🚧 未着手 - Components.schemas処理（enum、union、object型）
+- **Phase 3**: 🚧 未着手 - Paths/Operation処理
+- **Phase 4**: 🚧 未着手 - Document全体の統合
+- **Phase 5**: 🚧 未着手 - 最適化とリファクタリング
+
 ## 概要
 
 OpenAPIドキュメント（parser出力）を中間表現（IR）に変換するtransformerレイヤーを、関数ベースのVisitorパターンとTDD（Test-Driven Development）で実装する。
@@ -222,97 +230,64 @@ if (import.meta.vitest) {
 
 ### 実装済みファイル
 
-✅ **完了済み**:
+✅ **完了済み（Phase 1）**:
+
+**基盤実装**:
+
+- `src/transformer/context.ts` - Visitorコンテキスト管理（path、visited、depth管理）
+- `src/transformer/types.ts` - Visitor型定義（VisitorContext、VisitorResult）
+- `src/transformer/index.ts` - モジュールエクスポート
+
+**Visitor実装**:
 
 - `src/transformer/visitors/primitive-visitor.ts` - プリミティブ型処理
-- `src/transformer/visitors/type-visitor.ts` - 汎用型解決（null返却対応）
+  - string、number、integer、boolean型のサポート
+  - format属性（email、date-time、uuid等）の処理
+  - nullable属性（OpenAPI 3.0.x互換）の処理
+  - BNF参照: `<schema-object>`のプリミティブ型部分
+- `src/transformer/visitors/type-visitor.ts` - 汎用型解決
+  - プリミティブ型、配列型、参照型（$ref）の処理
+  - ネストした配列型のサポート
+  - null返却パターンによるエラーハンドリング
+  - BNF参照: `<schema-object>` | `<reference-object>`
+
+**Helper関数**:
+
 - `src/transformer/helpers/is-primitive-type.ts` - プリミティブ型判定
-- `src/transformer/helpers/extract-ref-name.ts` - $ref名抽出
+- `src/transformer/helpers/extract-ref-name.ts` - $ref名抽出（null返却対応）
 
-### Phase 1: Schema Object処理（Day 1-3）
+**テスト戦略**:
 
-最も基礎となるSchema Objectから開始（JSON Schema 2020-12準拠）。
+- in-sourceテスティング採用（`import.meta.vitest`）
+- 全91テスト合格
+- consola.warnを使用した非例外エラーハンドリング
 
-#### Step 1: プリミティブ型（Red → Green → Refactor） ✅ 完了
+### Phase 1: Schema Object処理 ✅ 完了
 
-```typescript
-// Red: テストファースト
-// tests/transformer/schema/primitive.test.ts
-describe("visitPrimitive", () => {
-  it("should convert string schema to IRPrimitive", () => {
-    const schema: SchemaObject = { type: "string" };
-    const result = visitPrimitive(schema);
-    expect(result).toEqual({
-      kind: "primitive",
-      type: "string"
-    });
-  });
-});
+最も基礎となるSchema Objectの処理を完了（JSON Schema 2020-12準拠）。
 
-// Green: 最小限の実装
-// src/transformer/visitors/schema/type-resolver.ts
-export function visitPrimitive(schema: SchemaObject): IRPrimitive {
-  return { kind: "primitive", type: schema.type as any };
-}
+#### 完了したステップ
 
-// Refactor: format対応、nullable対応などを追加
-```
+1. **Step 1: プリミティブ型** ✅
+   - `visitPrimitive`関数実装
+   - string、number、integer、boolean型サポート
+   - TDDサイクル（Red-Green-Refactor）実践
 
-#### Step 2: format付きプリミティブ
+2. **Step 2: format付きプリミティブ** ✅
+   - format属性の処理（email、date-time、uri、uuid等）
+   - nullable属性のサポート（OpenAPI 3.0.x互換）
 
-```typescript
-// Red
-it("should handle format property", () => {
-  const schema: SchemaObject = { 
-    type: "string", 
-    format: "email" 
-  };
-  const result = visitPrimitive(schema);
-  expect(result).toEqual({
-    kind: "primitive",
-    type: "string",
-    format: "email"
-  });
-});
-```
+3. **Step 3: $ref参照** ✅
+   - `extractRefName`によるコンポーネント名抽出
+   - 無効な$refに対するnull返却とconsola.warn
+   - 外部参照、URL参照のサポート
 
-#### Step 3: $ref参照
+4. **Step 4: 配列型** ✅
+   - `visitType`関数での配列型処理
+   - ネストした配列型のサポート
+   - 要素型が無効な場合のnull伝播
 
-```typescript
-// Red
-it("should resolve $ref to IRRef", () => {
-  const schema: ReferenceObject = { 
-    $ref: "#/components/schemas/User" 
-  };
-  const result = resolveType(schema);
-  expect(result).toEqual({
-    kind: "ref",
-    name: "User"
-  });
-});
-```
-
-#### Step 4: 配列型
-
-```typescript
-// Red
-it("should handle array type", () => {
-  const schema: SchemaObject = {
-    type: "array",
-    items: { type: "string" }
-  };
-  const result = resolveType(schema);
-  expect(result).toEqual({
-    kind: "array",
-    items: {
-      kind: "primitive",
-      type: "string"
-    }
-  });
-});
-```
-
-### Phase 2: Components.schemas処理（Day 4-6）
+### Phase 2: Components.schemas処理（次の実装目標）
 
 #### Step 5: Components処理
 
@@ -469,7 +444,7 @@ if (schema.oneOf || schema.anyOf) {
 }
 ```
 
-### Phase 3: Paths/Operation処理（Day 7-9）
+### Phase 3: Paths/Operation処理
 
 #### Step 8: 単純なGETエンドポイント
 
@@ -615,7 +590,7 @@ export function visitOperation(
 }
 ```
 
-### Phase 4: Document全体の統合（Day 10-11）
+### Phase 4: Document全体の統合
 
 #### Step 10: 完全なOpenAPIドキュメント
 
@@ -730,7 +705,7 @@ export function visitOpenAPI(
 }
 ```
 
-### Phase 5: 最適化とリファクタリング（Day 12）
+### Phase 5: 最適化とリファクタリング
 
 - パフォーマンス最適化
 - メモリ使用量の削減
