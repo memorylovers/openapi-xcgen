@@ -3,4 +3,4 @@
  */
 
 export { visitPrimitive } from "./primitive-visitor.js";
-export { visitType, resolveType } from "./type-visitor.js";
+export { visitType } from "./type-visitor.js";

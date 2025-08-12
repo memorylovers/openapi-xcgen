@@ -17,7 +17,11 @@ export {
 } from "./context.js";
 
 // Helper functions
-export { isPrimitiveType, extractRefName } from "./helpers/index.js";
+export {
+  isPrimitiveType,
+  extractRefName,
+  extractValidation,
+} from "./helpers/index.js";
 
 // Visitor functions
-export { visitPrimitive, visitType, resolveType } from "./visitors/index.js";
+export { visitPrimitive, visitType } from "./visitors/index.js";

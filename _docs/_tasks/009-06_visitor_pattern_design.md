@@ -289,38 +289,391 @@ if (import.meta.vitest) {
 
 ### Phase 2: Components.schemas処理（次の実装目標）
 
-#### Step 5: Components処理
+依存関係に基づき、leafに近いステップから順に実装。
+
+#### Step 5: Helper関数群（最もleafに近い）
+
+他の処理から共通で使用される基礎的なヘルパー関数。
 
 ```typescript
-// Red
-describe("components-visitor", () => {
-  it("should extract models from components.schemas", () => {
+// Red: to-upper-snake-case.ts
+describe("toUpperSnakeCase", () => {
+  it("should convert string to UPPER_SNAKE_CASE", () => {
+    expect(toUpperSnakeCase("pending")).toBe("PENDING");
+    expect(toUpperSnakeCase("in-progress")).toBe("IN_PROGRESS");
+    expect(toUpperSnakeCase("inProgress")).toBe("IN_PROGRESS");
+  });
+});
+
+// Green: helpers/to-upper-snake-case.ts
+export function toUpperSnakeCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .toUpperCase();
+}
+
+// Red: extract-name.ts
+describe("extractName", () => {
+  it("should extract name from context path", () => {
+    const path = ["components", "schemas", "User"];
+    expect(extractName(path)).toBe("User");
+  });
+});
+
+// Green: helpers/extract-name.ts
+export function extractName(path: string[]): string {
+  return path[path.length - 1] || "Unknown";
+}
+
+// Red: extract-validation.ts
+describe("extractValidation", () => {
+  it("should extract validation info from schema", () => {
+    const schema: SchemaObject = {
+      type: "string",
+      minLength: 3,
+      maxLength: 50,
+      pattern: "^[a-zA-Z]+$"
+    };
+    expect(extractValidation(schema)).toEqual({
+      minLength: 3,
+      maxLength: 50,
+      pattern: "^[a-zA-Z]+$"
+    });
+  });
+});
+
+// Green: helpers/extract-validation.ts
+export function extractValidation(schema: SchemaObject): IRValidation | undefined {
+  const validation: IRValidation = {};
+  
+  // 文字列バリデーション
+  if (schema.minLength !== undefined) validation.minLength = schema.minLength;
+  if (schema.maxLength !== undefined) validation.maxLength = schema.maxLength;
+  if (schema.pattern !== undefined) validation.pattern = schema.pattern;
+  
+  // 数値バリデーション
+  if (schema.minimum !== undefined) validation.minimum = schema.minimum;
+  if (schema.maximum !== undefined) validation.maximum = schema.maximum;
+  
+  return Object.keys(validation).length > 0 ? validation : undefined;
+}
+```
+
+#### Step 6: Enum処理（enum-detector.ts）
+
+SchemaObjectからenum定義を検出してIREnumに変換。
+
+```typescript
+// Red: enum-detector.ts
+describe("detectEnum", () => {
+  it("should detect and convert enum from schema", () => {
+    const schema: SchemaObject = {
+      type: "string",
+      enum: ["pending", "approved", "rejected"]
+    };
+    
+    const result = detectEnum(schema, "Status");
+    
+    expect(result).toEqual({
+      name: "Status",
+      type: "string",
+      values: [
+        { name: "PENDING", value: "pending" },
+        { name: "APPROVED", value: "approved" },
+        { name: "REJECTED", value: "rejected" }
+      ]
+    });
+  });
+  
+  it("should return null for non-enum schema", () => {
+    const schema: SchemaObject = { type: "string" };
+    expect(detectEnum(schema, "Status")).toBe(null);
+  });
+});
+
+// Green: helpers/enum-detector.ts
+import { toUpperSnakeCase } from "./to-upper-snake-case.js";
+
+export function detectEnum(
+  schema: SchemaObject,
+  name: string
+): IREnum | null {
+  if (!schema.enum || !Array.isArray(schema.enum)) {
+    return null;
+  }
+  
+  return {
+    name,
+    type: schema.type as "string" | "number",
+    description: schema.description,
+    values: schema.enum.map(value => ({
+      value,
+      name: toUpperSnakeCase(String(value))
+    }))
+  };
+}
+```
+
+#### Step 7: Object型処理（object-visitor.ts）
+
+object型のSchemaObjectをIRModelに変換。
+
+```typescript
+// Red: object-visitor.ts
+describe("visitObject", () => {
+  it("should convert object schema to IRModel", () => {
+    const schema: SchemaObject = {
+      type: "object",
+      properties: {
+        id: { type: "integer", format: "int64" },
+        name: { type: "string" },
+        email: { type: "string", format: "email" }
+      },
+      required: ["id", "name"]
+    };
+    
+    const result = visitObject(schema, "User");
+    
+    expect(result).toEqual({
+      name: "User",
+      properties: [
+        { 
+          name: "id", 
+          type: { kind: "primitive", type: "integer", format: "int64" },
+          required: true 
+        },
+        { 
+          name: "name", 
+          type: { kind: "primitive", type: "string" },
+          required: true 
+        },
+        { 
+          name: "email", 
+          type: { kind: "primitive", type: "string", format: "email" },
+          required: false 
+        }
+      ]
+    });
+  });
+});
+
+// Green: visitors/object-visitor.ts
+import { visitType } from "./type-visitor.js";
+import { extractValidation } from "../helpers/extract-validation.js";
+
+export function visitObject(
+  schema: SchemaObject,
+  name: string
+): IRModel | null {
+  if (schema.type !== "object" || !schema.properties) {
+    return null;
+  }
+  
+  const required = schema.required || [];
+  
+  const properties: IRProperty[] = Object.entries(schema.properties).map(
+    ([propName, propSchema]) => ({
+      name: propName,
+      type: visitType(propSchema as SchemaObject) || { kind: "any" },
+      required: required.includes(propName),
+      description: (propSchema as SchemaObject).description,
+      validation: extractValidation(propSchema as SchemaObject)
+    })
+  );
+  
+  return {
+    name,
+    description: schema.description,
+    properties
+  };
+}
+```
+
+#### Step 8: Union型処理（統合Visitor内）
+
+oneOf/anyOfを使用したUnion型の処理。
+
+```typescript
+// Red: Union型処理
+describe("Union type handling", () => {
+  it("should extract union from oneOf", () => {
+    const schema: SchemaObject = {
+      oneOf: [
+        { $ref: "#/components/schemas/Cat" },
+        { $ref: "#/components/schemas/Dog" }
+      ],
+      discriminator: {
+        propertyName: "type"
+      }
+    };
+    
+    const result = detectUnion(schema, "Pet");
+    
+    expect(result).toEqual({
+      name: "Pet",
+      types: [
+        { kind: "ref", name: "Cat" },
+        { kind: "ref", name: "Dog" }
+      ],
+      discriminator: "type"
+    });
+  });
+});
+
+// Green: helpers/union-detector.ts
+export function detectUnion(
+  schema: SchemaObject,
+  name: string
+): IRUnion | null {
+  const unionSchemas = schema.oneOf || schema.anyOf;
+  
+  if (!unionSchemas || !Array.isArray(unionSchemas)) {
+    return null;
+  }
+  
+  const types = unionSchemas.map(s => 
+    visitType(s as SchemaObject) || { kind: "any" }
+  );
+  
+  return {
+    name,
+    description: schema.description,
+    types,
+    discriminator: schema.discriminator?.propertyName
+  };
+}
+```
+
+#### Step 9: Schema統合Visitor（schema-visitor.ts）
+
+全ての型処理を統合し、適切なvisitor/detectorに振り分け。
+
+```typescript
+// Red: schema-visitor.ts
+describe("visitSchema", () => {
+  it("should handle enum schema", () => {
+    const schema: SchemaObject = {
+      type: "string",
+      enum: ["active", "inactive"]
+    };
+    const context = createContext({
+      path: ["components", "schemas", "Status"]
+    });
+    
+    const result = visitSchema(schema, context);
+    
+    expect(result.kind).toBe("enum");
+    expect(result.name).toBe("Status");
+  });
+  
+  it("should handle object schema", () => {
+    const schema: SchemaObject = {
+      type: "object",
+      properties: {
+        id: { type: "integer" }
+      }
+    };
+    const context = createContext({
+      path: ["components", "schemas", "User"]
+    });
+    
+    const result = visitSchema(schema, context);
+    
+    expect(result.kind).toBe("model");
+    expect(result.name).toBe("User");
+  });
+});
+
+// Green: visitors/schema-visitor.ts
+import { visitType } from "./type-visitor.js";
+import { visitObject } from "./object-visitor.js";
+import { detectEnum } from "../helpers/enum-detector.js";
+import { detectUnion } from "../helpers/union-detector.js";
+import { extractName } from "../helpers/extract-name.js";
+
+export function visitSchema(
+  schema: SchemaObject | ReferenceObject,
+  context: VisitorContext
+): SchemaResult {
+  const name = extractName(context.path);
+  
+  // $ref参照の場合
+  if (isReferenceObject(schema)) {
+    return { kind: "ref", ref: schema.$ref };
+  }
+  
+  // enum検出
+  const enumResult = detectEnum(schema, name);
+  if (enumResult) {
+    return { kind: "enum", ...enumResult };
+  }
+  
+  // union検出
+  const unionResult = detectUnion(schema, name);
+  if (unionResult) {
+    return { kind: "union", ...unionResult };
+  }
+  
+  // object型の場合
+  if (schema.type === "object") {
+    const modelResult = visitObject(schema, name);
+    if (modelResult) {
+      return { kind: "model", ...modelResult };
+    }
+  }
+  
+  // その他は通常の型として処理
+  const typeResult = visitType(schema);
+  return { kind: "type", type: typeResult };
+}
+```
+
+#### Step 10: Components処理（components-visitor.ts）
+
+components.schemasを処理し、models/enums/unionsに分類。
+
+```typescript
+// Red: components-visitor.ts
+describe("visitComponents", () => {
+  it("should extract and classify schemas", () => {
     const components: ComponentsObject = {
       schemas: {
         User: {
           type: "object",
           properties: {
             id: { type: "integer" },
-            name: { type: "string" }
-          },
-          required: ["id"]
+            status: { 
+              type: "string",
+              enum: ["active", "inactive"]
+            }
+          }
+        },
+        Status: {
+          type: "string",
+          enum: ["pending", "approved", "rejected"]
+        },
+        Pet: {
+          oneOf: [
+            { $ref: "#/components/schemas/Cat" },
+            { $ref: "#/components/schemas/Dog" }
+          ]
         }
       }
     };
+    
     const result = visitComponents(components, createContext());
+    
     expect(result.models).toHaveLength(1);
-    expect(result.models[0]).toEqual({
-      name: "User",
-      properties: [
-        { name: "id", type: { kind: "primitive", type: "integer" }, required: true },
-        { name: "name", type: { kind: "primitive", type: "string" }, required: false }
-      ]
-    });
+    expect(result.enums).toHaveLength(1);
+    expect(result.unions).toHaveLength(1);
   });
 });
 
-// Green: visitComponents実装
-// src/transformer/visitors/components-visitor.ts
+// Green: visitors/components-visitor.ts
+import { visitSchema } from "./schema-visitor.js";
+import { withPath } from "../context.js";
+
 export function visitComponents(
   components: ComponentsObject,
   context: VisitorContext
@@ -331,122 +684,35 @@ export function visitComponents(
     unions: []
   };
   
-  if (components.schemas) {
-    Object.entries(components.schemas).forEach(([name, schema]) => {
-      const schemaContext = {
-        ...context,
-        path: [...context.path, 'components', 'schemas', name]
-      };
-      
-      const schemaResult = visitSchema(schema, schemaContext);
-      
-      // 結果を適切な配列に振り分け（helpers/model-classifier.ts）
-      classifySchemaResult(schemaResult.value, name, result);
-    });
+  if (!components.schemas) {
+    return result;
   }
+  
+  Object.entries(components.schemas).forEach(([name, schema]) => {
+    const schemaContext = withPath(context, "components", "schemas", name);
+    const schemaResult = visitSchema(schema, schemaContext);
+    
+    // 結果を適切な配列に振り分け
+    switch (schemaResult.kind) {
+      case "model":
+        result.models.push(schemaResult);
+        break;
+      case "enum":
+        result.enums.push(schemaResult);
+        break;
+      case "union":
+        result.unions.push(schemaResult);
+        break;
+    }
+  });
   
   return result;
 }
 ```
 
-#### Step 6: Enum定義
-
-```typescript
-// Red
-it("should extract enum from schema with enum property", () => {
-  const schema: SchemaObject = {
-    type: "string",
-    enum: ["pending", "approved", "rejected"]
-  };
-  const context = createContext({ 
-    path: ['components', 'schemas', 'Status'] 
-  });
-  const result = visitSchema(schema, context);
-  expect(result.value).toEqual({
-    kind: "enum",
-    name: "Status",
-    type: "string",
-    values: [
-      { name: "PENDING", value: "pending" },
-      { name: "APPROVED", value: "approved" },
-      { name: "REJECTED", value: "rejected" }
-    ]
-  });
-});
-
-// Green: helpers/enum-detector.ts に実装
-// src/transformer/helpers/enum-detector.ts
-export function detectEnum(
-  schema: SchemaObject,
-  name: string
-): IREnum | null {
-  if (!schema.enum) return null;
-  
-  return {
-    name,
-    type: schema.type as "string" | "number",
-    values: schema.enum.map(value => ({
-      value,
-      name: toUpperSnakeCase(String(value))
-    }))
-  };
-}
-```
-
-#### Step 7: Union型（oneOf/anyOf）
-
-```typescript
-// Red
-it("should extract union from oneOf", () => {
-  const schema: SchemaObject = {
-    oneOf: [
-      { $ref: "#/components/schemas/Cat" },
-      { $ref: "#/components/schemas/Dog" }
-    ],
-    discriminator: {
-      propertyName: "type"
-    }
-  };
-  const context = createContext({
-    path: ['components', 'schemas', 'Pet']
-  });
-  const result = visitSchema(schema, context);
-  expect(result.value).toEqual({
-    kind: "union",
-    name: "Pet",
-    types: [
-      { kind: "ref", name: "Cat" },
-      { kind: "ref", name: "Dog" }
-    ],
-    discriminator: "type"
-  });
-});
-
-// Green: schema-visitor.ts で処理
-// src/transformer/visitors/schema-visitor.ts
-if (schema.oneOf || schema.anyOf) {
-  const types = (schema.oneOf || schema.anyOf).map(s => {
-    const subContext = { ...context, path: [...context.path, 'oneOf'] };
-    return visitSchema(s, subContext).value;
-  });
-  
-  const discriminator = schema.discriminator?.propertyName;
-  
-  return {
-    value: {
-      kind: 'union',
-      name: extractName(context.path),
-      types,
-      discriminator
-    },
-    continue: false
-  };
-}
-```
-
 ### Phase 3: Paths/Operation処理
 
-#### Step 8: 単純なGETエンドポイント
+#### Step 11: 単純なGETエンドポイント
 
 ```typescript
 // Red
@@ -514,7 +780,7 @@ export function visitPaths(
 }
 ```
 
-#### Step 9: パラメータ付きOperation
+#### Step 12: パラメータ付きOperation
 
 ```typescript
 // Red
@@ -592,7 +858,7 @@ export function visitOperation(
 
 ### Phase 4: Document全体の統合
 
-#### Step 10: 完全なOpenAPIドキュメント
+#### Step 13: 完全なOpenAPIドキュメント
 
 ```typescript
 // Red

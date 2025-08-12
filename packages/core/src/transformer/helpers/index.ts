@@ -4,3 +4,4 @@
 
 export { isPrimitiveType } from "./is-primitive-type.js";
 export { extractRefName } from "./extract-ref-name.js";
+export { extractValidation } from "./extract-validation.js";
