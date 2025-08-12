@@ -3,7 +3,8 @@
 ## 実装状況
 
 - **Phase 1**: ✅ 完了 - Schema Object処理（プリミティブ型、配列型、$ref参照）
-- **Phase 2**: 🚧 未着手 - Components.schemas処理（enum、union、object型）
+- **Phase 2**: 🚧 一部実装 - Components.schemas処理（enum、union、object型）
+  - Step 5: Helper関数群 - ✅ 完了（`extractValidation`実装、`extractName`はes-toolkitの`last`に移行）
 - **Phase 3**: 🚧 未着手 - Paths/Operation処理
 - **Phase 4**: 🚧 未着手 - Document全体の統合
 - **Phase 5**: 🚧 未着手 - 最適化とリファクタリング
@@ -71,8 +72,9 @@ packages/core/src/transformer/
 │
 ├── helpers/                        # 共通ヘルパー関数
 │   ├── type-resolver.ts           # 型解決ロジック
-│   ├── ref-extractor.ts           # $ref名抽出
-│   ├── validation-extractor.ts    # バリデーション情報抽出
+│   ├── extract-ref-name.ts        # $ref名抽出 ✅
+│   ├── extract-validation.ts      # バリデーション情報抽出 ✅
+│   ├── is-primitive-type.ts       # プリミティブ型判定 ✅
 │   ├── enum-detector.ts           # enum検出・変換
 │   └── model-classifier.ts        # モデル/enum/union分類
 │
@@ -112,10 +114,10 @@ visitors/
 
 ```
 helpers/
-├── is-primitive-type.ts      # プリミティブ型判定
-├── extract-ref-name.ts       # $ref名抽出
-├── to-upper-snake-case.ts    # enum値変換
-├── extract-name.ts           # パスから名前抽出
+├── is-primitive-type.ts      # プリミティブ型判定 ✅
+├── extract-ref-name.ts       # $ref名抽出 ✅
+├── extract-validation.ts     # バリデーション情報抽出 ✅
+├── (extractName -> es-toolkit/last) # パスから名前抽出はes-toolkitに移行
 └── ...
 ```
 
@@ -255,11 +257,12 @@ if (import.meta.vitest) {
 
 - `src/transformer/helpers/is-primitive-type.ts` - プリミティブ型判定
 - `src/transformer/helpers/extract-ref-name.ts` - $ref名抽出（null返却対応）
+- `src/transformer/helpers/extract-validation.ts` - バリデーション情報抽出（null返却対応）
 
 **テスト戦略**:
 
 - in-sourceテスティング採用（`import.meta.vitest`）
-- 全91テスト合格
+- 全104テスト合格
 - consola.warnを使用した非例外エラーハンドリング
 
 ### Phase 1: Schema Object処理 ✅ 完了
@@ -287,78 +290,14 @@ if (import.meta.vitest) {
    - ネストした配列型のサポート
    - 要素型が無効な場合のnull伝播
 
-### Phase 2: Components.schemas処理（次の実装目標）
+### Phase 2: Components.schemas処理（実装中）
 
 依存関係に基づき、leafに近いステップから順に実装。
 
-#### Step 5: Helper関数群（最もleafに近い）
+#### Step 5: Helper関数群 ✅ 完了
 
-他の処理から共通で使用される基礎的なヘルパー関数。
-
-```typescript
-// Red: to-upper-snake-case.ts
-describe("toUpperSnakeCase", () => {
-  it("should convert string to UPPER_SNAKE_CASE", () => {
-    expect(toUpperSnakeCase("pending")).toBe("PENDING");
-    expect(toUpperSnakeCase("in-progress")).toBe("IN_PROGRESS");
-    expect(toUpperSnakeCase("inProgress")).toBe("IN_PROGRESS");
-  });
-});
-
-// Green: helpers/to-upper-snake-case.ts
-export function toUpperSnakeCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, "$1_$2")
-    .replace(/[^a-zA-Z0-9]+/g, "_")
-    .toUpperCase();
-}
-
-// Red: extract-name.ts
-describe("extractName", () => {
-  it("should extract name from context path", () => {
-    const path = ["components", "schemas", "User"];
-    expect(extractName(path)).toBe("User");
-  });
-});
-
-// Green: helpers/extract-name.ts
-export function extractName(path: string[]): string {
-  return path[path.length - 1] || "Unknown";
-}
-
-// Red: extract-validation.ts
-describe("extractValidation", () => {
-  it("should extract validation info from schema", () => {
-    const schema: SchemaObject = {
-      type: "string",
-      minLength: 3,
-      maxLength: 50,
-      pattern: "^[a-zA-Z]+$"
-    };
-    expect(extractValidation(schema)).toEqual({
-      minLength: 3,
-      maxLength: 50,
-      pattern: "^[a-zA-Z]+$"
-    });
-  });
-});
-
-// Green: helpers/extract-validation.ts
-export function extractValidation(schema: SchemaObject): IRValidation | undefined {
-  const validation: IRValidation = {};
-  
-  // 文字列バリデーション
-  if (schema.minLength !== undefined) validation.minLength = schema.minLength;
-  if (schema.maxLength !== undefined) validation.maxLength = schema.maxLength;
-  if (schema.pattern !== undefined) validation.pattern = schema.pattern;
-  
-  // 数値バリデーション
-  if (schema.minimum !== undefined) validation.minimum = schema.minimum;
-  if (schema.maximum !== undefined) validation.maximum = schema.maximum;
-  
-  return Object.keys(validation).length > 0 ? validation : undefined;
-}
-```
+- `extract-validation.ts` - バリデーション情報抽出（13テスト実装）
+- `extractName` → es-toolkit/last に移行
 
 #### Step 6: Enum処理（enum-detector.ts）
 
@@ -392,9 +331,7 @@ describe("detectEnum", () => {
   });
 });
 
-// Green: helpers/enum-detector.ts
-import { toUpperSnakeCase } from "./to-upper-snake-case.js";
-
+// Green: helpers/enum-detector.ts（未実装）
 export function detectEnum(
   schema: SchemaObject,
   name: string
@@ -409,7 +346,7 @@ export function detectEnum(
     description: schema.description,
     values: schema.enum.map(value => ({
       value,
-      name: toUpperSnakeCase(String(value))
+      name: String(value).toUpperCase().replace(/[^A-Z0-9]+/g, '_')
     }))
   };
 }
@@ -590,13 +527,13 @@ import { visitType } from "./type-visitor.js";
 import { visitObject } from "./object-visitor.js";
 import { detectEnum } from "../helpers/enum-detector.js";
 import { detectUnion } from "../helpers/union-detector.js";
-import { extractName } from "../helpers/extract-name.js";
+import { last } from "es-toolkit";  // extractNameの代わりにes-toolkitのlastを使用
 
 export function visitSchema(
   schema: SchemaObject | ReferenceObject,
   context: VisitorContext
 ): SchemaResult {
-  const name = extractName(context.path);
+  const name = last(context.path) || "Unknown";  // es-toolkitのlast関数を使用
   
   // $ref参照の場合
   if (isReferenceObject(schema)) {
@@ -1014,7 +951,7 @@ export function visitSchema(
 
   // enum検出
   if (schema.enum) {
-    const name = extractName(context.path);
+    const name = last(context.path) || "Unknown";  // es-toolkitのlast関数を使用
     return {
       value: detectEnum(schema, name),
       continue: false
@@ -1323,6 +1260,33 @@ function safeVisit<T>(
    - リファクタリングの安全性
    - デバッグの容易性
 
-## まとめ
+## 実装サマリー
+
+### 完了済みタスク
+
+#### Phase 1: Schema Object処理 ✅ 完了
+
+- プリミティブ型処理（visitPrimitive）
+- 汎用型解決（visitType）
+- 配列型処理
+- $ref参照処理
+- format属性サポート
+- nullable属性サポート
+
+#### Phase 2: Helper関数（部分完了）
+
+- ✅ `is-primitive-type.ts` - プリミティブ型判定
+- ✅ `extract-ref-name.ts` - $ref名抽出（null返却対応）
+- ✅ `extract-validation.ts` - バリデーション情報抽出（null返却対応）
+- ✅ `extractName` → es-toolkit/last - パスから名前を抽出（es-toolkitに移行）
+
+### 現在の成果
+
+- **テスト数**: 104テスト全て合格
+- **エラーハンドリング**: consola.warn + null返却パターンで統一
+- **型安全性**: TypeScript strict modeで完全な型安全性を実現
+- **Tree-shaking**: 関数ベースアーキテクチャにより最適化
+
+## 今後の展望
 
 関数ベースのVisitorパターンとTDDの組み合わせにより、OpenAPI v3.1仕様に完全準拠した高品質なtransformer実装を実現します。段階的な実装とテストファーストのアプローチにより、確実で保守性の高いコードベースを構築できます。

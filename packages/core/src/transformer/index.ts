@@ -11,7 +11,6 @@ export {
   withPath,
   withDepth,
   withVisited,
-  extractName,
   isCircularReference,
   isDepthLimitExceeded,
 } from "./context.js";

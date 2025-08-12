@@ -43,13 +43,6 @@ export function withVisited(
 }
 
 /**
- * パスから名前を抽出
- */
-export function extractName(path: string[]): string {
-  return path[path.length - 1] || "Unknown";
-}
-
-/**
  * 循環参照をチェック
  */
 export function isCircularReference(

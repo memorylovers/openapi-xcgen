@@ -213,7 +213,7 @@ interface IRUnion {
 ```typescript
 // パターン1: パス + メソッド + 位置ベース
 "CreateUserRequest"     // POST /users のrequestBody
-"CreateUserResponse200" // POST /users の200レスポンス
+"CreateUserResponse"    // POST /users のレスポンス
 "GetUserByIdParams"     // GET /users/{id} のパラメータ
 "UpdateUserRequest"     // PUT /users/{id} のrequestBody
 
