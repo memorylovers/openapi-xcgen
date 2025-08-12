@@ -3,6 +3,16 @@
  */
 
 // ============================================================================
+// 基本型定義
+// ============================================================================
+
+/**
+ * OpenAPIのスカラー型
+ * IRPrimitiveとIREnumで使用される基本型
+ */
+export type IRScalarType = "string" | "number" | "integer" | "boolean";
+
+// ============================================================================
 // 型参照（IRType）- プロパティやパラメータの型として使用
 // ============================================================================
 
@@ -17,7 +27,7 @@
  */
 export interface IRPrimitive {
   kind: "primitive";
-  type: "string" | "number" | "integer" | "boolean";
+  type: IRScalarType;
   format?: string; // email, date, date-time, uri, uuid等
   nullable?: boolean;
 }
@@ -196,8 +206,8 @@ export interface IREnum {
   name: string;
   /** 説明 */
   description?: string;
-  /** 値の型 */
-  type: "string" | "number";
+  /** 値の型（OpenAPIの型をそのまま保持） */
+  type: IRScalarType;
   /** Enum値の配列 */
   values: IREnumValue[];
 }

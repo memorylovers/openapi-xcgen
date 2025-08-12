@@ -10,7 +10,7 @@ import { isReferenceObject } from "../../types/guards.js";
 import type { SchemaObject } from "../../types/index.js";
 import type { IRArray, IRType } from "../../types/ir/index.js";
 import { extractRefName } from "../helpers/extract-ref-name.js";
-import { isPrimitiveType } from "../helpers/is-primitive-type.js";
+import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
 import { visitPrimitive } from "./primitive-visitor.js";
 
 // OpenAPI 3.0.x supports nullable, 3.1.x uses type arrays
@@ -72,7 +72,7 @@ export function visitType(schema: SchemaObjectWithNullable): IRType | null {
   }
 
   // プリミティブ型: nullの場合はそのまま返す
-  if (isPrimitiveType(schema.type)) return visitPrimitive(schema);
+  if (toIRScalarType(schema.type)) return visitPrimitive(schema);
 
   // 配列型
   if (schema.type === "array" && schema.items) {

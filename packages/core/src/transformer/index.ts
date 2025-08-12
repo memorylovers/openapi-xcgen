@@ -17,10 +17,16 @@ export {
 
 // Helper functions
 export {
-  isPrimitiveType,
   extractRefName,
   extractValidation,
+  generateEnumName,
+  toIRScalarType,
 } from "./helpers/index.js";
 
 // Visitor functions
-export { visitPrimitive, visitType } from "./visitors/index.js";
+export {
+  visitPrimitive,
+  visitType,
+  visitEnum,
+  type EnumVisitorContext,
+} from "./visitors/index.js";

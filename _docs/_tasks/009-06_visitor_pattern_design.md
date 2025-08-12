@@ -3,8 +3,9 @@
 ## 実装状況
 
 - **Phase 1**: ✅ 完了 - Schema Object処理（プリミティブ型、配列型、$ref参照）
-- **Phase 2**: 🚧 一部実装 - Components.schemas処理（enum、union、object型）
-  - Step 5: Helper関数群 - ✅ 完了（`extractValidation`実装、`extractName`はes-toolkitの`last`に移行）
+- **Phase 2**: 🚧 実装中 - Components.schemas処理（enum、union、object型）
+  - Step 5: Helper関数群 - ✅ 完了
+  - Step 6: Enum処理 - ✅ 完了（`enum-visitor.ts`実装、Visitorパターン統合）
 - **Phase 3**: 🚧 未着手 - Paths/Operation処理
 - **Phase 4**: 🚧 未着手 - Document全体の統合
 - **Phase 5**: 🚧 未着手 - 最適化とリファクタリング
@@ -74,8 +75,8 @@ packages/core/src/transformer/
 │   ├── type-resolver.ts           # 型解決ロジック
 │   ├── extract-ref-name.ts        # $ref名抽出 ✅
 │   ├── extract-validation.ts      # バリデーション情報抽出 ✅
-│   ├── is-primitive-type.ts       # プリミティブ型判定 ✅
-│   ├── enum-detector.ts           # enum検出・変換
+│   ├── to-ir-scalar-type.ts       # IRScalarType変換 ✅
+│   ├── generate-enum-name.ts      # Enum名生成 ✅
 │   └── model-classifier.ts        # モデル/enum/union分類
 │
 ├── combinators/                    # Visitor組み合わせユーティリティ
@@ -114,10 +115,10 @@ visitors/
 
 ```
 helpers/
-├── is-primitive-type.ts      # プリミティブ型判定 ✅
 ├── extract-ref-name.ts       # $ref名抽出 ✅
 ├── extract-validation.ts     # バリデーション情報抽出 ✅
-├── (extractName -> es-toolkit/last) # パスから名前抽出はes-toolkitに移行
+├── to-ir-scalar-type.ts      # IRScalarType安全変換 ✅
+├── generate-enum-name.ts     # Enum名生成 ✅
 └── ...
 ```
 
@@ -232,38 +233,32 @@ if (import.meta.vitest) {
 
 ### 実装済みファイル
 
-✅ **完了済み（Phase 1）**:
+✅ **完了済み**:
 
 **基盤実装**:
 
-- `src/transformer/context.ts` - Visitorコンテキスト管理（path、visited、depth管理）
-- `src/transformer/types.ts` - Visitor型定義（VisitorContext、VisitorResult）
-- `src/transformer/index.ts` - モジュールエクスポート
+- `context.ts` - Visitorコンテキスト管理
+- `types.ts` - Visitor型定義、IRScalarType型エイリアス
+- `index.ts` - モジュールエクスポート
 
 **Visitor実装**:
 
-- `src/transformer/visitors/primitive-visitor.ts` - プリミティブ型処理
-  - string、number、integer、boolean型のサポート
-  - format属性（email、date-time、uuid等）の処理
-  - nullable属性（OpenAPI 3.0.x互換）の処理
-  - BNF参照: `<schema-object>`のプリミティブ型部分
-- `src/transformer/visitors/type-visitor.ts` - 汎用型解決
-  - プリミティブ型、配列型、参照型（$ref）の処理
-  - ネストした配列型のサポート
-  - null返却パターンによるエラーハンドリング
-  - BNF参照: `<schema-object>` | `<reference-object>`
+- `visitors/primitive-visitor.ts` - プリミティブ型処理（IRScalarType使用）
+- `visitors/type-visitor.ts` - 汎用型解決（配列、参照型含む）
+- `visitors/enum-visitor.ts` - Enum型処理（Context pattern採用）✅ NEW
 
 **Helper関数**:
 
-- `src/transformer/helpers/is-primitive-type.ts` - プリミティブ型判定
-- `src/transformer/helpers/extract-ref-name.ts` - $ref名抽出（null返却対応）
-- `src/transformer/helpers/extract-validation.ts` - バリデーション情報抽出（null返却対応）
+- `helpers/extract-ref-name.ts` - $ref名抽出
+- `helpers/extract-validation.ts` - バリデーション情報抽出
+- `helpers/to-ir-scalar-type.ts` - IRScalarType安全変換 ✅ NEW
+- `helpers/generate-enum-name.ts` - Enum名生成 ✅ NEW
 
 **テスト戦略**:
 
-- in-sourceテスティング採用（`import.meta.vitest`）
-- 全104テスト合格
-- consola.warnを使用した非例外エラーハンドリング
+- in-sourceテスティング採用
+- 全121テスト合格
+- null返却パターンでエラーハンドリング統一
 
 ### Phase 1: Schema Object処理 ✅ 完了
 
@@ -299,58 +294,14 @@ if (import.meta.vitest) {
 - `extract-validation.ts` - バリデーション情報抽出（13テスト実装）
 - `extractName` → es-toolkit/last に移行
 
-#### Step 6: Enum処理（enum-detector.ts）
+#### Step 6: Enum処理 ✅ 完了
 
-SchemaObjectからenum定義を検出してIREnumに変換。
+`enum-visitor.ts`として実装完了。Visitorパターンに統合し、Context patternを採用：
 
-```typescript
-// Red: enum-detector.ts
-describe("detectEnum", () => {
-  it("should detect and convert enum from schema", () => {
-    const schema: SchemaObject = {
-      type: "string",
-      enum: ["pending", "approved", "rejected"]
-    };
-    
-    const result = detectEnum(schema, "Status");
-    
-    expect(result).toEqual({
-      name: "Status",
-      type: "string",
-      values: [
-        { name: "PENDING", value: "pending" },
-        { name: "APPROVED", value: "approved" },
-        { name: "REJECTED", value: "rejected" }
-      ]
-    });
-  });
-  
-  it("should return null for non-enum schema", () => {
-    const schema: SchemaObject = { type: "string" };
-    expect(detectEnum(schema, "Status")).toBe(null);
-  });
-});
-
-// Green: helpers/enum-detector.ts（未実装）
-export function detectEnum(
-  schema: SchemaObject,
-  name: string
-): IREnum | null {
-  if (!schema.enum || !Array.isArray(schema.enum)) {
-    return null;
-  }
-  
-  return {
-    name,
-    type: schema.type as "string" | "number",
-    description: schema.description,
-    values: schema.enum.map(value => ({
-      value,
-      name: String(value).toUpperCase().replace(/[^A-Z0-9]+/g, '_')
-    }))
-  };
-}
-```
+- **visitEnum**: SchemaObjectからIREnumへの変換
+- **generateEnumName**: 有効な識別子名の生成（別ファイル）
+- **IRScalarType**: 型安全性向上のための型エイリアス導入
+- **toIRScalarType**: 安全な型変換ヘルパー
 
 #### Step 7: Object型処理（object-visitor.ts）
 
@@ -1264,7 +1215,7 @@ function safeVisit<T>(
 
 ### 完了済みタスク
 
-#### Phase 1: Schema Object処理 ✅ 完了
+#### Phase 1: Schema Object処理の実装完了
 
 - プリミティブ型処理（visitPrimitive）
 - 汎用型解決（visitType）
@@ -1273,19 +1224,25 @@ function safeVisit<T>(
 - format属性サポート
 - nullable属性サポート
 
-#### Phase 2: Helper関数（部分完了）
+#### Phase 2実装状況
 
-- ✅ `is-primitive-type.ts` - プリミティブ型判定
-- ✅ `extract-ref-name.ts` - $ref名抽出（null返却対応）
-- ✅ `extract-validation.ts` - バリデーション情報抽出（null返却対応）
-- ✅ `extractName` → es-toolkit/last - パスから名前を抽出（es-toolkitに移行）
+完了済み:
+
+- ✅ Step 5: Helper関数群（extractValidation、es-toolkit移行）
+- ✅ Step 6: Enum処理（enum-visitor.ts、generate-enum-name.ts）
+
+リファクタリング成果:
+
+- ✅ IRScalarType型エイリアス導入
+- ✅ toIRScalarTypeヘルパー実装
+- ✅ isPrimitiveType削除（冗長性排除）
 
 ### 現在の成果
 
-- **テスト数**: 104テスト全て合格
+- **テスト数**: 121テスト全て合格
 - **エラーハンドリング**: consola.warn + null返却パターンで統一
-- **型安全性**: TypeScript strict modeで完全な型安全性を実現
-- **Tree-shaking**: 関数ベースアーキテクチャにより最適化
+- **型安全性**: IRScalarType導入により型安全性向上
+- **Tree-shaking**: 1ファイル1関数原則の徹底
 
 ## 今後の展望
 

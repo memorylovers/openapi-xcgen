@@ -8,7 +8,7 @@
 import { consola } from "consola";
 import type { SchemaObject } from "../../types/index.js";
 import type { IRPrimitive } from "../../types/ir/index.js";
-import { isPrimitiveType } from "../helpers/is-primitive-type.js";
+import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
 
 // OpenAPI 3.0.x supports nullable, 3.1.x uses type arrays
 // For backward compatibility, we support nullable
@@ -20,7 +20,7 @@ type SchemaObjectWithNullable = SchemaObject & { nullable?: boolean };
  * @bnf <schema-object> - プリミティブ型を持つスキーマオブジェクト
  * @bnf-ref _docs/900_openapi_v3.1_BNF_spec.md:301-350
  * @bnf-fields
- *   - `type` (line 309): <type-value> - "string" | "number" | "integer" | "boolean"
+ *   - `type` (line 309): <type-value> - IRScalarType ("string" | "number" | "integer" | "boolean")
  *   - `format` (line 336): 型のフォーマット指定（例: "email", "date-time", "uuid"）
  *   - `nullable` (OpenAPI 3.0.x互換): 値がnullを許可するかの指定
  *
@@ -52,14 +52,15 @@ type SchemaObjectWithNullable = SchemaObject & { nullable?: boolean };
 export function visitPrimitive(
   schema: SchemaObjectWithNullable,
 ): IRPrimitive | null {
-  if (!isPrimitiveType(schema.type)) {
+  const scalarType = toIRScalarType(schema.type);
+  if (!scalarType) {
     consola.warn(`Invalid type for primitive visitor: ${schema.type}`);
     return null;
   }
 
   const result: IRPrimitive = {
     kind: "primitive",
-    type: schema.type as "string" | "number" | "integer" | "boolean",
+    type: scalarType,
   };
 
   // format プロパティがある場合は追加
