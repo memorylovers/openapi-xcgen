@@ -303,80 +303,15 @@ if (import.meta.vitest) {
 - **IRScalarType**: 型安全性向上のための型エイリアス導入
 - **toIRScalarType**: 安全な型変換ヘルパー
 
-#### Step 7: Object型処理（object-visitor.ts）
+#### Step 7: Object型処理 ✅ 完了
 
-object型のSchemaObjectをIRModelに変換。
+`object-visitor.ts`として実装完了。Contextパターンを採用し、モデル名を必須パラメータ化：
 
-```typescript
-// Red: object-visitor.ts
-describe("visitObject", () => {
-  it("should convert object schema to IRModel", () => {
-    const schema: SchemaObject = {
-      type: "object",
-      properties: {
-        id: { type: "integer", format: "int64" },
-        name: { type: "string" },
-        email: { type: "string", format: "email" }
-      },
-      required: ["id", "name"]
-    };
-    
-    const result = visitObject(schema, "User");
-    
-    expect(result).toEqual({
-      name: "User",
-      properties: [
-        { 
-          name: "id", 
-          type: { kind: "primitive", type: "integer", format: "int64" },
-          required: true 
-        },
-        { 
-          name: "name", 
-          type: { kind: "primitive", type: "string" },
-          required: true 
-        },
-        { 
-          name: "email", 
-          type: { kind: "primitive", type: "string", format: "email" },
-          required: false 
-        }
-      ]
-    });
-  });
-});
-
-// Green: visitors/object-visitor.ts
-import { visitType } from "./type-visitor.js";
-import { extractValidation } from "../helpers/extract-validation.js";
-
-export function visitObject(
-  schema: SchemaObject,
-  name: string
-): IRModel | null {
-  if (schema.type !== "object" || !schema.properties) {
-    return null;
-  }
-  
-  const required = schema.required || [];
-  
-  const properties: IRProperty[] = Object.entries(schema.properties).map(
-    ([propName, propSchema]) => ({
-      name: propName,
-      type: visitType(propSchema as SchemaObject) || { kind: "any" },
-      required: required.includes(propName),
-      description: (propSchema as SchemaObject).description,
-      validation: extractValidation(propSchema as SchemaObject)
-    })
-  );
-  
-  return {
-    name,
-    description: schema.description,
-    properties
-  };
-}
-```
+- **visitObject**: SchemaObjectからIRModelへの変換
+- **required/nullable対応**: OpenAPI 3.0.x互換の4パターン完全サポート
+- **プロパティ属性**: description、defaultValue、deprecated、validation対応
+- **型サポート**: プリミティブ、配列、$ref参照をvisitType経由で処理
+- **エラーハンドリング**: 無効プロパティのスキップと警告（17テスト実装）
 
 #### Step 8: Union型処理（統合Visitor内）
 
@@ -437,6 +372,12 @@ export function detectUnion(
 
 全ての型処理を統合し、適切なvisitor/detectorに振り分け。
 
+**実装すべき重要機能：**
+
+- **ネストしたオブジェクトの処理** - object型プロパティを独立したIRModelとして抽出
+- **インラインenumのIREnum抽出** - プロパティ内のenum配列を独立した型として分離
+- **循環参照の検出と処理** - 無限ループを防ぐためのvisitedチェック
+
 ```typescript
 // Red: schema-visitor.ts
 describe("visitSchema", () => {
@@ -471,6 +412,69 @@ describe("visitSchema", () => {
     expect(result.kind).toBe("model");
     expect(result.name).toBe("User");
   });
+
+  it("should extract nested objects as separate models", () => {
+    const schema: SchemaObject = {
+      type: "object",
+      properties: {
+        id: { type: "integer" },
+        address: {
+          type: "object",
+          properties: {
+            street: { type: "string" },
+            city: { type: "string" }
+          }
+        }
+      }
+    };
+    const context = createContext({
+      path: ["components", "schemas", "User"]
+    });
+    
+    const result = visitSchema(schema, context);
+    
+    // メインモデルとネストモデルが分離される
+    expect(result.models).toHaveLength(2);
+    expect(result.models[0].name).toBe("User");
+    expect(result.models[1].name).toBe("User_Address");
+    // addressプロパティは参照として保持
+    expect(result.models[0].properties[1].type).toEqual({
+      kind: "ref",
+      name: "User_Address"
+    });
+  });
+
+  it("should extract inline enums as IREnum", () => {
+    const schema: SchemaObject = {
+      type: "object",
+      properties: {
+        id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["active", "inactive", "pending"]
+        }
+      }
+    };
+    const context = createContext({
+      path: ["components", "schemas", "User"]
+    });
+    
+    const result = visitSchema(schema, context);
+    
+    // インラインenumがIREnumとして抽出される
+    expect(result.enums).toHaveLength(1);
+    expect(result.enums[0].name).toBe("User_Status");
+    expect(result.enums[0].values).toEqual([
+      { value: "active", name: "ACTIVE" },
+      { value: "inactive", name: "INACTIVE" },
+      { value: "pending", name: "PENDING" }
+    ]);
+    // statusプロパティは参照として保持
+    expect(result.models[0].properties[1].type).toEqual({
+      kind: "ref",
+      name: "User_Status"
+    });
+  });
 });
 
 // Green: visitors/schema-visitor.ts
@@ -485,6 +489,7 @@ export function visitSchema(
   context: VisitorContext
 ): SchemaResult {
   const name = last(context.path) || "Unknown";  // es-toolkitのlast関数を使用
+  const extracted = { models: [], enums: [], unions: [] };  // 抽出結果を収集
   
   // $ref参照の場合
   if (isReferenceObject(schema)) {
@@ -505,15 +510,86 @@ export function visitSchema(
   
   // object型の場合
   if (schema.type === "object") {
-    const modelResult = visitObject(schema, name);
+    const modelResult = visitObjectWithExtraction(schema, name, context);
     if (modelResult) {
-      return { kind: "model", ...modelResult };
+      // ネストオブジェクトとインラインenumを収集
+      extracted.models.push(modelResult.model);
+      extracted.models.push(...modelResult.nestedModels);
+      extracted.enums.push(...modelResult.extractedEnums);
+      
+      return { 
+        kind: "model", 
+        ...modelResult.model,
+        extracted  // 抽出されたmodels/enumsも返す
+      };
     }
   }
   
   // その他は通常の型として処理
   const typeResult = visitType(schema);
   return { kind: "type", type: typeResult };
+}
+
+// 拡張版visitObject - ネストオブジェクトとインラインenumを抽出
+function visitObjectWithExtraction(
+  schema: SchemaObject,
+  name: string,
+  context: VisitorContext
+): ExtractedModelResult | null {
+  const nestedModels: IRModel[] = [];
+  const extractedEnums: IREnum[] = [];
+  const properties: IRProperty[] = [];
+  
+  for (const [propName, propSchema] of Object.entries(schema.properties)) {
+    // インラインenumの検出と抽出
+    if (propSchema.enum) {
+      const enumName = `${name}_${toPascalCase(propName)}`;
+      const enumResult = visitEnum(propSchema, { name: enumName });
+      if (enumResult) {
+        extractedEnums.push(enumResult);
+        properties.push({
+          name: propName,
+          type: { kind: "ref", name: enumName },
+          // ... その他のプロパティ
+        });
+        continue;
+      }
+    }
+    
+    // ネストしたオブジェクトの検出と抽出
+    if (propSchema.type === "object" && propSchema.properties) {
+      const nestedName = `${name}_${toPascalCase(propName)}`;
+      const nestedResult = visitObjectWithExtraction(
+        propSchema, 
+        nestedName, 
+        withPath(context, propName)
+      );
+      if (nestedResult) {
+        nestedModels.push(nestedResult.model);
+        nestedModels.push(...nestedResult.nestedModels);
+        extractedEnums.push(...nestedResult.extractedEnums);
+        properties.push({
+          name: propName,
+          type: { kind: "ref", name: nestedName },
+          // ... その他のプロパティ
+        });
+        continue;
+      }
+    }
+    
+    // 通常のプロパティ処理
+    properties.push({
+      name: propName,
+      type: visitType(propSchema),
+      // ... その他のプロパティ
+    });
+  }
+  
+  return {
+    model: { name, properties },
+    nestedModels,
+    extractedEnums
+  };
 }
 ```
 
@@ -1230,6 +1306,13 @@ function safeVisit<T>(
 
 - ✅ Step 5: Helper関数群（extractValidation、es-toolkit移行）
 - ✅ Step 6: Enum処理（enum-visitor.ts、generate-enum-name.ts）
+- ✅ Step 7: Object型処理（object-visitor.ts、required/nullable対応）
+
+未着手:
+
+- 🚧 Step 8: Union型処理（oneOf/anyOfのサポート）
+- 🚧 Step 9: Schema統合Visitor（ネストオブジェクト/インラインenum抽出）
+- 🚧 Step 10: Components処理（schemas全体の処理）
 
 リファクタリング成果:
 
@@ -1239,7 +1322,7 @@ function safeVisit<T>(
 
 ### 現在の成果
 
-- **テスト数**: 121テスト全て合格
+- **テスト数**: 80テスト全て合格（parser: 1, transformer: 79）
 - **エラーハンドリング**: consola.warn + null返却パターンで統一
 - **型安全性**: IRScalarType導入により型安全性向上
 - **Tree-shaking**: 1ファイル1関数原則の徹底
