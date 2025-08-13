@@ -5,7 +5,7 @@
  * TDDアプローチに従い、段階的に拡張していく。
  */
 
-import type { IREnum, IRModel, IRUnion } from "./data";
+import type { IREnum, IRModel } from "./data";
 
 import type { IRService } from "./api";
 
@@ -22,8 +22,6 @@ export interface XcgenIR {
   models: IRModel[];
   /** 列挙型の配列 */
   enums: IREnum[];
-  /** Union型の配列 */
-  unions: IRUnion[];
   /** APIサービスの配列（タグでグループ化） */
   services: IRService[];
   /** サーバー情報の配列 */

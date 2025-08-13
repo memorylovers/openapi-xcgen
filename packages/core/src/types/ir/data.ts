@@ -235,33 +235,6 @@ export interface IREnumValue {
 }
 
 /**
- * IRUnion - Union型定義
- * oneOf/anyOfから生成される
- * @example
- * ```yaml
- * # OpenAPI → IRUnion
- * components:
- *   schemas:
- *     Pet:
- *       oneOf:
- *         - $ref: "#/components/schemas/Cat"
- *         - $ref: "#/components/schemas/Dog"
- *       discriminator:
- *         propertyName: type
- * ```
- */
-export interface IRUnion {
-  /** Union名（PascalCase） */
-  name: string;
-  /** 説明 */
-  description?: string;
-  /** 構成する型 */
-  types: IRType[];
-  /** 判別子プロパティ名 */
-  discriminator?: string;
-}
-
-/**
  * IRValidation - バリデーション情報
  * @example
  * ```yaml

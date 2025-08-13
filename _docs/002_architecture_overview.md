@@ -53,7 +53,6 @@ export type {
   XcgenIR,
   IRModel,
   IREnum,
-  IRUnion,
   IRService,
   IREndpoint,
   IRType,
@@ -75,7 +74,6 @@ export interface XcgenIR {
   metadata: IRMetadata;        // API基本情報
   models: IRModel[];           // データモデル
   enums: IREnum[];            // 列挙型
-  unions: IRUnion[];          // Union型
   services: IRService[];      // APIサービス（タグでグループ化）
   servers: IRServer[];        // サーバー情報
   security?: IRSecurityScheme[]; // セキュリティ定義

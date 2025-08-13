@@ -313,60 +313,17 @@ if (import.meta.vitest) {
 - **型サポート**: プリミティブ、配列、$ref参照をvisitType経由で処理
 - **エラーハンドリング**: 無効プロパティのスキップと警告（17テスト実装）
 
-#### Step 8: Union型処理（統合Visitor内）
+#### Step 8: Union型処理 🔜 将来実装
 
-oneOf/anyOfを使用したUnion型の処理。
+oneOf/anyOf/allOfを使用したUnion型およびスキーママージ処理：
 
-```typescript
-// Red: Union型処理
-describe("Union type handling", () => {
-  it("should extract union from oneOf", () => {
-    const schema: SchemaObject = {
-      oneOf: [
-        { $ref: "#/components/schemas/Cat" },
-        { $ref: "#/components/schemas/Dog" }
-      ],
-      discriminator: {
-        propertyName: "type"
-      }
-    };
-    
-    const result = detectUnion(schema, "Pet");
-    
-    expect(result).toEqual({
-      name: "Pet",
-      types: [
-        { kind: "ref", name: "Cat" },
-        { kind: "ref", name: "Dog" }
-      ],
-      discriminator: "type"
-    });
-  });
-});
+- **oneOf**: 排他的Union（exactly one）
+- **anyOf**: 包含的Union（one or more）
+- **allOf**: スキーママージ
+- **discriminator**: ポリモーフィズムサポート
 
-// Green: helpers/union-detector.ts
-export function detectUnion(
-  schema: SchemaObject,
-  name: string
-): IRUnion | null {
-  const unionSchemas = schema.oneOf || schema.anyOf;
-  
-  if (!unionSchemas || !Array.isArray(unionSchemas)) {
-    return null;
-  }
-  
-  const types = unionSchemas.map(s => 
-    visitType(s as SchemaObject) || { kind: "any" }
-  );
-  
-  return {
-    name,
-    description: schema.description,
-    types,
-    discriminator: schema.discriminator?.propertyName
-  };
-}
-```
+**実装予定時期**: 基本機能の安定化後（Phase 2.5）
+**理由**: 使用頻度が低く（全体の5-10%）、基本的な型処理を優先
 
 #### Step 9: Schema統合Visitor（schema-visitor.ts）
 
@@ -1308,11 +1265,16 @@ function safeVisit<T>(
 - ✅ Step 6: Enum処理（enum-visitor.ts、generate-enum-name.ts）
 - ✅ Step 7: Object型処理（object-visitor.ts、required/nullable対応）
 
-未着手:
+次の実装対象:
 
-- 🚧 Step 8: Union型処理（oneOf/anyOfのサポート）
 - 🚧 Step 9: Schema統合Visitor（ネストオブジェクト/インラインenum抽出）
 - 🚧 Step 10: Components処理（schemas全体の処理）
+
+将来実装（Phase 2.5）:
+
+- 🔜 Step 8: Union型処理（oneOf/anyOf/allOf）
+- 🔜 discriminator対応
+- 🔜 not（否定スキーマ）
 
 リファクタリング成果:
 
