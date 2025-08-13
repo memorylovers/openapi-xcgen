@@ -10,6 +10,7 @@ export type PathsObject = OpenAPIV3_1.PathsObject;
 export type PathItemObject = OpenAPIV3_1.PathItemObject;
 export type OperationObject = OpenAPIV3_1.OperationObject;
 export type SchemaObject = OpenAPIV3_1.SchemaObject;
+export type SchemaObjectWithNullable = SchemaObject & { nullable?: boolean };
 export type ReferenceObject = OpenAPIV3_1.ReferenceObject;
 export type ParameterObject = OpenAPIV3_1.ParameterObject;
 export type RequestBodyObject = OpenAPIV3_1.RequestBodyObject;

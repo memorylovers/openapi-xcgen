@@ -7,15 +7,11 @@
 
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards.js";
-import type { SchemaObject } from "../../types/index.js";
+import type { SchemaObjectWithNullable } from "../../types/index.js";
 import type { IRArray, IRType } from "../../types/ir/index.js";
 import { extractRefName } from "../helpers/extract-ref-name.js";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
 import { visitPrimitive } from "./primitive-visitor.js";
-
-// OpenAPI 3.0.x supports nullable, 3.1.x uses type arrays
-// For backward compatibility, we support nullable
-type SchemaObjectWithNullable = SchemaObject & { nullable?: boolean };
 
 /**
  * SchemaObjectをIRTypeに解決

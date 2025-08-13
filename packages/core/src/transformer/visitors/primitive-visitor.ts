@@ -6,13 +6,9 @@
  */
 
 import { consola } from "consola";
-import type { SchemaObject } from "../../types/index.js";
+import type { SchemaObjectWithNullable } from "../../types/index.js";
 import type { IRPrimitive } from "../../types/ir/index.js";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
-
-// OpenAPI 3.0.x supports nullable, 3.1.x uses type arrays
-// For backward compatibility, we support nullable
-type SchemaObjectWithNullable = SchemaObject & { nullable?: boolean };
 
 /**
  * プリミティブ型のSchemaObjectをIRPrimitiveに変換
