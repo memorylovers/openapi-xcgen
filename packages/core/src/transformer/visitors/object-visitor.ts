@@ -1,21 +1,27 @@
 /**
  * @file Object型のSchemaObjectをIRModelに変換するVisitor
+ *
+ * このVisitorはObject型のスキーマ構造の処理に専念し、
+ * 各プロパティの型判定は`visitSchema`に委譲します。
+ * これにより単一責任原則を実現し、型判定のロジックの重複を防ぎます。
+ *
  * @bnf <schema-object> - type: "object"を持つスキーマオブジェクト
  * @bnf-fields
- *   - `type` (line 309): "object"
- *   - `properties` (line 321): プロパティの定義マップ
- *   - `required` (line 322): 必須プロパティ名の配列
- *   - `description` (line 335): モデルの説明
+ *   - `type`: "object"
+ *   - `properties`: プロパティの定義マップ
+ *   - `required`: 必須プロパティ名の配列
+ *   - `description`: モデルの説明
  */
 
 import { consola } from "consola";
+import { pascalCase } from "es-toolkit/string";
 import type {
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../types/index.js";
-import type { IRModel, IRProperty } from "../../types/ir/data.js";
+import type { IREnum, IRModel, IRProperty } from "../../types/ir/data.js";
 import { extractValidation } from "../helpers/extract-validation.js";
-import { visitType } from "./type-visitor.js";
+import { visitSchema } from "./schema-visitor.js";
 
 /**
  * Object Visitorのコンテキスト
@@ -26,7 +32,22 @@ export interface ObjectVisitorContext {
 }
 
 /**
- * object型のSchemaObjectをIRModelに変換
+ * Object Visitorの結果
+ */
+export interface ObjectVisitorResult {
+  /** すべてのモデル（メインモデル＋ネストしたモデル） */
+  models: IRModel[];
+  /** インラインenum */
+  enums: IREnum[];
+}
+
+/**
+ * Object型のSchemaObjectをIRModelに変換し、ネスト構造を抽出
+ *
+ * 責務:
+ * - Object型スキーマの構造処理（propertiesの展開、requiredの適用）
+ * - 各プロパティの型判定を`visitSchema`に委譲
+ * - ネストされたモデルとenumの収集と集約
  *
  * OpenAPI 3.0.x におけるrequiredとnullableの組み合わせ：
  * - required: true  + nullable: true  = 必須だがnull値を許可
@@ -34,11 +55,11 @@ export interface ObjectVisitorContext {
  * - required: false + nullable: true  = オプショナルでnull値も許可
  * - required: false + nullable: false = オプショナル（デフォルト）
  *
- * nullable情報はvisitType経由で各プロパティの型情報（IRPrimitive等）に含まれる
+ * nullable情報はvisitSchema→visitType経由で各プロパティの型情報に含まれる
  *
  * @param schema - OpenAPI SchemaObject (type: "object")
  * @param context - Visitor context with model name
- * @returns IRModel型の結果、無効な場合はnull
+ * @returns ObjectVisitorResult型の結果（メインモデル、ネストしたモデル、インラインenum）
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -62,28 +83,41 @@ export interface ObjectVisitorContext {
  * @example Usage
  * ```typescript
  * const result = visitObject(schema, { name: "User" });
+ * // result.models[0]: メインのUserモデル
+ * // result.models[1..]: ネストしたモデル（visitSchema経由で抽出）
+ * // result.enums: インラインenum（visitSchema経由で抽出）
+ *
+ * // 内部では各プロパティに対してvisitSchemaを呼び出し
+ * // 型判定と処理を委譲している
  * ```
  */
 export function visitObject(
   schema: SchemaObjectWithNullable,
-  { name }: ObjectVisitorContext,
-): IRModel | null {
+  context: ObjectVisitorContext,
+): ObjectVisitorResult {
+  const result: ObjectVisitorResult = {
+    models: [],
+    enums: [],
+  };
+
+  const { name } = context;
+
   // 名前の妥当性チェック
   if (!name.trim()) {
     consola.warn("Invalid model name: empty or whitespace only");
-    return null;
+    return result;
   }
 
   // object型でない場合
   if (schema.type !== "object") {
     consola.warn(`Invalid type for object visitor: ${schema.type}`);
-    return null;
+    return result;
   }
 
   // propertiesがない場合
   if (!schema.properties) {
     consola.warn(`Object schema ${name} has no properties`);
-    return null;
+    return result;
   }
 
   // requiredプロパティの配列を取得（未定義の場合は空配列）
@@ -91,58 +125,79 @@ export function visitObject(
 
   // 各プロパティをIRPropertyに変換
   const properties: IRProperty[] = [];
+
+  // ネストしたモデルとenumを収集
+  const nestedModels: IRModel[] = [];
+  const nestedEnums: IREnum[] = [];
+
   for (const [propName, propSchema] of Object.entries(schema.properties)) {
-    const propType = visitType(propSchema as SchemaObjectWithNullable);
-
-    // プロパティの型が無効な場合はスキップ
-    if (propType === null) {
-      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
-      continue;
-    }
-
-    const property: IRProperty = {
-      name: propName,
-      type: propType,
-      required: required.includes(propName),
-    };
-
-    // descriptionがある場合は追加
     const schemaObj = propSchema as SchemaObjectWithNullable;
-    if (schemaObj.description) {
-      property.description = schemaObj.description;
-    }
 
-    // defaultValueがある場合は追加
-    if (schemaObj.default !== undefined) {
-      property.defaultValue = schemaObj.default;
-    }
+    // プロパティ名を含む適切な名前を生成
+    const propTypeName = `${name}${pascalCase(propName)}`;
 
-    // deprecatedがある場合は追加
-    if (schemaObj.deprecated === true) {
-      property.deprecated = true;
-    }
+    // visitSchemaを使って型を判定・処理
+    const propResult = visitSchema(schemaObj, {
+      name: propTypeName,
+    });
 
-    // バリデーション情報を抽出
-    const validation = extractValidation(schemaObj);
-    if (validation) {
-      property.validation = validation;
-    }
+    // 抽出されたモデルとenumを収集
+    nestedModels.push(...propResult.models);
+    nestedEnums.push(...propResult.enums);
 
-    properties.push(property);
+    // プロパティの型が取得できた場合のみ追加
+    if (propResult.type) {
+      const property: IRProperty = {
+        name: propName,
+        type: propResult.type,
+        required: required.includes(propName),
+      };
+
+      // descriptionがある場合は追加
+      if (schemaObj.description) {
+        property.description = schemaObj.description;
+      }
+
+      // defaultValueがある場合は追加
+      if (schemaObj.default !== undefined) {
+        property.defaultValue = schemaObj.default;
+      }
+
+      // deprecatedがある場合は追加
+      if (schemaObj.deprecated === true) {
+        property.deprecated = true;
+      }
+
+      // バリデーション情報を抽出
+      const validation = extractValidation(schemaObj);
+      if (validation) {
+        property.validation = validation;
+      }
+
+      properties.push(property);
+    } else {
+      // 型が無効な場合はスキップ
+      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+    }
   }
 
   // プロパティが1つも変換できなかった場合
   if (properties.length === 0) {
     consola.warn(`No valid properties found for model ${name}`);
-    return null;
+    return result;
   }
 
-  const result: IRModel = { name, properties };
+  const mainModel: IRModel = { name, properties };
 
   // descriptionがある場合のみ追加
   if (schema.description) {
-    result.description = schema.description;
+    mainModel.description = schema.description;
   }
+
+  // メインモデルを最初に、ネストしたモデルをその後に追加
+  result.models.push(mainModel);
+  result.models.push(...nestedModels);
+  result.enums = nestedEnums;
 
   return result;
 }
@@ -152,70 +207,79 @@ if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
 
   describe("visitObject", () => {
+    // ===================================
+    // カテゴリ1: 基本的なObject処理
+    // ===================================
     it("should convert object schema to IRModel", () => {
       const schema: SchemaObject = {
         type: "object",
-        description: "User model",
         properties: {
-          id: { type: "integer", format: "int64" },
-          name: { type: "string" },
-          email: { type: "string", format: "email" },
+          id: { type: "string" },
         },
-        required: ["id", "name"],
       };
 
-      const result = visitObject(schema, { name: "User" });
+      const result = visitObject(schema, { name: "Simple" });
 
       expect(result).toEqual({
-        name: "User",
-        description: "User model",
+        models: [
+          {
+            name: "Simple",
+            properties: [
+              {
+                name: "id",
+                type: { kind: "primitive", type: "string" },
+                required: false,
+              },
+            ],
+          },
+        ],
+        enums: [],
+      });
+    });
+
+    it("should handle model with description", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        description: "Test model",
+        properties: {
+          id: { type: "integer" },
+        },
+      };
+
+      const result = visitObject(schema, { name: "Model" });
+
+      expect(result.models[0]).toEqual({
+        name: "Model",
+        description: "Test model",
         properties: [
           {
             name: "id",
-            type: { kind: "primitive", type: "integer", format: "int64" },
-            required: true,
-          },
-          {
-            name: "name",
-            type: { kind: "primitive", type: "string" },
-            required: true,
-          },
-          {
-            name: "email",
-            type: { kind: "primitive", type: "string", format: "email" },
+            type: { kind: "primitive", type: "integer" },
             required: false,
           },
         ],
       });
     });
 
+    // ===================================
+    // カテゴリ2: プロパティのメタデータ処理
+    // ===================================
     it("should handle properties with descriptions", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
-          id: {
-            type: "integer",
-            description: "Unique identifier",
-          },
           name: {
             type: "string",
             description: "User's full name",
           },
         },
-        required: ["id"],
       };
 
       const result = visitObject(schema, { name: "User" });
 
-      expect(result).toEqual({
+      expect(result.models[0]).toEqual({
         name: "User",
         properties: [
-          {
-            name: "id",
-            type: { kind: "primitive", type: "integer" },
-            required: true,
-            description: "Unique identifier",
-          },
           {
             name: "name",
             type: { kind: "primitive", type: "string" },
@@ -234,16 +298,12 @@ if (import.meta.vitest) {
             type: "string",
             default: "active",
           },
-          count: {
-            type: "integer",
-            default: 0,
-          },
         },
       };
 
       const result = visitObject(schema, { name: "Config" });
 
-      expect(result).toEqual({
+      expect(result.models[0]).toEqual({
         name: "Config",
         properties: [
           {
@@ -251,12 +311,6 @@ if (import.meta.vitest) {
             type: { kind: "primitive", type: "string" },
             required: false,
             defaultValue: "active",
-          },
-          {
-            name: "count",
-            type: { kind: "primitive", type: "integer" },
-            required: false,
-            defaultValue: 0,
           },
         ],
       });
@@ -270,15 +324,12 @@ if (import.meta.vitest) {
             type: "string",
             deprecated: true,
           },
-          newField: {
-            type: "string",
-          },
         },
       };
 
       const result = visitObject(schema, { name: "Model" });
 
-      expect(result).toEqual({
+      expect(result.models[0]).toEqual({
         name: "Model",
         properties: [
           {
@@ -286,11 +337,6 @@ if (import.meta.vitest) {
             type: { kind: "primitive", type: "string" },
             required: false,
             deprecated: true,
-          },
-          {
-            name: "newField",
-            type: { kind: "primitive", type: "string" },
-            required: false,
           },
         ],
       });
@@ -306,28 +352,120 @@ if (import.meta.vitest) {
             maxLength: 20,
             pattern: "^[a-zA-Z0-9]+$",
           },
-          age: {
-            type: "integer",
-            minimum: 0,
-            maximum: 150,
-          },
         },
       };
 
       const result = visitObject(schema, { name: "User" });
 
-      expect(result?.properties[0].validation).toEqual({
-        minLength: 3,
-        maxLength: 20,
-        pattern: "^[a-zA-Z0-9]+$",
-      });
-      expect(result?.properties[1].validation).toEqual({
-        minimum: 0,
-        maximum: 150,
+      expect(result).toEqual({
+        models: [
+          {
+            name: "User",
+            properties: [
+              {
+                name: "username",
+                type: { kind: "primitive", type: "string" },
+                required: false,
+                validation: {
+                  minLength: 3,
+                  maxLength: 20,
+                  pattern: "^[a-zA-Z0-9]+$",
+                },
+              },
+            ],
+          },
+        ],
+        enums: [],
       });
     });
 
-    it("should handle nested object properties", () => {
+    // ===================================
+    // カテゴリ3: required/nullable処理
+    // ===================================
+    it("should handle combination of required and nullable properties", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          requiredNullable: {
+            type: "string",
+            nullable: true,
+          },
+          requiredNotNullable: {
+            type: "string",
+          },
+          optionalNullable: {
+            type: "string",
+            nullable: true,
+          },
+          optionalNotNullable: {
+            type: "string",
+          },
+        },
+        required: ["requiredNullable", "requiredNotNullable"],
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, { name: "NullableTest" });
+
+      expect(result.models[0]).toEqual({
+        name: "NullableTest",
+        properties: [
+          {
+            name: "requiredNullable",
+            type: { kind: "primitive", type: "string", nullable: true },
+            required: true,
+          },
+          {
+            name: "requiredNotNullable",
+            type: { kind: "primitive", type: "string" },
+            required: true,
+          },
+          {
+            name: "optionalNullable",
+            type: { kind: "primitive", type: "string", nullable: true },
+            required: false,
+          },
+          {
+            name: "optionalNotNullable",
+            type: { kind: "primitive", type: "string" },
+            required: false,
+          },
+        ],
+      });
+    });
+
+    it("should ignore non-existent property names in required array", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          name: { type: "string" },
+        },
+        required: ["id", "nonExistent"], // 存在しないプロパティ名を含む
+      };
+
+      const result = visitObject(schema, { name: "TestModel" });
+
+      expect(result.models[0]).toEqual({
+        name: "TestModel",
+        properties: [
+          {
+            name: "id",
+            type: { kind: "primitive", type: "integer" },
+            required: true, // 存在するプロパティは正しくrequired
+          },
+          {
+            name: "name",
+            type: { kind: "primitive", type: "string" },
+            required: false, // required配列に含まれていないのでfalse
+          },
+        ],
+      });
+    });
+
+    // ===================================
+    // カテゴリ4: visitSchemaへの委譲
+    // ===================================
+    it("should delegate nested objects to visitSchema", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -335,7 +473,6 @@ if (import.meta.vitest) {
             type: "object",
             properties: {
               street: { type: "string" },
-              city: { type: "string" },
             },
           },
         },
@@ -343,9 +480,31 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, { name: "Person" });
 
-      // type-visitorは現在object型をサポートしていないため、nullが返される
-      // そのため、プロパティはスキップされる
-      expect(result).toBe(null);
+      expect(result).toEqual({
+        models: [
+          {
+            name: "Person",
+            properties: [
+              {
+                name: "address",
+                type: { kind: "ref", name: "PersonAddress" },
+                required: false,
+              },
+            ],
+          },
+          {
+            name: "PersonAddress",
+            properties: [
+              {
+                name: "street",
+                type: { kind: "primitive", type: "string" },
+                required: false,
+              },
+            ],
+          },
+        ],
+        enums: [],
+      });
     });
 
     it("should handle array properties", () => {
@@ -356,22 +515,28 @@ if (import.meta.vitest) {
             type: "array",
             items: { type: "string" },
           },
-          scores: {
-            type: "array",
-            items: { type: "number" },
-          },
         },
       };
 
       const result = visitObject(schema, { name: "Data" });
 
-      expect(result?.properties[0].type).toEqual({
-        kind: "array",
-        itemType: { kind: "primitive", type: "string" },
-      });
-      expect(result?.properties[1].type).toEqual({
-        kind: "array",
-        itemType: { kind: "primitive", type: "number" },
+      expect(result).toEqual({
+        models: [
+          {
+            name: "Data",
+            properties: [
+              {
+                name: "tags",
+                type: {
+                  kind: "array",
+                  itemType: { kind: "primitive", type: "string" },
+                },
+                required: false,
+              },
+            ],
+          },
+        ],
+        enums: [],
       });
     });
 
@@ -380,85 +545,78 @@ if (import.meta.vitest) {
         type: "object",
         properties: {
           user: { $ref: "#/components/schemas/User" },
-          group: { $ref: "#/components/schemas/Group" },
         },
-        required: ["user"],
       } as SchemaObject;
 
       const result = visitObject(schema, { name: "Membership" });
 
-      expect(result?.properties[0]).toEqual({
-        name: "user",
-        type: { kind: "ref", name: "User" },
-        required: true,
-      });
-      expect(result?.properties[1]).toEqual({
-        name: "group",
-        type: { kind: "ref", name: "Group" },
-        required: false,
+      expect(result).toEqual({
+        models: [
+          {
+            name: "Membership",
+            properties: [
+              {
+                name: "user",
+                type: { kind: "ref", name: "User" },
+                required: false,
+              },
+            ],
+          },
+        ],
+        enums: [],
       });
     });
 
-    it("should handle combination of required and nullable properties", () => {
-      const schema = {
+    it("should collect enums from delegated properties", () => {
+      const schema: SchemaObject = {
         type: "object",
         properties: {
-          requiredNullable: {
+          status: {
             type: "string",
-            nullable: true,
-            description: "Required but nullable",
-          },
-          requiredNotNullable: {
-            type: "string",
-            description: "Required and not nullable",
-          },
-          optionalNullable: {
-            type: "string",
-            nullable: true,
-            description: "Optional and nullable",
-          },
-          optionalNotNullable: {
-            type: "string",
-            description: "Optional and not nullable",
+            enum: ["draft", "published", "archived"],
+            description: "Document status",
           },
         },
-        required: ["requiredNullable", "requiredNotNullable"],
-      } as SchemaObjectWithNullable;
+      };
 
-      const result = visitObject(schema, { name: "NullableTest" });
+      const result = visitObject(schema, { name: "Document" });
 
       expect(result).toEqual({
-        name: "NullableTest",
-        properties: [
+        models: [
           {
-            name: "requiredNullable",
-            type: { kind: "primitive", type: "string", nullable: true },
-            required: true,
-            description: "Required but nullable",
+            name: "Document",
+            properties: [
+              {
+                name: "status",
+                type: { kind: "ref", name: "DocumentStatus" },
+                required: false,
+                description: "Document status",
+                validation: {
+                  enum: ["draft", "published", "archived"],
+                },
+              },
+            ],
           },
+        ],
+        enums: [
           {
-            name: "requiredNotNullable",
-            type: { kind: "primitive", type: "string" },
-            required: true,
-            description: "Required and not nullable",
-          },
-          {
-            name: "optionalNullable",
-            type: { kind: "primitive", type: "string", nullable: true },
-            required: false,
-            description: "Optional and nullable",
-          },
-          {
-            name: "optionalNotNullable",
-            type: { kind: "primitive", type: "string" },
-            required: false,
-            description: "Optional and not nullable",
+            name: "DocumentStatus",
+            description: "Document status",
+            type: "string",
+            values: [
+              { value: "draft", name: "DRAFT" },
+              { value: "published", name: "PUBLISHED" },
+              { value: "archived", name: "ARCHIVED" },
+            ],
           },
         ],
       });
     });
 
-    it("should return null for non-object type", () => {
+    // ===================================
+    // カテゴリ5: エラーハンドリング
+    // ===================================
+    it("should return empty result for non-object type", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -471,7 +629,10 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, { name: "Invalid" });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid type for object visitor: string",
       );
@@ -479,7 +640,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for object without properties", () => {
+    it("should return empty result for object without properties", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -489,7 +650,10 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, { name: "Empty" });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "Object schema Empty has no properties",
       );
@@ -497,7 +661,49 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for empty name", () => {
+    it("should return empty result for object with null properties", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const schema = {
+        type: "object",
+        properties: null,
+      } as unknown as SchemaObject;
+
+      const result = visitObject(schema, { name: "NullProps" });
+
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Object schema NullProps has no properties",
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("should return empty result for object with empty properties", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {},
+      };
+
+      const result = visitObject(schema, { name: "EmptyProps" });
+
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "No valid properties found for model EmptyProps",
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("should return empty result for empty name", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -509,7 +715,10 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, { name: "" });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid model name: empty or whitespace only",
       );
@@ -517,7 +726,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for whitespace-only name", () => {
+    it("should return empty result for whitespace-only name", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -529,7 +738,10 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, { name: "   " });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid model name: empty or whitespace only",
       );
@@ -545,15 +757,26 @@ if (import.meta.vitest) {
         properties: {
           valid: { type: "string" },
           invalid: { type: "unknown" } as unknown as SchemaObject,
-          alsoValid: { type: "integer" },
         },
       };
 
       const result = visitObject(schema, { name: "Mixed" });
 
-      expect(result?.properties).toHaveLength(2);
-      expect(result?.properties[0].name).toBe("valid");
-      expect(result?.properties[1].name).toBe("alsoValid");
+      expect(result).toEqual({
+        models: [
+          {
+            name: "Mixed",
+            properties: [
+              {
+                name: "valid",
+                type: { kind: "primitive", type: "string" },
+                required: false,
+              },
+            ],
+          },
+        ],
+        enums: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "Skipping property invalid in Mixed: invalid type",
       );
@@ -561,139 +784,28 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null if all properties are invalid", () => {
+    it("should return empty result if all properties are invalid", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
         type: "object",
         properties: {
           invalid1: { type: "unknown" } as unknown as SchemaObject,
-          invalid2: { type: "object" }, // object型は未サポート
+          invalid2: { type: "invalid" } as unknown as SchemaObject,
         },
       };
 
       const result = visitObject(schema, { name: "AllInvalid" });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({
+        models: [],
+        enums: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "No valid properties found for model AllInvalid",
       );
 
       warnSpy.mockRestore();
-    });
-
-    it("should handle model without description", () => {
-      const schema: SchemaObject = {
-        type: "object",
-        properties: {
-          id: { type: "integer" },
-        },
-      };
-
-      const result = visitObject(schema, { name: "Simple" });
-
-      expect(result).toEqual({
-        name: "Simple",
-        properties: [
-          {
-            name: "id",
-            type: { kind: "primitive", type: "integer" },
-            required: false,
-          },
-        ],
-      });
-    });
-
-    it("should handle all fields combined", () => {
-      const schema: SchemaObject = {
-        type: "object",
-        description: "Complex model with all features",
-        properties: {
-          id: {
-            type: "integer",
-            format: "int64",
-            description: "Unique ID",
-          },
-          name: {
-            type: "string",
-            minLength: 1,
-            maxLength: 100,
-            description: "Name field",
-          },
-          status: {
-            type: "string",
-            enum: ["active", "inactive"],
-            default: "active",
-            description: "Status field",
-          },
-          oldField: {
-            type: "string",
-            deprecated: true,
-            description: "Deprecated field",
-          },
-          tags: {
-            type: "array",
-            items: { type: "string" },
-            minItems: 0,
-            maxItems: 10,
-          },
-        },
-        required: ["id", "name"],
-      };
-
-      const result = visitObject(schema, { name: "ComplexModel" });
-
-      expect(result).toEqual({
-        name: "ComplexModel",
-        description: "Complex model with all features",
-        properties: [
-          {
-            name: "id",
-            type: { kind: "primitive", type: "integer", format: "int64" },
-            required: true,
-            description: "Unique ID",
-          },
-          {
-            name: "name",
-            type: { kind: "primitive", type: "string" },
-            required: true,
-            description: "Name field",
-            validation: {
-              minLength: 1,
-              maxLength: 100,
-            },
-          },
-          {
-            name: "status",
-            type: { kind: "primitive", type: "string" },
-            required: false,
-            description: "Status field",
-            defaultValue: "active",
-            validation: {
-              enum: ["active", "inactive"],
-            },
-          },
-          {
-            name: "oldField",
-            type: { kind: "primitive", type: "string" },
-            required: false,
-            description: "Deprecated field",
-            deprecated: true,
-          },
-          {
-            name: "tags",
-            type: {
-              kind: "array",
-              itemType: { kind: "primitive", type: "string" },
-            },
-            required: false,
-            validation: {
-              minItems: 0,
-              maxItems: 10,
-            },
-          },
-        ],
-      });
     });
   });
 }

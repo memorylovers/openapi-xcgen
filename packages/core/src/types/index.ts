@@ -60,7 +60,6 @@ export type {
   IRServerVariableMap,
   IRService,
   IRType,
-  IRUnion,
   IRValidation,
   MimeType,
   XcgenIR,

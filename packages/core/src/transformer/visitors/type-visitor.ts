@@ -80,9 +80,7 @@ export function visitType(schema: SchemaObjectWithNullable): IRType | null {
   }
 
   // その他の型は無効として扱う
-  consola.warn(
-    `Invalid or unsupported schema type: ${schema.type || "undefined"}`,
-  );
+  consola.warn(`Invalid or unsupported schema type: ${schema.type}`);
   return null;
 }
 
@@ -148,7 +146,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for unknown types", () => {
+    it("should return null for empty schemas", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema: SchemaObjectWithNullable = {};
       const result = visitType(schema);
