@@ -325,230 +325,16 @@ oneOf/anyOf/allOfを使用したUnion型およびスキーママージ処理：
 **実装予定時期**: 基本機能の安定化後（Phase 2.5）
 **理由**: 使用頻度が低く（全体の5-10%）、基本的な型処理を優先
 
-#### Step 9: Schema統合Visitor（schema-visitor.ts）
+#### Step 9: Schema統合Visitor ✅ 完了
 
-全ての型処理を統合し、適切なvisitor/detectorに振り分け。
+`schema-visitor.ts`として実装完了。中央ディスパッチャーとして全ての型処理を統合：
 
-**実装すべき重要機能：**
-
-- **ネストしたオブジェクトの処理** - object型プロパティを独立したIRModelとして抽出
-- **インラインenumのIREnum抽出** - プロパティ内のenum配列を独立した型として分離
-- **循環参照の検出と処理** - 無限ループを防ぐためのvisitedチェック
-
-```typescript
-// Red: schema-visitor.ts
-describe("visitSchema", () => {
-  it("should handle enum schema", () => {
-    const schema: SchemaObject = {
-      type: "string",
-      enum: ["active", "inactive"]
-    };
-    const context = createContext({
-      path: ["components", "schemas", "Status"]
-    });
-    
-    const result = visitSchema(schema, context);
-    
-    expect(result.kind).toBe("enum");
-    expect(result.name).toBe("Status");
-  });
-  
-  it("should handle object schema", () => {
-    const schema: SchemaObject = {
-      type: "object",
-      properties: {
-        id: { type: "integer" }
-      }
-    };
-    const context = createContext({
-      path: ["components", "schemas", "User"]
-    });
-    
-    const result = visitSchema(schema, context);
-    
-    expect(result.kind).toBe("model");
-    expect(result.name).toBe("User");
-  });
-
-  it("should extract nested objects as separate models", () => {
-    const schema: SchemaObject = {
-      type: "object",
-      properties: {
-        id: { type: "integer" },
-        address: {
-          type: "object",
-          properties: {
-            street: { type: "string" },
-            city: { type: "string" }
-          }
-        }
-      }
-    };
-    const context = createContext({
-      path: ["components", "schemas", "User"]
-    });
-    
-    const result = visitSchema(schema, context);
-    
-    // メインモデルとネストモデルが分離される
-    expect(result.models).toHaveLength(2);
-    expect(result.models[0].name).toBe("User");
-    expect(result.models[1].name).toBe("User_Address");
-    // addressプロパティは参照として保持
-    expect(result.models[0].properties[1].type).toEqual({
-      kind: "ref",
-      name: "User_Address"
-    });
-  });
-
-  it("should extract inline enums as IREnum", () => {
-    const schema: SchemaObject = {
-      type: "object",
-      properties: {
-        id: { type: "integer" },
-        status: {
-          type: "string",
-          enum: ["active", "inactive", "pending"]
-        }
-      }
-    };
-    const context = createContext({
-      path: ["components", "schemas", "User"]
-    });
-    
-    const result = visitSchema(schema, context);
-    
-    // インラインenumがIREnumとして抽出される
-    expect(result.enums).toHaveLength(1);
-    expect(result.enums[0].name).toBe("User_Status");
-    expect(result.enums[0].values).toEqual([
-      { value: "active", name: "ACTIVE" },
-      { value: "inactive", name: "INACTIVE" },
-      { value: "pending", name: "PENDING" }
-    ]);
-    // statusプロパティは参照として保持
-    expect(result.models[0].properties[1].type).toEqual({
-      kind: "ref",
-      name: "User_Status"
-    });
-  });
-});
-
-// Green: visitors/schema-visitor.ts
-import { visitType } from "./type-visitor.js";
-import { visitObject } from "./object-visitor.js";
-import { detectEnum } from "../helpers/enum-detector.js";
-import { detectUnion } from "../helpers/union-detector.js";
-import { last } from "es-toolkit";  // extractNameの代わりにes-toolkitのlastを使用
-
-export function visitSchema(
-  schema: SchemaObject | ReferenceObject,
-  context: VisitorContext
-): SchemaResult {
-  const name = last(context.path) || "Unknown";  // es-toolkitのlast関数を使用
-  const extracted = { models: [], enums: [], unions: [] };  // 抽出結果を収集
-  
-  // $ref参照の場合
-  if (isReferenceObject(schema)) {
-    return { kind: "ref", ref: schema.$ref };
-  }
-  
-  // enum検出
-  const enumResult = detectEnum(schema, name);
-  if (enumResult) {
-    return { kind: "enum", ...enumResult };
-  }
-  
-  // union検出
-  const unionResult = detectUnion(schema, name);
-  if (unionResult) {
-    return { kind: "union", ...unionResult };
-  }
-  
-  // object型の場合
-  if (schema.type === "object") {
-    const modelResult = visitObjectWithExtraction(schema, name, context);
-    if (modelResult) {
-      // ネストオブジェクトとインラインenumを収集
-      extracted.models.push(modelResult.model);
-      extracted.models.push(...modelResult.nestedModels);
-      extracted.enums.push(...modelResult.extractedEnums);
-      
-      return { 
-        kind: "model", 
-        ...modelResult.model,
-        extracted  // 抽出されたmodels/enumsも返す
-      };
-    }
-  }
-  
-  // その他は通常の型として処理
-  const typeResult = visitType(schema);
-  return { kind: "type", type: typeResult };
-}
-
-// 拡張版visitObject - ネストオブジェクトとインラインenumを抽出
-function visitObjectWithExtraction(
-  schema: SchemaObject,
-  name: string,
-  context: VisitorContext
-): ExtractedModelResult | null {
-  const nestedModels: IRModel[] = [];
-  const extractedEnums: IREnum[] = [];
-  const properties: IRProperty[] = [];
-  
-  for (const [propName, propSchema] of Object.entries(schema.properties)) {
-    // インラインenumの検出と抽出
-    if (propSchema.enum) {
-      const enumName = `${name}_${toPascalCase(propName)}`;
-      const enumResult = visitEnum(propSchema, { name: enumName });
-      if (enumResult) {
-        extractedEnums.push(enumResult);
-        properties.push({
-          name: propName,
-          type: { kind: "ref", name: enumName },
-          // ... その他のプロパティ
-        });
-        continue;
-      }
-    }
-    
-    // ネストしたオブジェクトの検出と抽出
-    if (propSchema.type === "object" && propSchema.properties) {
-      const nestedName = `${name}_${toPascalCase(propName)}`;
-      const nestedResult = visitObjectWithExtraction(
-        propSchema, 
-        nestedName, 
-        withPath(context, propName)
-      );
-      if (nestedResult) {
-        nestedModels.push(nestedResult.model);
-        nestedModels.push(...nestedResult.nestedModels);
-        extractedEnums.push(...nestedResult.extractedEnums);
-        properties.push({
-          name: propName,
-          type: { kind: "ref", name: nestedName },
-          // ... その他のプロパティ
-        });
-        continue;
-      }
-    }
-    
-    // 通常のプロパティ処理
-    properties.push({
-      name: propName,
-      type: visitType(propSchema),
-      // ... その他のプロパティ
-    });
-  }
-  
-  return {
-    model: { name, properties },
-    nestedModels,
-    extractedEnums
-  };
-}
-```
+- **visitSchema**: SchemaObjectの型判定と適切なVisitorへの振り分け
+- **処理優先順位**: enum > object > その他の型（primitive、array、$ref）
+- **ネストしたオブジェクトの抽出**: object型プロパティを独立したIRModelとして分離
+- **インラインenumの抽出**: プロパティ内のenum配列を独立したIREnumとして分離
+- **階層的命名規則**: ネスト構造に対応した名前生成（例: Blog → BlogPosts → BlogPostsAuthor）
+- **配列要素の特別処理**: 配列要素がobjectの場合も独立モデルとして抽出
 
 #### Step 10: Components処理（components-visitor.ts）
 
@@ -1264,10 +1050,10 @@ function safeVisit<T>(
 - ✅ Step 5: Helper関数群（extractValidation、es-toolkit移行）
 - ✅ Step 6: Enum処理（enum-visitor.ts、generate-enum-name.ts）
 - ✅ Step 7: Object型処理（object-visitor.ts、required/nullable対応）
+- ✅ Step 9: Schema統合Visitor（schema-visitor.ts、ネストオブジェクト/インラインenum抽出）
 
 次の実装対象:
 
-- 🚧 Step 9: Schema統合Visitor（ネストオブジェクト/インラインenum抽出）
 - 🚧 Step 10: Components処理（schemas全体の処理）
 
 将来実装（Phase 2.5）:
@@ -1284,10 +1070,11 @@ function safeVisit<T>(
 
 ### 現在の成果
 
-- **テスト数**: 80テスト全て合格（parser: 1, transformer: 79）
+- **テスト数**: 151テスト全て合格（parser: 1, transformer: 150）
 - **エラーハンドリング**: consola.warn + null返却パターンで統一
 - **型安全性**: IRScalarType導入により型安全性向上
 - **Tree-shaking**: 1ファイル1関数原則の徹底
+- **Schema統合Visitor完成**: 中央ディスパッチャーによる型処理の統合実現
 
 ## 今後の展望
 
