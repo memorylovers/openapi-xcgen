@@ -25,8 +25,16 @@ export {
 
 // Visitor functions
 export {
+  visitComponents,
+  type ComponentsResult,
   visitPrimitive,
   visitType,
   visitEnum,
   type EnumVisitorContext,
+  visitObject,
+  type ObjectVisitorContext,
+  type ObjectVisitorResult,
+  visitSchema,
+  type SchemaVisitorContext,
+  type SchemaVisitorResult,
 } from "./visitors/index.js";

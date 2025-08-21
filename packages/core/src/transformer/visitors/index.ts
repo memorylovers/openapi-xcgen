@@ -2,6 +2,10 @@
  * Visitor functions exports
  */
 
+export {
+  visitComponents,
+  type ComponentsResult,
+} from "./components-visitor.js";
 export { visitEnum, type EnumVisitorContext } from "./enum-visitor.js";
 export {
   visitObject,

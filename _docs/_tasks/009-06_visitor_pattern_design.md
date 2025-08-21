@@ -336,86 +336,15 @@ oneOf/anyOf/allOfを使用したUnion型およびスキーママージ処理：
 - **階層的命名規則**: ネスト構造に対応した名前生成（例: Blog → BlogPosts → BlogPostsAuthor）
 - **配列要素の特別処理**: 配列要素がobjectの場合も独立モデルとして抽出
 
-#### Step 10: Components処理（components-visitor.ts）
+#### Step 10: Components処理 ✅ 完了
 
-components.schemasを処理し、models/enums/unionsに分類。
+`components-visitor.ts`として実装完了。ComponentsObjectのschemasセクションを処理し、models/enumsに分類：
 
-```typescript
-// Red: components-visitor.ts
-describe("visitComponents", () => {
-  it("should extract and classify schemas", () => {
-    const components: ComponentsObject = {
-      schemas: {
-        User: {
-          type: "object",
-          properties: {
-            id: { type: "integer" },
-            status: { 
-              type: "string",
-              enum: ["active", "inactive"]
-            }
-          }
-        },
-        Status: {
-          type: "string",
-          enum: ["pending", "approved", "rejected"]
-        },
-        Pet: {
-          oneOf: [
-            { $ref: "#/components/schemas/Cat" },
-            { $ref: "#/components/schemas/Dog" }
-          ]
-        }
-      }
-    };
-    
-    const result = visitComponents(components, createContext());
-    
-    expect(result.models).toHaveLength(1);
-    expect(result.enums).toHaveLength(1);
-    expect(result.unions).toHaveLength(1);
-  });
-});
-
-// Green: visitors/components-visitor.ts
-import { visitSchema } from "./schema-visitor.js";
-import { withPath } from "../context.js";
-
-export function visitComponents(
-  components: ComponentsObject,
-  context: VisitorContext
-): ComponentsResult {
-  const result = {
-    models: [],
-    enums: [],
-    unions: []
-  };
-  
-  if (!components.schemas) {
-    return result;
-  }
-  
-  Object.entries(components.schemas).forEach(([name, schema]) => {
-    const schemaContext = withPath(context, "components", "schemas", name);
-    const schemaResult = visitSchema(schema, schemaContext);
-    
-    // 結果を適切な配列に振り分け
-    switch (schemaResult.kind) {
-      case "model":
-        result.models.push(schemaResult);
-        break;
-      case "enum":
-        result.enums.push(schemaResult);
-        break;
-      case "union":
-        result.unions.push(schemaResult);
-        break;
-    }
-  });
-  
-  return result;
-}
-```
+- **visitComponents**: components.schemasをイテレートし、各スキーマをvisitSchemaで処理
+- **エラーハンドリング**: null/undefinedスキーマのスキップと警告
+- **結果の集約**: 各スキーマから抽出されたmodels/enumsを統合
+- **TypeSpec互換**: array型、scalar型、$ref型のスキーマに対応
+- **テスト最適化**: 8テストケースで完全カバレッジ、toEqual()での厳密な検証
 
 ### Phase 3: Paths/Operation処理
 
@@ -1052,9 +981,7 @@ function safeVisit<T>(
 - ✅ Step 7: Object型処理（object-visitor.ts、required/nullable対応）
 - ✅ Step 9: Schema統合Visitor（schema-visitor.ts、ネストオブジェクト/インラインenum抽出）
 
-次の実装対象:
-
-- 🚧 Step 10: Components処理（schemas全体の処理）
+- ✅ Step 10: Components処理（components-visitor.ts、models/enums分類）
 
 将来実装（Phase 2.5）:
 
