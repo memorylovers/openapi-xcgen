@@ -3,10 +3,16 @@
 ## 実装状況
 
 - **Phase 1**: ✅ 完了 - Schema Object処理（プリミティブ型、配列型、$ref参照）
-- **Phase 2**: 🚧 実装中 - Components.schemas処理（enum、union、object型）
+- **Phase 2**: ✅ 完了 - Components.schemas処理（enum、object型）
   - Step 5: Helper関数群 - ✅ 完了
   - Step 6: Enum処理 - ✅ 完了（`enum-visitor.ts`実装、Visitorパターン統合）
-- **Phase 3**: 🚧 未着手 - Paths/Operation処理
+  - Step 7: Object型処理 - ✅ 完了（`object-visitor.ts`実装）
+  - Step 8: Union型処理 - 🔜 将来実装（oneOf/anyOf/allOf）
+  - Step 9: Schema統合Visitor - ✅ 完了（`schema-visitor.ts`実装）
+  - Step 10: Components処理 - ✅ 完了（`components-visitor.ts`実装）
+- **Phase 3**: 🚧 実装予定 - Paths/Operation処理
+  - Step 11: 基本的なエンドポイント処理（`paths-visitor.ts`, `path-item-visitor.ts`）
+  - Step 12: パラメータ付きOperation（`operation-visitor.ts`, `parameter-visitor.ts`）
 - **Phase 4**: 🚧 未着手 - Document全体の統合
 - **Phase 5**: 🚧 未着手 - 最適化とリファクタリング
 
@@ -348,10 +354,32 @@ oneOf/anyOf/allOfを使用したUnion型およびスキーママージ処理：
 
 ### Phase 3: Paths/Operation処理
 
+OpenAPIのPaths/Operationセクションを処理し、APIエンドポイント情報をIRに変換します。
+
+#### 実装方針
+
+- **TDDアプローチ**: Red-Green-Refactorサイクルの厳守
+- **in-sourceテスティング**: 実装とテストを同じファイルに配置
+- **エラーハンドリング**: null返却パターンで統一（例外を投げない）
+- **既存Visitorとの連携**: `visitType`でschema処理、`visitSchema`でボディ処理
+- **段階的実装**: 基本的なGETから始め、段階的に機能を追加
+
+#### 責務分担
+
+- **paths-visitor.ts**: `PathsObject`を処理し、タグでグループ化された`IRService[]`を生成
+- **path-item-visitor.ts**: `PathItemObject`から各HTTPメソッドのエンドポイントを抽出
+- **operation-visitor.ts**: `OperationObject`から`IREndpoint`を生成
+- **parameter-visitor.ts**: `ParameterObject`から`IRParameter`を生成（path/query/header/cookie）
+- **response-visitor.ts**: `ResponseObject`から`IRResponse`を生成（必要に応じて）
+
 #### Step 11: 単純なGETエンドポイント
 
+基本的なGET操作を処理し、タグによるサービスグループ化を実装します。
+
+##### 11-1: paths-visitor.ts
+
 ```typescript
-// Red
+// Red - テストファースト
 describe("paths-visitor", () => {
   it("should extract GET operation", () => {
     const paths: PathsObject = {
@@ -383,8 +411,17 @@ describe("paths-visitor", () => {
   });
 });
 
-// Green: paths-visitor.ts に実装
+// Green - 最小限の実装
 // src/transformer/visitors/paths-visitor.ts
+import type { PathsObject } from "../../types/index.js";
+import type { IRService } from "../../types/ir/index.js";
+import type { VisitorContext } from "../types.js";
+import { visitPathItem } from "./path-item-visitor.js";
+
+export interface PathsResult {
+  services: IRService[];
+}
+
 export function visitPaths(
   paths: PathsObject,
   context: VisitorContext
@@ -399,7 +436,7 @@ export function visitPaths(
     
     const endpoints = visitPathItem(pathItem, pathContext);
     
-    // タグでグループ化
+    // タグでグループ化（OpenAPIのtagsを使ってサービスを分類）
     endpoints.forEach(endpoint => {
       const tag = endpoint.tags?.[0] || 'default';
       if (!serviceMap.has(tag)) {
@@ -416,79 +453,211 @@ export function visitPaths(
 }
 ```
 
-#### Step 12: パラメータ付きOperation
+##### 11-2: path-item-visitor.ts
 
 ```typescript
-// Red
-it("should extract path and query parameters", () => {
-  const operation: OperationObject = {
-    operationId: "getPet",
-    parameters: [
-      {
-        name: "id",
-        in: "path",
-        required: true,
-        schema: { type: "integer" }
-      },
-      {
-        name: "detailed",
-        in: "query",
-        schema: { type: "boolean" }
+// src/transformer/visitors/path-item-visitor.ts
+import type { PathItemObject } from "../../types/index.js";
+import type { IREndpoint } from "../../types/ir/index.js";
+import type { VisitorContext } from "../types.js";
+import { visitOperation } from "./operation-visitor.js";
+
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] as const;
+
+export function visitPathItem(
+  pathItem: PathItemObject,
+  context: VisitorContext
+): IREndpoint[] {
+  const endpoints: IREndpoint[] = [];
+  const pathTemplate = context.path[context.path.length - 1]; // 最後の要素がパス
+  
+  HTTP_METHODS.forEach(method => {
+    const operation = pathItem[method];
+    if (operation) {
+      const operationContext = {
+        ...context,
+        method,
+        pathTemplate
+      };
+      const endpoint = visitOperation(operation, operationContext);
+      if (endpoint) {
+        endpoints.push(endpoint);
       }
-    ]
-  };
-  const context = createContext({
-    method: "GET",
-    pathTemplate: "/pets/{id}"
+    }
   });
-  const result = visitOperation(operation, context);
-  expect(result.pathParams).toHaveLength(1);
-  expect(result.queryParams).toHaveLength(1);
+  
+  return endpoints;
+}
+```
+
+#### Step 12: パラメータ付きOperation
+
+パラメータ、リクエストボディ、レスポンスを含む完全なOperation処理を実装します。
+
+##### 12-1: operation-visitor.ts（基本実装）
+
+```typescript
+// Red - パラメータ付きのテスト
+describe("operation-visitor", () => {
+  it("should extract path and query parameters", () => {
+    const operation: OperationObject = {
+      operationId: "getPet",
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "integer" }
+        },
+        {
+          name: "detailed",
+          in: "query",
+          schema: { type: "boolean" }
+        }
+      ]
+    };
+    const context = createContext({
+      method: "GET",
+      pathTemplate: "/pets/{id}"
+    });
+    const result = visitOperation(operation, context);
+    expect(result.parameters).toHaveLength(2);
+    expect(result.parameters[0].in).toBe("path");
+    expect(result.parameters[1].in).toBe("query");
+  });
 });
 
-// Green: operation-visitor.ts に実装
+// Green - operation-visitor.ts
 // src/transformer/visitors/operation-visitor.ts
+import { consola } from "consola";
+import type { OperationObject } from "../../types/index.js";
+import type { IREndpoint, IRParameter } from "../../types/ir/index.js";
+import type { VisitorContext } from "../types.js";
+import { visitParameter } from "./parameter-visitor.js";
+import { isReferenceObject } from "../../types/guards.js";
+
+interface OperationContext extends VisitorContext {
+  method: string;
+  pathTemplate: string;
+}
+
 export function visitOperation(
   operation: OperationObject,
-  context: VisitorContext
-): IREndpoint {
+  context: OperationContext
+): IREndpoint | null {
+  if (!operation.operationId) {
+    consola.warn(`Operation without operationId at ${context.pathTemplate}`);
+    return null;
+  }
+  
   const endpoint: IREndpoint = {
-    operationId: operation.operationId!,
+    id: operation.operationId,
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
-    tags: operation.tags,
     summary: operation.summary,
     description: operation.description,
-    pathParams: [],
-    queryParams: [],
-    headerParams: [],
-    responses: []
+    parameters: [],
+    responses: [],
+    deprecated: operation.deprecated
   };
   
   // パラメータ処理
   if (operation.parameters) {
-    operation.parameters.forEach(param => {
-      const paramContext = {
-        ...context,
-        path: [...context.path, 'parameters']
-      };
-      const irParam = visitParameter(param, paramContext);
-      
-      switch (irParam.in) {
-        case 'path':
-          endpoint.pathParams.push(irParam);
-          break;
-        case 'query':
-          endpoint.queryParams.push(irParam);
-          break;
-        case 'header':
-          endpoint.headerParams.push(irParam);
-          break;
+    for (const param of operation.parameters) {
+      if (isReferenceObject(param)) {
+        // $ref参照のパラメータは現時点でスキップ
+        consola.warn(`Reference parameter not supported yet: ${param.$ref}`);
+        continue;
       }
-    });
+      
+      const irParam = visitParameter(param, context);
+      if (irParam) {
+        endpoint.parameters.push(irParam);
+      }
+    }
   }
   
+  // TODO: requestBody処理
+  // TODO: responses処理
+  
   return endpoint;
+}
+```
+
+##### 12-2: parameter-visitor.ts
+
+```typescript
+// src/transformer/visitors/parameter-visitor.ts
+import { consola } from "consola";
+import type { ParameterObject } from "../../types/index.js";
+import type { IRParameter } from "../../types/ir/index.js";
+import type { VisitorContext } from "../types.js";
+import { visitType } from "./type-visitor.js";
+
+export function visitParameter(
+  parameter: ParameterObject,
+  context: VisitorContext
+): IRParameter | null {
+  if (!parameter.schema) {
+    consola.warn(`Parameter without schema: ${parameter.name}`);
+    return null;
+  }
+  
+  const type = visitType(parameter.schema);
+  if (!type) {
+    consola.warn(`Invalid parameter type for: ${parameter.name}`);
+    return null;
+  }
+  
+  return {
+    name: parameter.name,
+    in: parameter.in,
+    description: parameter.description,
+    required: parameter.required || false,
+    type,
+    deprecated: parameter.deprecated
+  };
+}
+
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+  
+  describe("visitParameter", () => {
+    it("should handle path parameter", () => {
+      const param: ParameterObject = {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: { type: "string" }
+      };
+      const result = visitParameter(param, createContext());
+      
+      expect(result).toEqual({
+        name: "id",
+        in: "path",
+        required: true,
+        type: { kind: "primitive", type: "string" },
+        description: undefined,
+        deprecated: undefined
+      });
+    });
+    
+    it("should handle query parameter with default", () => {
+      const param: ParameterObject = {
+        name: "limit",
+        in: "query",
+        schema: { type: "integer", default: 10 }
+      };
+      const result = visitParameter(param, createContext());
+      
+      expect(result?.type).toEqual({
+        kind: "primitive",
+        type: "integer",
+        defaultValue: 10
+      });
+    });
+  });
 }
 ```
 
@@ -963,7 +1132,7 @@ function safeVisit<T>(
 
 ### 完了済みタスク
 
-#### Phase 1: Schema Object処理の実装完了
+#### Phase 1: Schema Object処理（完了）
 
 - プリミティブ型処理（visitPrimitive）
 - 汎用型解決（visitType）
@@ -972,28 +1141,33 @@ function safeVisit<T>(
 - format属性サポート
 - nullable属性サポート
 
-#### Phase 2実装状況
-
-完了済み:
+#### Phase 2: Components.schemas処理（完了）
 
 - ✅ Step 5: Helper関数群（extractValidation、es-toolkit移行）
 - ✅ Step 6: Enum処理（enum-visitor.ts、generate-enum-name.ts）
 - ✅ Step 7: Object型処理（object-visitor.ts、required/nullable対応）
 - ✅ Step 9: Schema統合Visitor（schema-visitor.ts、ネストオブジェクト/インラインenum抽出）
-
 - ✅ Step 10: Components処理（components-visitor.ts、models/enums分類）
 
-将来実装（Phase 2.5）:
+**将来実装（Phase 2.5）:**
 
 - 🔜 Step 8: Union型処理（oneOf/anyOf/allOf）
 - 🔜 discriminator対応
 - 🔜 not（否定スキーマ）
 
-リファクタリング成果:
+### 実装予定タスク
 
-- ✅ IRScalarType型エイリアス導入
-- ✅ toIRScalarTypeヘルパー実装
-- ✅ isPrimitiveType削除（冗長性排除）
+#### Phase 3: Paths/Operation処理（実装予定）
+
+- Step 11: 基本的なエンドポイント処理
+  - paths-visitor.ts: PathsObjectからIRService[]生成
+  - path-item-visitor.ts: HTTPメソッドごとのエンドポイント抽出
+  - operation-visitor.ts（基本）: IREndpoint基本情報生成
+  
+- Step 12: パラメータ付きOperation
+  - parameter-visitor.ts: IRParameter生成（path/query/header/cookie）
+  - operation-visitor.ts（拡張）: パラメータ/リクエスト/レスポンス処理
+  - response-visitor.ts: IRResponse生成（必要に応じて）
 
 ### 現在の成果
 
