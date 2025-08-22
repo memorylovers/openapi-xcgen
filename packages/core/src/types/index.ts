@@ -47,6 +47,7 @@ export type {
   IROAuth2Flows,
   IROAuth2ScopeMap,
   IRParameter,
+  IRParameterInType,
   IRPrimitive,
   IRProperty,
   IRRef,

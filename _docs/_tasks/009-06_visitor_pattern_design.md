@@ -10,9 +10,10 @@
   - Step 8: Union型処理 - 🔜 将来実装（oneOf/anyOf/allOf）
   - Step 9: Schema統合Visitor - ✅ 完了（`schema-visitor.ts`実装）
   - Step 10: Components処理 - ✅ 完了（`components-visitor.ts`実装）
-- **Phase 3**: 🚧 実装予定 - Paths/Operation処理
-  - Step 11: 基本的なエンドポイント処理（`paths-visitor.ts`, `path-item-visitor.ts`）
-  - Step 12: パラメータ付きOperation（`operation-visitor.ts`, `parameter-visitor.ts`）
+- **Phase 3**: 🚧 実装中 - Paths/Operation処理
+  - Step 11: Leaf Visitors - ✅ 完了（`parameter-visitor.ts`, `response-visitor.ts`, `request-body-visitor.ts`）
+  - Step 12: Operation Visitor - 🚧 実装予定（`operation-visitor.ts`完全版）
+  - Step 13: Path Visitors - 🚧 実装予定（`path-item-visitor.ts`, `paths-visitor.ts`）
 - **Phase 4**: 🚧 未着手 - Document全体の統合
 - **Phase 5**: 🚧 未着手 - 最適化とリファクタリング
 
@@ -352,149 +353,85 @@ oneOf/anyOf/allOfを使用したUnion型およびスキーママージ処理：
 - **TypeSpec互換**: array型、scalar型、$ref型のスキーマに対応
 - **テスト最適化**: 8テストケースで完全カバレッジ、toEqual()での厳密な検証
 
-### Phase 3: Paths/Operation処理
+### Phase 3: Paths/Operation処理（ボトムアップアプローチ）
 
 OpenAPIのPaths/Operationセクションを処理し、APIエンドポイント情報をIRに変換します。
+依存関係を考慮し、leaf（末端）のVisitorから実装を進めます。
 
 #### 実装方針
 
+- **ボトムアップアプローチ**: 依存関係のないleaf visitorから実装
 - **TDDアプローチ**: Red-Green-Refactorサイクルの厳守
 - **in-sourceテスティング**: 実装とテストを同じファイルに配置
 - **エラーハンドリング**: null返却パターンで統一（例外を投げない）
 - **既存Visitorとの連携**: `visitType`でschema処理、`visitSchema`でボディ処理
-- **段階的実装**: 基本的なGETから始め、段階的に機能を追加
+
+#### 実装順序と依存関係
+
+```
+レベル1（Leaf - 他のPath/Operation Visitorに依存しない）:
+├── parameter-visitor.ts    → visitTypeを使用
+├── response-visitor.ts      → visitSchemaを使用
+└── request-body-visitor.ts  → visitSchemaを使用
+
+レベル2（Leafを使用）:
+└── operation-visitor.ts     → parameter/response/request-bodyを使用
+
+レベル3（レベル2を使用）:
+└── path-item-visitor.ts     → operationを使用
+
+レベル4（レベル3を使用）:
+└── paths-visitor.ts         → path-itemを使用
+```
 
 #### 責務分担
 
-- **paths-visitor.ts**: `PathsObject`を処理し、タグでグループ化された`IRService[]`を生成
-- **path-item-visitor.ts**: `PathItemObject`から各HTTPメソッドのエンドポイントを抽出
-- **operation-visitor.ts**: `OperationObject`から`IREndpoint`を生成
 - **parameter-visitor.ts**: `ParameterObject`から`IRParameter`を生成（path/query/header/cookie）
-- **response-visitor.ts**: `ResponseObject`から`IRResponse`を生成（必要に応じて）
+- **response-visitor.ts**: `ResponseObject`から`IRResponse`を生成
+- **request-body-visitor.ts**: `RequestBodyObject`から`IRRequestBody`を生成
+- **operation-visitor.ts**: `OperationObject`から`IREndpoint`を生成（完全版）
+- **path-item-visitor.ts**: `PathItemObject`から各HTTPメソッドのエンドポイントを抽出
+- **paths-visitor.ts**: `PathsObject`を処理し、タグでグループ化された`IRService[]`を生成
 
-#### Step 11: 単純なGETエンドポイント
+#### Step 11: Leaf Visitors（依存関係なし） ✅ 完了
 
-基本的なGET操作を処理し、タグによるサービスグループ化を実装します。
+他のPath/Operation Visitorに依存しない、最も基本的なVisitorから実装完了。ボトムアップアプローチの基盤：
 
-##### 11-1: paths-visitor.ts
+##### parameter-visitor.ts
 
-```typescript
-// Red - テストファースト
-describe("paths-visitor", () => {
-  it("should extract GET operation", () => {
-    const paths: PathsObject = {
-      "/pets": {
-        get: {
-          operationId: "listPets",
-          tags: ["pets"],
-          responses: {
-            "200": {
-              description: "Success",
-              content: {
-                "application/json": {
-                  schema: {
-                    type: "array",
-                    items: { $ref: "#/components/schemas/Pet" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-    const context = createContext();
-    const result = visitPaths(paths, context);
-    expect(result.services).toHaveLength(1);
-    expect(result.services[0].name).toBe("pets");
-    expect(result.services[0].endpoints).toHaveLength(1);
-  });
-});
+- **visitParameter**: ParameterObjectからIRParameterへの変換
+- **パラメータ位置**: path/query/header/cookieパラメータのサポート
+- **toIRParameterInType**: パラメータ位置の型安全な検証ヘルパー追加
+- **schemaの検証**: ReferenceObjectとSchemaObjectの適切な処理
+- **エラーハンドリング**: 無効なパラメータ位置の検出と警告（8テスト実装）
 
-// Green - 最小限の実装
-// src/transformer/visitors/paths-visitor.ts
-import type { PathsObject } from "../../types/index.js";
-import type { IRService } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitPathItem } from "./path-item-visitor.js";
+##### response-visitor.ts
 
-export interface PathsResult {
-  services: IRService[];
-}
+- **visitResponse**: ResponseObjectからIRResponseへの変換
+- **ステータスコード処理**: HTTPステータスコードごとのレスポンス定義
+- **content処理**: 複数のMIMEタイプ（JSON/XML/text）に対応
+- **visitSchema連携**: レスポンスボディのスキーマ処理
+- **headers対応準備**: レスポンスヘッダー処理のインターフェース定義（6テスト実装）
 
-export function visitPaths(
-  paths: PathsObject,
-  context: VisitorContext
-): PathsResult {
-  const serviceMap = new Map<string, IRService>();
-  
-  Object.entries(paths).forEach(([path, pathItem]) => {
-    const pathContext = {
-      ...context,
-      path: [...context.path, 'paths', path]
-    };
-    
-    const endpoints = visitPathItem(pathItem, pathContext);
-    
-    // タグでグループ化（OpenAPIのtagsを使ってサービスを分類）
-    endpoints.forEach(endpoint => {
-      const tag = endpoint.tags?.[0] || 'default';
-      if (!serviceMap.has(tag)) {
-        serviceMap.set(tag, {
-          name: tag,
-          endpoints: []
-        });
-      }
-      serviceMap.get(tag)!.endpoints.push(endpoint);
-    });
-  });
-  
-  return { services: Array.from(serviceMap.values()) };
-}
-```
+##### request-body-visitor.ts
 
-##### 11-2: path-item-visitor.ts
+- **visitRequestBody**: RequestBodyObjectからIRRequestBodyへの変換
+- **required属性**: リクエストボディの必須/オプション制御
+- **複数MIME対応**: JSON/XML/multipart-form-dataのサポート
+- **operationId連携**: リクエストボディモデルの自動命名
+- **content検証**: 空のcontentに対する適切なエラーハンドリング（7テスト実装）
 
-```typescript
-// src/transformer/visitors/path-item-visitor.ts
-import type { PathItemObject } from "../../types/index.js";
-import type { IREndpoint } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitOperation } from "./operation-visitor.js";
+##### 新規ヘルパー関数
 
-const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] as const;
+- **to-ir-parameter-in-type.ts**: IRParameterInType型の検証と変換（8テスト実装）
 
-export function visitPathItem(
-  pathItem: PathItemObject,
-  context: VisitorContext
-): IREndpoint[] {
-  const endpoints: IREndpoint[] = [];
-  const pathTemplate = context.path[context.path.length - 1]; // 最後の要素がパス
-  
-  HTTP_METHODS.forEach(method => {
-    const operation = pathItem[method];
-    if (operation) {
-      const operationContext = {
-        ...context,
-        method,
-        pathTemplate
-      };
-      const endpoint = visitOperation(operation, operationContext);
-      if (endpoint) {
-        endpoints.push(endpoint);
-      }
-    }
-  });
-  
-  return endpoints;
-}
-```
+**成果**: 29テスト全て合格、Leaf Visitorの完全実装により次ステップの基盤確立
 
-#### Step 12: パラメータ付きOperation
+#### Step 12: Operation Visitor（Leaf Visitorsを統合）
 
-パラメータ、リクエストボディ、レスポンスを含む完全なOperation処理を実装します。
+Leaf Visitors（parameter、response、request-body）を使用して、完全なOperation処理を実装します。
 
-##### 12-1: operation-visitor.ts（基本実装）
+##### 12-1: operation-visitor.ts（完全実装）
 
 ```typescript
 // Red - パラメータ付きのテスト
@@ -661,9 +598,96 @@ if (import.meta.vitest) {
 }
 ```
 
+#### Step 13: Path Visitors（Operationを使用）
+
+Operation Visitorを使用して、上位層のPath処理を実装します。
+
+##### 13-1: path-item-visitor.ts
+
+```typescript
+// src/transformer/visitors/path-item-visitor.ts
+import type { PathItemObject } from "../../types/index.js";
+import type { IREndpoint } from "../../types/ir/index.js";
+import type { VisitorContext } from "../types.js";
+import { visitOperation, type OperationContext } from "./operation-visitor.js";
+
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] as const;
+
+export function visitPathItem(
+  pathItem: PathItemObject,
+  context: PathItemContext
+): IREndpoint[] {
+  const endpoints: IREndpoint[] = [];
+  
+  for (const method of HTTP_METHODS) {
+    const operation = pathItem[method];
+    if (operation && typeof operation === "object") {
+      const operationContext: OperationContext = {
+        ...context,
+        method,
+        pathTemplate: context.pathTemplate
+      };
+      
+      const endpoint = visitOperation(operation, operationContext);
+      if (endpoint) {
+        endpoints.push(endpoint);
+      }
+    }
+  }
+  
+  return endpoints;
+}
+```
+
+##### 13-2: paths-visitor.ts
+
+```typescript
+// src/transformer/visitors/paths-visitor.ts
+import type { PathsObject } from "../../types/index.js";
+import type { IRService } from "../../types/ir/index.js";
+import type { VisitorContext } from "../types.js";
+import { visitPathItem } from "./path-item-visitor.js";
+
+export function visitPaths(
+  paths: PathsObject,
+  context: VisitorContext
+): PathsResult {
+  const serviceMap = new Map<string, IRService>();
+  
+  for (const [pathTemplate, pathItem] of Object.entries(paths)) {
+    if (!pathItem) continue;
+    
+    const pathItemContext = {
+      ...context,
+      pathTemplate
+    };
+    
+    const endpoints = visitPathItem(pathItem, pathItemContext);
+    
+    // タグでグループ化
+    for (const endpoint of endpoints) {
+      const tag = "default"; // TODO: endpointからタグ情報を取得
+      
+      if (!serviceMap.has(tag)) {
+        serviceMap.set(tag, {
+          name: tag,
+          endpoints: []
+        });
+      }
+      
+      serviceMap.get(tag)!.endpoints.push(endpoint);
+    }
+  }
+  
+  return {
+    services: Array.from(serviceMap.values())
+  };
+}
+```
+
 ### Phase 4: Document全体の統合
 
-#### Step 13: 完全なOpenAPIドキュメント
+#### Step 14: 完全なOpenAPIドキュメント
 
 ```typescript
 // Red
@@ -1155,27 +1179,32 @@ function safeVisit<T>(
 - 🔜 discriminator対応
 - 🔜 not（否定スキーマ）
 
+#### Phase 3: Paths/Operation処理（実装中）
+
+- ✅ Step 11: Leaf Visitors（parameter-visitor.ts、response-visitor.ts、request-body-visitor.ts）
+  - IRParameterInType型の分離とヘルパー関数追加
+  - 全てのパラメータ位置（path/query/header/cookie）をサポート
+  - 複数MIMEタイプ対応（JSON/XML/multipart-form-data）
+
 ### 実装予定タスク
 
-#### Phase 3: Paths/Operation処理（実装予定）
-
-- Step 11: 基本的なエンドポイント処理
-  - paths-visitor.ts: PathsObjectからIRService[]生成
-  - path-item-visitor.ts: HTTPメソッドごとのエンドポイント抽出
-  - operation-visitor.ts（基本）: IREndpoint基本情報生成
+#### Phase 3: Paths/Operation処理（ボトムアップアプローチで継続）
   
-- Step 12: パラメータ付きOperation
-  - parameter-visitor.ts: IRParameter生成（path/query/header/cookie）
-  - operation-visitor.ts（拡張）: パラメータ/リクエスト/レスポンス処理
-  - response-visitor.ts: IRResponse生成（必要に応じて）
+- Step 12: Operation Visitor（Leafを統合）
+  - operation-visitor.ts: OperationObject → IREndpoint（完全版）
+  
+- Step 13: Path Visitors（Operationを使用）
+  - path-item-visitor.ts: PathItemObject → IREndpoint[]
+  - paths-visitor.ts: PathsObject → IRService[]
 
 ### 現在の成果
 
-- **テスト数**: 151テスト全て合格（parser: 1, transformer: 150）
+- **テスト数**: 180テスト全て合格（parser: 1, transformer: 179）
 - **エラーハンドリング**: consola.warn + null返却パターンで統一
-- **型安全性**: IRScalarType導入により型安全性向上
+- **型安全性**: IRScalarType、IRParameterInType導入により型安全性向上
 - **Tree-shaking**: 1ファイル1関数原則の徹底
 - **Schema統合Visitor完成**: 中央ディスパッチャーによる型処理の統合実現
+- **Leaf Visitors完成**: ボトムアップアプローチの基盤確立、Operation処理の準備完了
 
 ## 今後の展望
 

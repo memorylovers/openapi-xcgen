@@ -119,6 +119,12 @@ export type IRHttpMethod =
   | "options";
 
 /**
+ * IRParameterInType - パラメータの場所を表す型
+ * OpenAPIの parameter.in の値に対応
+ */
+export type IRParameterInType = "path" | "query" | "header" | "cookie";
+
+/**
  * IRParameter - パラメータ
  * @example
  * ```yaml
@@ -157,7 +163,7 @@ export interface IRParameter {
   /** パラメータ名 */
   name: string;
   /** パラメータの場所 */
-  in: "path" | "query" | "header" | "cookie";
+  in: IRParameterInType;
   /** 説明 */
   description?: string;
   /** 必須フラグ */
