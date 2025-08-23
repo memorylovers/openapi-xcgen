@@ -353,10 +353,10 @@ oneOf/anyOf/allOfを使用したUnion型およびスキーママージ処理：
 - **TypeSpec互換**: array型、scalar型、$ref型のスキーマに対応
 - **テスト最適化**: 8テストケースで完全カバレッジ、toEqual()での厳密な検証
 
-### Phase 3: Paths/Operation処理（ボトムアップアプローチ）
+### Phase 3: Paths/Operation処理（ボトムアップアプローチ） ✅ 完了
 
-OpenAPIのPaths/Operationセクションを処理し、APIエンドポイント情報をIRに変換します。
-依存関係を考慮し、leaf（末端）のVisitorから実装を進めます。
+OpenAPIのPaths/Operationセクションを処理し、APIエンドポイント情報をIRに変換しました。
+依存関係を考慮し、leaf（末端）のVisitorから実装を完了しました。
 
 #### 実装方針
 
@@ -443,92 +443,27 @@ Leaf Visitors（parameter、response、request-body）を使用して、完全�
 
 **成果**: 全8テスト合格、3つのLeaf Visitorを統合してエンドポイント情報を完全に抽出
 
-#### Step 13: Path Visitors（Operationを使用）
+#### Step 13: Path Visitors（Operationを使用） ✅ 完了
 
-Operation Visitorを使用して、上位層のPath処理を実装します。
+Operation Visitorを使用して、上位層のPath処理を実装完了。
 
-##### 13-1: path-item-visitor.ts
+##### path-item-visitor.ts
 
-```typescript
-// src/transformer/visitors/path-item-visitor.ts
-import type { PathItemObject } from "../../types/index.js";
-import type { IREndpoint } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitOperation, type OperationContext } from "./operation-visitor.js";
+- **visitPathItem**: PathItemObjectから各HTTPメソッドのエンドポイントを抽出
+- **HTTPメソッド処理**: GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONSをサポート
+- **操作の委譲**: 各operationをvisitOperationに委譲してIREndpointに変換
+- **タグ情報の保持**: PathItemEndpoint型でエンドポイントとタグを返却
+- **null/undefinedスキップ**: 無効な操作を適切にフィルタリング（4テスト実装）
 
-const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] as const;
+##### paths-visitor.ts
 
-export function visitPathItem(
-  pathItem: PathItemObject,
-  context: PathItemContext
-): IREndpoint[] {
-  const endpoints: IREndpoint[] = [];
-  
-  for (const method of HTTP_METHODS) {
-    const operation = pathItem[method];
-    if (operation && typeof operation === "object") {
-      const operationContext: OperationContext = {
-        ...context,
-        method,
-        pathTemplate: context.pathTemplate
-      };
-      
-      const endpoint = visitOperation(operation, operationContext);
-      if (endpoint) {
-        endpoints.push(endpoint);
-      }
-    }
-  }
-  
-  return endpoints;
-}
-```
+- **visitPaths**: PathsObjectを処理してタグでグループ化されたサービスを生成
+- **サービスマップ**: タグごとにエンドポイントをグループ化
+- **デフォルトタグ**: タグ未指定のエンドポイントは"default"に分類
+- **PathsResult型**: services配列を含む結果オブジェクトを返却
+- **PathItemContext**: パステンプレートを含む拡張コンテキスト（3テスト実装）
 
-##### 13-2: paths-visitor.ts
-
-```typescript
-// src/transformer/visitors/paths-visitor.ts
-import type { PathsObject } from "../../types/index.js";
-import type { IRService } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitPathItem } from "./path-item-visitor.js";
-
-export function visitPaths(
-  paths: PathsObject,
-  context: VisitorContext
-): PathsResult {
-  const serviceMap = new Map<string, IRService>();
-  
-  for (const [pathTemplate, pathItem] of Object.entries(paths)) {
-    if (!pathItem) continue;
-    
-    const pathItemContext = {
-      ...context,
-      pathTemplate
-    };
-    
-    const endpoints = visitPathItem(pathItem, pathItemContext);
-    
-    // タグでグループ化
-    for (const endpoint of endpoints) {
-      const tag = "default"; // TODO: endpointからタグ情報を取得
-      
-      if (!serviceMap.has(tag)) {
-        serviceMap.set(tag, {
-          name: tag,
-          endpoints: []
-        });
-      }
-      
-      serviceMap.get(tag)!.endpoints.push(endpoint);
-    }
-  }
-  
-  return {
-    services: Array.from(serviceMap.values())
-  };
-}
-```
+**成果**: 全7テスト合格、Phase 3のPaths/Operation処理が完全実装
 
 ### Phase 4: Document全体の統合
 
