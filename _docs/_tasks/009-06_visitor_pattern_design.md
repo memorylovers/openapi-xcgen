@@ -427,176 +427,21 @@ OpenAPIのPaths/Operationセクションを処理し、APIエンドポイント�
 
 **成果**: 29テスト全て合格、Leaf Visitorの完全実装により次ステップの基盤確立
 
-#### Step 12: Operation Visitor（Leaf Visitorsを統合）
+#### Step 12: Operation Visitor（Leaf Visitorsを統合） ✅ 完了
 
-Leaf Visitors（parameter、response、request-body）を使用して、完全なOperation処理を実装します。
+Leaf Visitors（parameter、response、request-body）を使用して、完全なOperation処理を実装完了。
 
-##### 12-1: operation-visitor.ts（完全実装）
+##### operation-visitor.ts
 
-```typescript
-// Red - パラメータ付きのテスト
-describe("operation-visitor", () => {
-  it("should extract path and query parameters", () => {
-    const operation: OperationObject = {
-      operationId: "getPet",
-      parameters: [
-        {
-          name: "id",
-          in: "path",
-          required: true,
-          schema: { type: "integer" }
-        },
-        {
-          name: "detailed",
-          in: "query",
-          schema: { type: "boolean" }
-        }
-      ]
-    };
-    const context = createContext({
-      method: "GET",
-      pathTemplate: "/pets/{id}"
-    });
-    const result = visitOperation(operation, context);
-    expect(result.parameters).toHaveLength(2);
-    expect(result.parameters[0].in).toBe("path");
-    expect(result.parameters[1].in).toBe("query");
-  });
-});
+- **visitOperation**: OperationObjectからIREndpointへの完全変換
+- **operationId必須**: 必須チェックと警告メッセージ
+- **parameters処理**: visitParameterで各パラメータを処理し、配列に集約
+- **requestBody処理**: visitRequestBodyでリクエストボディを処理
+- **responses処理**: visitResponseで各ステータスコードのレスポンスを処理
+- **参照スキップ**: ReferenceObjectのパラメータは警告付きでスキップ
+- **エラーハンドリング**: null伝播パターンで統一（8テスト実装）
 
-// Green - operation-visitor.ts
-// src/transformer/visitors/operation-visitor.ts
-import { consola } from "consola";
-import type { OperationObject } from "../../types/index.js";
-import type { IREndpoint, IRParameter } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitParameter } from "./parameter-visitor.js";
-import { isReferenceObject } from "../../types/guards.js";
-
-interface OperationContext extends VisitorContext {
-  method: string;
-  pathTemplate: string;
-}
-
-export function visitOperation(
-  operation: OperationObject,
-  context: OperationContext
-): IREndpoint | null {
-  if (!operation.operationId) {
-    consola.warn(`Operation without operationId at ${context.pathTemplate}`);
-    return null;
-  }
-  
-  const endpoint: IREndpoint = {
-    id: operation.operationId,
-    method: context.method as IRHttpMethod,
-    path: context.pathTemplate,
-    summary: operation.summary,
-    description: operation.description,
-    parameters: [],
-    responses: [],
-    deprecated: operation.deprecated
-  };
-  
-  // パラメータ処理
-  if (operation.parameters) {
-    for (const param of operation.parameters) {
-      if (isReferenceObject(param)) {
-        // $ref参照のパラメータは現時点でスキップ
-        consola.warn(`Reference parameter not supported yet: ${param.$ref}`);
-        continue;
-      }
-      
-      const irParam = visitParameter(param, context);
-      if (irParam) {
-        endpoint.parameters.push(irParam);
-      }
-    }
-  }
-  
-  // TODO: requestBody処理
-  // TODO: responses処理
-  
-  return endpoint;
-}
-```
-
-##### 12-2: parameter-visitor.ts
-
-```typescript
-// src/transformer/visitors/parameter-visitor.ts
-import { consola } from "consola";
-import type { ParameterObject } from "../../types/index.js";
-import type { IRParameter } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitType } from "./type-visitor.js";
-
-export function visitParameter(
-  parameter: ParameterObject,
-  context: VisitorContext
-): IRParameter | null {
-  if (!parameter.schema) {
-    consola.warn(`Parameter without schema: ${parameter.name}`);
-    return null;
-  }
-  
-  const type = visitType(parameter.schema);
-  if (!type) {
-    consola.warn(`Invalid parameter type for: ${parameter.name}`);
-    return null;
-  }
-  
-  return {
-    name: parameter.name,
-    in: parameter.in,
-    description: parameter.description,
-    required: parameter.required || false,
-    type,
-    deprecated: parameter.deprecated
-  };
-}
-
-// === in-source testing ===
-if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
-  
-  describe("visitParameter", () => {
-    it("should handle path parameter", () => {
-      const param: ParameterObject = {
-        name: "id",
-        in: "path",
-        required: true,
-        schema: { type: "string" }
-      };
-      const result = visitParameter(param, createContext());
-      
-      expect(result).toEqual({
-        name: "id",
-        in: "path",
-        required: true,
-        type: { kind: "primitive", type: "string" },
-        description: undefined,
-        deprecated: undefined
-      });
-    });
-    
-    it("should handle query parameter with default", () => {
-      const param: ParameterObject = {
-        name: "limit",
-        in: "query",
-        schema: { type: "integer", default: 10 }
-      };
-      const result = visitParameter(param, createContext());
-      
-      expect(result?.type).toEqual({
-        kind: "primitive",
-        type: "integer",
-        defaultValue: 10
-      });
-    });
-  });
-}
-```
+**成果**: 全8テスト合格、3つのLeaf Visitorを統合してエンドポイント情報を完全に抽出
 
 #### Step 13: Path Visitors（Operationを使用）
 
