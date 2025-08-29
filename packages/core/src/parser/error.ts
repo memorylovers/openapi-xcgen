@@ -41,7 +41,7 @@ export const ParserError = XcgenParserError;
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, test, expect } = import.meta.vitest;
-  const { PARSER_ERROR_CODES } = await import("../errors/codes.js");
+  const { PARSER_ERROR_CODES } = await import("../errors/codes");
 
   describe("XcgenParserError", () => {
     test("should create parser error with message", () => {

@@ -15,13 +15,10 @@
 
 import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
-import type {
-  SchemaObject,
-  SchemaObjectWithNullable,
-} from "../../types/index.js";
-import type { IREnum, IRModel, IRProperty } from "../../types/ir/data.js";
-import { extractValidation } from "../helpers/extract-validation.js";
-import { visitSchema } from "./schema-visitor.js";
+import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
+import type { IREnum, IRModel, IRProperty } from "../../types/ir/data";
+import { extractValidation } from "../helpers/extract-validation";
+import { visitSchema } from "./schema-visitor";
 
 /**
  * Object Visitorのコンテキスト

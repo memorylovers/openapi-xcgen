@@ -6,8 +6,8 @@
 
 import { describe, it, expect } from "vitest";
 import { join } from "node:path";
-import { parse } from "../../src/parser/index.js";
-import { transform } from "../../src/transformer/index.js";
+import { parse } from "../../src/parser/index";
+import { transform } from "../../src/transformer/index";
 import type {
   IRModel,
   IRService,
@@ -15,7 +15,7 @@ import type {
   IRProperty,
   IREnum,
   IREnumValue,
-} from "../../src/types/ir/index.js";
+} from "../../src/types/ir/index";
 
 /**
  * テストヘルパー: YAMLファイルを読み込んでIRに変換

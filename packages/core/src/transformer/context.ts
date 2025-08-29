@@ -2,7 +2,7 @@
  * Context管理ユーティリティ
  */
 
-import type { VisitorContext } from "./types.js";
+import type { VisitorContext } from "./types";
 
 /**
  * 新しいパスコンテキストを作成

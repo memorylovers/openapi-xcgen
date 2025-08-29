@@ -11,10 +11,10 @@
  * - IRService[]の生成
  */
 
-import type { PathsObject } from "../../types/index.js";
-import type { IRService } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitPathItem, type PathItemContext } from "./path-item-visitor.js";
+import type { PathsObject } from "../../types/index";
+import type { IRService } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
+import { visitPathItem, type PathItemContext } from "./path-item-visitor";
 
 /**
  * Paths処理の結果
@@ -89,7 +89,7 @@ export function visitPaths(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  const { createContext } = await import("../types.js");
+  const { createContext } = await import("../types");
 
   describe("visitPaths", () => {
     it("should extract a simple GET endpoint", () => {

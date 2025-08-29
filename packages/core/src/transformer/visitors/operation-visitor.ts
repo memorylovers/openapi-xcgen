@@ -12,18 +12,18 @@
  */
 
 import { consola } from "consola";
-import type { OperationObject, ReferenceObject } from "../../types/index.js";
+import type { OperationObject, ReferenceObject } from "../../types/index";
 import type {
   IREndpoint,
   IRHttpMethod,
   IRParameter,
   IRResponse,
-} from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { isReferenceObject } from "../../types/guards.js";
-import { visitParameter } from "./parameter-visitor.js";
-import { visitRequestBody } from "./request-body-visitor.js";
-import { visitResponse } from "./response-visitor.js";
+} from "../../types/ir/index";
+import type { VisitorContext } from "../types";
+import { isReferenceObject } from "../../types/guards";
+import { visitParameter } from "./parameter-visitor";
+import { visitRequestBody } from "./request-body-visitor";
+import { visitResponse } from "./response-visitor";
 
 /**
  * Operation処理用の拡張コンテキスト
@@ -138,7 +138,7 @@ export function visitOperation(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types.js");
+  const { createContext } = await import("../types");
 
   describe("visitOperation", () => {
     it("should extract basic operation info", () => {

@@ -6,9 +6,9 @@
  */
 
 import { consola } from "consola";
-import type { SchemaObjectWithNullable } from "../../types/index.js";
-import type { IRPrimitive } from "../../types/ir/index.js";
-import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
+import type { SchemaObjectWithNullable } from "../../types/index";
+import type { IRPrimitive } from "../../types/ir/index";
+import { toIRScalarType } from "../helpers/to-ir-scalar-type";
 
 /**
  * プリミティブ型のSchemaObjectをIRPrimitiveに変換

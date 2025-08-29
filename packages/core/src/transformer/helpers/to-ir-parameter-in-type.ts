@@ -1,4 +1,4 @@
-import type { IRParameterInType } from "../../types/ir/index.js";
+import type { IRParameterInType } from "../../types/ir/index";
 
 /**
  * OpenAPIのparameter.in値をIRParameterInTypeに変換

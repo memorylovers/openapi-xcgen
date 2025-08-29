@@ -13,11 +13,11 @@
  * 他のVisitorは各自の専門処理に専念できます。
  */
 
-import type { SchemaObjectWithNullable } from "../../types/index.js";
-import type { IREnum, IRModel, IRType } from "../../types/ir/index.js";
-import { visitEnum } from "./enum-visitor.js";
-import { visitObject } from "./object-visitor.js";
-import { visitType } from "./type-visitor.js";
+import type { SchemaObjectWithNullable } from "../../types/index";
+import type { IREnum, IRModel, IRType } from "../../types/ir/index";
+import { visitEnum } from "./enum-visitor";
+import { visitObject } from "./object-visitor";
+import { visitType } from "./type-visitor";
 
 /**
  * Schema Visitorのコンテキスト

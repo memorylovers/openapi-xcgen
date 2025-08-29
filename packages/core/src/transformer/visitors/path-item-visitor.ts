@@ -10,10 +10,10 @@
  * - パラメータの継承（PathItem共通パラメータ）の処理
  */
 
-import type { PathItemObject } from "../../types/index.js";
-import type { IREndpoint } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitOperation, type OperationContext } from "./operation-visitor.js";
+import type { PathItemObject } from "../../types/index";
+import type { IREndpoint } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
+import { visitOperation, type OperationContext } from "./operation-visitor";
 
 /**
  * PathItem処理用の拡張コンテキスト
@@ -106,7 +106,7 @@ export function visitPathItem(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  const { createContext } = await import("../types.js");
+  const { createContext } = await import("../types");
 
   describe("visitPathItem", () => {
     it("should extract GET operation", () => {

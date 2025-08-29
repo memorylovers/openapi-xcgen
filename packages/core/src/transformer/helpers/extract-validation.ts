@@ -1,5 +1,5 @@
-import type { SchemaObject } from "../../types/index.js";
-import type { IRValidation } from "../../types/ir/index.js";
+import type { SchemaObject } from "../../types/index";
+import type { IRValidation } from "../../types/ir/index";
 
 /**
  * SchemaObjectからバリデーション情報を抽出

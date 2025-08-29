@@ -1,4 +1,4 @@
-import type { IRScalarType } from "../../types/ir/index.js";
+import type { IRScalarType } from "../../types/ir/index";
 
 /**
  * OpenAPIのtype値をIRScalarTypeに変換

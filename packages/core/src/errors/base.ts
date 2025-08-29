@@ -74,7 +74,7 @@ export class XcgenError extends Error {
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, test, expect } = import.meta.vitest;
-  const { GENERAL_ERROR_CODES } = await import("./codes.js");
+  const { GENERAL_ERROR_CODES } = await import("./codes");
 
   describe("XcgenError", () => {
     test("should create base error with message", () => {

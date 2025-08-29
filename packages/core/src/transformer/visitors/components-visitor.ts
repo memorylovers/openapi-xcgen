@@ -9,10 +9,10 @@ import { consola } from "consola";
 import type {
   ComponentsObject,
   SchemaObjectWithNullable,
-} from "../../types/index.js";
-import type { IREnum, IRModel } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { visitSchema, type SchemaVisitorContext } from "./schema-visitor.js";
+} from "../../types/index";
+import type { IREnum, IRModel } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
+import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
 
 /**
  * Components処理の結果
@@ -93,7 +93,7 @@ export function visitComponents(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types.js");
+  const { createContext } = await import("../types");
 
   describe("visitComponents", () => {
     it("should extract models and enums from schemas", () => {

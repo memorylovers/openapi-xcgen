@@ -2,20 +2,17 @@
  * Visitor functions exports
  */
 
-export {
-  visitComponents,
-  type ComponentsResult,
-} from "./components-visitor.js";
-export { visitEnum, type EnumVisitorContext } from "./enum-visitor.js";
+export { visitComponents, type ComponentsResult } from "./components-visitor";
+export { visitEnum, type EnumVisitorContext } from "./enum-visitor";
 export {
   visitObject,
   type ObjectVisitorContext,
   type ObjectVisitorResult,
-} from "./object-visitor.js";
-export { visitPrimitive } from "./primitive-visitor.js";
+} from "./object-visitor";
+export { visitPrimitive } from "./primitive-visitor";
 export {
   visitSchema,
   type SchemaVisitorContext,
   type SchemaVisitorResult,
-} from "./schema-visitor.js";
-export { visitType } from "./type-visitor.js";
+} from "./schema-visitor";
+export { visitType } from "./type-visitor";

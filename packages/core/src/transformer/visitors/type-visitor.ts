@@ -6,12 +6,12 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../types/guards.js";
-import type { SchemaObjectWithNullable } from "../../types/index.js";
-import type { IRArray, IRType } from "../../types/ir/index.js";
-import { extractRefName } from "../helpers/extract-ref-name.js";
-import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
-import { visitPrimitive } from "./primitive-visitor.js";
+import { isReferenceObject } from "../../types/guards";
+import type { SchemaObjectWithNullable } from "../../types/index";
+import type { IRArray, IRType } from "../../types/ir/index";
+import { extractRefName } from "../helpers/extract-ref-name";
+import { toIRScalarType } from "../helpers/to-ir-scalar-type";
+import { visitPrimitive } from "./primitive-visitor";
 
 /**
  * SchemaObjectをIRTypeに解決

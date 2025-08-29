@@ -1,5 +1,5 @@
-import type { SchemaObject } from "../types/index.js";
-import type { IRType } from "../types/ir/index.js";
+import type { SchemaObject } from "../types/index";
+import type { IRType } from "../types/ir/index";
 
 /**
  * Visitor実行コンテキスト

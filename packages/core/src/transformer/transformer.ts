@@ -15,16 +15,11 @@ import type {
   OpenAPIDocument,
   ComponentsObject,
   PathsObject,
-} from "../types/index.js";
-import type {
-  IRDocument,
-  IRModel,
-  IREnum,
-  IRService,
-} from "../types/ir/index.js";
-import { createContext } from "./types.js";
-import { visitComponents } from "./visitors/components-visitor.js";
-import { visitPaths } from "./visitors/paths-visitor.js";
+} from "../types/index";
+import type { IRDocument, IRModel, IREnum, IRService } from "../types/ir/index";
+import { createContext } from "./types";
+import { visitComponents } from "./visitors/components-visitor";
+import { visitPaths } from "./visitors/paths-visitor";
 
 /**
  * OpenAPIDocumentをIRDocumentに変換

@@ -12,11 +12,11 @@
  */
 
 import { consola } from "consola";
-import type { ResponseObject, ReferenceObject } from "../../types/index.js";
-import type { IRContentMap, IRResponse } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { isReferenceObject } from "../../types/guards.js";
-import { visitSchema, type SchemaVisitorContext } from "./schema-visitor.js";
+import type { ResponseObject, ReferenceObject } from "../../types/index";
+import type { IRContentMap, IRResponse } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
+import { isReferenceObject } from "../../types/guards";
+import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
 
 /**
  * ResponseObjectをIRResponseに変換
@@ -96,7 +96,7 @@ export function visitResponse(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types.js");
+  const { createContext } = await import("../types");
 
   describe("visitResponse", () => {
     it("should handle basic response without content", () => {

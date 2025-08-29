@@ -12,12 +12,12 @@
  */
 
 import { consola } from "consola";
-import type { ParameterObject, SchemaObject } from "../../types/index.js";
-import type { IRParameter } from "../../types/ir/index.js";
-import type { VisitorContext } from "../types.js";
-import { isReferenceObject } from "../../types/guards.js";
-import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type.js";
-import { visitType } from "./type-visitor.js";
+import type { ParameterObject, SchemaObject } from "../../types/index";
+import type { IRParameter } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
+import { isReferenceObject } from "../../types/guards";
+import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type";
+import { visitType } from "./type-visitor";
 
 /**
  * ParameterObjectをIRParameterに変換
@@ -98,7 +98,7 @@ export function visitParameter(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types.js");
+  const { createContext } = await import("../types");
 
   describe("visitParameter", () => {
     it("should handle path parameter", () => {

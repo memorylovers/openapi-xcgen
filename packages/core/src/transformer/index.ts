@@ -3,11 +3,11 @@
  */
 
 // Main transformer
-export { transform } from "./transformer.js";
+export { transform } from "./transformer";
 
 // Types
-export type { VisitorContext, VisitorResult, SchemaVisitor } from "./types.js";
-export { createContext } from "./types.js";
+export type { VisitorContext, VisitorResult, SchemaVisitor } from "./types";
+export { createContext } from "./types";
 
 // Context utilities
 export {
@@ -16,7 +16,7 @@ export {
   withVisited,
   isCircularReference,
   isDepthLimitExceeded,
-} from "./context.js";
+} from "./context";
 
 // Helper functions
 export {
@@ -24,7 +24,7 @@ export {
   extractValidation,
   generateEnumName,
   toIRScalarType,
-} from "./helpers/index.js";
+} from "./helpers/index";
 
 // Visitor functions
 export {
@@ -40,4 +40,4 @@ export {
   visitSchema,
   type SchemaVisitorContext,
   type SchemaVisitorResult,
-} from "./visitors/index.js";
+} from "./visitors/index";

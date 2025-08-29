@@ -6,13 +6,10 @@
  */
 
 import { consola } from "consola";
-import type {
-  SchemaObject,
-  SchemaObjectWithNullable,
-} from "../../types/index.js";
-import type { IREnum, IREnumValue } from "../../types/ir/index.js";
-import { generateEnumName } from "../helpers/generate-enum-name.js";
-import { toIRScalarType } from "../helpers/to-ir-scalar-type.js";
+import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
+import type { IREnum, IREnumValue } from "../../types/ir/index";
+import { generateEnumName } from "../helpers/generate-enum-name";
+import { toIRScalarType } from "../helpers/to-ir-scalar-type";
 
 // Context for enum visitor
 export interface EnumVisitorContext {
