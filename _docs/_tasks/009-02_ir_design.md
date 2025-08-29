@@ -24,15 +24,27 @@ bundle()メソッドで$refを保持したOpenAPIドキュメントから、コ�
 
 ### 2.1 全体構造
 
+#### 現在の実装（IRDocument）
+
 ```
-XcgenIR
-├── metadata: IRMetadata           # API基本情報
+IRDocument
+├── info: IRInfo                   # API基本情報（簡易版）
 ├── models: IRModel[]              # データモデル
 ├── enums: IREnum[]                # 列挙型
-├── unions: IRUnion[]              # Union型
+└── services: IRService[]          # APIサービス（タグでグループ化）
+```
+
+#### 将来的な完全版（XcgenIR）
+
+```
+XcgenIR
+├── metadata: IRMetadata           # API基本情報（完全版）
+├── models: IRModel[]              # データモデル
+├── enums: IREnum[]                # 列挙型
+├── unions: IRUnion[]              # Union型（将来実装）
 ├── services: IRService[]          # APIサービス（タグでグループ化）
-├── servers: IRServer[]            # サーバー情報
-└── security?: IRSecurityScheme[]  # セキュリティ定義
+├── servers: IRServer[]            # サーバー情報（将来実装）
+└── security?: IRSecurityScheme[]  # セキュリティ定義（将来実装）
 ```
 
 #### ファイル構造（実装済み）
@@ -50,13 +62,13 @@ packages/core/src/types/ir/
 ```
     OpenAPIDocument (bundle後)
            |
-           | transform()
+           | transform()（Visitorパターン）
            ↓
-    XcgenIR
+    IRDocument（現在）
            |
-    ┌──────┴──────┬──────────┬──────────┐
-    ↓             ↓          ↓          ↓
-  IRModels    IREnums    IRServices  IRUnions
+    ┌──────┴──────┬──────────┐
+    ↓             ↓          ↓
+  IRModels    IREnums    IRServices
     |            |          |          |
     ├─IRProperty └─IREnumValue├─IREndpoint └─IRType
     └─IRType               └─IRParameter
@@ -320,10 +332,16 @@ class Transformer {
     for (const [propName, propSchema] of Object.entries(schema.properties || {})) {
       if (!propSchema.$ref && propSchema.type === 'object') {
         const nestedName = `${parentName}${toPascalCase(propName)}`;
-        this.inlineModels.set(nestedName, this.schemaToModel(propSchema, nestedName));
         
-        // 再帰的に探索
-        this.extractNestedInlineSchemas(propSchema, nestedName);
+        // Visitorパターンで再帰的に処理
+        const nestedModel = visitSchema(propSchema, {
+          ...context,
+          modelName: nestedName
+        });
+        
+        if (nestedModel && nestedModel.kind === 'model') {
+          context.models.set(nestedName, nestedModel);
+        }
       }
       
       // 配列の要素がインラインオブジェクトの場合
@@ -332,25 +350,32 @@ class Transformer {
           !propSchema.items.$ref && 
           propSchema.items.type === 'object') {
         const itemName = `${parentName}${toPascalCase(propName)}Item`;
-        this.inlineModels.set(itemName, this.schemaToModel(propSchema.items, itemName));
         
-        // 再帰的に探索
-        this.extractNestedInlineSchemas(propSchema.items, itemName);
+        // Visitorパターンで再帰的に処理
+        const itemModel = visitSchema(propSchema.items, {
+          ...context,
+          modelName: itemName
+        });
+        
+        if (itemModel && itemModel.kind === 'model') {
+          context.models.set(itemName, itemModel);
+        }
       }
     }
   }
 }
 ```
 
-#### 名前の衝突回避
+#### 名前の衝突回避（Visitorパターンの実装例）
 
 ```typescript
-private ensureUniqueName(baseName: string): string {
+// 実際の実装では、context内でモデル名を管理
+function ensureUniqueName(baseName: string, context: VisitorContext): string {
   let name = baseName;
   let counter = 1;
   
-  // componentModelsとinlineModelsの両方をチェック
-  while (this.componentModels.has(name) || this.inlineModels.has(name)) {
+  // context内の既存モデル名をチェック
+  while (context.models.has(name) || context.enums.has(name)) {
     name = `${baseName}${counter}`;
     counter++;
   }
@@ -581,40 +606,40 @@ test('should transform complete OpenAPI document', () => {
   - [x] type aliasの追加（MimeType, IRContentMap等）
   - [x] インライン型の分離（IRContact, IRLicense等）
 
-- [ ] Task 5.1: Transformer基本構造
-  - [ ] クラス作成
-  - [ ] 空のtransform()メソッド
+- [x] Task 5.1: Transformer実装（Visitorパターン）✅ 完了
+  - [x] transform関数作成（関数ベース）
+  - [x] Visitorパターンで実装
 
-- [ ] Task 5.2: IRModel抽出
-  - [ ] components.schemas巡回
-  - [ ] IRModel型への変換
+- [x] Task 5.2: IRModel抽出 ✅ 完了
+  - [x] components.schemas巡回（visitComponents）
+  - [x] IRModel型への変換（visitObject）
 
-- [ ] Task 5.3: IREnum抽出
-  - [ ] enum配列の検出
-  - [ ] IREnum型への変換
+- [x] Task 5.3: IREnum抽出 ✅ 完了
+  - [x] enum配列の検出（visitEnum）
+  - [x] IREnum型への変換
 
-- [ ] Task 5.4: IRUnion型抽出
+- [ ] Task 5.4: IRUnion型抽出 🔜 将来実装
   - [ ] oneOf/anyOf検出
-  - [ ] IRUnion作成
+  - [ ] IRUnion作成（基本機能安定化後）
 
-- [ ] Task 5.5: IRService/IREndpoint抽出
-  - [ ] paths巡回
-  - [ ] tagsによるグループ化
+- [x] Task 5.5: IRService/IREndpoint抽出 ✅ 完了
+  - [x] paths巡回（visitPaths）
+  - [x] tagsによるグループ化
 
-- [ ] Task 5.6: 型解決
-  - [ ] $ref解決ロジック
-  - [ ] IRResolvedType完全実装
+- [x] Task 5.6: 型解決 ✅ 完了
+  - [x] $ref解決ロジック（visitType）
+  - [x] プリミティブ型解決（visitPrimitive）
 
-- [ ] Task 5.7: 依存関係解析
-  - [ ] imports配列生成
-  - [ ] 循環参照チェック
+- [x] Task 5.7: 依存関係解析 ✅ 完了
+  - [x] ネストオブジェクトの抽出（visitSchema）
+  - [x] インラインenumの抽出
 
-- [ ] Task 5.8: インラインスキーマ抽出
-  - [ ] requestBodyのインラインスキーマ検出
-  - [ ] responsesのインラインスキーマ検出
-  - [ ] ネストされたインラインスキーマの再帰的探索
-  - [ ] 一意の名前生成ロジック
-  - [ ] 名前の衝突回避処理
+- [x] Task 5.8: インラインスキーマ抽出 ✅ 完了
+  - [x] requestBodyのインラインスキーマ検出
+  - [x] responsesのインラインスキーマ検出
+  - [x] ネストされたインラインスキーマの再帰的探索
+  - [x] 一意の名前生成ロジック（階層的命名）
+  - [x] 名前の衝突回避処理
 
 ## 7. 実装済みの設計決定
 

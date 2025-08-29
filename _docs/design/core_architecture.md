@@ -69,18 +69,20 @@ OpenAPI仕様書からTypeScript/Dartコードを生成するための、各コ�
 │  └──────────────────────────────────────────────────┘   │
 │                              ↓                            │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │              OpenAPITransformer                   │   │
-│  │  - Extract Models, Enums, Unions from components  │   │
+│  │         Transformer (Visitor Pattern)             │   │
+│  │  - Extract Models, Enums from components          │   │
 │  │  - Handle inline schemas with auto-naming         │   │
 │  │  - Group Services by Tags                         │   │
-│  │  - Analyze Dependencies                           │   │
+│  │  - Function-based Visitors (not class-based)      │   │
+│  │  - Unions: Future implementation (oneOf/anyOf)    │   │
 │  └──────────────────────────────────────────────────┘   │
 │                              ↓                            │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │            XcgenIR (Intermediate Representation)  │   │
-│  │  - Flat component lists                           │   │
+│  │       IRDocument (Current Implementation)         │   │
+│  │  - Simplified IR structure                        │   │
 │  │  - IRType with discriminated unions               │   │
 │  │  - Service-oriented structure                     │   │
+│  │  - Future: Full XcgenIR with servers/security     │   │
 │  └──────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────┘
                               ↓
