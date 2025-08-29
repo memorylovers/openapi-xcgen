@@ -178,9 +178,9 @@ if (import.meta.vitest) {
           responses: {},
         },
         // postがundefined/null
-        post: undefined as any,
-        put: null as any,
-      };
+        post: undefined,
+        put: undefined,
+      } as PathItemObject;
 
       const context: PathItemContext = {
         ...createContext(),

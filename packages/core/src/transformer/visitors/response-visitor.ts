@@ -54,7 +54,7 @@ import { visitSchema, type SchemaVisitorContext } from "./schema-visitor.js";
 export function visitResponse(
   response: ResponseObject | ReferenceObject,
   statusCode: string,
-  context: VisitorContext,
+  _context: VisitorContext,
 ): IRResponse | null {
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(response)) {

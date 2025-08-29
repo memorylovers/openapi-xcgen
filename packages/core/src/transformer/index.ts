@@ -2,6 +2,9 @@
  * Transformer module exports
  */
 
+// Main transformer
+export { transform } from "./transformer.js";
+
 // Types
 export type { VisitorContext, VisitorResult, SchemaVisitor } from "./types.js";
 export { createContext } from "./types.js";

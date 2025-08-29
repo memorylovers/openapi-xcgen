@@ -51,7 +51,7 @@ import { visitSchema, type SchemaVisitorContext } from "./schema-visitor.js";
 export function visitRequestBody(
   requestBody: RequestBodyObject | ReferenceObject,
   operationId: string,
-  context: VisitorContext,
+  _context: VisitorContext,
 ): IRRequestBody | null {
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(requestBody)) {
@@ -239,11 +239,11 @@ if (import.meta.vitest) {
         content: {
           "application/json": {
             // No schema
-          } as any,
+          },
           "text/plain": {
             schema: { type: "string" },
           },
-        },
+        } as RequestBodyObject["content"],
       };
 
       const result = visitRequestBody(requestBody, "testOp", createContext());
