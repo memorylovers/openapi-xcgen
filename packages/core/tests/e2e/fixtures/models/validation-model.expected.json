@@ -1,0 +1,113 @@
+{
+  "info": {
+    "title": "Validation Model Test",
+    "version": "1.0.0",
+    "description": "Test validation constraints"
+  },
+  "models": [
+    {
+      "name": "Product",
+      "properties": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        {
+          "name": "code",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false,
+          "validation": {
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        {
+          "name": "userId",
+          "type": {
+            "kind": "primitive",
+            "type": "string",
+            "format": "uuid"
+          },
+          "required": false
+        },
+        {
+          "name": "email",
+          "type": {
+            "kind": "primitive",
+            "type": "string",
+            "format": "email"
+          },
+          "required": false
+        },
+        {
+          "name": "website",
+          "type": {
+            "kind": "primitive",
+            "type": "string",
+            "format": "uri"
+          },
+          "required": false
+        },
+        {
+          "name": "ipAddress",
+          "type": {
+            "kind": "primitive",
+            "type": "string",
+            "format": "ipv4"
+          },
+          "required": false
+        },
+        {
+          "name": "price",
+          "type": {
+            "kind": "primitive",
+            "type": "number"
+          },
+          "required": false,
+          "validation": {
+            "minimum": 0,
+            "maximum": 1000
+          }
+        },
+        {
+          "name": "quantity",
+          "type": {
+            "kind": "primitive",
+            "type": "integer"
+          },
+          "required": false,
+          "validation": {
+            "minimum": 1
+          }
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "primitive",
+              "type": "string"
+            }
+          },
+          "required": false,
+          "validation": {
+            "minItems": 1,
+            "maxItems": 5
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "services": []
+}

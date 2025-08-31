@@ -1,0 +1,61 @@
+{
+  "info": {
+    "title": "Ref Model Test",
+    "version": "1.0.0",
+    "description": "Test $ref references to components"
+  },
+  "models": [
+    {
+      "name": "Order",
+      "properties": [
+        {
+          "name": "customer",
+          "type": {
+            "kind": "ref",
+            "name": "Customer"
+          },
+          "required": false
+        },
+        {
+          "name": "items",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "OrderItem"
+            }
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "properties": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "OrderItem",
+      "properties": [
+        {
+          "name": "productId",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "services": []
+}

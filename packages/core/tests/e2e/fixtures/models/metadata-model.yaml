@@ -1,0 +1,52 @@
+openapi: 3.1.0
+info:
+  title: Metadata Model Test
+  version: 1.0.0
+  description: Test metadata attributes
+
+paths:
+  # TODO: 未実装 - operationIdがない操作は自動生成が必要
+  /articles:
+    get:
+      summary: Get articles
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+
+components:
+  schemas:
+    Article:
+      type: object
+      # スキーマレベルのメタデータ
+      title: Article Schema
+      description: Article model with metadata
+      properties:
+        # title + description
+        name:
+          type: string
+          title: Name Field
+          description: Name description
+        # example属性のみ
+        code:
+          type: string
+          example: ABC123
+        # default属性のみ
+        status:
+          type: string
+          default: active
+        # readOnly属性
+        createdAt:
+          type: string
+          readOnly: true
+        # writeOnly属性
+        password:
+          type: string
+          writeOnly: true
+        # deprecated属性
+        oldId:
+          type: string
+          deprecated: true

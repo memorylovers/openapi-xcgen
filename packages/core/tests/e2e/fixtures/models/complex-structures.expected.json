@@ -1,0 +1,170 @@
+{
+  "info": {
+    "title": "Complex Structures Test",
+    "version": "1.0.0",
+    "description": "Test complex object structures and arrays"
+  },
+  "models": [
+    {
+      "name": "Level1",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "Level1Data"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level1Data",
+      "properties": [
+        {
+          "name": "value",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level2",
+      "properties": [
+        {
+          "name": "outer",
+          "type": {
+            "kind": "ref",
+            "name": "Level2Outer"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level2Outer",
+      "properties": [
+        {
+          "name": "inner",
+          "type": {
+            "kind": "ref",
+            "name": "Level2OuterInner"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level2OuterInner",
+      "properties": [
+        {
+          "name": "value",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level3",
+      "properties": [
+        {
+          "name": "level1",
+          "type": {
+            "kind": "ref",
+            "name": "Level3Level1"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level3Level1",
+      "properties": [
+        {
+          "name": "level2",
+          "type": {
+            "kind": "ref",
+            "name": "Level3Level1Level2"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level3Level1Level2",
+      "properties": [
+        {
+          "name": "level3",
+          "type": {
+            "kind": "ref",
+            "name": "Level3Level1Level2Level3"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Level3Level1Level2Level3",
+      "properties": [
+        {
+          "name": "value",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Team",
+      "properties": [
+        {
+          "name": "members",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "TeamMembers"
+            }
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "TeamMembers",
+      "properties": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "properties": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "services": []
+}

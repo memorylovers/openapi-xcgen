@@ -1,0 +1,131 @@
+{
+  "info": {
+    "title": "Data Types Test",
+    "version": "1.0.0",
+    "description": "Test all supported data types"
+  },
+  "models": [
+    {
+      "name": "DataTypes",
+      "properties": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "type": "integer"
+          },
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        },
+        {
+          "name": "score",
+          "type": {
+            "kind": "primitive",
+            "type": "number"
+          },
+          "required": false
+        },
+        {
+          "name": "isActive",
+          "type": {
+            "kind": "primitive",
+            "type": "boolean"
+          },
+          "required": false
+        },
+        {
+          "name": "birthDate",
+          "type": {
+            "kind": "primitive",
+            "type": "string",
+            "format": "date"
+          },
+          "required": false
+        },
+        {
+          "name": "createdAt",
+          "type": {
+            "kind": "primitive",
+            "type": "string",
+            "format": "date-time"
+          },
+          "required": false
+        },
+        {
+          "name": "profile",
+          "type": {
+            "kind": "ref",
+            "name": "DataTypesProfile"
+          },
+          "required": false
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "primitive",
+              "type": "string"
+            }
+          },
+          "required": false
+        },
+        {
+          "name": "numbers",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "primitive",
+              "type": "integer"
+            }
+          },
+          "required": false
+        },
+        {
+          "name": "scores",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "primitive",
+              "type": "number"
+            }
+          },
+          "required": false
+        },
+        {
+          "name": "flags",
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "primitive",
+              "type": "boolean"
+            }
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "DataTypesProfile",
+      "properties": [
+        {
+          "name": "bio",
+          "type": {
+            "kind": "primitive",
+            "type": "string"
+          },
+          "required": false
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "services": []
+}
