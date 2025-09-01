@@ -82,26 +82,10 @@ export interface IRMap {
 }
 
 /**
- * IRAny - any型（型情報なし）
- * @example
- * ```yaml
- * # OpenAPI
- * {} # 空のスキーマ
- * # または
- * type: object
- * additionalProperties: true
- * ```
- */
-export interface IRAny {
-  kind: "any";
-  nullable?: boolean;
-}
-
-/**
  * IRType - 型情報の判別共用体
  * プロパティやパラメータの型として使用される
  */
-export type IRType = IRPrimitive | IRRef | IRArray | IRMap | IRAny;
+export type IRType = IRPrimitive | IRRef | IRArray | IRMap;
 
 // ============================================================================
 // 型定義（XcgenIRのトップレベルで定義される実体）

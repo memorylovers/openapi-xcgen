@@ -30,7 +30,6 @@ export {
 
 // Re-export IR types
 export type {
-  IRAny,
   IRApiKeyConfig,
   IRArray,
   IRContact,

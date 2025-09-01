@@ -315,8 +315,12 @@ Conventional Commitsに従う：
 - **multipleOf**: 数値の倍数制約
 - **contentMediaType/contentEncoding**: コンテンツエンコーディング
 - **$id/$anchor**: スキーマ識別子
+- **空のスキーマ `{}`**: any型相当（すべての型を許可）
+- **typeプロパティなし**: 暗黙的なany型
 
 これらの機能は使用頻度が低く（全体の5-10%）、基本的な型処理（object、array、primitive、enum、$ref）で90%以上のAPIに対応可能です。
+
+注: any型のサポートは意図的に除外しています。型安全性を重視し、明示的な型定義を推奨します。
 
 ## トラブルシューティング
 
