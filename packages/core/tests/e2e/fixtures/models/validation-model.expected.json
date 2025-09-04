@@ -10,10 +10,7 @@
       "properties": [
         {
           "name": "name",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false,
           "validation": {
             "minLength": 1,
@@ -22,10 +19,7 @@
         },
         {
           "name": "code",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false,
           "validation": {
             "pattern": "^[A-Z]{3}$"
@@ -33,46 +27,39 @@
         },
         {
           "name": "userId",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
+          "type": "string",
+          "required": false,
+          "validation": {
             "format": "uuid"
-          },
-          "required": false
+          }
         },
         {
           "name": "email",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
+          "type": "string",
+          "required": false,
+          "validation": {
             "format": "email"
-          },
-          "required": false
+          }
         },
         {
           "name": "website",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
+          "type": "string",
+          "required": false,
+          "validation": {
             "format": "uri"
-          },
-          "required": false
+          }
         },
         {
           "name": "ipAddress",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
+          "type": "string",
+          "required": false,
+          "validation": {
             "format": "ipv4"
-          },
-          "required": false
+          }
         },
         {
           "name": "price",
-          "type": {
-            "kind": "primitive",
-            "type": "number"
-          },
+          "type": "double",
           "required": false,
           "validation": {
             "minimum": 0,
@@ -81,10 +68,7 @@
         },
         {
           "name": "quantity",
-          "type": {
-            "kind": "primitive",
-            "type": "integer"
-          },
+          "type": "int",
           "required": false,
           "validation": {
             "minimum": 1
@@ -94,10 +78,7 @@
           "name": "tags",
           "type": {
             "kind": "array",
-            "itemType": {
-              "kind": "primitive",
-              "type": "string"
-            }
+            "itemType": "string"
           },
           "required": false,
           "validation": {

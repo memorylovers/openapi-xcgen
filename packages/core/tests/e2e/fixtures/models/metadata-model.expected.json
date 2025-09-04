@@ -10,52 +10,34 @@
       "properties": [
         {
           "name": "name",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false,
           "description": "Name description"
         },
         {
           "name": "code",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         },
         {
           "name": "status",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false,
           "defaultValue": "active"
         },
         {
           "name": "createdAt",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         },
         {
           "name": "password",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         },
         {
           "name": "oldId",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false,
           "deprecated": true
         }

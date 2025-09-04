@@ -1,54 +1,99 @@
-# template-citty-unbuild
+# openapi-xcgen
 
-Template for CLI and npm package powered by [citty](https://github.com/unjs/citty) and [unbuild](https://github.com/unjs/unbuild).
+A cross-language code generator that transforms OpenAPI specifications into TypeScript and Dart client code.
 
-## How To Use
+## Overview
 
-You can easily download this template using [unjs/giget](https://github.com/unjs/giget).
+openapi-xcgen takes OpenAPI specification files (YAML/JSON) generated from TypeSpec and produces type-safe client code for multiple languages. The library uses an intermediate representation (IR) to ensure consistent code generation across different target languages.
 
-```shell
-# create package by this template
-$ npx giget@latest gh:memorylovers/template-citty-unbuild my-cli
-# or 
-$ pnpm dlx giget@latest gh:memorylovers/template-citty-unbuild my-cli
-#
-$ cd my-cli 
+## Packages
+
+- **@openapi-xcgen/core**: Parser and transformer for OpenAPI to IR conversion
+- **@openapi-xcgen/generator-typescript**: TypeScript code generator (planned)
+- **@openapi-xcgen/generator-dart**: Dart code generator (planned)
+
+## Type System
+
+### IR Scalar Types
+
+The following table shows the mapping between OpenAPI types and IR scalar types:
+
+| IR Type | Description | OpenAPI `type` | OpenAPI `format` |
+|---------|-------------|----------------|------------------|
+| `int` | 32-bit integer | `integer` | - or `int32` |
+| `long` | 64-bit integer | `integer` | `int64` |
+| `float` | Single precision float | `number` | `float` |
+| `double` | Double precision float | `number` | - or `double` |
+| `string` | String | `string` | - |
+| `boolean` | Boolean | `boolean` | - |
+| `date` | Date only | `string` | `date` |
+| `datetime` | Date and time | `string` | `date-time` |
+| `binary` | Binary data | `string` | `binary` |
+| `byte` | Base64 encoded | `string` | `byte` |
+
+### Complex Types
+
+- **Array**: Represented as `IRArray` with element type
+- **Object**: Represented as `IRMap` for additional properties or model with properties
+- **Reference**: Represented as `IRRef` pointing to components
+
+### Type Modifiers
+
+- **Nullable**: Handled at usage level (`IRProperty`, `IRParameter`) rather than type definition
+- **Required**: Specified in model's required array or parameter's required flag
+
+## Development
+
+### Prerequisites
+
+- Node.js v20+
+- pnpm 10.13.1
+
+### Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+
+# Check code quality
+pnpm check
 ```
 
-## Using Packages
+### Commands
 
-- [unjs/citty](https://github.com/unjs/citty) ... CLI Builder
-- [unjs/unbuild](https://github.com/unjs/unbuild) ... Build System
-- [vitest](https://vitest.dev/) ... Testing Framework
+```bash
+# Development
+pnpm dev          # Watch mode
+pnpm build        # Build packages
 
-and,
+# Testing
+pnpm test         # Run tests
+pnpm test:watch   # Watch mode testing
+pnpm test:coverage # Coverage report
 
-- [unjs/consola](https://github.com/unjs/consola) ... Elegant console.log
-- [unjs/jiti](https://github.com/unjs/jiti) ... Execute .ts file
-- [unjs/defu](https://github.com/unjs/defu) ... Assign default properties
-
-## Directory Structure
-
-```text
-.
-├── bin/
-│   └── cli.mjs      ... CLI command
-├── playground/
-├── src/
-│   ├── lib/         ... library sorce codes
-│   ├── cli.ts       ... CLI command definition
-│   ├── index.ts     ... exports
-│   └── types.ts
-├── tests/           ... test files
-├── build.config.ts  ... "unbuild" config file
-├── package.json
-├── tsconfig.json
-└── vitest.config.ts ... "vitest" config file
+# Quality
+pnpm check        # Run all checks
+pnpm lint         # Lint code
+pnpm lint:fix     # Fix lint issues
+pnpm typecheck    # TypeScript check
 ```
 
-For more information please see my blog.
+## Currently Unsupported Features
 
-[cittyとunbuildでCLIツールを作ってみた(テンプレート付き) - くらげになりたい。](https://www.memory-lovers.blog/entry/2025/01/06/084007)
+The following OpenAPI features are not yet supported:
+
+- `oneOf`, `anyOf`, `allOf` (union types and schema composition)
+- `discriminator` (polymorphism)
+- `not` (negation schema)
+- `additionalProperties` (dynamic properties)
+- `if`/`then`/`else` (conditional schemas)
+- Empty schemas `{}`
 
 ## License
 

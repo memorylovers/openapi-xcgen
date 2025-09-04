@@ -11,7 +11,6 @@ import type { SchemaObjectWithNullable } from "../../types/index";
 import type { IRArray, IRType } from "../../types/ir/index";
 import { extractRefName } from "../helpers/extract-ref-name";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type";
-import { visitPrimitive } from "./primitive-visitor";
 
 /**
  * SchemaObjectをIRTypeに解決
@@ -67,8 +66,14 @@ export function visitType(schema: SchemaObjectWithNullable): IRType | null {
     return { kind: "ref", name: refName };
   }
 
-  // プリミティブ型: nullの場合はそのまま返す
-  if (toIRScalarType(schema.type)) return visitPrimitive(schema);
+  // プリミティブ型: 直接IRScalarTypeを返す
+  // OpenAPI 3.1ではtypeが配列の場合もあるので、文字列の場合のみ処理
+  if (typeof schema.type === "string") {
+    const formatValue =
+      typeof schema.format === "string" ? schema.format : undefined;
+    const scalarType = toIRScalarType(schema.type, formatValue);
+    if (scalarType) return scalarType;
+  }
 
   // 配列型
   if (schema.type === "array" && schema.items) {
@@ -92,8 +97,25 @@ if (import.meta.vitest) {
     it("should resolve primitive types", () => {
       const schema: SchemaObjectWithNullable = { type: "string" };
       const result = visitType(schema);
-      expect(result).not.toBe(null);
-      expect(result?.kind).toBe("primitive");
+      expect(result).toBe("string");
+    });
+
+    it("should resolve integer with format", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "integer",
+        format: "int64",
+      };
+      const result = visitType(schema);
+      expect(result).toBe("long");
+    });
+
+    it("should resolve string with date format", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "string",
+        format: "date-time",
+      };
+      const result = visitType(schema);
+      expect(result).toBe("datetime");
     });
 
     it("should resolve array types", () => {
@@ -103,8 +125,10 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema);
       expect(result).not.toBe(null);
-      expect(result?.kind).toBe("array");
-      expect((result as IRArray).itemType.kind).toBe("primitive");
+      expect(
+        result && typeof result === "object" && "kind" in result && result.kind,
+      ).toBe("array");
+      expect((result as IRArray).itemType).toBe("string");
     });
 
     it("should resolve nested array types", () => {
@@ -117,11 +141,17 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema);
       expect(result).not.toBe(null);
-      expect(result?.kind).toBe("array");
+      expect(
+        result && typeof result === "object" && "kind" in result && result.kind,
+      ).toBe("array");
       const outerArray = result as IRArray;
-      expect(outerArray.itemType.kind).toBe("array");
+      expect(
+        typeof outerArray.itemType === "object" &&
+          "kind" in outerArray.itemType &&
+          outerArray.itemType.kind,
+      ).toBe("array");
       const innerArray = outerArray.itemType as IRArray;
-      expect(innerArray.itemType.kind).toBe("primitive");
+      expect(innerArray.itemType).toBe("double");
     });
 
     it("should resolve $ref types", () => {
@@ -199,9 +229,8 @@ if (import.meta.vitest) {
         nullable: true,
       };
       const result = visitType(schema);
-      expect(result).not.toBe(null);
-      expect(result?.kind).toBe("primitive");
-      expect(result).toHaveProperty("nullable", true);
+      // nullableはプロパティレベルで管理されるため、scalar typeにはnullableプロパティがない
+      expect(result).toBe("string");
     });
 
     it("should handle format in primitive", () => {
@@ -210,9 +239,18 @@ if (import.meta.vitest) {
         format: "email",
       };
       const result = visitType(schema);
-      expect(result).not.toBe(null);
-      expect(result?.kind).toBe("primitive");
-      expect(result).toHaveProperty("format", "email");
+      // email formatは通常のstringとして扱われる
+      expect(result).toBe("string");
+    });
+
+    it("should handle special format in primitive", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "string",
+        format: "date-time",
+      };
+      const result = visitType(schema);
+      // date-time formatは特別な型として扱われる
+      expect(result).toBe("datetime");
     });
   });
 

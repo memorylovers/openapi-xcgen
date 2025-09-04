@@ -80,9 +80,15 @@ export function visitEnum(
   // typeが未定義の場合はエラーとして扱う。
   // 手書きOpenAPIで型推論が必要な場合（例: enum: [1,2,3]のみ）は
   // 将来的にinferEnumType()関数を実装して対応する。
+  // OpenAPI 3.1ではtypeが配列の場合もあるので、文字列の場合のみ処理
+  if (typeof schema.type !== "string") {
+    consola.warn(`Missing or invalid type for enum ${name}: ${schema.type}`);
+    return null;
+  }
+
   const type = toIRScalarType(schema.type);
   if (!type) {
-    consola.warn(`Missing or invalid type for enum ${name}: ${schema.type}`);
+    consola.warn(`Invalid scalar type for enum ${name}: ${schema.type}`);
     return null;
   }
 
@@ -139,7 +145,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         name: "Priority",
-        type: "integer", // OpenAPIの型をそのまま保持
+        type: "int", // integerはIRScalarTypeのintに変換される
         description: "Priority level",
         values: [
           { value: 1, name: "VALUE_1" },

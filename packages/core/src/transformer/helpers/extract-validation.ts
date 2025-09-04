@@ -88,6 +88,15 @@ export function extractValidation(schema: SchemaObject): IRValidation | null {
     validation.enum = schema.enum;
   }
 
+  // フォーマット（バリデーション用のみ）
+  // date、date-time、binary、byteはスカラー型として処理されるため除外
+  if (
+    schema.format !== undefined &&
+    !["date", "date-time", "binary", "byte"].includes(schema.format)
+  ) {
+    validation.format = schema.format;
+  }
+
   // バリデーションが空の場合はnullを返す
   return Object.keys(validation).length > 0 ? validation : null;
 }
@@ -296,6 +305,60 @@ if (import.meta.vitest) {
         maximum: 100,
         exclusiveMinimum: true,
         exclusiveMaximum: true,
+      });
+    });
+
+    it("should extract validation format (uuid, email, etc.)", () => {
+      const schema: SchemaObject = {
+        type: "string",
+        format: "uuid",
+      };
+
+      const result = extractValidation(schema);
+
+      expect(result).toEqual({
+        format: "uuid",
+      });
+    });
+
+    it("should exclude scalar type formats (date, datetime, etc.)", () => {
+      const dateSchema: SchemaObject = {
+        type: "string",
+        format: "date",
+      };
+      const dateTimeSchema: SchemaObject = {
+        type: "string",
+        format: "date-time",
+      };
+      const binarySchema: SchemaObject = {
+        type: "string",
+        format: "binary",
+      };
+      const byteSchema: SchemaObject = {
+        type: "string",
+        format: "byte",
+      };
+
+      expect(extractValidation(dateSchema)).toBeNull();
+      expect(extractValidation(dateTimeSchema)).toBeNull();
+      expect(extractValidation(binarySchema)).toBeNull();
+      expect(extractValidation(byteSchema)).toBeNull();
+    });
+
+    it("should extract format with other validations", () => {
+      const schema: SchemaObject = {
+        type: "string",
+        format: "email",
+        minLength: 5,
+        maxLength: 100,
+      };
+
+      const result = extractValidation(schema);
+
+      expect(result).toEqual({
+        minLength: 5,
+        maxLength: 100,
+        format: "email",
       });
     });
   });

@@ -276,7 +276,7 @@ if (import.meta.vitest) {
         in: "path",
         required: true,
         description: undefined,
-        type: { kind: "primitive", type: "string" },
+        type: "string",
         defaultValue: undefined,
         deprecated: undefined,
       });
@@ -285,7 +285,7 @@ if (import.meta.vitest) {
         in: "query",
         required: false,
         description: undefined,
-        type: { kind: "primitive", type: "integer" },
+        type: "int",
         defaultValue: 10,
         deprecated: undefined,
       });

@@ -10,52 +10,32 @@
       "properties": [
         {
           "name": "id",
-          "type": {
-            "kind": "primitive",
-            "type": "integer"
-          },
+          "type": "int",
           "required": false
         },
         {
           "name": "name",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         },
         {
           "name": "score",
-          "type": {
-            "kind": "primitive",
-            "type": "number"
-          },
+          "type": "double",
           "required": false
         },
         {
           "name": "isActive",
-          "type": {
-            "kind": "primitive",
-            "type": "boolean"
-          },
+          "type": "boolean",
           "required": false
         },
         {
           "name": "birthDate",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
-            "format": "date"
-          },
+          "type": "date",
           "required": false
         },
         {
           "name": "createdAt",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
-            "format": "date-time"
-          },
+          "type": "datetime",
           "required": false
         },
         {
@@ -70,10 +50,7 @@
           "name": "tags",
           "type": {
             "kind": "array",
-            "itemType": {
-              "kind": "primitive",
-              "type": "string"
-            }
+            "itemType": "string"
           },
           "required": false
         },
@@ -81,10 +58,7 @@
           "name": "numbers",
           "type": {
             "kind": "array",
-            "itemType": {
-              "kind": "primitive",
-              "type": "integer"
-            }
+            "itemType": "int"
           },
           "required": false
         },
@@ -92,10 +66,7 @@
           "name": "scores",
           "type": {
             "kind": "array",
-            "itemType": {
-              "kind": "primitive",
-              "type": "number"
-            }
+            "itemType": "double"
           },
           "required": false
         },
@@ -103,10 +74,7 @@
           "name": "flags",
           "type": {
             "kind": "array",
-            "itemType": {
-              "kind": "primitive",
-              "type": "boolean"
-            }
+            "itemType": "boolean"
           },
           "required": false
         }
@@ -117,10 +85,7 @@
       "properties": [
         {
           "name": "bio",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]

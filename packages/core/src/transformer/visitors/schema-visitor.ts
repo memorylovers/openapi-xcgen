@@ -214,7 +214,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
             ],
@@ -241,10 +241,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: {
-          kind: "primitive",
-          type: "string",
-        },
+        type: "string",
         models: [],
         enums: [],
       });
@@ -300,7 +297,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "Status",
-            type: "number", // typeフィールドの値
+            type: "double", // typeフィールドの値
             values: [
               { value: "a", name: "A" },
               { value: "b", name: "B" },
@@ -333,7 +330,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "Priority",
-            type: "integer",
+            type: "int",
             values: [
               { value: 1, name: "VALUE_1" },
               { value: 2, name: "VALUE_2" },
@@ -376,7 +373,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
             ],
@@ -444,7 +441,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "value",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
             ],
@@ -509,7 +506,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
               {
@@ -527,7 +524,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "title",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
               {
@@ -542,7 +539,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "name",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
               {
@@ -614,12 +611,12 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                type: { kind: "primitive", type: "integer" },
+                type: "int",
                 required: false,
               },
               {
                 name: "name",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
               {
@@ -634,7 +631,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "created",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
               {

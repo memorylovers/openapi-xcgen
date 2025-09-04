@@ -10,27 +10,26 @@
  * OpenAPIのスカラー型
  * IRPrimitiveとIREnumで使用される基本型
  */
-export type IRScalarType = "string" | "number" | "integer" | "boolean";
+export type IRScalarType =
+  // 整数型
+  | "int" // integer/int32 → 32ビット整数
+  | "long" // integer/int64 → 64ビット整数
+  // 浮動小数点型
+  | "float" // number/float → 単精度
+  | "double" // number/double → 倍精度
+  // 基本型
+  | "string" // string
+  | "boolean" // boolean
+  // 日時型（特別扱い）
+  | "date" // string/date → 日付のみ
+  | "datetime" // string/date-time → 日時
+  // バイナリ型（特別扱い）
+  | "binary" // string/binary → バイナリデータ
+  | "byte"; // string/byte → Base64エンコード
 
 // ============================================================================
 // 型参照（IRType）- プロパティやパラメータの型として使用
 // ============================================================================
-
-/**
- * IRPrimitive - プリミティブ型
- * @example
- * ```yaml
- * # OpenAPI
- * type: string
- * format: email
- * ```
- */
-export interface IRPrimitive {
-  kind: "primitive";
-  type: IRScalarType;
-  format?: string; // email, date, date-time, uri, uuid等
-  nullable?: boolean;
-}
 
 /**
  * IRRef - 型への参照（$ref）
@@ -46,7 +45,6 @@ export interface IRPrimitive {
 export interface IRRef {
   kind: "ref";
   name: string; // "User", "Status", "Pet" など
-  nullable?: boolean;
 }
 
 /**
@@ -62,7 +60,6 @@ export interface IRRef {
 export interface IRArray {
   kind: "array";
   itemType: IRType;
-  nullable?: boolean;
 }
 
 /**
@@ -78,14 +75,13 @@ export interface IRArray {
 export interface IRMap {
   kind: "map";
   valueType: IRType;
-  nullable?: boolean;
 }
 
 /**
  * IRType - 型情報の判別共用体
  * プロパティやパラメータの型として使用される
  */
-export type IRType = IRPrimitive | IRRef | IRArray | IRMap;
+export type IRType = IRScalarType | IRRef | IRArray | IRMap;
 
 // ============================================================================
 // 型定義（XcgenIRのトップレベルで定義される実体）
@@ -157,6 +153,8 @@ export interface IRProperty {
   type: IRType;
   /** 必須フラグ */
   required: boolean;
+  /** null許容フラグ */
+  nullable?: boolean;
   /** デフォルト値 */
   defaultValue?: unknown;
   /** 非推奨フラグ */
@@ -256,4 +254,6 @@ export interface IRValidation {
   maxProperties?: number;
   /** 列挙値 */
   enum?: unknown[];
+  /** フォーマット（uuid、email、uri、ipv4等のバリデーション用） */
+  format?: string;
 }

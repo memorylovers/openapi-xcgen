@@ -170,6 +170,8 @@ export interface IRParameter {
   required: boolean;
   /** 型情報 */
   type: IRType;
+  /** null許容フラグ */
+  nullable?: boolean;
   /** デフォルト値 */
   defaultValue?: unknown;
   /** 非推奨フラグ */

@@ -165,6 +165,11 @@ export function visitObject(
         property.deprecated = true;
       }
 
+      // nullableがある場合は追加
+      if (schemaObj.nullable === true) {
+        property.nullable = true;
+      }
+
       // バリデーション情報を抽出
       const validation = extractValidation(schemaObj);
       if (validation) {
@@ -224,7 +229,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
             ],
@@ -251,7 +256,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "id",
-            type: { kind: "primitive", type: "integer" },
+            type: "int",
             required: false,
           },
         ],
@@ -279,7 +284,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "name",
-            type: { kind: "primitive", type: "string" },
+            type: "string",
             required: false,
             description: "User's full name",
           },
@@ -305,7 +310,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "status",
-            type: { kind: "primitive", type: "string" },
+            type: "string",
             required: false,
             defaultValue: "active",
           },
@@ -331,7 +336,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "oldField",
-            type: { kind: "primitive", type: "string" },
+            type: "string",
             required: false,
             deprecated: true,
           },
@@ -361,7 +366,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "username",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
                 validation: {
                   minLength: 3,
@@ -408,22 +413,24 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "requiredNullable",
-            type: { kind: "primitive", type: "string", nullable: true },
+            type: "string",
+            nullable: true,
             required: true,
           },
           {
             name: "requiredNotNullable",
-            type: { kind: "primitive", type: "string" },
+            type: "string",
             required: true,
           },
           {
             name: "optionalNullable",
-            type: { kind: "primitive", type: "string", nullable: true },
+            type: "string",
+            nullable: true,
             required: false,
           },
           {
             name: "optionalNotNullable",
-            type: { kind: "primitive", type: "string" },
+            type: "string",
             required: false,
           },
         ],
@@ -447,12 +454,12 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "id",
-            type: { kind: "primitive", type: "integer" },
+            type: "int",
             required: true, // 存在するプロパティは正しくrequired
           },
           {
             name: "name",
-            type: { kind: "primitive", type: "string" },
+            type: "string",
             required: false, // required配列に含まれていないのでfalse
           },
         ],
@@ -494,7 +501,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "street",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
             ],
@@ -526,7 +533,7 @@ if (import.meta.vitest) {
                 name: "tags",
                 type: {
                   kind: "array",
-                  itemType: { kind: "primitive", type: "string" },
+                  itemType: "string",
                 },
                 required: false,
               },
@@ -766,7 +773,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "valid",
-                type: { kind: "primitive", type: "string" },
+                type: "string",
                 required: false,
               },
             ],

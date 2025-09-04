@@ -3,15 +3,14 @@ import { dirname, resolve } from "pathe";
 
 // テストユーティリティのディレクトリを基準にfixturesディレクトリを特定
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const FIXTURES_DIR = resolve(__dirname, "../fixtures");
 
 /**
- * fixtureファイルのパスを取得
- * @param filename - fixtureファイル名
+ * 各種fixtureファイルのパスを取得
+ * @param path - fixturesディレクトリからの相対パス
  * @returns 絶対パス
  */
-function getFixturePath(filename: string): string {
-  return resolve(FIXTURES_DIR, filename);
+function getFixturePath(path: string): string {
+  return resolve(__dirname, "../", path);
 }
 
 /**
@@ -19,9 +18,14 @@ function getFixturePath(filename: string): string {
  * 直接parseやreadFileに渡せる絶対パスを提供
  */
 export const FIXTURES = {
-  PETSTORE: getFixturePath("petstore.yaml"),
-  INVALID: getFixturePath("invalid.yaml"),
-  INVALID_OPENAPI: getFixturePath("invalid-openapi.yaml"),
+  // General fixtures
+  PETSTORE: getFixturePath("e2e/fixtures/general/petstore.yaml"),
+  MULTI_SERVICE: getFixturePath("e2e/fixtures/general/multi-service.yaml"),
+  COMPLEX_SCHEMA: getFixturePath("e2e/fixtures/general/complex-schema.yaml"),
+
+  // Parser test fixtures
+  INVALID: getFixturePath("parser/fixtures/invalid.yaml"),
+  INVALID_OPENAPI: getFixturePath("parser/fixtures/invalid-openapi.yaml"),
 } as const;
 
 // 型定義（オプション）

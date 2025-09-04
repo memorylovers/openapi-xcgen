@@ -47,7 +47,6 @@ export type {
   IROAuth2ScopeMap,
   IRParameter,
   IRParameterInType,
-  IRPrimitive,
   IRProperty,
   IRRef,
   IRRequestBody,

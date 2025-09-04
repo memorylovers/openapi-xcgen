@@ -9,7 +9,6 @@ export {
   type ObjectVisitorContext,
   type ObjectVisitorResult,
 } from "./object-visitor";
-export { visitPrimitive } from "./primitive-visitor";
 export {
   visitSchema,
   type SchemaVisitorContext,

@@ -10,37 +10,24 @@
       "properties": [
         {
           "name": "id",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": true
         },
         {
           "name": "name",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         },
         {
           "name": "bio",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
-            "nullable": true
-          },
+          "type": "string",
+          "nullable": true,
           "required": false
         },
         {
           "name": "lastLoginDate",
-          "type": {
-            "kind": "primitive",
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
+          "type": "datetime",
+          "nullable": true,
           "required": false
         },
         {
@@ -49,17 +36,16 @@
             "kind": "ref",
             "name": "ProfileSettings"
           },
+          "nullable": true,
           "required": false
         },
         {
           "name": "tags",
           "type": {
             "kind": "array",
-            "itemType": {
-              "kind": "primitive",
-              "type": "string"
-            }
+            "itemType": "string"
           },
+          "nullable": true,
           "required": false
         }
       ]
@@ -69,10 +55,7 @@
       "properties": [
         {
           "name": "theme",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]

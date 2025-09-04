@@ -30,7 +30,6 @@ export {
 export {
   visitComponents,
   type ComponentsResult,
-  visitPrimitive,
   visitType,
   visitEnum,
   type EnumVisitorContext,

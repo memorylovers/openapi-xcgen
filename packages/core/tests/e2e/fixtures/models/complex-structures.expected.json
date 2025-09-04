@@ -23,10 +23,7 @@
       "properties": [
         {
           "name": "value",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]
@@ -62,10 +59,7 @@
       "properties": [
         {
           "name": "value",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]
@@ -114,10 +108,7 @@
       "properties": [
         {
           "name": "value",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]
@@ -143,10 +134,7 @@
       "properties": [
         {
           "name": "name",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]
@@ -156,10 +144,7 @@
       "properties": [
         {
           "name": "name",
-          "type": {
-            "kind": "primitive",
-            "type": "string"
-          },
+          "type": "string",
           "required": false
         }
       ]
