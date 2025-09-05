@@ -189,7 +189,12 @@ export function visitObject(
     return result;
   }
 
-  const mainModel: IRModel = { name, properties };
+  // TODO: 実際のreferencePathを生成する処理を実装
+  const mainModel: IRModel = {
+    name,
+    referencePath: `#/components/schemas/${name}`, // 仮の値
+    properties,
+  };
 
   // descriptionがある場合のみ追加
   if (schema.description) {
@@ -226,6 +231,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Simple",
+            referencePath: "#/components/schemas/Simple",
             properties: [
               {
                 name: "id",
@@ -252,6 +258,7 @@ if (import.meta.vitest) {
 
       expect(result.models[0]).toEqual({
         name: "Model",
+        referencePath: "#/components/schemas/Model",
         description: "Test model",
         properties: [
           {
@@ -281,6 +288,7 @@ if (import.meta.vitest) {
 
       expect(result.models[0]).toEqual({
         name: "User",
+        referencePath: "#/components/schemas/User",
         properties: [
           {
             name: "name",
@@ -307,6 +315,7 @@ if (import.meta.vitest) {
 
       expect(result.models[0]).toEqual({
         name: "Config",
+        referencePath: "#/components/schemas/Config",
         properties: [
           {
             name: "status",
@@ -333,6 +342,7 @@ if (import.meta.vitest) {
 
       expect(result.models[0]).toEqual({
         name: "Model",
+        referencePath: "#/components/schemas/Model",
         properties: [
           {
             name: "oldField",
@@ -363,6 +373,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "User",
+            referencePath: "#/components/schemas/User",
             properties: [
               {
                 name: "username",
@@ -410,6 +421,7 @@ if (import.meta.vitest) {
 
       expect(result.models[0]).toEqual({
         name: "NullableTest",
+        referencePath: "#/components/schemas/NullableTest",
         properties: [
           {
             name: "requiredNullable",
@@ -451,6 +463,7 @@ if (import.meta.vitest) {
 
       expect(result.models[0]).toEqual({
         name: "TestModel",
+        referencePath: "#/components/schemas/TestModel",
         properties: [
           {
             name: "id",
@@ -488,6 +501,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Person",
+            referencePath: "#/components/schemas/Person",
             properties: [
               {
                 name: "address",
@@ -498,6 +512,7 @@ if (import.meta.vitest) {
           },
           {
             name: "PersonAddress",
+            referencePath: "#/components/schemas/PersonAddress",
             properties: [
               {
                 name: "street",
@@ -528,6 +543,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Data",
+            referencePath: "#/components/schemas/Data",
             properties: [
               {
                 name: "tags",
@@ -558,6 +574,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Membership",
+            referencePath: "#/components/schemas/Membership",
             properties: [
               {
                 name: "user",
@@ -589,6 +606,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Document",
+            referencePath: "#/components/schemas/Document",
             properties: [
               {
                 name: "status",
@@ -605,6 +623,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "DocumentStatus",
+            referencePath: "#/components/schemas/DocumentStatus",
             description: "Document status",
             type: "string",
             values: [
@@ -770,6 +789,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Mixed",
+            referencePath: "#/components/schemas/Mixed",
             properties: [
               {
                 name: "valid",

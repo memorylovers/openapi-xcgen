@@ -98,7 +98,13 @@ export function visitEnum(
     return { value, name: enumName };
   });
 
-  const result: IREnum = { name, type, values };
+  // TODO: 実際のreferencePathを生成する処理を実装
+  const result: IREnum = {
+    name,
+    referencePath: `#/components/schemas/${name}`, // 仮の値
+    type,
+    values,
+  };
 
   // descriptionがある場合のみ追加
   if (schema.description) {
@@ -124,6 +130,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         name: "Status",
+        referencePath: "#/components/schemas/Status",
         type: "string",
         description: "Status of the item",
         values: [
@@ -145,6 +152,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         name: "Priority",
+        referencePath: "#/components/schemas/Priority",
         type: "int", // integerはIRScalarTypeのintに変換される
         description: "Priority level",
         values: [
@@ -165,6 +173,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         name: "TaskStatus",
+        referencePath: "#/components/schemas/TaskStatus",
         type: "string",
         values: [
           { value: "in-progress", name: "IN_PROGRESS" },

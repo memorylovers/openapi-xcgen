@@ -177,6 +177,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "Status",
+            referencePath: "#/components/schemas/Status",
             type: "string",
             values: [
               { value: "a", name: "A" },
@@ -211,6 +212,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "User",
+            referencePath: "#/components/schemas/User",
             properties: [
               {
                 name: "id",
@@ -297,6 +299,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "Status",
+            referencePath: "#/components/schemas/Status",
             type: "double", // typeフィールドの値
             values: [
               { value: "a", name: "A" },
@@ -330,6 +333,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "Priority",
+            referencePath: "#/components/schemas/Priority",
             type: "int",
             values: [
               { value: 1, name: "VALUE_1" },
@@ -370,6 +374,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Item",
+            referencePath: "#/components/schemas/Item",
             properties: [
               {
                 name: "id",
@@ -420,6 +425,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Root",
+            referencePath: "#/components/schemas/Root",
             properties: [
               {
                 name: "status",
@@ -438,6 +444,7 @@ if (import.meta.vitest) {
           },
           {
             name: "RootNested",
+            referencePath: "#/components/schemas/RootNested",
             properties: [
               {
                 name: "value",
@@ -450,6 +457,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "RootStatus",
+            referencePath: "#/components/schemas/RootStatus",
             type: "string",
             values: [
               { value: "a", name: "A" },
@@ -503,6 +511,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Blog",
+            referencePath: "#/components/schemas/Blog",
             properties: [
               {
                 name: "id",
@@ -521,6 +530,7 @@ if (import.meta.vitest) {
           },
           {
             name: "BlogPosts",
+            referencePath: "#/components/schemas/BlogPosts",
             properties: [
               {
                 name: "title",
@@ -536,6 +546,7 @@ if (import.meta.vitest) {
           },
           {
             name: "BlogPostsAuthor",
+            referencePath: "#/components/schemas/BlogPostsAuthor",
             properties: [
               {
                 name: "name",
@@ -556,6 +567,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "BlogPostsAuthorRole",
+            referencePath: "#/components/schemas/BlogPostsAuthorRole",
             type: "string",
             values: [
               { value: "admin", name: "ADMIN" },
@@ -608,6 +620,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Items",
+            referencePath: "#/components/schemas/Items",
             properties: [
               {
                 name: "id",
@@ -628,6 +641,7 @@ if (import.meta.vitest) {
           },
           {
             name: "ItemsMetadata",
+            referencePath: "#/components/schemas/ItemsMetadata",
             properties: [
               {
                 name: "created",
@@ -648,6 +662,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "ItemsMetadataCategory",
+            referencePath: "#/components/schemas/ItemsMetadataCategory",
             type: "string",
             values: [
               { value: "product", name: "PRODUCT" },

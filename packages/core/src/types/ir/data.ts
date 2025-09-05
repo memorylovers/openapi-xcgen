@@ -122,6 +122,13 @@ export type IRType = IRScalarType | IRRef | IRArray | IRMap;
 export interface IRModel {
   /** モデル名（PascalCase） */
   name: string;
+  /**
+   * 参照パス（$refで参照される際のパス）
+   * @example
+   * - Components定義: `#/components/schemas/User`
+   * - インラインスキーマ: `#/paths/::users/post/requestBody/PostUsersRequestBody`
+   */
+  referencePath: string;
   /** モデルの説明 */
   description?: string;
   /** プロパティの配列 */
@@ -186,6 +193,13 @@ export interface IRProperty {
 export interface IREnum {
   /** Enum名（PascalCase） */
   name: string;
+  /**
+   * 参照パス（$refで参照される際のパス）
+   * @example
+   * - Components定義: `#/components/schemas/UserRole`
+   * - インラインEnum: `#/paths/::users/get/parameters/GetUsersParamsSortEnum`
+   */
+  referencePath: string;
   /** 説明 */
   description?: string;
   /** 値の型（OpenAPIの型をそのまま保持） */

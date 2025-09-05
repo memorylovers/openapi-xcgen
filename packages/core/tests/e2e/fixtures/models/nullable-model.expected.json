@@ -7,6 +7,7 @@
   "models": [
     {
       "name": "Profile",
+      "referencePath": "#/components/schemas/Profile",
       "properties": [
         {
           "name": "id",
@@ -21,14 +22,14 @@
         {
           "name": "bio",
           "type": "string",
-          "nullable": true,
-          "required": false
+          "required": false,
+          "nullable": true
         },
         {
           "name": "lastLoginDate",
           "type": "datetime",
-          "nullable": true,
-          "required": false
+          "required": false,
+          "nullable": true
         },
         {
           "name": "settings",
@@ -36,8 +37,8 @@
             "kind": "ref",
             "name": "ProfileSettings"
           },
-          "nullable": true,
-          "required": false
+          "required": false,
+          "nullable": true
         },
         {
           "name": "tags",
@@ -45,13 +46,14 @@
             "kind": "array",
             "itemType": "string"
           },
-          "nullable": true,
-          "required": false
+          "required": false,
+          "nullable": true
         }
       ]
     },
     {
       "name": "ProfileSettings",
+      "referencePath": "#/components/schemas/ProfileSettings",
       "properties": [
         {
           "name": "theme",

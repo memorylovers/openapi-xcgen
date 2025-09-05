@@ -118,6 +118,7 @@ if (import.meta.vitest) {
         models: [
           {
             name: "Item",
+            referencePath: "#/components/schemas/Item",
             properties: [
               {
                 name: "status",
@@ -131,6 +132,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "ItemStatus",
+            referencePath: "#/components/schemas/ItemStatus",
             type: "string",
             values: [
               { value: "a", name: "A" },
@@ -139,6 +141,7 @@ if (import.meta.vitest) {
           },
           {
             name: "Type",
+            referencePath: "#/components/schemas/Type",
             type: "string",
             values: [
               { value: "x", name: "X" },
@@ -223,6 +226,7 @@ if (import.meta.vitest) {
         enums: [
           {
             name: "GoodSchema",
+            referencePath: "#/components/schemas/GoodSchema",
             type: "string",
             values: [
               { value: "a", name: "A" },
