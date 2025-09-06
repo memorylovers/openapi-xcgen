@@ -8,14 +8,10 @@
 import { consola } from "consola";
 import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
 import type { IREnum, IREnumValue } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
 import { generateEnumName } from "../helpers/generate-enum-name";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type";
-
-// Context for enum visitor
-export interface EnumVisitorContext {
-  /** Enum名（必須） */
-  name: string;
-}
+import { buildReferencePath } from "../helpers/build-reference-path";
 
 /**
  * SchemaObjectからEnum定義を検出してIREnumに変換
@@ -48,13 +44,16 @@ export interface EnumVisitorContext {
  *
  * @example Usage
  * ```typescript
- * const result = visitEnum(schema, { name: "Status" });
+ * const result = visitEnum(schema, { documentPath: ["components", "schemas", "Status"] });
  * ```
  */
 export function visitEnum(
   schema: SchemaObjectWithNullable,
-  { name }: EnumVisitorContext,
+  context: VisitorContext,
 ): IREnum | null {
+  // documentPathから名前を抽出（最後の要素がEnum名）
+  const name = context.documentPath[context.documentPath.length - 1] || "";
+
   // 名前の妥当性チェック
   if (!name.trim()) {
     consola.warn("Invalid enum name: empty or whitespace only");
@@ -98,10 +97,9 @@ export function visitEnum(
     return { value, name: enumName };
   });
 
-  // TODO: 実際のreferencePathを生成する処理を実装
   const result: IREnum = {
     name,
-    referencePath: `#/components/schemas/${name}`, // 仮の値
+    referencePath: buildReferencePath(context.documentPath),
     type,
     values,
   };
@@ -126,7 +124,9 @@ if (import.meta.vitest) {
         description: "Status of the item",
       };
 
-      const result = visitEnum(schema, { name: "Status" });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", "Status"],
+      });
 
       expect(result).toEqual({
         name: "Status",
@@ -148,7 +148,9 @@ if (import.meta.vitest) {
         description: "Priority level",
       };
 
-      const result = visitEnum(schema, { name: "Priority" });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", "Priority"],
+      });
 
       expect(result).toEqual({
         name: "Priority",
@@ -169,7 +171,9 @@ if (import.meta.vitest) {
         enum: ["in-progress", "on_hold", "completed!", "new/pending"],
       };
 
-      const result = visitEnum(schema, { name: "TaskStatus" });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", "TaskStatus"],
+      });
 
       expect(result).toEqual({
         name: "TaskStatus",
@@ -191,7 +195,9 @@ if (import.meta.vitest) {
         maxLength: 50,
       };
 
-      const result = visitEnum(schema, { name: "Status" });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", "Status"],
+      });
 
       expect(result).toBe(null);
     });
@@ -205,7 +211,9 @@ if (import.meta.vitest) {
         enum: [],
       };
 
-      const emptyResult = visitEnum(emptySchema, { name: "Status" });
+      const emptyResult = visitEnum(emptySchema, {
+        documentPath: ["components", "schemas", "Status"],
+      });
       expect(emptyResult).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith("Empty enum array for Status");
 
@@ -215,7 +223,9 @@ if (import.meta.vitest) {
         enum: "not-an-array",
       } as unknown as SchemaObject;
 
-      const invalidResult = visitEnum(invalidSchema, { name: "Status" });
+      const invalidResult = visitEnum(invalidSchema, {
+        documentPath: ["components", "schemas", "Status"],
+      });
       expect(invalidResult).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid enum type for Status: not an array",
@@ -232,7 +242,9 @@ if (import.meta.vitest) {
         // typeが未定義
       } as SchemaObject;
 
-      const result = visitEnum(schema, { name: "Numbers" });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", "Numbers"],
+      });
 
       expect(result).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith(
@@ -250,7 +262,9 @@ if (import.meta.vitest) {
         enum: ["a", "b", "c"],
       };
 
-      const result = visitEnum(schema, { name: "" });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", ""],
+      });
 
       expect(result).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith(
@@ -268,7 +282,9 @@ if (import.meta.vitest) {
         enum: ["x", "y", "z"],
       };
 
-      const result = visitEnum(schema, { name: "   " });
+      const result = visitEnum(schema, {
+        documentPath: ["components", "schemas", "   "],
+      });
 
       expect(result).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith(

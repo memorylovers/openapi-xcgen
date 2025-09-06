@@ -11,11 +11,11 @@
  */
 
 import { consola } from "consola";
-import type { RequestBodyObject, ReferenceObject } from "../../types/index";
+import { isReferenceObject } from "../../types/guards";
+import type { ReferenceObject, RequestBodyObject } from "../../types/index";
 import type { IRContentMap, IRRequestBody } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
-import { isReferenceObject } from "../../types/guards";
-import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
+import { visitSchema } from "./schema-visitor";
 
 /**
  * RequestBodyObjectをIRRequestBodyに変換
@@ -51,7 +51,7 @@ import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
 export function visitRequestBody(
   requestBody: RequestBodyObject | ReferenceObject,
   operationId: string,
-  _context: VisitorContext,
+  context: VisitorContext,
 ): IRRequestBody | null {
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(requestBody)) {
@@ -71,10 +71,9 @@ export function visitRequestBody(
   const content: IRContentMap = {};
   for (const [mimeType, mediaType] of Object.entries(requestBody.content)) {
     if (mediaType.schema) {
-      const schemaContext: SchemaVisitorContext = {
-        name: `${operationId}Request`,
-      };
-      const schemaResult = visitSchema(mediaType.schema, schemaContext);
+      const schemaResult = visitSchema(mediaType.schema, {
+        documentPath: [...context.documentPath, "content", mimeType, "schema"],
+      });
       if (schemaResult.type) {
         content[mimeType] = schemaResult.type;
       }
@@ -99,7 +98,6 @@ export function visitRequestBody(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitRequestBody", () => {
     it("should handle basic requestBody with JSON content", () => {
@@ -119,11 +117,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitRequestBody(
-        requestBody,
-        "createUser",
-        createContext(),
-      );
+      const result = visitRequestBody(requestBody, "createUser", {
+        documentPath: ["paths", "/users", "post", "requestBody"],
+      });
 
       expect(result).not.toBeNull();
       expect(result?.description).toBe("User data");
@@ -163,11 +159,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitRequestBody(
-        requestBody,
-        "uploadFile",
-        createContext(),
-      );
+      const result = visitRequestBody(requestBody, "uploadFile", {
+        documentPath: ["paths", "/files", "post", "requestBody"],
+      });
 
       expect(result?.required).toBe(false);
       expect(result?.content).toBeDefined();
@@ -184,7 +178,9 @@ if (import.meta.vitest) {
         // No content
       } as RequestBodyObject;
 
-      const result = visitRequestBody(requestBody, "testOp", createContext());
+      const result = visitRequestBody(requestBody, "testOp", {
+        documentPath: ["paths", "/test", "post", "requestBody"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith(
@@ -201,7 +197,9 @@ if (import.meta.vitest) {
         content: {},
       };
 
-      const result = visitRequestBody(requestBody, "testOp", createContext());
+      const result = visitRequestBody(requestBody, "testOp", {
+        documentPath: ["paths", "/test", "post", "requestBody"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith(
@@ -218,11 +216,9 @@ if (import.meta.vitest) {
         $ref: "#/components/requestBodies/UserInput",
       };
 
-      const result = visitRequestBody(
-        requestBody,
-        "updateUser",
-        createContext(),
-      );
+      const result = visitRequestBody(requestBody, "updateUser", {
+        documentPath: ["paths", "/users/{id}", "put", "requestBody"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith(
@@ -246,7 +242,9 @@ if (import.meta.vitest) {
         } as RequestBodyObject["content"],
       };
 
-      const result = visitRequestBody(requestBody, "testOp", createContext());
+      const result = visitRequestBody(requestBody, "testOp", {
+        documentPath: ["paths", "/test", "post", "requestBody"],
+      });
 
       expect(result).not.toBeNull();
       expect(result?.content?.["text/plain"]).toBeDefined();
@@ -269,7 +267,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitRequestBody(requestBody, "testOp", createContext());
+      const result = visitRequestBody(requestBody, "testOp", {
+        documentPath: ["paths", "/test", "post", "requestBody"],
+      });
 
       expect(result?.required).toBe(false);
     });

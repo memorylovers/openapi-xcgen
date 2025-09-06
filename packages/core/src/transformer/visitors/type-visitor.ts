@@ -9,6 +9,7 @@ import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
 import type { SchemaObjectWithNullable } from "../../types/index";
 import type { IRArray, IRType } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
 import { extractRefName } from "../helpers/extract-ref-name";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type";
 
@@ -24,6 +25,7 @@ import { toIRScalarType } from "../helpers/to-ir-scalar-type";
  *   - `format` (line 336): 型のフォーマット指定
  *
  * @param schema - 変換対象のスキーマ
+ * @param context - Visitorコンテキスト
  * @returns IRType型の結果、無効な場合はnull
  *
  * @example OpenAPI YAML
@@ -55,7 +57,10 @@ import { toIRScalarType } from "../helpers/to-ir-scalar-type";
  *   type: object
  * ```
  */
-export function visitType(schema: SchemaObjectWithNullable): IRType | null {
+export function visitType(
+  schema: SchemaObjectWithNullable,
+  context: VisitorContext,
+): IRType | null {
   // $ref参照の場合
   if (isReferenceObject(schema)) {
     const refName = extractRefName(schema.$ref);
@@ -77,7 +82,9 @@ export function visitType(schema: SchemaObjectWithNullable): IRType | null {
 
   // 配列型
   if (schema.type === "array" && schema.items) {
-    const itemType = visitType(schema.items as SchemaObjectWithNullable);
+    const itemType = visitType(schema.items as SchemaObjectWithNullable, {
+      documentPath: [...context.documentPath, "items"],
+    });
     // 配列の要素型が無効な場合はnullを返す
     if (itemType === null) return null;
 
@@ -96,7 +103,15 @@ if (import.meta.vitest) {
   describe("visitType", () => {
     it("should resolve primitive types", () => {
       const schema: SchemaObjectWithNullable = { type: "string" };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: [
+          "components",
+          "schemas",
+          "Example",
+          "properties",
+          "name",
+        ],
+      });
       expect(result).toBe("string");
     });
 
@@ -105,7 +120,9 @@ if (import.meta.vitest) {
         type: "integer",
         format: "int64",
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "Example", "properties", "id"],
+      });
       expect(result).toBe("long");
     });
 
@@ -114,7 +131,15 @@ if (import.meta.vitest) {
         type: "string",
         format: "date-time",
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: [
+          "components",
+          "schemas",
+          "Example",
+          "properties",
+          "createdAt",
+        ],
+      });
       expect(result).toBe("datetime");
     });
 
@@ -123,7 +148,15 @@ if (import.meta.vitest) {
         type: "array",
         items: { type: "string" },
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: [
+          "components",
+          "schemas",
+          "Example",
+          "properties",
+          "tags",
+        ],
+      });
       expect(result).not.toBe(null);
       expect(
         result && typeof result === "object" && "kind" in result && result.kind,
@@ -139,7 +172,9 @@ if (import.meta.vitest) {
           items: { type: "number" },
         },
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "Matrix", "properties", "data"],
+      });
       expect(result).not.toBe(null);
       expect(
         result && typeof result === "object" && "kind" in result && result.kind,
@@ -157,7 +192,18 @@ if (import.meta.vitest) {
     it("should resolve $ref types", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const schema = { $ref: "#/components/schemas/User" } as any;
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: [
+          "paths",
+          "/users",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+        ],
+      });
       expect(result).toEqual({
         kind: "ref",
         name: "User",
@@ -168,7 +214,9 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const schema = { $ref: "" } as any;
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "Invalid"],
+      });
 
       expect(result).toBe(null);
       expect(warnSpy).toHaveBeenCalledTimes(2); // extractRefNameとvisitTypeの両方で警告
@@ -179,7 +227,9 @@ if (import.meta.vitest) {
     it("should return null for empty schemas", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema: SchemaObjectWithNullable = {};
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "Empty"],
+      });
 
       expect(result).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith(
@@ -192,7 +242,9 @@ if (import.meta.vitest) {
     it("should return null for object types", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema: SchemaObjectWithNullable = { type: "object" };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "ObjectType"],
+      });
 
       expect(result).toBe(null);
       expect(warnSpy).toHaveBeenCalledWith(
@@ -205,7 +257,9 @@ if (import.meta.vitest) {
     it("should return null for array without items", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const schema = { type: "array" } as any;
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "ArrayWithoutItems"],
+      });
       expect(result).toBe(null);
     });
 
@@ -216,7 +270,9 @@ if (import.meta.vitest) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "ArrayWithInvalidItems"],
+      });
 
       // When items have an unknown type, visitType returns null
       // So the array visitor also returns null
@@ -228,7 +284,9 @@ if (import.meta.vitest) {
         type: "string",
         nullable: true,
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "NullableString"],
+      });
       // nullableはプロパティレベルで管理されるため、scalar typeにはnullableプロパティがない
       expect(result).toBe("string");
     });
@@ -238,7 +296,9 @@ if (import.meta.vitest) {
         type: "string",
         format: "email",
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "Email"],
+      });
       // email formatは通常のstringとして扱われる
       expect(result).toBe("string");
     });
@@ -248,7 +308,9 @@ if (import.meta.vitest) {
         type: "string",
         format: "date-time",
       };
-      const result = visitType(schema);
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "DateTime"],
+      });
       // date-time formatは特別な型として扱われる
       expect(result).toBe("datetime");
     });
@@ -257,8 +319,11 @@ if (import.meta.vitest) {
   describe("resolveType (deprecated)", () => {
     it("should work as alias for visitType", () => {
       const schema: SchemaObjectWithNullable = { type: "string" };
-      const result1 = visitType(schema);
-      const result2 = visitType(schema); // Use visitType instead of deprecated resolveType
+      const context = {
+        documentPath: ["components", "schemas", "Test"],
+      };
+      const result1 = visitType(schema, context);
+      const result2 = visitType(schema, context); // Use visitType instead of deprecated resolveType
       expect(result1).toEqual(result2);
     });
   });

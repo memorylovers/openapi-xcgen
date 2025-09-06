@@ -16,7 +16,7 @@ import type { ResponseObject, ReferenceObject } from "../../types/index";
 import type { IRContentMap, IRResponse } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { isReferenceObject } from "../../types/guards";
-import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
+import { visitSchema } from "./schema-visitor";
 
 /**
  * ResponseObjectをIRResponseに変換
@@ -54,7 +54,7 @@ import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
 export function visitResponse(
   response: ResponseObject | ReferenceObject,
   statusCode: string,
-  _context: VisitorContext,
+  context: VisitorContext,
 ): IRResponse | null {
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(response)) {
@@ -68,8 +68,13 @@ export function visitResponse(
     content = {};
     for (const [mimeType, mediaType] of Object.entries(response.content)) {
       if (mediaType.schema) {
-        const schemaContext: SchemaVisitorContext = {
-          name: `Response${statusCode}`,
+        const schemaContext: VisitorContext = {
+          documentPath: [
+            ...context.documentPath,
+            "content",
+            mimeType,
+            "schema",
+          ],
         };
         const schemaResult = visitSchema(mediaType.schema, schemaContext);
         if (schemaResult.type) {
@@ -96,7 +101,6 @@ export function visitResponse(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitResponse", () => {
     it("should handle basic response without content", () => {
@@ -104,7 +108,9 @@ if (import.meta.vitest) {
         description: "Success",
       };
 
-      const result = visitResponse(response, "200", createContext());
+      const result = visitResponse(response, "200", {
+        documentPath: ["paths", "/users", "get", "responses", "200"],
+      });
 
       expect(result).toEqual({
         statusCode: "200",
@@ -131,7 +137,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "200", createContext());
+      const result = visitResponse(response, "200", {
+        documentPath: ["paths", "/users", "get", "responses", "200"],
+      });
 
       expect(result).not.toBeNull();
       expect(result?.statusCode).toBe("200");
@@ -165,7 +173,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "200", createContext());
+      const result = visitResponse(response, "200", {
+        documentPath: ["paths", "/data", "get", "responses", "200"],
+      });
 
       expect(result?.content).toBeDefined();
       expect(Object.keys(result?.content || {})).toHaveLength(3);
@@ -185,7 +195,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "200", createContext());
+      const result = visitResponse(response, "200", {
+        documentPath: ["paths", "/users", "get", "responses", "200"],
+      });
 
       expect(result).not.toBeNull();
       // TODO: headersの処理はStep 12で実装
@@ -199,7 +211,9 @@ if (import.meta.vitest) {
         $ref: "#/components/responses/NotFound",
       };
 
-      const result = visitResponse(response, "404", createContext());
+      const result = visitResponse(response, "404", {
+        documentPath: ["paths", "/users/{id}", "get", "responses", "404"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith(
@@ -225,7 +239,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "400", createContext());
+      const result = visitResponse(response, "400", {
+        documentPath: ["paths", "/users", "post", "responses", "400"],
+      });
 
       expect(result?.statusCode).toBe("400");
       expect(result?.description).toBe("Bad Request");

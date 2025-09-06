@@ -17,16 +17,10 @@ import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
 import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
 import type { IREnum, IRModel, IRProperty } from "../../types/ir/data";
+import { buildReferencePath } from "../helpers/build-reference-path";
 import { extractValidation } from "../helpers/extract-validation";
+import type { VisitorContext } from "../types";
 import { visitSchema } from "./schema-visitor";
-
-/**
- * Object Visitorのコンテキスト
- */
-export interface ObjectVisitorContext {
-  /** モデル名（必須） */
-  name: string;
-}
 
 /**
  * Object Visitorの結果
@@ -79,7 +73,7 @@ export interface ObjectVisitorResult {
  *
  * @example Usage
  * ```typescript
- * const result = visitObject(schema, { name: "User" });
+ * const result = visitObject(schema, { name: "User"] });
  * // result.models[0]: メインのUserモデル
  * // result.models[1..]: ネストしたモデル（visitSchema経由で抽出）
  * // result.enums: インラインenum（visitSchema経由で抽出）
@@ -90,14 +84,15 @@ export interface ObjectVisitorResult {
  */
 export function visitObject(
   schema: SchemaObjectWithNullable,
-  context: ObjectVisitorContext,
+  context: VisitorContext,
 ): ObjectVisitorResult {
   const result: ObjectVisitorResult = {
     models: [],
     enums: [],
   };
 
-  const { name } = context;
+  // documentPathから名前を抽出（最後の要素がモデル名）
+  const name = context.documentPath[context.documentPath.length - 1] || "";
 
   // 名前の妥当性チェック
   if (!name.trim()) {
@@ -134,8 +129,10 @@ export function visitObject(
     const propTypeName = `${name}${pascalCase(propName)}`;
 
     // visitSchemaを使って型を判定・処理
+    // ネストされたモデルは独立したコンポーネントとして扱う
+    // 親のコンテキストのパスを継承し、最後の要素を新しい名前に置き換える
     const propResult = visitSchema(schemaObj, {
-      name: propTypeName,
+      documentPath: [...context.documentPath.slice(0, -1), propTypeName],
     });
 
     // 抽出されたモデルとenumを収集
@@ -189,10 +186,9 @@ export function visitObject(
     return result;
   }
 
-  // TODO: 実際のreferencePathを生成する処理を実装
   const mainModel: IRModel = {
     name,
-    referencePath: `#/components/schemas/${name}`, // 仮の値
+    referencePath: buildReferencePath(context.documentPath),
     properties,
   };
 
@@ -225,7 +221,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Simple" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Simple"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -254,7 +252,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Model" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Model"],
+      });
 
       expect(result.models[0]).toEqual({
         name: "Model",
@@ -284,7 +284,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "User" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "User"],
+      });
 
       expect(result.models[0]).toEqual({
         name: "User",
@@ -311,7 +313,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Config" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Config"],
+      });
 
       expect(result.models[0]).toEqual({
         name: "Config",
@@ -338,7 +342,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Model" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Model"],
+      });
 
       expect(result.models[0]).toEqual({
         name: "Model",
@@ -367,7 +373,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "User" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "User"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -417,7 +425,9 @@ if (import.meta.vitest) {
         required: ["requiredNullable", "requiredNotNullable"],
       } as SchemaObjectWithNullable;
 
-      const result = visitObject(schema, { name: "NullableTest" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "NullableTest"],
+      });
 
       expect(result.models[0]).toEqual({
         name: "NullableTest",
@@ -459,7 +469,9 @@ if (import.meta.vitest) {
         required: ["id", "nonExistent"], // 存在しないプロパティ名を含む
       };
 
-      const result = visitObject(schema, { name: "TestModel" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "TestModel"],
+      });
 
       expect(result.models[0]).toEqual({
         name: "TestModel",
@@ -495,7 +507,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Person" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Person"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -537,7 +551,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Data" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Data"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -568,7 +584,9 @@ if (import.meta.vitest) {
         },
       } as SchemaObject;
 
-      const result = visitObject(schema, { name: "Membership" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Membership"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -600,7 +618,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Document" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Document"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -650,7 +670,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Invalid" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Invalid"],
+      });
 
       expect(result).toEqual({
         models: [],
@@ -671,7 +693,9 @@ if (import.meta.vitest) {
         // propertiesが未定義
       };
 
-      const result = visitObject(schema, { name: "Empty" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Empty"],
+      });
 
       expect(result).toEqual({
         models: [],
@@ -692,7 +716,9 @@ if (import.meta.vitest) {
         properties: null,
       } as unknown as SchemaObject;
 
-      const result = visitObject(schema, { name: "NullProps" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "NullProps"],
+      });
 
       expect(result).toEqual({
         models: [],
@@ -713,7 +739,9 @@ if (import.meta.vitest) {
         properties: {},
       };
 
-      const result = visitObject(schema, { name: "EmptyProps" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "EmptyProps"],
+      });
 
       expect(result).toEqual({
         models: [],
@@ -736,7 +764,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", ""],
+      });
 
       expect(result).toEqual({
         models: [],
@@ -759,7 +789,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "   " });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "   "],
+      });
 
       expect(result).toEqual({
         models: [],
@@ -783,7 +815,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "Mixed" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "Mixed"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -819,7 +853,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitObject(schema, { name: "AllInvalid" });
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "AllInvalid"],
+      });
 
       expect(result).toEqual({
         models: [],

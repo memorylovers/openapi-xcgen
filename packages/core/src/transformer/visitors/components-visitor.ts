@@ -12,7 +12,7 @@ import type {
 } from "../../types/index";
 import type { IREnum, IRModel } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
-import { visitSchema, type SchemaVisitorContext } from "./schema-visitor";
+import { visitSchema } from "./schema-visitor";
 
 /**
  * Components処理の結果
@@ -50,7 +50,7 @@ export interface ComponentsResult {
  */
 export function visitComponents(
   components: ComponentsObject,
-  _context: VisitorContext,
+  context: VisitorContext,
 ): ComponentsResult {
   const result: ComponentsResult = {
     models: [],
@@ -71,12 +71,10 @@ export function visitComponents(
     }
 
     try {
-      // visitSchemaを呼び出し（SchemaVisitorContextを作成）
-      const schemaContext: SchemaVisitorContext = { name };
-      const schemaResult = visitSchema(
-        schema as SchemaObjectWithNullable,
-        schemaContext,
-      );
+      // visitSchemaを呼び出し（VisitorContextを作成）
+      const schemaResult = visitSchema(schema as SchemaObjectWithNullable, {
+        documentPath: [...context.documentPath, name],
+      });
 
       // 結果の各配列をマージ
       result.models.push(...schemaResult.models);
@@ -93,7 +91,6 @@ export function visitComponents(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitComponents", () => {
     it("should extract models and enums from schemas", () => {
@@ -112,7 +109,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       expect(result).toEqual({
         models: [
@@ -154,7 +153,9 @@ if (import.meta.vitest) {
 
     it("should handle empty components.schemas", () => {
       const components: ComponentsObject = { schemas: {} };
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       expect(result.models).toEqual([]);
       expect(result.enums).toEqual([]);
@@ -163,10 +164,9 @@ if (import.meta.vitest) {
     it("should handle undefined or missing schemas", () => {
       // schemasプロパティが存在しない場合
       const componentsWithoutSchemas: ComponentsObject = {};
-      const result1 = visitComponents(
-        componentsWithoutSchemas,
-        createContext(),
-      );
+      const result1 = visitComponents(componentsWithoutSchemas, {
+        documentPath: ["components", "schemas"],
+      });
 
       expect(result1).toEqual({
         models: [],
@@ -177,7 +177,9 @@ if (import.meta.vitest) {
       const componentsWithUndefined: ComponentsObject = {
         schemas: undefined,
       };
-      const result2 = visitComponents(componentsWithUndefined, createContext());
+      const result2 = visitComponents(componentsWithUndefined, {
+        documentPath: ["components", "schemas"],
+      });
 
       expect(result2).toEqual({
         models: [],
@@ -195,7 +197,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Invalid schema"),
@@ -218,7 +222,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       // BadSchemaの処理でエラーは出るが、GoodSchemaは正常に処理される
       expect(result).toEqual({
@@ -249,7 +255,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       // 配列型はモデル/enumとして扱われない
       expect(result).toEqual({
@@ -265,7 +273,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       // プリミティブ型はモデル/enumとして扱われない
       expect(result).toEqual({
@@ -283,7 +293,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitComponents(components, createContext());
+      const result = visitComponents(components, {
+        documentPath: ["components", "schemas"],
+      });
 
       // $ref参照はモデル/enumとして扱われない
       expect(result).toEqual({

@@ -82,7 +82,7 @@ export function visitPathItem(
     const operation = pathItem[method];
     if (operation && typeof operation === "object") {
       const operationContext: OperationContext = {
-        ...context,
+        documentPath: [...context.documentPath, method],
         method,
         pathTemplate: context.pathTemplate,
       };
@@ -106,7 +106,6 @@ export function visitPathItem(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitPathItem", () => {
     it("should extract GET operation", () => {
@@ -121,7 +120,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets/{id}"],
         pathTemplate: "/pets/{id}",
       };
 
@@ -156,7 +155,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets/{id}"],
         pathTemplate: "/pets/{id}",
       };
 
@@ -183,7 +182,7 @@ if (import.meta.vitest) {
       } as PathItemObject;
 
       const context: PathItemContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets/{id}"],
         pathTemplate: "/pets/{id}",
       };
 
@@ -211,7 +210,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets/{id}"],
         pathTemplate: "/pets/{id}",
       };
 

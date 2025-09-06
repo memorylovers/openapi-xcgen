@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-undef */
 /**
  * Script to regenerate expected JSON files for E2E tests
  * This is needed when the IR output format changes

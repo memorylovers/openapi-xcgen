@@ -59,7 +59,7 @@ export function visitPaths(
     if (!pathItem) continue;
 
     const pathItemContext: PathItemContext = {
-      ...context,
+      documentPath: [...context.documentPath, pathTemplate],
       pathTemplate,
     };
 
@@ -89,7 +89,6 @@ export function visitPaths(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitPaths", () => {
     it("should extract a simple GET endpoint", () => {
@@ -107,7 +106,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const context = createContext();
+      const context: VisitorContext = {
+        documentPath: ["paths"],
+      };
       const result = visitPaths(paths, context);
 
       // Red Phase: このテストは失敗する
@@ -149,7 +150,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const context = createContext();
+      const context: VisitorContext = {
+        documentPath: ["paths"],
+      };
       const result = visitPaths(paths, context);
 
       // Red Phase: このテストは失敗する
@@ -175,7 +178,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const context = createContext();
+      const context: VisitorContext = {
+        documentPath: ["paths"],
+      };
       const result = visitPaths(paths, context);
 
       // Red Phase: このテストは失敗する

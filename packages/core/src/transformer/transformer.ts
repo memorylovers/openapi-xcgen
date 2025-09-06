@@ -12,12 +12,11 @@
 
 import { consola } from "consola";
 import type {
-  OpenAPIDocument,
   ComponentsObject,
+  OpenAPIDocument,
   PathsObject,
 } from "../types/index";
-import type { IRDocument, IRModel, IREnum, IRService } from "../types/ir/index";
-import { createContext } from "./types";
+import type { IRDocument, IREnum, IRModel, IRService } from "../types/ir/index";
 import { visitComponents } from "./visitors/components-visitor";
 import { visitPaths } from "./visitors/paths-visitor";
 
@@ -49,8 +48,6 @@ export function transform(document: OpenAPIDocument): IRDocument {
     throw new Error("Missing required info field");
   }
 
-  const context = createContext();
-
   // Components処理（schemas）
   let models: IRModel[] = [];
   let enums: IREnum[] = [];
@@ -58,7 +55,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const componentsResult = visitComponents(
       document.components as ComponentsObject,
-      context,
+      { documentPath: ["components", "schemas"] },
     );
     models = componentsResult.models;
     enums = componentsResult.enums;
@@ -68,7 +65,9 @@ export function transform(document: OpenAPIDocument): IRDocument {
   let services: IRService[] = [];
   if (document.paths) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
-    const pathsResult = visitPaths(document.paths as PathsObject, context);
+    const pathsResult = visitPaths(document.paths as PathsObject, {
+      documentPath: ["paths"],
+    });
     services = pathsResult.services;
   }
 

@@ -15,19 +15,10 @@
 
 import type { SchemaObjectWithNullable } from "../../types/index";
 import type { IREnum, IRModel, IRType } from "../../types/ir/index";
+import type { VisitorContext } from "../types";
 import { visitEnum } from "./enum-visitor";
 import { visitObject } from "./object-visitor";
 import { visitType } from "./type-visitor";
-
-/**
- * Schema Visitorのコンテキスト
- */
-export interface SchemaVisitorContext {
-  /** スキーマ名 */
-  name: string;
-  /** パス（将来の拡張用） */
-  path?: string[];
-}
 
 /**
  * Schema Visitorの結果
@@ -50,30 +41,30 @@ export interface SchemaVisitorResult {
  * 3. その他の型の場合 → visitTypeで処理（primitive、array、$refなど）
  *
  * @param schema - 処理対象のスキーマ
- * @param context - Visitorコンテキスト（名前）
+ * @param context - Visitorコンテキスト（documentPathから名前を抽出）
  * @returns 処理結果（型と抽出されたmodels/enums）
  *
  * @example
  * ```typescript
  * // Enum型の場合
  * const enumSchema = { type: "string", enum: ["A", "B"] };
- * const result = visitSchema(enumSchema, { name: "Status" });
+ * const result = visitSchema(enumSchema, { documentPath: ["components", "schemas", "Status"] });
  * // → enumsに追加、typeはref型
  *
  * // Object型の場合
  * const objectSchema = { type: "object", properties: {...} };
- * const result = visitSchema(objectSchema, { name: "User" });
+ * const result = visitSchema(objectSchema, { documentPath: ["components", "schemas", "User"] });
  * // → modelsに追加、各プロパティは再帰的に処理
  *
  * // Primitive型の場合
  * const primitiveSchema = { type: "string" };
- * const result = visitSchema(primitiveSchema, { name: "Name" });
+ * const result = visitSchema(primitiveSchema, { documentPath: ["components", "schemas", "Name"] });
  * // → typeはprimitive型
  * ```
  */
 export function visitSchema(
   schema: SchemaObjectWithNullable,
-  context: SchemaVisitorContext,
+  context: VisitorContext,
 ): SchemaVisitorResult {
   const result: SchemaVisitorResult = {
     type: null,
@@ -81,21 +72,22 @@ export function visitSchema(
     enums: [],
   };
 
+  // documentPathから名前を抽出（最後の要素がスキーマ名）
+  const name = context.documentPath[context.documentPath.length - 1] || "";
+
   // enum型の処理
   if (schema.enum !== undefined) {
-    const enumResult = visitEnum(schema, { name: context.name });
+    const enumResult = visitEnum(schema, context);
     if (!enumResult) return result;
 
     result.enums.push(enumResult);
-    result.type = { kind: "ref", name: context.name };
+    result.type = { kind: "ref", name };
     return result;
   }
   // object型の処理
   else if (schema.type === "object") {
     // visitObjectでobject処理（ネスト構造の抽出含む）を完結
-    const objectResult = visitObject(schema, {
-      name: context.name,
-    });
+    const objectResult = visitObject(schema, context);
 
     // visitObjectの結果をマージ
     result.models.push(...objectResult.models);
@@ -103,7 +95,7 @@ export function visitSchema(
 
     // メインモデルが作成された場合は参照型を設定
     if (objectResult.models.length > 0) {
-      result.type = { kind: "ref", name: context.name };
+      result.type = { kind: "ref", name };
     }
     return result;
   }
@@ -113,9 +105,7 @@ export function visitSchema(
 
     // 配列の要素がobject型の場合、モデルとして抽出
     if (itemSchema.type === "object") {
-      const itemResult = visitSchema(itemSchema, {
-        name: context.name,
-      });
+      const itemResult = visitSchema(itemSchema, context);
 
       // 抽出されたモデルとenumを集約
       result.models.push(...itemResult.models);
@@ -125,23 +115,23 @@ export function visitSchema(
       if (itemResult.models.length > 0) {
         result.type = {
           kind: "array",
-          itemType: { kind: "ref", name: context.name },
+          itemType: { kind: "ref", name },
         };
       } else {
         // モデルが生成されなかった場合は通常の配列処理
-        result.type = visitType(schema);
+        result.type = visitType(schema, context);
       }
       return result;
     }
     // 配列の要素がobject以外の場合は通常処理
     else {
-      result.type = visitType(schema);
+      result.type = visitType(schema, context);
       return result;
     }
   }
   // その他の型（プリミティブなど）
   else {
-    result.type = visitType(schema);
+    result.type = visitType(schema, context);
     return result;
   }
 }
@@ -165,8 +155,8 @@ if (import.meta.vitest) {
         type: "string",
         enum: ["a", "b"],
       };
-      const context: SchemaVisitorContext = {
-        name: "Status",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Status"],
       };
 
       const result = visitSchema(schema, context);
@@ -201,8 +191,8 @@ if (import.meta.vitest) {
           id: { type: "string" },
         },
       };
-      const context: SchemaVisitorContext = {
-        name: "User",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
       };
 
       const result = visitSchema(schema, context);
@@ -236,8 +226,8 @@ if (import.meta.vitest) {
       const schema: SchemaObjectWithNullable = {
         type: "string",
       };
-      const context: SchemaVisitorContext = {
-        name: "Name",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Name"],
       };
 
       const result = visitSchema(schema, context);
@@ -259,8 +249,8 @@ if (import.meta.vitest) {
       const schema = {
         $ref: "#/components/schemas/Foo",
       } as unknown as SchemaObjectWithNullable;
-      const context: SchemaVisitorContext = {
-        name: "Bar",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Bar"],
       };
 
       const result = visitSchema(schema, context);
@@ -285,8 +275,8 @@ if (import.meta.vitest) {
         type: "number", // enumがあるので無視される
         enum: ["a", "b"], // 文字列のenum
       };
-      const context: SchemaVisitorContext = {
-        name: "Status",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Status"],
       };
 
       const result = visitSchema(schema, context);
@@ -321,8 +311,8 @@ if (import.meta.vitest) {
         type: "integer",
         enum: [1, 2],
       };
-      const context: SchemaVisitorContext = {
-        name: "Priority",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Priority"],
       };
 
       const result = visitSchema(schema, context);
@@ -360,8 +350,8 @@ if (import.meta.vitest) {
           },
         },
       };
-      const context: SchemaVisitorContext = {
-        name: "Item",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Item"],
       };
 
       const result = visitSchema(schema, context);
@@ -414,8 +404,8 @@ if (import.meta.vitest) {
           },
         },
       };
-      const context: SchemaVisitorContext = {
-        name: "Root",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Root"],
       };
 
       const result = visitSchema(schema, context);
@@ -500,8 +490,8 @@ if (import.meta.vitest) {
           },
         },
       };
-      const context: SchemaVisitorContext = {
-        name: "Blog",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Blog"],
       };
 
       const result = visitSchema(schema, context);
@@ -606,8 +596,8 @@ if (import.meta.vitest) {
           },
         },
       };
-      const context: SchemaVisitorContext = {
-        name: "Items",
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Items"],
       };
 
       const result = visitSchema(schema, context);

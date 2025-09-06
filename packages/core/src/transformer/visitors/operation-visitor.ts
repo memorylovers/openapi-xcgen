@@ -12,6 +12,7 @@
  */
 
 import { consola } from "consola";
+import { isReferenceObject } from "../../types/guards";
 import type { OperationObject, ReferenceObject } from "../../types/index";
 import type {
   IREndpoint,
@@ -20,7 +21,6 @@ import type {
   IRResponse,
 } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
-import { isReferenceObject } from "../../types/guards";
 import { visitParameter } from "./parameter-visitor";
 import { visitRequestBody } from "./request-body-visitor";
 import { visitResponse } from "./response-visitor";
@@ -89,7 +89,9 @@ export function visitOperation(
         );
         continue;
       }
-      const irParam = visitParameter(param, context);
+      const irParam = visitParameter(param, {
+        documentPath: [...context.documentPath, "parameters", param.name],
+      });
       if (irParam) {
         parameters.push(irParam);
       }
@@ -102,7 +104,9 @@ export function visitOperation(
     const irRequestBody = visitRequestBody(
       operation.requestBody,
       operation.operationId,
-      context,
+      {
+        documentPath: [...context.documentPath, "requestBody"],
+      },
     );
     if (irRequestBody) {
       requestBody = irRequestBody;
@@ -113,7 +117,9 @@ export function visitOperation(
   const responses: IRResponse[] = [];
   if (operation.responses) {
     for (const [statusCode, response] of Object.entries(operation.responses)) {
-      const irResponse = visitResponse(response, statusCode, context);
+      const irResponse = visitResponse(response, statusCode, {
+        documentPath: [...context.documentPath, "responses", statusCode],
+      });
       if (irResponse) {
         responses.push(irResponse);
       }
@@ -138,7 +144,6 @@ export function visitOperation(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitOperation", () => {
     it("should extract basic operation info", () => {
@@ -153,7 +158,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets/{id}", "get"],
         method: "get",
         pathTemplate: "/pets/{id}",
       };
@@ -183,7 +188,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/old/endpoint", "post"],
         method: "post",
         pathTemplate: "/old/endpoint",
       };
@@ -205,7 +210,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/missing", "get"],
         method: "get",
         pathTemplate: "/missing",
       };
@@ -229,7 +234,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/no-tags", "get"],
         method: "get",
         pathTemplate: "/no-tags",
       };
@@ -262,7 +267,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/with/{id}", "get"],
         method: "get",
         pathTemplate: "/with/{id}",
       };
@@ -313,7 +318,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets", "post"],
         method: "post",
         pathTemplate: "/pets",
       };
@@ -353,7 +358,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/pets/{id}", "get"],
         method: "get",
         pathTemplate: "/pets/{id}",
       };
@@ -393,7 +398,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
-        ...createContext(),
+        documentPath: ["paths", "/ref/{id}", "get"],
         method: "get",
         pathTemplate: "/ref/{id}",
       };

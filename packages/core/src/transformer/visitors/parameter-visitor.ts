@@ -12,11 +12,11 @@
  */
 
 import { consola } from "consola";
+import { isReferenceObject } from "../../types/guards";
 import type { ParameterObject, SchemaObject } from "../../types/index";
 import type { IRParameter } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
-import { isReferenceObject } from "../../types/guards";
 import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type";
+import type { VisitorContext } from "../types";
 import { visitType } from "./type-visitor";
 
 /**
@@ -48,7 +48,7 @@ import { visitType } from "./type-visitor";
  */
 export function visitParameter(
   parameter: ParameterObject,
-  _context: VisitorContext,
+  context: VisitorContext,
 ): IRParameter | null {
   // schemaが必須
   if (!parameter.schema) {
@@ -77,7 +77,9 @@ export function visitParameter(
   }
 
   // visitTypeでschemaから型情報を取得
-  const type = visitType(schema);
+  const type = visitType(schema, {
+    documentPath: [...context.documentPath, "schema"],
+  });
   if (!type) {
     consola.warn(`Invalid parameter type for: ${parameter.name}`);
     return null;
@@ -98,7 +100,6 @@ export function visitParameter(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
-  const { createContext } = await import("../types");
 
   describe("visitParameter", () => {
     it("should handle path parameter", () => {
@@ -110,7 +111,9 @@ if (import.meta.vitest) {
         schema: { type: "string" },
       };
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toEqual({
         name: "id",
@@ -135,7 +138,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toEqual({
         name: "limit",
@@ -156,7 +161,9 @@ if (import.meta.vitest) {
         schema: { type: "string" },
       };
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toEqual({
         name: "X-API-Version",
@@ -177,7 +184,9 @@ if (import.meta.vitest) {
         schema: { type: "string" },
       };
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toEqual({
         name: "session",
@@ -199,7 +208,9 @@ if (import.meta.vitest) {
         // schemaなし
       } as ParameterObject;
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith("Parameter without schema: invalid");
@@ -218,7 +229,9 @@ if (import.meta.vitest) {
         },
       } as ParameterObject;
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith(
@@ -237,7 +250,9 @@ if (import.meta.vitest) {
         schema: { type: "object" },
       } as ParameterObject;
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith(
@@ -259,7 +274,9 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitParameter(param, createContext());
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+      });
 
       expect(result).toEqual({
         name: "tags",

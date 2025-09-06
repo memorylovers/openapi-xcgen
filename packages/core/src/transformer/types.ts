@@ -5,14 +5,8 @@ import type { IRType } from "../types/ir/index";
  * Visitor実行コンテキスト
  */
 export interface VisitorContext {
-  /** 現在のパス（breadcrumb） */
-  path: string[];
-  /** 訪問済み$refを記録（循環参照対策） */
-  visited: Set<string>;
-  /** 現在の深さ */
-  depth: number;
-  /** 最大深さ制限 */
-  maxDepth: number;
+  /** OpenAPIドキュメント内の現在位置 */
+  documentPath: string[];
 }
 
 /**
@@ -32,18 +26,3 @@ export type SchemaVisitor = (
   schema: SchemaObject,
   context: VisitorContext,
 ) => VisitorResult<IRType>;
-
-/**
- * デフォルトコンテキストを作成
- */
-export function createContext(
-  options?: Partial<VisitorContext>,
-): VisitorContext {
-  return {
-    path: [],
-    visited: new Set(),
-    depth: 0,
-    maxDepth: 100,
-    ...options,
-  };
-}

@@ -6,17 +6,7 @@
 export { transform } from "./transformer";
 
 // Types
-export type { VisitorContext, VisitorResult, SchemaVisitor } from "./types";
-export { createContext } from "./types";
-
-// Context utilities
-export {
-  withPath,
-  withDepth,
-  withVisited,
-  isCircularReference,
-  isDepthLimitExceeded,
-} from "./context";
+export type { SchemaVisitor, VisitorContext, VisitorResult } from "./types";
 
 // Helper functions
 export {
@@ -29,14 +19,11 @@ export {
 // Visitor functions
 export {
   visitComponents,
-  type ComponentsResult,
-  visitType,
   visitEnum,
-  type EnumVisitorContext,
   visitObject,
-  type ObjectVisitorContext,
-  type ObjectVisitorResult,
   visitSchema,
-  type SchemaVisitorContext,
+  visitType,
+  type ComponentsResult,
+  type ObjectVisitorResult,
   type SchemaVisitorResult,
 } from "./visitors/index";

@@ -4,8 +4,8 @@
 
 ### Phase 1: 型定義の更新
 
-- [ ] IRModelインターフェースに`referencePath: string`を追加
-- [ ] IREnumインターフェースに`referencePath: string`を追加
+- [x] IRModelインターフェースに`referencePath: string`を追加
+- [x] IREnumインターフェースに`referencePath: string`を追加
 
 ### Phase 2: パーサー層の準備
 
