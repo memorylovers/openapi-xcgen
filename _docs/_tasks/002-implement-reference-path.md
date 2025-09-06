@@ -1,5 +1,15 @@
 # referencePath実装計画
 
+## 概要
+
+IRModelとIREnumに`referencePath`フィールドを追加し、OpenAPIの`$ref`参照を適切に処理できるようにする実装計画。
+
+## 現在のステータス
+
+- **完了**: Phase 1-3（基本実装）、Phase 4の一部（ヘルパー関数）
+- **進行中**: Phase 4（インラインスキーマ処理）
+- **未着手**: Phase 5-7
+
 ## TODOリスト
 
 ### Phase 1: 型定義の更新
@@ -23,8 +33,10 @@
 
 ### Phase 4: インラインスキーマの処理
 
-- [ ] エンドポイントパスを`::`記法に変換するヘルパー関数作成
-- [ ] ComponentName生成ロジックの実装
+- [x] エンドポイントパスを`::`記法に変換するヘルパー関数作成
+  - convert-path-to-endpoint.tsを実装
+- [x] ComponentName生成ロジックの実装
+  - generate-component-name.tsを実装（es-toolkit活用）
 - [ ] リクエストボディのインラインスキーマ処理
 - [ ] レスポンスのインラインスキーマ処理
 - [ ] パラメータの統合モデル生成
@@ -70,7 +82,53 @@
    - パラメータのdocumentPathをインデックスから名前ベースに変更（可読性向上）
    - 全テストを更新し、createContext()の使用を排除
 
+#### Phase 4部分完了
+
+5. **インラインスキーマ処理用ヘルパー実装**
+   - `convert-path-to-endpoint.ts`: パステンプレートを`::`記法に変換
+     - シンプルな文字列置換で実装（KISS原則）
+     - 双方向変換をサポート
+   - `generate-component-name.ts`: コンポーネント名生成
+     - es-toolkitの`pascalCase`を活用して簡潔化
+     - パステンプレートとHTTPメソッドから一意な名前を生成
+     - コンテキスト別の接尾辞（RequestBody、Response、Params等）
+
+6. **コード最適化**
+   - es-toolkitを活用して約30行のコード削減
+   - パラメータ名を`path`から`pathTemplate`に変更（意図の明確化）
+
 #### 関連コミット
 
 - `47e3fcc` refactor(core): VisitorContextをシンプル化し、documentPath継承を統一
 - `621325d` feat(core): IRModel/IREnumにreferencePathフィールドを追加
+- `c3b28d7` docs: referencePath実装の進捗を更新（Phase 1-3完了）
+- `d178f56` feat(core): インラインスキーマ処理用のヘルパー関数を追加
+
+## 次のステップ
+
+### 優先度高
+
+1. **リクエストボディのインラインスキーマ処理**
+   - request-body-visitorの拡張
+   - インラインスキーマを検出してIRModelとして抽出
+   - generateComponentNameを使用して一意な名前を生成
+   - referencePathの設定
+
+2. **レスポンスのインラインスキーマ処理**
+   - response-visitorの拡張
+   - ステータスコード別の処理
+   - 同上の抽出とreferencePath設定
+
+3. **パラメータの統合モデル生成**
+   - 複数のパラメータを1つのモデルにまとめる
+   - parameter-visitorの拡張
+
+### 優先度中
+
+4. **重複回避機構**
+   - 同名コンポーネントの検出
+   - カウンタによる自動リネーム
+
+5. **E2Eテスト**
+   - インラインスキーマが正しく抽出されることを確認
+   - referencePathが適切に設定されることを確認
