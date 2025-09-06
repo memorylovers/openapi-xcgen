@@ -9,13 +9,17 @@
 
 ### Phase 2: パーサー層の準備
 
-- [ ] OpenAPIのコンテキスト情報（現在のパス）を保持する仕組みを検討
-- [ ] Visitorコンテキストの拡張
+- [x] OpenAPIのコンテキスト情報（現在のパス）を保持する仕組みを検討
+  - VisitorContextに`documentPath: string[]`を実装
+- [x] Visitorコンテキストの拡張
+  - 全visitorでdocumentPathを適切に継承・拡張するように統一
 
 ### Phase 3: Components配下の処理
 
-- [ ] components/schemas配下のモデルに`#/components/schemas/{Name}`を設定
-- [ ] components/schemas配下のEnumに`#/components/schemas/{Name}`を設定
+- [x] components/schemas配下のモデルに`#/components/schemas/{Name}`を設定
+  - build-reference-pathヘルパーを実装し、components-visitorで使用
+- [x] components/schemas配下のEnumに`#/components/schemas/{Name}`を設定
+  - 同上
 
 ### Phase 4: インラインスキーマの処理
 
@@ -41,3 +45,32 @@
 
 - [ ] README.mdへの機能追記
 - [ ] APIドキュメントの更新
+
+## 実装履歴
+
+### 2025-01-06
+
+#### Phase 1-3完了
+
+以下の実装を完了：
+
+1. **型定義の更新**
+   - IRModelとIREnumに`referencePath: string`フィールドを追加
+
+2. **VisitorContext実装**
+   - `documentPath: string[]`のみを保持するシンプルな設計に変更
+   - 全visitorで親のdocumentPathを適切に継承・拡張
+   - createContext関数を削除し、YAGNI原則に従う
+
+3. **build-reference-pathヘルパー実装**
+   - documentPathから参照パス（#/components/schemas/{Name}等）を生成
+   - components-visitorで使用し、IRModelとIREnumにreferencePathを設定
+
+4. **コード改善**
+   - パラメータのdocumentPathをインデックスから名前ベースに変更（可読性向上）
+   - 全テストを更新し、createContext()の使用を排除
+
+#### 関連コミット
+
+- `47e3fcc` refactor(core): VisitorContextをシンプル化し、documentPath継承を統一
+- `621325d` feat(core): IRModel/IREnumにreferencePathフィールドを追加
