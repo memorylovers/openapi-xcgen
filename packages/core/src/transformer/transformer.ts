@@ -69,6 +69,9 @@ export function transform(document: OpenAPIDocument): IRDocument {
       documentPath: ["paths"],
     });
     services = pathsResult.services;
+    // インラインスキーマから抽出されたモデルとEnumを追加
+    models.push(...pathsResult.models);
+    enums.push(...pathsResult.enums);
   }
 
   // IRDocument生成

@@ -16,14 +16,19 @@ import { isReferenceObject } from "../../types/guards";
 import type { OperationObject, ReferenceObject } from "../../types/index";
 import type {
   IREndpoint,
+  IREnum,
   IRHttpMethod,
+  IRModel,
   IRParameter,
   IRResponse,
 } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitParameter } from "./parameter-visitor";
-import { visitRequestBody } from "./request-body-visitor";
-import { visitResponse } from "./response-visitor";
+import {
+  visitRequestBody,
+  type RequestBodyContext,
+} from "./request-body-visitor";
+import { visitResponse, type ResponseContext } from "./response-visitor";
 
 /**
  * Operation処理用の拡張コンテキスト
@@ -36,11 +41,23 @@ export interface OperationContext extends VisitorContext {
 }
 
 /**
- * OperationObjectを処理してIREndpointに変換
+ * Operation処理の結果
+ */
+export interface OperationResult {
+  /** 生成されたエンドポイント */
+  endpoint: IREndpoint;
+  /** インラインスキーマから抽出されたモデル */
+  models: IRModel[];
+  /** インラインスキーマから抽出された列挙型 */
+  enums: IREnum[];
+}
+
+/**
+ * OperationObjectを処理してIREndpointとインラインモデルに変換
  *
  * @param operation - OpenAPIのOperationObject
  * @param context - Operation用のコンテキスト
- * @returns IREndpoint、またはnull（operationIdがない場合）
+ * @returns OperationResult、またはnull（operationIdがない場合）
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -68,7 +85,7 @@ export interface OperationContext extends VisitorContext {
 export function visitOperation(
   operation: OperationObject,
   context: OperationContext,
-): IREndpoint | null {
+): OperationResult | null {
   // operationIdは必須
   if (!operation.operationId) {
     consola.warn(
@@ -100,16 +117,30 @@ export function visitOperation(
 
   // requestBody処理
   let requestBody;
+  const models: IRModel[] = [];
+  const enums: IREnum[] = [];
+
   if (operation.requestBody) {
-    const irRequestBody = visitRequestBody(
+    const requestBodyContext: RequestBodyContext = {
+      documentPath: [...context.documentPath, "requestBody"],
+      method: context.method,
+      pathTemplate: context.pathTemplate,
+    };
+
+    const requestBodyResult = visitRequestBody(
       operation.requestBody,
       operation.operationId,
-      {
-        documentPath: [...context.documentPath, "requestBody"],
-      },
+      requestBodyContext,
     );
-    if (irRequestBody) {
-      requestBody = irRequestBody;
+
+    if (requestBodyResult) {
+      if (requestBodyResult.requestBody) {
+        requestBody = requestBodyResult.requestBody;
+      }
+
+      // インラインモデルとEnumを収集
+      models.push(...requestBodyResult.models);
+      enums.push(...requestBodyResult.enums);
     }
   }
 
@@ -117,11 +148,26 @@ export function visitOperation(
   const responses: IRResponse[] = [];
   if (operation.responses) {
     for (const [statusCode, response] of Object.entries(operation.responses)) {
-      const irResponse = visitResponse(response, statusCode, {
+      const responseContext: ResponseContext = {
         documentPath: [...context.documentPath, "responses", statusCode],
-      });
-      if (irResponse) {
-        responses.push(irResponse);
+        method: context.method,
+        pathTemplate: context.pathTemplate,
+      };
+
+      const responseResult = visitResponse(
+        response,
+        statusCode,
+        responseContext,
+      );
+
+      if (responseResult) {
+        if (responseResult.response) {
+          responses.push(responseResult.response);
+        }
+
+        // インラインモデルとEnumを収集
+        models.push(...responseResult.models);
+        enums.push(...responseResult.enums);
       }
     }
   }
@@ -138,7 +184,11 @@ export function visitOperation(
     deprecated: operation.deprecated,
   };
 
-  return endpoint;
+  return {
+    endpoint,
+    models,
+    enums,
+  };
 }
 
 // === in-source testing ===
@@ -165,9 +215,8 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      // Red Phase: このテストは失敗する
       expect(result).not.toBeNull();
-      expect(result).toEqual(
+      expect(result?.endpoint).toEqual(
         expect.objectContaining({
           id: "getPet",
           method: "get",
@@ -178,6 +227,8 @@ if (import.meta.vitest) {
           responses: expect.any(Array),
         }),
       );
+      expect(result?.models).toEqual([]);
+      expect(result?.enums).toEqual([]);
     });
 
     it("should handle deprecated operations", () => {
@@ -195,9 +246,8 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      // Red Phase: このテストは失敗する
       expect(result).not.toBeNull();
-      expect(result?.deprecated).toBe(true);
+      expect(result?.endpoint.deprecated).toBe(true);
     });
 
     it("should return null for operations without operationId", () => {
@@ -241,10 +291,8 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      // Red Phase: このテストは失敗する
       expect(result).not.toBeNull();
-      expect(result?.id).toBe("noTags");
-      // tagsは含まれないかundefined
+      expect(result?.endpoint.id).toBe("noTags");
     });
 
     it("should process parameters array", () => {
@@ -275,8 +323,8 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       expect(result).not.toBeNull();
-      expect(result?.parameters).toHaveLength(2);
-      expect(result?.parameters[0]).toEqual({
+      expect(result?.endpoint.parameters).toHaveLength(2);
+      expect(result?.endpoint.parameters[0]).toEqual({
         name: "id",
         in: "path",
         required: true,
@@ -285,7 +333,7 @@ if (import.meta.vitest) {
         defaultValue: undefined,
         deprecated: undefined,
       });
-      expect(result?.parameters[1]).toEqual({
+      expect(result?.endpoint.parameters[1]).toEqual({
         name: "limit",
         in: "query",
         required: false,
@@ -326,11 +374,16 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       expect(result).not.toBeNull();
-      expect(result?.requestBody).toBeDefined();
-      expect(result?.requestBody?.description).toBe("Pet to add");
-      expect(result?.requestBody?.required).toBe(true);
-      expect(result?.requestBody?.content).toBeDefined();
-      expect(result?.requestBody?.content?.["application/json"]).toBeDefined();
+      expect(result?.endpoint.requestBody).toBeDefined();
+      expect(result?.endpoint.requestBody?.description).toBe("Pet to add");
+      expect(result?.endpoint.requestBody?.required).toBe(true);
+      expect(result?.endpoint.requestBody?.content).toBeDefined();
+      expect(
+        result?.endpoint.requestBody?.content?.["application/json"],
+      ).toBeDefined();
+      // インラインオブジェクトスキーマはモデルとして抽出される
+      expect(result?.models).toHaveLength(1);
+      expect(result?.models[0].name).toBe("PostPetsRequestBody");
     });
 
     it("should process responses with content", () => {
@@ -366,14 +419,18 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       expect(result).not.toBeNull();
-      expect(result?.responses).toHaveLength(2);
+      expect(result?.endpoint.responses).toHaveLength(2);
 
-      const response200 = result?.responses.find((r) => r.statusCode === "200");
+      const response200 = result?.endpoint.responses.find(
+        (r) => r.statusCode === "200",
+      );
       expect(response200).toBeDefined();
       expect(response200?.description).toBe("Success");
       expect(response200?.content?.["application/json"]).toBeDefined();
 
-      const response404 = result?.responses.find((r) => r.statusCode === "404");
+      const response404 = result?.endpoint.responses.find(
+        (r) => r.statusCode === "404",
+      );
       expect(response404).toBeDefined();
       expect(response404?.description).toBe("Not found");
       expect(response404?.content).toBeUndefined();
@@ -406,8 +463,8 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       expect(result).not.toBeNull();
-      expect(result?.parameters).toHaveLength(1); // 参照は飛ばされる
-      expect(result?.parameters[0].name).toBe("limit");
+      expect(result?.endpoint.parameters).toHaveLength(1); // 参照は飛ばされる
+      expect(result?.endpoint.parameters[0].name).toBe("limit");
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference parameter not supported yet in operation: withRefParam",
       );

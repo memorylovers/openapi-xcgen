@@ -12,7 +12,7 @@
  */
 
 import type { PathsObject } from "../../types/index";
-import type { IRService } from "../../types/ir/index";
+import type { IREnum, IRModel, IRService } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitPathItem, type PathItemContext } from "./path-item-visitor";
 
@@ -22,6 +22,10 @@ import { visitPathItem, type PathItemContext } from "./path-item-visitor";
 export interface PathsResult {
   /** 抽出されたサービス（タグでグループ化） */
   services: IRService[];
+  /** インラインスキーマから抽出されたモデル */
+  models: IRModel[];
+  /** インラインスキーマから抽出された列挙型 */
+  enums: IREnum[];
 }
 
 /**
@@ -53,6 +57,8 @@ export function visitPaths(
   context: VisitorContext,
 ): PathsResult {
   const serviceMap = new Map<string, IRService>();
+  const models: IRModel[] = [];
+  const enums: IREnum[] = [];
 
   // 各パスを処理
   for (const [pathTemplate, pathItem] of Object.entries(paths)) {
@@ -65,7 +71,7 @@ export function visitPaths(
 
     const results = visitPathItem(pathItem, pathItemContext);
 
-    // エンドポイントをタグでグループ化
+    // エンドポイントをタグでグループ化、インラインモデルを収集
     for (const result of results) {
       // tagsが指定されていない場合は'default'を使用
       const tag = result.tags?.[0] || "default";
@@ -78,11 +84,21 @@ export function visitPaths(
       }
 
       serviceMap.get(tag)!.endpoints.push(result.endpoint);
+
+      // インラインモデルとEnum収集
+      if (result.models) {
+        models.push(...result.models);
+      }
+      if (result.enums) {
+        enums.push(...result.enums);
+      }
     }
   }
 
   return {
     services: Array.from(serviceMap.values()),
+    models,
+    enums,
   };
 }
 

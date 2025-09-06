@@ -12,18 +12,53 @@
 
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
-import type { ReferenceObject, RequestBodyObject } from "../../types/index";
-import type { IRContentMap, IRRequestBody } from "../../types/ir/index";
+import type {
+  ReferenceObject,
+  RequestBodyObject,
+  SchemaObject,
+} from "../../types/index";
+import type {
+  IRContentMap,
+  IREnum,
+  IRModel,
+  IRRef,
+  IRRequestBody,
+} from "../../types/ir/index";
+import { buildReferencePath } from "../helpers/build-reference-path";
+import { generateComponentName } from "../helpers/generate-component-name";
 import type { VisitorContext } from "../types";
+import { visitObject } from "./object-visitor";
 import { visitSchema } from "./schema-visitor";
 
 /**
- * RequestBodyObjectをIRRequestBodyに変換
+ * RequestBodyの処理結果
+ */
+export interface RequestBodyResult {
+  /** 生成されたリクエストボディ */
+  requestBody: IRRequestBody | null;
+  /** インラインスキーマから抽出されたモデル */
+  models: IRModel[];
+  /** インラインスキーマから抽出された列挙型 */
+  enums: IREnum[];
+}
+
+/**
+ * RequestBodyの処理用コンテキスト
+ */
+export interface RequestBodyContext extends VisitorContext {
+  /** HTTPメソッド */
+  method: string;
+  /** パステンプレート */
+  pathTemplate: string;
+}
+
+/**
+ * RequestBodyObjectをIRRequestBodyに変換し、インラインモデルを抽出
  *
  * @param requestBody - OpenAPIのRequestBodyObjectまたはReferenceObject
  * @param operationId - エンドポイントのoperationId（命名に使用）
- * @param context - Visitorコンテキスト
- * @returns IRRequestBody、または変換できない場合はnull
+ * @param context - RequestBody用コンテキスト
+ * @returns RequestBodyResult
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -51,8 +86,11 @@ import { visitSchema } from "./schema-visitor";
 export function visitRequestBody(
   requestBody: RequestBodyObject | ReferenceObject,
   operationId: string,
-  context: VisitorContext,
-): IRRequestBody | null {
+  context: RequestBodyContext,
+): RequestBodyResult | null {
+  const models: IRModel[] = [];
+  const enums: IREnum[] = [];
+
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(requestBody)) {
     consola.warn(
@@ -71,11 +109,78 @@ export function visitRequestBody(
   const content: IRContentMap = {};
   for (const [mimeType, mediaType] of Object.entries(requestBody.content)) {
     if (mediaType.schema) {
-      const schemaResult = visitSchema(mediaType.schema, {
-        documentPath: [...context.documentPath, "content", mimeType, "schema"],
-      });
-      if (schemaResult.type) {
-        content[mimeType] = schemaResult.type;
+      // インラインのobjectスキーマを検出
+      if (
+        !isReferenceObject(mediaType.schema) &&
+        mediaType.schema.type === "object"
+      ) {
+        // コンポーネント名を生成
+        const componentName = generateComponentName(
+          context.pathTemplate,
+          context.method,
+          "requestBody",
+        );
+
+        // オブジェクトvisitorで処理してIRModelを生成
+        const objectResult = visitObject(mediaType.schema as SchemaObject, {
+          documentPath: [
+            ...context.documentPath,
+            "content",
+            mimeType,
+            "schema",
+          ],
+        });
+
+        if (objectResult && objectResult.models.length > 0) {
+          // ObjectVisitorResultから最初のモデルを取得し、名前とreferencePathを更新
+          const model: IRModel = {
+            name: componentName,
+            description: mediaType.schema.description,
+            properties: objectResult.models[0].properties,
+            referencePath: buildReferencePath([
+              ...context.documentPath,
+              "content",
+              mimeType,
+              "schema",
+            ]),
+          };
+          models.push(model);
+
+          // ネストしたモデルとEnumも追加
+          if (objectResult.models.length > 1) {
+            models.push(...objectResult.models.slice(1));
+          }
+          if (objectResult.enums) {
+            enums.push(...objectResult.enums);
+          }
+
+          // contentには$refを設定
+          const ref: IRRef = {
+            kind: "ref",
+            name: `#/components/schemas/${componentName}`,
+          };
+          content[mimeType] = ref;
+        }
+      } else {
+        // それ以外のスキーマは通常通り処理
+        const schemaResult = visitSchema(mediaType.schema, {
+          documentPath: [
+            ...context.documentPath,
+            "content",
+            mimeType,
+            "schema",
+          ],
+        });
+        if (schemaResult.type) {
+          content[mimeType] = schemaResult.type;
+          // ネストしたモデルとEnumを収集
+          if (schemaResult.models) {
+            models.push(...schemaResult.models);
+          }
+          if (schemaResult.enums) {
+            enums.push(...schemaResult.enums);
+          }
+        }
       }
     }
   }
@@ -88,11 +193,13 @@ export function visitRequestBody(
     return null;
   }
 
-  return {
+  const irRequestBody: IRRequestBody = {
     description: requestBody.description,
     required: requestBody.required || false,
     content,
   };
+
+  return { requestBody: irRequestBody, models, enums };
 }
 
 // === in-source testing ===
@@ -119,13 +226,19 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "createUser", {
         documentPath: ["paths", "/users", "post", "requestBody"],
+        method: "post",
+        pathTemplate: "/users",
       });
 
       expect(result).not.toBeNull();
-      expect(result?.description).toBe("User data");
-      expect(result?.required).toBe(true);
-      expect(result?.content).toBeDefined();
-      expect(result?.content?.["application/json"]).toBeDefined();
+      expect(result!.requestBody).not.toBeNull();
+      expect(result!.requestBody?.description).toBe("User data");
+      expect(result!.requestBody?.required).toBe(true);
+      expect(result!.requestBody?.content).toBeDefined();
+      expect(result!.requestBody?.content?.["application/json"]).toBeDefined();
+      // インラインobjectスキーマはモデルとして抽出される
+      expect(result!.models).toHaveLength(1);
+      expect(result!.models[0].name).toBe("PostUsersRequestBody");
     });
 
     it("should handle requestBody with multiple content types", () => {
@@ -161,12 +274,19 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "uploadFile", {
         documentPath: ["paths", "/files", "post", "requestBody"],
+        method: "post",
+        pathTemplate: "/files",
       });
 
-      expect(result?.required).toBe(false);
-      expect(result?.content).toBeDefined();
-      expect(Object.keys(result?.content || {})).toHaveLength(3);
-      expect(result?.content?.["multipart/form-data"]).toBeDefined();
+      expect(result).not.toBeNull();
+      expect(result!.requestBody?.required).toBe(false);
+      expect(result!.requestBody?.content).toBeDefined();
+      expect(Object.keys(result!.requestBody?.content || {})).toHaveLength(3);
+      expect(
+        result!.requestBody?.content?.["multipart/form-data"],
+      ).toBeDefined();
+      // 複数のインラインobjectスキーマがモデルとして抽出される
+      expect(result!.models).toHaveLength(3);
     });
 
     it("should warn and return null for requestBody without content", () => {
@@ -180,6 +300,8 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        method: "post",
+        pathTemplate: "/test",
       });
 
       expect(result).toBeNull();
@@ -199,6 +321,8 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        method: "post",
+        pathTemplate: "/test",
       });
 
       expect(result).toBeNull();
@@ -218,6 +342,8 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "updateUser", {
         documentPath: ["paths", "/users/{id}", "put", "requestBody"],
+        method: "put",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toBeNull();
@@ -244,11 +370,16 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        method: "post",
+        pathTemplate: "/test",
       });
 
       expect(result).not.toBeNull();
-      expect(result?.content?.["text/plain"]).toBeDefined();
-      expect(result?.content?.["application/json"]).toBeUndefined();
+      expect(result!.requestBody).not.toBeNull();
+      expect(result!.requestBody?.content?.["text/plain"]).toBeDefined();
+      expect(
+        result!.requestBody?.content?.["application/json"],
+      ).toBeUndefined();
 
       warnSpy.mockRestore();
     });
@@ -269,9 +400,12 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        method: "post",
+        pathTemplate: "/test",
       });
 
-      expect(result?.required).toBe(false);
+      expect(result).not.toBeNull();
+      expect(result!.requestBody?.required).toBe(false);
     });
   });
 }

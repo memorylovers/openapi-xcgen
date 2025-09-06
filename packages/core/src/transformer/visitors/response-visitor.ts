@@ -12,19 +12,54 @@
  */
 
 import { consola } from "consola";
-import type { ResponseObject, ReferenceObject } from "../../types/index";
-import type { IRContentMap, IRResponse } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
 import { isReferenceObject } from "../../types/guards";
+import type {
+  ReferenceObject,
+  ResponseObject,
+  SchemaObject,
+} from "../../types/index";
+import type {
+  IRContentMap,
+  IREnum,
+  IRModel,
+  IRRef,
+  IRResponse,
+} from "../../types/ir/index";
+import { buildReferencePath } from "../helpers/build-reference-path";
+import { generateComponentName } from "../helpers/generate-component-name";
+import type { VisitorContext } from "../types";
+import { visitObject } from "./object-visitor";
 import { visitSchema } from "./schema-visitor";
 
 /**
- * ResponseObjectをIRResponseに変換
+ * Responseの処理結果
+ */
+export interface ResponseResult {
+  /** 生成されたレスポンス */
+  response: IRResponse | null;
+  /** インラインスキーマから抽出されたモデル */
+  models: IRModel[];
+  /** インラインスキーマから抽出された列挙型 */
+  enums: IREnum[];
+}
+
+/**
+ * Responseの処理用コンテキスト
+ */
+export interface ResponseContext extends VisitorContext {
+  /** HTTPメソッド */
+  method: string;
+  /** パステンプレート */
+  pathTemplate: string;
+}
+
+/**
+ * ResponseObjectをIRResponseに変換し、インラインモデルを抽出
  *
  * @param response - OpenAPIのResponseObjectまたはReferenceObject
  * @param statusCode - HTTPステータスコード
- * @param context - Visitorコンテキスト
- * @returns IRResponse、または変換できない場合はnull
+ * @param context - Response用コンテキスト
+ * @returns ResponseResult
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -54,8 +89,11 @@ import { visitSchema } from "./schema-visitor";
 export function visitResponse(
   response: ResponseObject | ReferenceObject,
   statusCode: string,
-  context: VisitorContext,
-): IRResponse | null {
+  context: ResponseContext,
+): ResponseResult | null {
+  const models: IRModel[] = [];
+  const enums: IREnum[] = [];
+
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(response)) {
     consola.warn(`Reference response not supported yet: ${response.$ref}`);
@@ -68,17 +106,80 @@ export function visitResponse(
     content = {};
     for (const [mimeType, mediaType] of Object.entries(response.content)) {
       if (mediaType.schema) {
-        const schemaContext: VisitorContext = {
-          documentPath: [
-            ...context.documentPath,
-            "content",
-            mimeType,
-            "schema",
-          ],
-        };
-        const schemaResult = visitSchema(mediaType.schema, schemaContext);
-        if (schemaResult.type) {
-          content[mimeType] = schemaResult.type;
+        // インラインのobjectスキーマを検出
+        if (
+          !isReferenceObject(mediaType.schema) &&
+          mediaType.schema.type === "object"
+        ) {
+          // コンポーネント名を生成
+          const componentName = generateComponentName(
+            context.pathTemplate,
+            context.method,
+            "response",
+            statusCode,
+          );
+
+          // オブジェクトvisitorで処理してIRModelを生成
+          const objectResult = visitObject(mediaType.schema as SchemaObject, {
+            documentPath: [
+              ...context.documentPath,
+              "content",
+              mimeType,
+              "schema",
+            ],
+          });
+
+          if (objectResult && objectResult.models.length > 0) {
+            // ObjectVisitorResultから最初のモデルを取得し、名前とreferencePathを更新
+            const model: IRModel = {
+              name: componentName,
+              description: mediaType.schema.description,
+              properties: objectResult.models[0].properties,
+              referencePath: buildReferencePath([
+                ...context.documentPath,
+                "content",
+                mimeType,
+                "schema",
+              ]),
+            };
+            models.push(model);
+
+            // ネストしたモデルとEnumも追加
+            if (objectResult.models.length > 1) {
+              models.push(...objectResult.models.slice(1));
+            }
+            if (objectResult.enums) {
+              enums.push(...objectResult.enums);
+            }
+
+            // contentには$refを設定
+            const ref: IRRef = {
+              kind: "ref",
+              name: `#/components/schemas/${componentName}`,
+            };
+            content[mimeType] = ref;
+          }
+        } else {
+          // それ以外のスキーマは通常通り処理
+          const schemaContext: VisitorContext = {
+            documentPath: [
+              ...context.documentPath,
+              "content",
+              mimeType,
+              "schema",
+            ],
+          };
+          const schemaResult = visitSchema(mediaType.schema, schemaContext);
+          if (schemaResult.type) {
+            content[mimeType] = schemaResult.type;
+            // ネストしたモデルとEnumを収集
+            if (schemaResult.models) {
+              models.push(...schemaResult.models);
+            }
+            if (schemaResult.enums) {
+              enums.push(...schemaResult.enums);
+            }
+          }
         }
       }
     }
@@ -90,12 +191,14 @@ export function visitResponse(
 
   // TODO: headersの処理（Step 12で実装予定）
 
-  return {
+  const irResponse: IRResponse = {
     statusCode,
     description: response.description,
     content,
     // headers: undefined, // TODO: headersの処理
   };
+
+  return { response: irResponse, models, enums };
 }
 
 // === in-source testing ===
@@ -110,13 +213,18 @@ if (import.meta.vitest) {
 
       const result = visitResponse(response, "200", {
         documentPath: ["paths", "/users", "get", "responses", "200"],
+        method: "get",
+        pathTemplate: "/users",
       });
 
-      expect(result).toEqual({
+      expect(result).not.toBeNull();
+      expect(result!.response).toEqual({
         statusCode: "200",
         description: "Success",
         content: undefined,
       });
+      expect(result!.models).toEqual([]);
+      expect(result!.enums).toEqual([]);
     });
 
     it("should handle response with JSON content", () => {
@@ -139,12 +247,18 @@ if (import.meta.vitest) {
 
       const result = visitResponse(response, "200", {
         documentPath: ["paths", "/users", "get", "responses", "200"],
+        method: "get",
+        pathTemplate: "/users",
       });
 
       expect(result).not.toBeNull();
-      expect(result?.statusCode).toBe("200");
-      expect(result?.content).toBeDefined();
-      expect(result?.content?.["application/json"]).toBeDefined();
+      expect(result!.response).not.toBeNull();
+      expect(result!.response?.statusCode).toBe("200");
+      expect(result!.response?.content).toBeDefined();
+      expect(result!.response?.content?.["application/json"]).toBeDefined();
+      // インラインobjectスキーマはモデルとして抽出される
+      expect(result!.models).toHaveLength(1);
+      expect(result!.models[0].name).toBe("GetUsers200Response");
     });
 
     it("should handle response with multiple content types", () => {
@@ -175,10 +289,15 @@ if (import.meta.vitest) {
 
       const result = visitResponse(response, "200", {
         documentPath: ["paths", "/data", "get", "responses", "200"],
+        method: "get",
+        pathTemplate: "/data",
       });
 
-      expect(result?.content).toBeDefined();
-      expect(Object.keys(result?.content || {})).toHaveLength(3);
+      expect(result).not.toBeNull();
+      expect(result!.response?.content).toBeDefined();
+      expect(Object.keys(result!.response?.content || {})).toHaveLength(3);
+      // 複数のインラインobjectスキーマがモデルとして抽出される
+      expect(result!.models).toHaveLength(2); // JSONとXMLの2つ
     });
 
     it("should handle response with headers", () => {
@@ -197,9 +316,12 @@ if (import.meta.vitest) {
 
       const result = visitResponse(response, "200", {
         documentPath: ["paths", "/users", "get", "responses", "200"],
+        method: "get",
+        pathTemplate: "/users",
       });
 
       expect(result).not.toBeNull();
+      expect(result!.response).not.toBeNull();
       // TODO: headersの処理はStep 12で実装
       // expect(result?.headers).toBeDefined();
     });
@@ -213,6 +335,8 @@ if (import.meta.vitest) {
 
       const result = visitResponse(response, "404", {
         documentPath: ["paths", "/users/{id}", "get", "responses", "404"],
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toBeNull();
@@ -241,11 +365,17 @@ if (import.meta.vitest) {
 
       const result = visitResponse(response, "400", {
         documentPath: ["paths", "/users", "post", "responses", "400"],
+        method: "post",
+        pathTemplate: "/users",
       });
 
-      expect(result?.statusCode).toBe("400");
-      expect(result?.description).toBe("Bad Request");
-      expect(result?.content?.["application/json"]).toBeDefined();
+      expect(result).not.toBeNull();
+      expect(result!.response?.statusCode).toBe("400");
+      expect(result!.response?.description).toBe("Bad Request");
+      expect(result!.response?.content?.["application/json"]).toBeDefined();
+      // エラーレスポンスのインラインスキーマもモデルとして抽出
+      expect(result!.models).toHaveLength(1);
+      expect(result!.models[0].name).toBe("PostUsers400Response");
     });
   });
 }
