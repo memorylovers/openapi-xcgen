@@ -6,9 +6,9 @@ IRModelとIREnumに`referencePath`フィールドを追加し、OpenAPIの`$ref`
 
 ## 現在のステータス
 
-- **完了**: Phase 1-3（基本実装）、Phase 4の一部（ヘルパー関数）
-- **進行中**: Phase 4（インラインスキーマ処理）
-- **未着手**: Phase 5-7
+- **完了**: Phase 1-4（基本実装、インラインスキーマ処理）
+- **進行中**: Phase 5（重複回避機構）
+- **未着手**: Phase 6-7
 
 ## TODOリスト
 
@@ -37,8 +37,12 @@ IRModelとIREnumに`referencePath`フィールドを追加し、OpenAPIの`$ref`
   - convert-path-to-endpoint.tsを実装
 - [x] ComponentName生成ロジックの実装
   - generate-component-name.tsを実装（es-toolkit活用）
-- [ ] リクエストボディのインラインスキーマ処理
-- [ ] レスポンスのインラインスキーマ処理
+- [x] リクエストボディのインラインスキーマ処理
+  - request-body-visitorを拡張し、インラインobjectスキーマを独立したIRModelとして抽出
+- [x] レスポンスのインラインスキーマ処理
+  - response-visitorを拡張し、インラインobjectスキーマを独立したIRModelとして抽出
+- [x] Visitor関数の返り値一貫性修正
+  - 全visitor関数でnullableな返り値に統一し、visitorパターンの原則に準拠
 - [ ] パラメータの統合モデル生成
 
 ### Phase 5: 重複回避
@@ -97,38 +101,49 @@ IRModelとIREnumに`referencePath`フィールドを追加し、OpenAPIの`$ref`
    - es-toolkitを活用して約30行のコード削減
    - パラメータ名を`path`から`pathTemplate`に変更（意図の明確化）
 
+#### Phase 4完了（同日続き）
+
+7. **インラインスキーマ処理の実装**
+   - `request-body-visitor.ts`と`response-visitor.ts`を拡張
+   - インラインobjectスキーマを検出し、独立したIRModelとして抽出
+   - 生成されるモデルに適切なreferencePath設定（例: `#/paths/::users/post/requestBody/schema`）
+   - generateComponentNameで一意な名前生成（例: `PostUsersRequestBody`, `GetUsers200Response`）
+
+8. **Visitor関数の一貫性向上**
+   - 全visitor関数でnullableな返り値に統一（visitorパターンの原則に準拠）
+   - エラー時は`null`を返し、成功時はオブジェクトを返すように統一
+   - TypeScriptエラーの修正とテストの更新
+
+9. **実装品質の向上**
+   - ObjectVisitorResultから適切にプロパティを取得
+   - IRRefのフィールド修正（`ref` → `name`）
+   - ネストしたモデルとEnumの適切な収集
+
 #### 関連コミット
 
 - `47e3fcc` refactor(core): VisitorContextをシンプル化し、documentPath継承を統一
 - `621325d` feat(core): IRModel/IREnumにreferencePathフィールドを追加
 - `c3b28d7` docs: referencePath実装の進捗を更新（Phase 1-3完了）
 - `d178f56` feat(core): インラインスキーマ処理用のヘルパー関数を追加
+- `ea7d3d8` fix(core): response-visitor.tsのTypeScriptエラーを修正
 
 ## 次のステップ
 
 ### 優先度高
 
-1. **リクエストボディのインラインスキーマ処理**
-   - request-body-visitorの拡張
-   - インラインスキーマを検出してIRModelとして抽出
-   - generateComponentNameを使用して一意な名前を生成
-   - referencePathの設定
-
-2. **レスポンスのインラインスキーマ処理**
-   - response-visitorの拡張
-   - ステータスコード別の処理
-   - 同上の抽出とreferencePath設定
-
-3. **パラメータの統合モデル生成**
+1. **パラメータの統合モデル生成**
    - 複数のパラメータを1つのモデルにまとめる
    - parameter-visitorの拡張
+   - generateComponentNameでパラメータモデル名生成（例: `GetUsersParams`）
 
 ### 優先度中
 
-4. **重複回避機構**
+2. **重複回避機構**
    - 同名コンポーネントの検出
-   - カウンタによる自動リネーム
+   - カウンタによる自動リネーム（例: `User2`, `User3`）
 
-5. **E2Eテスト**
-   - インラインスキーマが正しく抽出されることを確認
+3. **E2Eテスト**
+   - インラインスキーマが正しく抽出されることを確認（リクエストボディ・レスポンス）
    - referencePathが適切に設定されることを確認
+   - パラメータ統合モデルのテスト
+   - 重複回避機構のテスト
