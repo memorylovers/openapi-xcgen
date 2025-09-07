@@ -33,6 +33,9 @@ const testCases = [
   "models/validation-model",
   "models/metadata-model",
   "models/inline-schemas",
+  "general/petstore",
+  "general/complex-schema",
+  "general/multi-service",
 ];
 
 async function generateAll() {

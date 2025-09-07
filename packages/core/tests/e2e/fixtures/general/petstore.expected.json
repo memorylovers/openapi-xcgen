@@ -1,0 +1,223 @@
+{
+  "info": {
+    "title": "Petstore API",
+    "version": "1.0.0",
+    "description": "A simple petstore API"
+  },
+  "models": [
+    {
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tag",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "NewPet",
+      "referencePath": "#/components/schemas/NewPet",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tag",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Error",
+      "referencePath": "#/components/schemas/Error",
+      "properties": [
+        {
+          "name": "code",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "GetPetsParams",
+      "description": "Parameters for GET /pets\nlimit: How many items to return at one time",
+      "properties": [
+        {
+          "name": "limit",
+          "description": "How many items to return at one time",
+          "type": "int",
+          "required": false,
+          "defaultValue": 20
+        }
+      ],
+      "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
+    },
+    {
+      "name": "GetPetsParams",
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
+      "properties": [
+        {
+          "name": "petId",
+          "description": "The id of the pet to retrieve",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
+    }
+  ],
+  "enums": [],
+  "services": [
+    {
+      "name": "pets",
+      "endpoints": [
+        {
+          "id": "listPets",
+          "method": "get",
+          "path": "/pets",
+          "summary": "List all pets",
+          "parameters": [
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "How many items to return at one time",
+              "required": false,
+              "type": "int",
+              "defaultValue": 20
+            }
+          ],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "A paged array of pets",
+              "content": {
+                "application/json": {
+                  "kind": "array",
+                  "itemType": {
+                    "kind": "ref",
+                    "name": "Pet"
+                  }
+                }
+              }
+            },
+            {
+              "statusCode": "500",
+              "description": "Unexpected error",
+              "content": {
+                "application/json": {
+                  "kind": "ref",
+                  "name": "Error"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "createPet",
+          "method": "post",
+          "path": "/pets",
+          "summary": "Create a pet",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "kind": "ref",
+                "name": "NewPet"
+              }
+            }
+          },
+          "responses": [
+            {
+              "statusCode": "201",
+              "description": "Pet created",
+              "content": {
+                "application/json": {
+                  "kind": "ref",
+                  "name": "Pet"
+                }
+              }
+            },
+            {
+              "statusCode": "500",
+              "description": "Unexpected error",
+              "content": {
+                "application/json": {
+                  "kind": "ref",
+                  "name": "Error"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "getPetById",
+          "method": "get",
+          "path": "/pets/{petId}",
+          "summary": "Info for a specific pet",
+          "parameters": [
+            {
+              "name": "petId",
+              "in": "path",
+              "description": "The id of the pet to retrieve",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Expected response to a valid request",
+              "content": {
+                "application/json": {
+                  "kind": "ref",
+                  "name": "Pet"
+                }
+              }
+            },
+            {
+              "statusCode": "404",
+              "description": "Pet not found"
+            },
+            {
+              "statusCode": "500",
+              "description": "Unexpected error",
+              "content": {
+                "application/json": {
+                  "kind": "ref",
+                  "name": "Error"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
