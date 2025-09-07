@@ -6,29 +6,26 @@
  *
  * 責務:
  * - operationId、summary、description、tags、deprecatedの処理
- * - parameters配列の処理（visitParameterに委譲）
+ * - parameters配列の処理（visitParametersに委譲）
  * - requestBodyの処理（visitRequestBodyに委譲）
- * - responsesの処理（visitResponseに委譲）
+ * - responsesの処理（visitResponsesに委譲）
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../types/guards";
 import type { OperationObject, ReferenceObject } from "../../types/index";
 import type {
   IREndpoint,
   IREnum,
   IRHttpMethod,
   IRModel,
-  IRParameter,
-  IRResponse,
 } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
-import { visitParameter } from "./parameter-visitor";
+import { visitParameters, type ParametersContext } from "./parameters-visitor";
 import {
   visitRequestBody,
   type RequestBodyContext,
 } from "./request-body-visitor";
-import { visitResponse, type ResponseContext } from "./response-visitor";
+import { visitResponses, type ResponsesContext } from "./responses-visitor";
 
 /**
  * Operation処理用の拡張コンテキスト
@@ -97,23 +94,16 @@ export function visitOperation(
   }
 
   // parameters処理
-  const parameters: IRParameter[] = [];
-  if (operation.parameters) {
-    for (const param of operation.parameters) {
-      if (isReferenceObject(param)) {
-        consola.warn(
-          `Reference parameter not supported yet in operation: ${operation.operationId}`,
-        );
-        continue;
-      }
-      const irParam = visitParameter(param, {
-        documentPath: [...context.documentPath, "parameters", param.name],
-      });
-      if (irParam) {
-        parameters.push(irParam);
-      }
-    }
-  }
+  const parametersContext: ParametersContext = {
+    documentPath: [...context.documentPath, "parameters"],
+    method: context.method,
+    pathTemplate: context.pathTemplate,
+  };
+
+  const parametersResult = visitParameters(
+    operation.parameters,
+    parametersContext,
+  );
 
   // requestBody処理
   let requestBody;
@@ -145,31 +135,24 @@ export function visitOperation(
   }
 
   // responses処理
-  const responses: IRResponse[] = [];
-  if (operation.responses) {
-    for (const [statusCode, response] of Object.entries(operation.responses)) {
-      const responseContext: ResponseContext = {
-        documentPath: [...context.documentPath, "responses", statusCode],
-        method: context.method,
-        pathTemplate: context.pathTemplate,
-      };
+  const responsesContext: ResponsesContext = {
+    documentPath: [...context.documentPath, "responses"],
+    method: context.method,
+    pathTemplate: context.pathTemplate,
+  };
 
-      const responseResult = visitResponse(
-        response,
-        statusCode,
-        responseContext,
-      );
+  const responsesResult = visitResponses(operation.responses, responsesContext);
 
-      if (responseResult) {
-        if (responseResult.response) {
-          responses.push(responseResult.response);
-        }
+  // 全てのモデルとEnumを収集
+  models.push(...parametersResult.models);
+  enums.push(...parametersResult.enums);
 
-        // インラインモデルとEnumを収集
-        models.push(...responseResult.models);
-        enums.push(...responseResult.enums);
-      }
-    }
+  models.push(...responsesResult.models);
+  enums.push(...responsesResult.enums);
+
+  // パラメータ統合モデルを追加
+  if (parametersResult.unifiedModel) {
+    models.push(parametersResult.unifiedModel);
   }
 
   const endpoint: IREndpoint = {
@@ -178,9 +161,9 @@ export function visitOperation(
     path: context.pathTemplate,
     summary: operation.summary,
     description: operation.description,
-    parameters,
+    parameters: parametersResult.parameters,
     requestBody,
-    responses,
+    responses: responsesResult.responses,
     deprecated: operation.deprecated,
   };
 
@@ -466,7 +449,7 @@ if (import.meta.vitest) {
       expect(result?.endpoint.parameters).toHaveLength(1); // 参照は飛ばされる
       expect(result?.endpoint.parameters[0].name).toBe("limit");
       expect(warnSpy).toHaveBeenCalledWith(
-        "Reference parameter not supported yet in operation: withRefParam",
+        "Reference parameter not supported yet: #/components/parameters/IdParam",
       );
 
       warnSpy.mockRestore();

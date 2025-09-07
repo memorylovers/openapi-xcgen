@@ -295,7 +295,7 @@ if (import.meta.vitest) {
 
       expect(result.info.title).toBe("Complete API");
       expect(result.info.version).toBe("2.0.0");
-      expect(result.models).toHaveLength(1);
+      expect(result.models).toHaveLength(2); // Pet + GetPetsParams
       expect(result.enums).toHaveLength(1);
       expect(result.services).toHaveLength(1);
       expect(result.services[0].endpoints).toHaveLength(1);
