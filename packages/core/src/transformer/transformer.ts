@@ -74,6 +74,31 @@ export function transform(document: OpenAPIDocument): IRDocument {
     enums.push(...pathsResult.enums);
   }
 
+  // 重複検出と警告
+  const names = new Set<string>();
+  const duplicates = new Set<string>();
+
+  // モデルとEnumの名前をチェック
+  [...models, ...enums].forEach((item) => {
+    if (names.has(item.name)) {
+      duplicates.add(item.name);
+    }
+    names.add(item.name);
+  });
+
+  // 重複があれば警告
+  if (duplicates.size > 0) {
+    duplicates.forEach((name) => {
+      consola.warn(`Duplicate component name detected: "${name}"`);
+    });
+    consola.warn(
+      `Consider reviewing your OpenAPI design for naming conflicts.`,
+    );
+    consola.warn(
+      `Components with duplicate names may cause issues in code generation.`,
+    );
+  }
+
   // IRDocument生成
   const irDocument: IRDocument = {
     info: {
@@ -96,7 +121,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
 
 // === in-source testing ===
 if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
+  const { describe, it, expect, vi } = import.meta.vitest;
 
   describe("transform", () => {
     it("should transform minimal OpenAPI document", () => {
@@ -348,6 +373,233 @@ if (import.meta.vitest) {
       expect(result.models).toEqual([]);
       expect(result.enums).toEqual([]);
       expect(result.services).toEqual([]);
+    });
+  });
+
+  describe("Duplicate Detection", () => {
+    it("should not warn when no duplicates exist", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const doc: OpenAPIDocument = {
+        openapi: "3.1.0",
+        info: {
+          title: "No Duplicates API",
+          version: "1.0.0",
+        },
+        components: {
+          schemas: {
+            User: {
+              type: "object",
+              properties: { id: { type: "string" } },
+            },
+            Status: {
+              type: "string",
+              enum: ["active", "inactive"],
+            },
+          },
+        },
+        paths: {
+          "/orders": {
+            post: {
+              operationId: "createOrder",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: { total: { type: "number" } },
+                    },
+                  },
+                },
+              },
+              responses: { "200": { description: "Created" } },
+            },
+          },
+        },
+      };
+
+      transform(doc);
+
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("Duplicate component name detected"),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("should warn when model duplicates exist", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const doc: OpenAPIDocument = {
+        openapi: "3.1.0",
+        info: {
+          title: "Duplicate Models API",
+          version: "1.0.0",
+        },
+        components: {
+          schemas: {
+            PostUsersRequestBody: {
+              type: "object",
+              properties: { id: { type: "string" } },
+            },
+          },
+        },
+        paths: {
+          "/users": {
+            post: {
+              operationId: "createUser",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: { name: { type: "string" } },
+                    },
+                  },
+                },
+              },
+              responses: { "200": { description: "Created" } },
+            },
+          },
+        },
+      };
+
+      transform(doc);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Duplicate component name detected: "PostUsersRequestBody"',
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Consider reviewing your OpenAPI design for naming conflicts.",
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Components with duplicate names may cause issues in code generation.",
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("should warn when enum duplicates exist", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const doc: OpenAPIDocument = {
+        openapi: "3.1.0",
+        info: {
+          title: "Duplicate Enums API",
+          version: "1.0.0",
+        },
+        components: {
+          schemas: {
+            schemaStatus: {
+              type: "string",
+              enum: ["success", "failure"],
+            },
+          },
+        },
+        paths: {
+          "/users": {
+            post: {
+              operationId: "createUser",
+              responses: {
+                "200": {
+                  description: "Success",
+                  content: {
+                    "application/json": {
+                      schema: {
+                        type: "object",
+                        properties: {
+                          status: {
+                            type: "string",
+                            enum: ["active", "inactive"],
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      transform(doc);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Duplicate component name detected: "schemaStatus"',
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Consider reviewing your OpenAPI design for naming conflicts.",
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Components with duplicate names may cause issues in code generation.",
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("should warn for multiple duplicates", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const doc: OpenAPIDocument = {
+        openapi: "3.1.0",
+        info: {
+          title: "Multiple Duplicates API",
+          version: "1.0.0",
+        },
+        components: {
+          schemas: {
+            PostUsersRequestBody: {
+              type: "object",
+              properties: { id: { type: "string" } },
+            },
+            GetUsersParams: {
+              type: "object",
+              properties: { limit: { type: "integer" } },
+            },
+          },
+        },
+        paths: {
+          "/users": {
+            get: {
+              operationId: "getUsers",
+              parameters: [
+                {
+                  name: "offset",
+                  in: "query",
+                  schema: { type: "integer" },
+                },
+              ],
+              responses: { "200": { description: "Success" } },
+            },
+            post: {
+              operationId: "createUser",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: { name: { type: "string" } },
+                    },
+                  },
+                },
+              },
+              responses: { "200": { description: "Created" } },
+            },
+          },
+        },
+      };
+
+      transform(doc);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Duplicate component name detected: "PostUsersRequestBody"',
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Duplicate component name detected: "GetUsersParams"',
+      );
+
+      warnSpy.mockRestore();
     });
   });
 }

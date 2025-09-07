@@ -26,16 +26,13 @@ async function generateExpected(testCase: string): Promise<void> {
 
 // Generate expected JSON files for all test cases
 const testCases = [
-  "models/primitive-model",
-  "models/object-model",
-  "models/array-model",
-  "models/nested-object",
-  "models/array-of-objects",
+  "models/data-types",
+  "models/complex-structures",
   "models/ref-model",
   "models/nullable-model",
   "models/validation-model",
-  "models/format-model",
   "models/metadata-model",
+  "models/inline-schemas",
 ];
 
 async function generateAll() {

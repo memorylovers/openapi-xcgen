@@ -31,4 +31,10 @@ describe("E2E: Transformer - Models", () => {
       await compareWithExpected("models/metadata-model");
     });
   });
+
+  describe("Inline Schemas", () => {
+    it("should extract inline schemas from basic to nested levels correctly", async () => {
+      await compareWithExpected("models/inline-schemas");
+    });
+  });
 });
