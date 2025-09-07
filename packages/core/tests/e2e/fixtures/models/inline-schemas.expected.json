@@ -222,13 +222,7 @@
             "kind": "ref",
             "name": "schemaResultStatus"
           },
-          "required": false,
-          "validation": {
-            "enum": [
-              "success",
-              "failed"
-            ]
-          }
+          "required": false
         }
       ]
     },

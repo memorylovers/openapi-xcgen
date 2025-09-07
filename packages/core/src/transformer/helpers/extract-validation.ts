@@ -83,11 +83,6 @@ export function extractValidation(schema: SchemaObject): IRValidation | null {
     validation.maxProperties = schema.maxProperties;
   }
 
-  // 列挙値
-  if (schema.enum !== undefined && Array.isArray(schema.enum)) {
-    validation.enum = schema.enum;
-  }
-
   // フォーマット（バリデーション用のみ）
   // date、date-time、binary、byteはスカラー型として処理されるため除外
   if (
@@ -190,19 +185,6 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should extract enum validation", () => {
-      const schema: SchemaObject = {
-        type: "string",
-        enum: ["pending", "approved", "rejected"],
-      };
-
-      const result = extractValidation(schema);
-
-      expect(result).toEqual({
-        enum: ["pending", "approved", "rejected"],
-      });
-    });
-
     it("should extract mixed validation", () => {
       const schema: SchemaObject = {
         type: "string",
@@ -218,7 +200,6 @@ if (import.meta.vitest) {
         minLength: 1,
         maxLength: 100,
         pattern: "^[a-zA-Z0-9]+$",
-        enum: ["active", "inactive"],
       });
     });
 

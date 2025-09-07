@@ -123,7 +123,6 @@ if (import.meta.vitest) {
                 name: "status",
                 type: { kind: "ref", name: "ItemStatus" },
                 required: false,
-                validation: { enum: ["a", "b"] },
               },
             ],
           },

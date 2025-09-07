@@ -266,8 +266,6 @@ export interface IRValidation {
   minProperties?: number;
   /** 最大プロパティ数 */
   maxProperties?: number;
-  /** 列挙値 */
-  enum?: unknown[];
   /** フォーマット（uuid、email、uri、ipv4等のバリデーション用） */
   format?: string;
 }

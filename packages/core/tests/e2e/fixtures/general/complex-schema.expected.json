@@ -45,16 +45,7 @@
             "kind": "ref",
             "name": "OrderStatus"
           },
-          "required": false,
-          "validation": {
-            "enum": [
-              "pending",
-              "processing",
-              "shipped",
-              "delivered",
-              "cancelled"
-            ]
-          }
+          "required": false
         },
         {
           "name": "priority",
@@ -62,15 +53,7 @@
             "kind": "ref",
             "name": "OrderPriority"
           },
-          "required": false,
-          "validation": {
-            "enum": [
-              "low",
-              "normal",
-              "high",
-              "urgent"
-            ]
-          }
+          "required": false
         },
         {
           "name": "tags",

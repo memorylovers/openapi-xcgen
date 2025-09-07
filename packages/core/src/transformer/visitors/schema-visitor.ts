@@ -421,9 +421,6 @@ if (import.meta.vitest) {
                 name: "status",
                 type: { kind: "ref", name: "RootStatus" },
                 required: false,
-                validation: {
-                  enum: ["a", "b"],
-                },
               },
               {
                 name: "nested",
@@ -547,9 +544,6 @@ if (import.meta.vitest) {
                 name: "role",
                 type: { kind: "ref", name: "BlogPostsAuthorRole" },
                 required: false,
-                validation: {
-                  enum: ["admin", "editor", "viewer"],
-                },
               },
             ],
           },
@@ -642,9 +636,6 @@ if (import.meta.vitest) {
                 name: "category",
                 type: { kind: "ref", name: "ItemsMetadataCategory" },
                 required: false,
-                validation: {
-                  enum: ["product", "service", "other"],
-                },
               },
             ],
           },

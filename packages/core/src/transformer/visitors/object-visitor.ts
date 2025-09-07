@@ -633,9 +633,6 @@ if (import.meta.vitest) {
                 type: { kind: "ref", name: "DocumentStatus" },
                 required: false,
                 description: "Document status",
-                validation: {
-                  enum: ["draft", "published", "archived"],
-                },
               },
             ],
           },

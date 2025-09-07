@@ -33,14 +33,7 @@
             "kind": "ref",
             "name": "UserRole"
           },
-          "required": false,
-          "validation": {
-            "enum": [
-              "admin",
-              "user",
-              "guest"
-            ]
-          }
+          "required": false
         }
       ]
     },
