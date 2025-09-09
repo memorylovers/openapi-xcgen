@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
       "properties": [
@@ -31,6 +32,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Customer",
       "referencePath": "#/components/schemas/Customer",
       "properties": [
@@ -42,6 +44,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "OrderItem",
       "referencePath": "#/components/schemas/OrderItem",
       "properties": [
@@ -53,6 +56,5 @@
       ]
     }
   ],
-  "enums": [],
   "services": []
 }

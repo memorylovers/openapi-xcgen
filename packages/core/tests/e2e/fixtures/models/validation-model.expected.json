@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Product",
       "referencePath": "#/components/schemas/Product",
       "properties": [
@@ -90,6 +91,5 @@
       ]
     }
   ],
-  "enums": [],
   "services": []
 }

@@ -10,8 +10,12 @@
  * - referencePathの適切な設定
  */
 
-import type { IRModel, IRParameter, IRProperty } from "../../types/ir/index";
 import { pascalCase } from "es-toolkit/string";
+import type {
+  IRObjectModel,
+  IRParameter,
+  IRProperty,
+} from "../../types/ir/index";
 import { buildReferencePath } from "./build-reference-path";
 
 /**
@@ -44,7 +48,7 @@ export function createParameterModel(
   pathTemplate: string,
   method: string,
   documentPath: string[],
-): IRModel | null {
+): IRObjectModel | null {
   // パラメータがない場合はnull
   if (parameters.length === 0) {
     return null;
@@ -66,7 +70,8 @@ export function createParameterModel(
       : `Parameters for ${method.toUpperCase()} ${pathTemplate}`;
 
   // 統合モデルを生成
-  const model: IRModel = {
+  const model: IRObjectModel = {
+    kind: "object",
     name: componentName,
     description,
     properties,
@@ -124,16 +129,27 @@ function generateParameterModelName(
  * ```
  */
 function parameterToProperty(parameter: IRParameter): IRProperty {
-  return {
+  const property: IRProperty = {
     name: parameter.name,
-    description: parameter.description,
     type: parameter.type,
     required: parameter.required,
-    nullable: parameter.nullable,
-    defaultValue: parameter.defaultValue,
-    deprecated: parameter.deprecated,
-    // validation は現時点では設定しない（将来の拡張で対応）
   };
+
+  // Optional properties: only include if they have actual values
+  if (parameter.description !== undefined) {
+    property.description = parameter.description;
+  }
+  if (parameter.nullable !== undefined) {
+    property.nullable = parameter.nullable;
+  }
+  if (parameter.defaultValue !== undefined) {
+    property.defaultValue = parameter.defaultValue;
+  }
+  if (parameter.deprecated !== undefined) {
+    property.deprecated = parameter.deprecated;
+  }
+
+  return property;
 }
 
 // === in-source testing ===

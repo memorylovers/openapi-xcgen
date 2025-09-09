@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Pet",
       "referencePath": "#/components/schemas/Pet",
       "properties": [
@@ -30,6 +31,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "NewPet",
       "referencePath": "#/components/schemas/NewPet",
       "properties": [
@@ -46,6 +48,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Error",
       "referencePath": "#/components/schemas/Error",
       "properties": [
@@ -65,6 +68,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "GetPetsParams",
       "description": "Parameters for GET /pets\nlimit: How many items to return at one time",
       "properties": [
@@ -79,6 +83,7 @@
       "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
     },
     {
+      "kind": "object",
       "name": "GetPetsParams",
       "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
       "properties": [
@@ -92,7 +97,6 @@
       "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
     }
   ],
-  "enums": [],
   "services": [
     {
       "name": "pets",

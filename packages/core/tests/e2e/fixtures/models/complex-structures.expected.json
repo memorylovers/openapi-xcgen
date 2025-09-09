@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Level1",
       "referencePath": "#/components/schemas/Level1",
       "properties": [
@@ -20,6 +21,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level1Data",
       "referencePath": "#/components/schemas/Level1Data",
       "properties": [
@@ -31,6 +33,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level2",
       "referencePath": "#/components/schemas/Level2",
       "properties": [
@@ -45,6 +48,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level2Outer",
       "referencePath": "#/components/schemas/Level2Outer",
       "properties": [
@@ -59,6 +63,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level2OuterInner",
       "referencePath": "#/components/schemas/Level2OuterInner",
       "properties": [
@@ -70,6 +75,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level3",
       "referencePath": "#/components/schemas/Level3",
       "properties": [
@@ -84,6 +90,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level3Level1",
       "referencePath": "#/components/schemas/Level3Level1",
       "properties": [
@@ -98,6 +105,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level3Level1Level2",
       "referencePath": "#/components/schemas/Level3Level1Level2",
       "properties": [
@@ -112,6 +120,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Level3Level1Level2Level3",
       "referencePath": "#/components/schemas/Level3Level1Level2Level3",
       "properties": [
@@ -123,6 +132,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "Team",
       "referencePath": "#/components/schemas/Team",
       "properties": [
@@ -140,6 +150,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "TeamMembers",
       "referencePath": "#/components/schemas/TeamMembers",
       "properties": [
@@ -151,6 +162,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "User",
       "referencePath": "#/components/schemas/User",
       "properties": [
@@ -162,6 +174,5 @@
       ]
     }
   ],
-  "enums": [],
   "services": []
 }

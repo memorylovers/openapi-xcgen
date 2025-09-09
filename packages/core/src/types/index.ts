@@ -35,7 +35,6 @@ export type {
   IRContact,
   IRContentMap,
   IREndpoint,
-  IREnum,
   IREnumValue,
   IRHttpMethod,
   IRLicense,

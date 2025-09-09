@@ -11,7 +11,7 @@
  */
 
 import type { PathItemObject } from "../../types/index";
-import type { IREndpoint, IREnum, IRModel } from "../../types/ir/index";
+import type { IREndpoint, IRModel } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitOperation, type OperationContext } from "./operation-visitor";
 
@@ -69,10 +69,8 @@ const HTTP_METHODS = [
 export interface PathItemEndpoint {
   endpoint: IREndpoint;
   tags?: string[];
-  /** インラインスキーマから抽出されたモデル */
+  /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models?: IRModel[];
-  /** インラインスキーマから抽出された列挙型 */
-  enums?: IREnum[];
 }
 
 export function visitPathItem(
@@ -97,7 +95,6 @@ export function visitPathItem(
           endpoint: operationResult.endpoint,
           tags: operation.tags, // tagsを保持
           models: operationResult.models,
-          enums: operationResult.enums,
         });
       }
     }

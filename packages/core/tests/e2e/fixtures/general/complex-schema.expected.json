@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
       "properties": [
@@ -76,6 +77,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "OrderItems",
       "referencePath": "#/components/schemas/OrderItems",
       "properties": [
@@ -113,6 +115,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "OrderCustomer",
       "referencePath": "#/components/schemas/OrderCustomer",
       "properties": [
@@ -145,6 +148,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "OrderCustomerAddress",
       "referencePath": "#/components/schemas/OrderCustomerAddress",
       "properties": [
@@ -172,10 +176,9 @@
           }
         }
       ]
-    }
-  ],
-  "enums": [
+    },
     {
+      "kind": "enum",
       "name": "OrderStatus",
       "referencePath": "#/components/schemas/OrderStatus",
       "type": "string",
@@ -203,6 +206,7 @@
       ]
     },
     {
+      "kind": "enum",
       "name": "OrderPriority",
       "referencePath": "#/components/schemas/OrderPriority",
       "type": "string",

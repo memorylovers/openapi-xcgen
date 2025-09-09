@@ -16,7 +16,7 @@ import type {
   OpenAPIDocument,
   PathsObject,
 } from "../types/index";
-import type { IRDocument, IREnum, IRModel, IRService } from "../types/ir/index";
+import type { IRDocument, IRModel, IRService } from "../types/ir/index";
 import { visitComponents } from "./visitors/components-visitor";
 import { visitPaths } from "./visitors/paths-visitor";
 
@@ -50,7 +50,6 @@ export function transform(document: OpenAPIDocument): IRDocument {
 
   // Components処理（schemas）
   let models: IRModel[] = [];
-  let enums: IREnum[] = [];
   if (document.components?.schemas) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const componentsResult = visitComponents(
@@ -58,7 +57,6 @@ export function transform(document: OpenAPIDocument): IRDocument {
       { documentPath: ["components", "schemas"] },
     );
     models = componentsResult.models;
-    enums = componentsResult.enums;
   }
 
   // Paths処理（services/endpoints）
@@ -69,17 +67,16 @@ export function transform(document: OpenAPIDocument): IRDocument {
       documentPath: ["paths"],
     });
     services = pathsResult.services;
-    // インラインスキーマから抽出されたモデルとEnumを追加
+    // インラインスキーマから抽出されたモデルを追加
     models.push(...pathsResult.models);
-    enums.push(...pathsResult.enums);
   }
 
   // 重複検出と警告
   const names = new Set<string>();
   const duplicates = new Set<string>();
 
-  // モデルとEnumの名前をチェック
-  [...models, ...enums].forEach((item) => {
+  // モデルの名前をチェック（オブジェクト、列挙型等を統一的に処理）
+  models.forEach((item) => {
     if (names.has(item.name)) {
       duplicates.add(item.name);
     }
@@ -107,13 +104,17 @@ export function transform(document: OpenAPIDocument): IRDocument {
       description: document.info.description,
     },
     models,
-    enums,
     services,
   };
 
-  // 統計情報をログ出力
+  // 統計情報をログ出力（種類別にカウント）
+  const objectCount = models.filter((m) => m.kind === "object").length;
+  const enumCount = models.filter((m) => m.kind === "enum").length;
+  const arrayCount = models.filter((m) => m.kind === "array").length;
+  const mapCount = models.filter((m) => m.kind === "map").length;
+
   consola.success(
-    `Transformed OpenAPI document: ${models.length} models, ${enums.length} enums, ${services.length} services`,
+    `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps), ${services.length} services`,
   );
 
   return irDocument;
@@ -143,7 +144,6 @@ if (import.meta.vitest) {
           description: undefined,
         },
         models: [],
-        enums: [],
         services: [],
       });
     });
@@ -182,10 +182,18 @@ if (import.meta.vitest) {
         version: "1.0.0",
         description: "A sample API",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].name).toBe("Pet");
-      expect(result.enums).toHaveLength(1);
-      expect(result.enums[0].name).toBe("Status");
+      expect(result.models).toHaveLength(2);
+
+      // Petオブジェクトモデルを確認
+      const petModel = result.models.find((m) => m.name === "Pet");
+      expect(petModel).toBeDefined();
+      expect(petModel?.kind).toBe("object");
+
+      // Statusenumモデルを確認
+      const statusModel = result.models.find((m) => m.name === "Status");
+      expect(statusModel).toBeDefined();
+      expect(statusModel?.kind).toBe("enum");
+
       expect(result.services).toHaveLength(0);
     });
 
@@ -320,8 +328,13 @@ if (import.meta.vitest) {
 
       expect(result.info.title).toBe("Complete API");
       expect(result.info.version).toBe("2.0.0");
-      expect(result.models).toHaveLength(2); // Pet + GetPetsParams
-      expect(result.enums).toHaveLength(1);
+      expect(result.models).toHaveLength(3); // Pet object + inline status enum + GetPetsParams
+
+      // Petオブジェクトモデルを確認
+      const petModel = result.models.find((m) => m.name === "Pet");
+      expect(petModel).toBeDefined();
+      expect(petModel?.kind).toBe("object");
+
       expect(result.services).toHaveLength(1);
       expect(result.services[0].endpoints).toHaveLength(1);
       expect(result.services[0].endpoints[0].parameters).toHaveLength(1);
@@ -371,7 +384,6 @@ if (import.meta.vitest) {
       const result = transform(doc);
 
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
       expect(result.services).toEqual([]);
     });
   });

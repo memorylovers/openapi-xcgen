@@ -10,7 +10,7 @@ import type {
   ComponentsObject,
   SchemaObjectWithNullable,
 } from "../../types/index";
-import type { IREnum, IRModel } from "../../types/ir/index";
+import type { IRModel } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitSchema } from "./schema-visitor";
 
@@ -18,18 +18,16 @@ import { visitSchema } from "./schema-visitor";
  * Components処理の結果
  */
 export interface ComponentsResult {
-  /** 抽出されたモデル */
+  /** 抽出されたモデル（オブジェクト、列挙型、配列、マップを統一的に管理） */
   models: IRModel[];
-  /** 抽出されたenum */
-  enums: IREnum[];
 }
 
 /**
- * ComponentsObjectを処理してmodels/enumsに分類
+ * ComponentsObjectを処理してモデルに変換
  *
  * @param components - OpenAPIのComponentsObject
  * @param context - Visitorコンテキスト
- * @returns 分類されたmodels/enums
+ * @returns 統一されたモデル配列
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -54,7 +52,6 @@ export function visitComponents(
 ): ComponentsResult {
   const result: ComponentsResult = {
     models: [],
-    enums: [],
   };
 
   // schemasが存在しない場合は早期リターン
@@ -76,9 +73,8 @@ export function visitComponents(
         documentPath: [...context.documentPath, name],
       });
 
-      // 結果の各配列をマージ
+      // 結果をマージ（統一されたモデル配列）
       result.models.push(...schemaResult.models);
-      result.enums.push(...schemaResult.enums);
       // schemaResult.typeは使用しない（componentsレベルでは不要）
     } catch (error) {
       consola.warn(`Failed to process schema "${name}":`, error);
@@ -116,6 +112,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Item",
             referencePath: "#/components/schemas/Item",
             properties: [
@@ -126,9 +123,8 @@ if (import.meta.vitest) {
               },
             ],
           },
-        ],
-        enums: [
           {
+            kind: "enum",
             name: "ItemStatus",
             referencePath: "#/components/schemas/ItemStatus",
             type: "string",
@@ -138,6 +134,7 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "enum",
             name: "Type",
             referencePath: "#/components/schemas/Type",
             type: "string",
@@ -157,7 +154,6 @@ if (import.meta.vitest) {
       });
 
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should handle undefined or missing schemas", () => {
@@ -169,7 +165,6 @@ if (import.meta.vitest) {
 
       expect(result1).toEqual({
         models: [],
-        enums: [],
       });
 
       // schemasプロパティがundefinedの場合
@@ -182,7 +177,6 @@ if (import.meta.vitest) {
 
       expect(result2).toEqual({
         models: [],
-        enums: [],
       });
     });
 
@@ -203,7 +197,7 @@ if (import.meta.vitest) {
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Invalid schema"),
       );
-      expect(result.enums).toHaveLength(1); // Validのenumのみ
+      expect(result.models).toHaveLength(1); // Validのenumのみ
 
       warnSpy.mockRestore();
     });
@@ -227,9 +221,9 @@ if (import.meta.vitest) {
 
       // BadSchemaの処理でエラーは出るが、GoodSchemaは正常に処理される
       expect(result).toEqual({
-        models: [],
-        enums: [
+        models: [
           {
+            kind: "enum",
             name: "GoodSchema",
             referencePath: "#/components/schemas/GoodSchema",
             type: "string",
@@ -261,7 +255,6 @@ if (import.meta.vitest) {
       // 配列型はモデル/enumとして扱われない
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
     });
 
@@ -279,7 +272,6 @@ if (import.meta.vitest) {
       // プリミティブ型はモデル/enumとして扱われない
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
     });
 
@@ -299,7 +291,6 @@ if (import.meta.vitest) {
       // $ref参照はモデル/enumとして扱われない
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
     });
   });

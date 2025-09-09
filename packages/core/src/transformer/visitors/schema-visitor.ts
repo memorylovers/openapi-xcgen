@@ -14,7 +14,7 @@
  */
 
 import type { SchemaObjectWithNullable } from "../../types/index";
-import type { IREnum, IRModel, IRType } from "../../types/ir/index";
+import type { IRModel, IRType } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitEnum } from "./enum-visitor";
 import { visitObject } from "./object-visitor";
@@ -26,10 +26,8 @@ import { visitType } from "./type-visitor";
 export interface SchemaVisitorResult {
   /** 主要な型 */
   type: IRType | null;
-  /** 抽出されたモデル */
+  /** 抽出されたモデル（オブジェクト、列挙型、配列、マップを統一的に管理） */
   models: IRModel[];
-  /** 抽出されたenum */
-  enums: IREnum[];
 }
 
 /**
@@ -69,7 +67,6 @@ export function visitSchema(
   const result: SchemaVisitorResult = {
     type: null,
     models: [],
-    enums: [],
   };
 
   // documentPathから名前を抽出（最後の要素がスキーマ名）
@@ -78,9 +75,9 @@ export function visitSchema(
   // enum型の処理
   if (schema.enum !== undefined) {
     const enumResult = visitEnum(schema, context);
-    if (!enumResult) return result;
+    if (enumResult.models.length === 0) return result;
 
-    result.enums.push(enumResult);
+    result.models.push(...enumResult.models);
     result.type = { kind: "ref", name };
     return result;
   }
@@ -91,7 +88,6 @@ export function visitSchema(
 
     // visitObjectの結果をマージ
     result.models.push(...objectResult.models);
-    result.enums.push(...objectResult.enums);
 
     // メインモデルが作成された場合は参照型を設定
     if (objectResult.models.length > 0) {
@@ -107,9 +103,8 @@ export function visitSchema(
     if (itemSchema.type === "object") {
       const itemResult = visitSchema(itemSchema, context);
 
-      // 抽出されたモデルとenumを集約
+      // 抽出されたモデルを集約
       result.models.push(...itemResult.models);
-      result.enums.push(...itemResult.enums);
 
       // 配列型を構築（要素は参照型）
       if (itemResult.models.length > 0) {
@@ -163,9 +158,9 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: { kind: "ref", name: "Status" },
-        models: [],
-        enums: [
+        models: [
           {
+            kind: "enum",
             name: "Status",
             referencePath: "#/components/schemas/Status",
             type: "string",
@@ -201,6 +196,7 @@ if (import.meta.vitest) {
         type: { kind: "ref", name: "User" },
         models: [
           {
+            kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
             properties: [
@@ -212,7 +208,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -235,7 +230,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         type: "string",
         models: [],
-        enums: [],
       });
     });
 
@@ -258,7 +252,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         type: { kind: "ref", name: "Foo" },
         models: [],
-        enums: [],
       });
     });
 
@@ -285,9 +278,9 @@ if (import.meta.vitest) {
       // enum-visitorはtypeフィールドをそのまま使用する
       expect(result).toEqual({
         type: { kind: "ref", name: "Status" },
-        models: [],
-        enums: [
+        models: [
           {
+            kind: "enum",
             name: "Status",
             referencePath: "#/components/schemas/Status",
             type: "double", // typeフィールドの値
@@ -319,9 +312,9 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: { kind: "ref", name: "Priority" },
-        models: [],
-        enums: [
+        models: [
           {
+            kind: "enum",
             name: "Priority",
             referencePath: "#/components/schemas/Priority",
             type: "int",
@@ -363,6 +356,7 @@ if (import.meta.vitest) {
         },
         models: [
           {
+            kind: "object",
             name: "Item",
             referencePath: "#/components/schemas/Item",
             properties: [
@@ -374,7 +368,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -414,6 +407,7 @@ if (import.meta.vitest) {
         type: { kind: "ref", name: "Root" },
         models: [
           {
+            kind: "object",
             name: "Root",
             referencePath: "#/components/schemas/Root",
             properties: [
@@ -430,6 +424,17 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "enum",
+            name: "RootStatus",
+            referencePath: "#/components/schemas/RootStatus",
+            type: "string",
+            values: [
+              { value: "a", name: "A" },
+              { value: "b", name: "B" },
+            ],
+          },
+          {
+            kind: "object",
             name: "RootNested",
             referencePath: "#/components/schemas/RootNested",
             properties: [
@@ -438,17 +443,6 @@ if (import.meta.vitest) {
                 type: "string",
                 required: false,
               },
-            ],
-          },
-        ],
-        enums: [
-          {
-            name: "RootStatus",
-            referencePath: "#/components/schemas/RootStatus",
-            type: "string",
-            values: [
-              { value: "a", name: "A" },
-              { value: "b", name: "B" },
             ],
           },
         ],
@@ -497,6 +491,7 @@ if (import.meta.vitest) {
         type: { kind: "ref", name: "Blog" },
         models: [
           {
+            kind: "object",
             name: "Blog",
             referencePath: "#/components/schemas/Blog",
             properties: [
@@ -516,6 +511,7 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "object",
             name: "BlogPosts",
             referencePath: "#/components/schemas/BlogPosts",
             properties: [
@@ -532,6 +528,7 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "object",
             name: "BlogPostsAuthor",
             referencePath: "#/components/schemas/BlogPostsAuthor",
             properties: [
@@ -547,9 +544,8 @@ if (import.meta.vitest) {
               },
             ],
           },
-        ],
-        enums: [
           {
+            kind: "enum",
             name: "BlogPostsAuthorRole",
             referencePath: "#/components/schemas/BlogPostsAuthorRole",
             type: "string",
@@ -603,6 +599,7 @@ if (import.meta.vitest) {
         },
         models: [
           {
+            kind: "object",
             name: "Items",
             referencePath: "#/components/schemas/Items",
             properties: [
@@ -624,6 +621,7 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "object",
             name: "ItemsMetadata",
             referencePath: "#/components/schemas/ItemsMetadata",
             properties: [
@@ -639,9 +637,8 @@ if (import.meta.vitest) {
               },
             ],
           },
-        ],
-        enums: [
           {
+            kind: "enum",
             name: "ItemsMetadataCategory",
             referencePath: "#/components/schemas/ItemsMetadataCategory",
             type: "string",

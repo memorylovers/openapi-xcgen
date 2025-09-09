@@ -20,7 +20,6 @@ import type {
 } from "../../types/index";
 import type {
   IRContentMap,
-  IREnum,
   IRModel,
   IRRef,
   IRResponse,
@@ -37,10 +36,8 @@ import { visitSchema } from "./schema-visitor";
 export interface ResponseResult {
   /** 生成されたレスポンス */
   response: IRResponse | null;
-  /** インラインスキーマから抽出されたモデル */
+  /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
-  /** インラインスキーマから抽出された列挙型 */
-  enums: IREnum[];
 }
 
 /**
@@ -92,7 +89,6 @@ export function visitResponse(
   context: ResponseContext,
 ): ResponseResult | null {
   const models: IRModel[] = [];
-  const enums: IREnum[] = [];
 
   // $ref参照の場合は現時点でスキップ
   if (isReferenceObject(response)) {
@@ -131,10 +127,18 @@ export function visitResponse(
 
           if (objectResult && objectResult.models.length > 0) {
             // ObjectVisitorResultから最初のモデルを取得し、名前とreferencePathを更新
+            const firstModel = objectResult.models[0];
+            if (firstModel.kind !== "object") {
+              consola.warn(
+                `Expected object model from visitObject, got: ${firstModel.kind}`,
+              );
+              continue;
+            }
+
             const model: IRModel = {
+              kind: "object",
               name: componentName,
-              description: mediaType.schema.description,
-              properties: objectResult.models[0].properties,
+              properties: firstModel.properties,
               referencePath: buildReferencePath([
                 ...context.documentPath,
                 "content",
@@ -142,14 +146,16 @@ export function visitResponse(
                 "schema",
               ]),
             };
+
+            // Optional properties: only include if they have actual values
+            if (mediaType.schema.description !== undefined) {
+              model.description = mediaType.schema.description;
+            }
             models.push(model);
 
-            // ネストしたモデルとEnumも追加
+            // ネストしたモデルも追加
             if (objectResult.models.length > 1) {
               models.push(...objectResult.models.slice(1));
-            }
-            if (objectResult.enums) {
-              enums.push(...objectResult.enums);
             }
 
             // contentには$refを設定
@@ -172,12 +178,9 @@ export function visitResponse(
           const schemaResult = visitSchema(mediaType.schema, schemaContext);
           if (schemaResult.type) {
             content[mimeType] = schemaResult.type;
-            // ネストしたモデルとEnumを収集
+            // ネストしたモデルを収集
             if (schemaResult.models) {
               models.push(...schemaResult.models);
-            }
-            if (schemaResult.enums) {
-              enums.push(...schemaResult.enums);
             }
           }
         }
@@ -194,11 +197,14 @@ export function visitResponse(
   const irResponse: IRResponse = {
     statusCode,
     description: response.description,
-    content,
-    // headers: undefined, // TODO: headersの処理
   };
 
-  return { response: irResponse, models, enums };
+  // Optional properties: only include if they have actual values
+  if (content !== undefined) {
+    irResponse.content = content;
+  }
+
+  return { response: irResponse, models };
 }
 
 // === in-source testing ===
@@ -224,7 +230,6 @@ if (import.meta.vitest) {
         content: undefined,
       });
       expect(result!.models).toEqual([]);
-      expect(result!.enums).toEqual([]);
     });
 
     it("should handle response with JSON content", () => {

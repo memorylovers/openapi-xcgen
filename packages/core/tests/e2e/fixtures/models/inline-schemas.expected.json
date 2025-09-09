@@ -6,6 +6,39 @@
   },
   "models": [
     {
+      "kind": "enum",
+      "name": "RoleEnum",
+      "referencePath": "#/components/schemas/RoleEnum",
+      "type": "string",
+      "values": [
+        {
+          "value": "admin",
+          "name": "ADMIN"
+        },
+        {
+          "value": "user",
+          "name": "USER"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "StatusEnum",
+      "referencePath": "#/components/schemas/StatusEnum",
+      "type": "string",
+      "values": [
+        {
+          "value": "active",
+          "name": "ACTIVE"
+        },
+        {
+          "value": "inactive",
+          "name": "INACTIVE"
+        }
+      ]
+    },
+    {
+      "kind": "object",
       "name": "UserResponse",
       "referencePath": "#/components/schemas/UserResponse",
       "properties": [
@@ -30,6 +63,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "UserProfile",
       "referencePath": "#/components/schemas/UserProfile",
       "properties": [
@@ -46,6 +80,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "GetTest1ParametersId200Response",
       "properties": [
         {
@@ -57,6 +92,7 @@
       "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application/json/schema"
     },
     {
+      "kind": "object",
       "name": "GetTest1ParametersParams",
       "description": "Parameters for GET /test-1-parameters/{id}\nid: Path parameter - always required\ncategory: Optional enum query parameter\nstatus: Required enum query parameter\nlimit: Optional integer parameter with default value\nincludeDetails: Optional boolean parameter with default value\nAuthorization: Optional header parameter\nsessionId: Optional cookie parameter",
       "properties": [
@@ -108,6 +144,7 @@
       "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersParams"
     },
     {
+      "kind": "object",
       "name": "PostTest2RequestRequestBody",
       "properties": [
         {
@@ -135,6 +172,7 @@
       "referencePath": "#/paths/::test-2-request/post/requestBody/content/application/json/schema"
     },
     {
+      "kind": "object",
       "name": "schemaNested",
       "referencePath": "#/paths/::test-2-request/post/requestBody/content/application/json/schemaNested",
       "properties": [
@@ -159,6 +197,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "PostTest2Request201Response",
       "properties": [
         {
@@ -170,6 +209,7 @@
       "referencePath": "#/paths/::test-2-request/post/responses/responses/201/content/application/json/schema"
     },
     {
+      "kind": "object",
       "name": "schema",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/201/content/application/json/schema",
       "properties": [
@@ -194,6 +234,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "GetTest3Response202Response",
       "properties": [
         {
@@ -213,6 +254,7 @@
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application/json/schema"
     },
     {
+      "kind": "object",
       "name": "schemaResult",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application/json/schemaResult",
       "properties": [
@@ -227,6 +269,23 @@
       ]
     },
     {
+      "kind": "enum",
+      "name": "schemaResultStatus",
+      "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application/json/schemaResultStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "success",
+          "name": "SUCCESS"
+        },
+        {
+          "value": "failed",
+          "name": "FAILED"
+        }
+      ]
+    },
+    {
+      "kind": "object",
       "name": "GetTest3ResponseParams",
       "description": "Parameters for GET /test-3-response",
       "properties": [
@@ -244,53 +303,6 @@
         }
       ],
       "referencePath": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
-    }
-  ],
-  "enums": [
-    {
-      "name": "RoleEnum",
-      "referencePath": "#/components/schemas/RoleEnum",
-      "type": "string",
-      "values": [
-        {
-          "value": "admin",
-          "name": "ADMIN"
-        },
-        {
-          "value": "user",
-          "name": "USER"
-        }
-      ]
-    },
-    {
-      "name": "StatusEnum",
-      "referencePath": "#/components/schemas/StatusEnum",
-      "type": "string",
-      "values": [
-        {
-          "value": "active",
-          "name": "ACTIVE"
-        },
-        {
-          "value": "inactive",
-          "name": "INACTIVE"
-        }
-      ]
-    },
-    {
-      "name": "schemaResultStatus",
-      "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application/json/schemaResultStatus",
-      "type": "string",
-      "values": [
-        {
-          "value": "success",
-          "name": "SUCCESS"
-        },
-        {
-          "value": "failed",
-          "name": "FAILED"
-        }
-      ]
     }
   ],
   "services": [

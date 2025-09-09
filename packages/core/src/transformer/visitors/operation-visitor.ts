@@ -13,12 +13,7 @@
 
 import { consola } from "consola";
 import type { OperationObject, ReferenceObject } from "../../types/index";
-import type {
-  IREndpoint,
-  IREnum,
-  IRHttpMethod,
-  IRModel,
-} from "../../types/ir/index";
+import type { IREndpoint, IRHttpMethod, IRModel } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitParameters, type ParametersContext } from "./parameters-visitor";
 import {
@@ -43,10 +38,8 @@ export interface OperationContext extends VisitorContext {
 export interface OperationResult {
   /** 生成されたエンドポイント */
   endpoint: IREndpoint;
-  /** インラインスキーマから抽出されたモデル */
+  /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
-  /** インラインスキーマから抽出された列挙型 */
-  enums: IREnum[];
 }
 
 /**
@@ -108,7 +101,6 @@ export function visitOperation(
   // requestBody処理
   let requestBody;
   const models: IRModel[] = [];
-  const enums: IREnum[] = [];
 
   if (operation.requestBody) {
     const requestBodyContext: RequestBodyContext = {
@@ -128,9 +120,8 @@ export function visitOperation(
         requestBody = requestBodyResult.requestBody;
       }
 
-      // インラインモデルとEnumを収集
+      // インラインモデルを収集（オブジェクト、列挙型、配列、マップを統一）
       models.push(...requestBodyResult.models);
-      enums.push(...requestBodyResult.enums);
     }
   }
 
@@ -143,12 +134,10 @@ export function visitOperation(
 
   const responsesResult = visitResponses(operation.responses, responsesContext);
 
-  // 全てのモデルとEnumを収集
+  // 全てのモデルを収集（オブジェクト、列挙型、配列、マップを統一）
   models.push(...parametersResult.models);
-  enums.push(...parametersResult.enums);
 
   models.push(...responsesResult.models);
-  enums.push(...responsesResult.enums);
 
   // パラメータ統合モデルを追加
   if (parametersResult.unifiedModel) {
@@ -160,17 +149,24 @@ export function visitOperation(
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
     summary: operation.summary,
-    description: operation.description,
     parameters: parametersResult.parameters,
-    requestBody,
     responses: responsesResult.responses,
-    deprecated: operation.deprecated,
   };
+
+  // Optional properties: only include if they have actual values
+  if (operation.description !== undefined) {
+    endpoint.description = operation.description;
+  }
+  if (requestBody !== undefined) {
+    endpoint.requestBody = requestBody;
+  }
+  if (operation.deprecated !== undefined) {
+    endpoint.deprecated = operation.deprecated;
+  }
 
   return {
     endpoint,
     models,
-    enums,
   };
 }
 
@@ -211,7 +207,6 @@ if (import.meta.vitest) {
         }),
       );
       expect(result?.models).toEqual([]);
-      expect(result?.enums).toEqual([]);
     });
 
     it("should handle deprecated operations", () => {

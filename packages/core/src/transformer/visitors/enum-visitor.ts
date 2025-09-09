@@ -7,14 +7,22 @@
 
 import { consola } from "consola";
 import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
-import type { IREnum, IREnumValue } from "../../types/ir/index";
+import type { IRModel, IREnumModel, IREnumValue } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { generateEnumName } from "../helpers/generate-enum-name";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type";
 import { buildReferencePath } from "../helpers/build-reference-path";
 
 /**
- * SchemaObjectからEnum定義を検出してIREnumに変換
+ * Enum visitor結果の型
+ */
+export interface EnumVisitorResult {
+  /** 抽出されたモデル（IREnumModelを含む） */
+  models: IRModel[];
+}
+
+/**
+ * SchemaObjectからEnum定義を検出してIREnumModelに変換
  *
  * @bnf <schema-object> - enum配列を持つスキーマオブジェクト
  * @bnf-ref _docs/900_openapi_v3.1_BNF_spec.md:325
@@ -25,7 +33,7 @@ import { buildReferencePath } from "../helpers/build-reference-path";
  *
  * @param schema - OpenAPI SchemaObject
  * @param context - Visitor context with enum name
- * @returns IREnum型の結果、enum配列がない場合はnull
+ * @returns 統一されたモデル配列、enum配列がない場合は空の配列
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -45,34 +53,35 @@ import { buildReferencePath } from "../helpers/build-reference-path";
  * @example Usage
  * ```typescript
  * const result = visitEnum(schema, { documentPath: ["components", "schemas", "Status"] });
+ * // result.models[0].kind === "enum"
  * ```
  */
 export function visitEnum(
   schema: SchemaObjectWithNullable,
   context: VisitorContext,
-): IREnum | null {
+): EnumVisitorResult {
   // documentPathから名前を抽出（最後の要素がEnum名）
   const name = context.documentPath[context.documentPath.length - 1] || "";
 
   // 名前の妥当性チェック
   if (!name.trim()) {
     consola.warn("Invalid enum name: empty or whitespace only");
-    return null;
+    return { models: [] };
   }
 
   // enum配列のチェック
-  if (!schema.enum) return null;
+  if (!schema.enum) return { models: [] };
 
   // enum配列が配列でない場合
   if (!Array.isArray(schema.enum)) {
     consola.warn(`Invalid enum type for ${name}: not an array`);
-    return null;
+    return { models: [] };
   }
 
   // enum配列が空の場合
   if (schema.enum.length === 0) {
     consola.warn(`Empty enum array for ${name}`);
-    return null;
+    return { models: [] };
   }
 
   // NOTE: TypeSpecは常にtypeを明示的に出力するため、
@@ -82,13 +91,13 @@ export function visitEnum(
   // OpenAPI 3.1ではtypeが配列の場合もあるので、文字列の場合のみ処理
   if (typeof schema.type !== "string") {
     consola.warn(`Missing or invalid type for enum ${name}: ${schema.type}`);
-    return null;
+    return { models: [] };
   }
 
   const type = toIRScalarType(schema.type);
   if (!type) {
     consola.warn(`Invalid scalar type for enum ${name}: ${schema.type}`);
-    return null;
+    return { models: [] };
   }
 
   // enum値をIREnumValueに変換
@@ -97,7 +106,9 @@ export function visitEnum(
     return { value, name: enumName };
   });
 
-  const result: IREnum = {
+  // IREnumModelを作成
+  const enumModel: IREnumModel = {
+    kind: "enum",
     name,
     referencePath: buildReferencePath(context.documentPath),
     type,
@@ -106,10 +117,10 @@ export function visitEnum(
 
   // descriptionがある場合のみ追加
   if (schema.description) {
-    result.description = schema.description;
+    enumModel.description = schema.description;
   }
 
-  return result;
+  return { models: [enumModel] };
 }
 
 // === in-source testing ===
@@ -129,14 +140,19 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "Status",
-        referencePath: "#/components/schemas/Status",
-        type: "string",
-        description: "Status of the item",
-        values: [
-          { value: "pending", name: "PENDING" },
-          { value: "approved", name: "APPROVED" },
-          { value: "rejected", name: "REJECTED" },
+        models: [
+          {
+            kind: "enum",
+            name: "Status",
+            referencePath: "#/components/schemas/Status",
+            type: "string",
+            description: "Status of the item",
+            values: [
+              { value: "pending", name: "PENDING" },
+              { value: "approved", name: "APPROVED" },
+              { value: "rejected", name: "REJECTED" },
+            ],
+          },
         ],
       });
     });
@@ -153,14 +169,19 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "Priority",
-        referencePath: "#/components/schemas/Priority",
-        type: "int", // integerはIRScalarTypeのintに変換される
-        description: "Priority level",
-        values: [
-          { value: 1, name: "VALUE_1" },
-          { value: 2, name: "VALUE_2" },
-          { value: 3, name: "VALUE_3" },
+        models: [
+          {
+            kind: "enum",
+            name: "Priority",
+            referencePath: "#/components/schemas/Priority",
+            type: "int", // integerはIRScalarTypeのintに変換される
+            description: "Priority level",
+            values: [
+              { value: 1, name: "VALUE_1" },
+              { value: 2, name: "VALUE_2" },
+              { value: 3, name: "VALUE_3" },
+            ],
+          },
         ],
       });
     });
@@ -176,19 +197,24 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "TaskStatus",
-        referencePath: "#/components/schemas/TaskStatus",
-        type: "string",
-        values: [
-          { value: "in-progress", name: "IN_PROGRESS" },
-          { value: "on_hold", name: "ON_HOLD" },
-          { value: "completed!", name: "COMPLETED_" },
-          { value: "new/pending", name: "NEW_PENDING" },
+        models: [
+          {
+            kind: "enum",
+            name: "TaskStatus",
+            referencePath: "#/components/schemas/TaskStatus",
+            type: "string",
+            values: [
+              { value: "in-progress", name: "IN_PROGRESS" },
+              { value: "on_hold", name: "ON_HOLD" },
+              { value: "completed!", name: "COMPLETED_" },
+              { value: "new/pending", name: "NEW_PENDING" },
+            ],
+          },
         ],
       });
     });
 
-    it("should return null for non-enum schema", () => {
+    it("should return empty models array for non-enum schema", () => {
       const schema: SchemaObject = {
         type: "string",
         minLength: 3,
@@ -199,10 +225,10 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Status"],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({ models: [] });
     });
 
-    it("should warn and return null for invalid enum type", () => {
+    it("should warn and return empty models array for invalid enum type", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       // enum配列が空の場合
@@ -214,7 +240,7 @@ if (import.meta.vitest) {
       const emptyResult = visitEnum(emptySchema, {
         documentPath: ["components", "schemas", "Status"],
       });
-      expect(emptyResult).toBe(null);
+      expect(emptyResult).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith("Empty enum array for Status");
 
       // enum配列でない場合
@@ -226,7 +252,7 @@ if (import.meta.vitest) {
       const invalidResult = visitEnum(invalidSchema, {
         documentPath: ["components", "schemas", "Status"],
       });
-      expect(invalidResult).toBe(null);
+      expect(invalidResult).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid enum type for Status: not an array",
       );
@@ -234,7 +260,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null when type is missing", () => {
+    it("should return empty models array when type is missing", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema = {
@@ -246,7 +272,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Numbers"],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith(
         "Missing or invalid type for enum Numbers: undefined",
       );
@@ -254,7 +280,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for empty enum name", () => {
+    it("should return empty models array for empty enum name", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -266,7 +292,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", ""],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid enum name: empty or whitespace only",
       );
@@ -274,7 +300,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for whitespace-only enum name", () => {
+    it("should return empty models array for whitespace-only enum name", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -286,7 +312,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "   "],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid enum name: empty or whitespace only",
       );

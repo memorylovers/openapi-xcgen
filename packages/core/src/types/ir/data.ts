@@ -88,11 +88,11 @@ export type IRType = IRScalarType | IRRef | IRArray | IRMap;
 // ============================================================================
 
 /**
- * IRModel - モデル定義
+ * IRObjectModel - オブジェクト型モデル定義
  * componentsで定義されたものと、インラインスキーマから自動生成されたものの両方を含む
  * @example
  * ```yaml
- * # OpenAPI → IRModel
+ * # OpenAPI → IRObjectModel
  * # パターン1: componentsで定義
  * components:
  *   schemas:
@@ -119,7 +119,9 @@ export type IRType = IRScalarType | IRRef | IRArray | IRMap;
  *                   type: string
  * ```
  */
-export interface IRModel {
+export interface IRObjectModel {
+  /** 型種別 */
+  kind: "object";
   /** モデル名（PascalCase） */
   name: string;
   /**
@@ -171,11 +173,11 @@ export interface IRProperty {
 }
 
 /**
- * IREnum - 列挙型定義
+ * IREnumModel - 列挙型モデル定義
  * componentsで定義されたものと、インラインenumから自動生成されたものの両方を含む
  * @example
  * ```yaml
- * # OpenAPI → IREnum
+ * # OpenAPI → IREnumModel
  * # パターン1: componentsで定義
  * components:
  *   schemas:
@@ -190,7 +192,9 @@ export interface IRProperty {
  *     enum: [active, inactive, pending]
  * ```
  */
-export interface IREnum {
+export interface IREnumModel {
+  /** 型種別 */
+  kind: "enum";
   /** Enum名（PascalCase） */
   name: string;
   /**
@@ -229,6 +233,71 @@ export interface IREnumValue {
   /** 説明 */
   description?: string;
 }
+
+/**
+ * IRArrayModel - 配列型モデル定義（将来の拡張性のため）
+ * 現在は未使用だが、将来的に独立したモデルとしての抽出に備える
+ */
+export interface IRArrayModel {
+  /** 型種別 */
+  kind: "array";
+  /** モデル名（PascalCase） */
+  name: string;
+  /** 参照パス */
+  referencePath: string;
+  /** モデルの説明 */
+  description?: string;
+  /** 配列アイテムの型 */
+  itemType: IRType;
+}
+
+/**
+ * IRMapModel - マップ型モデル定義（将来の拡張性のため）
+ * 現在は未使用だが、将来的に独立したモデルとしての抽出に備える
+ */
+export interface IRMapModel {
+  /** 型種別 */
+  kind: "map";
+  /** モデル名（PascalCase） */
+  name: string;
+  /** 参照パス */
+  referencePath: string;
+  /** モデルの説明 */
+  description?: string;
+  /** 値の型 */
+  valueType: IRType;
+}
+
+// ============================================================================
+// 統一されたモデル定義（判別共用体）
+// ============================================================================
+
+/**
+ * IRModel - 統一されたモデル定義
+ * 全てのデータモデルを統一的に表現する判別共用体
+ *
+ * @example
+ * ```typescript
+ * // 使用例：型安全なswitch文
+ * function processModel(model: IRModel) {
+ *   switch (model.kind) {
+ *     case "object":
+ *       // model.propertiesにアクセス可能
+ *       break;
+ *     case "enum":
+ *       // model.valuesにアクセス可能
+ *       break;
+ *     case "array":
+ *       // model.itemTypeにアクセス可能
+ *       break;
+ *     case "map":
+ *       // model.valueTypeにアクセス可能
+ *       break;
+ *   }
+ * }
+ * ```
+ */
+export type IRModel = IRObjectModel | IREnumModel | IRArrayModel | IRMapModel;
 
 /**
  * IRValidation - バリデーション情報

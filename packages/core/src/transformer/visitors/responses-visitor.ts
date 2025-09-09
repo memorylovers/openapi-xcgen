@@ -12,7 +12,7 @@
  */
 
 import type { ResponseObject, ReferenceObject } from "../../types/index";
-import type { IREnum, IRModel, IRResponse } from "../../types/ir/index";
+import type { IRModel, IRResponse } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitResponse, type ResponseContext } from "./response-visitor";
 
@@ -32,10 +32,8 @@ export interface ResponsesContext extends VisitorContext {
 export interface ResponsesResult {
   /** レスポンス配列 */
   responses: IRResponse[];
-  /** インラインスキーマから抽出されたモデル */
+  /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
-  /** インラインスキーマから抽出された列挙型 */
-  enums: IREnum[];
 }
 
 /**
@@ -71,14 +69,12 @@ export function visitResponses(
 ): ResponsesResult {
   const irResponses: IRResponse[] = [];
   const models: IRModel[] = [];
-  const enums: IREnum[] = [];
 
   // responsesが存在しない場合
   if (!responses) {
     return {
       responses: [],
       models: [],
-      enums: [],
     };
   }
 
@@ -97,16 +93,14 @@ export function visitResponses(
         irResponses.push(responseResult.response);
       }
 
-      // インラインモデルとEnumを収集
+      // インラインモデルを収集（オブジェクト、列挙型、配列、マップを統一）
       models.push(...responseResult.models);
-      enums.push(...responseResult.enums);
     }
   }
 
   return {
     responses: irResponses,
     models,
-    enums,
   };
 }
 
@@ -124,7 +118,6 @@ if (import.meta.vitest) {
 
       expect(result.responses).toEqual([]);
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should return empty result for empty responses object", () => {
@@ -139,7 +132,6 @@ if (import.meta.vitest) {
 
       expect(result.responses).toEqual([]);
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should process single response without content", () => {
@@ -162,7 +154,6 @@ if (import.meta.vitest) {
         content: undefined,
       });
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should process multiple responses", () => {
@@ -199,7 +190,6 @@ if (import.meta.vitest) {
       expect(response500!.description).toBe("Internal server error");
 
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should process responses with inline schemas", () => {
@@ -358,7 +348,6 @@ if (import.meta.vitest) {
       // visitResponseの結果に応じてレスポンスが含まれる
       expect(result.responses.length).toBeGreaterThanOrEqual(0);
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
   });
 }

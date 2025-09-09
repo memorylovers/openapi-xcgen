@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "User",
       "referencePath": "#/components/schemas/User",
       "properties": [
@@ -38,6 +39,27 @@
       ]
     },
     {
+      "kind": "enum",
+      "name": "UserRole",
+      "referencePath": "#/components/schemas/UserRole",
+      "type": "string",
+      "values": [
+        {
+          "value": "admin",
+          "name": "ADMIN"
+        },
+        {
+          "value": "user",
+          "name": "USER"
+        },
+        {
+          "value": "guest",
+          "name": "GUEST"
+        }
+      ]
+    },
+    {
+      "kind": "object",
       "name": "NewPost",
       "referencePath": "#/components/schemas/NewPost",
       "properties": [
@@ -59,6 +81,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "GetUsersParams",
       "description": "Parameters for GET /users/{userId}",
       "properties": [
@@ -69,27 +92,6 @@
         }
       ],
       "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
-    }
-  ],
-  "enums": [
-    {
-      "name": "UserRole",
-      "referencePath": "#/components/schemas/UserRole",
-      "type": "string",
-      "values": [
-        {
-          "value": "admin",
-          "name": "ADMIN"
-        },
-        {
-          "value": "user",
-          "name": "USER"
-        },
-        {
-          "value": "guest",
-          "name": "GUEST"
-        }
-      ]
     }
   ],
   "services": [

@@ -16,7 +16,7 @@
 import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
 import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
-import type { IREnum, IRModel, IRProperty } from "../../types/ir/data";
+import type { IRModel, IRProperty } from "../../types/ir/data";
 import { buildReferencePath } from "../helpers/build-reference-path";
 import { extractValidation } from "../helpers/extract-validation";
 import type { VisitorContext } from "../types";
@@ -26,10 +26,8 @@ import { visitSchema } from "./schema-visitor";
  * Object Visitorの結果
  */
 export interface ObjectVisitorResult {
-  /** すべてのモデル（メインモデル＋ネストしたモデル） */
+  /** すべてのモデル（メインモデル＋ネストしたモデル、enumを統一的に管理） */
   models: IRModel[];
-  /** インラインenum */
-  enums: IREnum[];
 }
 
 /**
@@ -76,7 +74,7 @@ export interface ObjectVisitorResult {
  * const result = visitObject(schema, { name: "User"] });
  * // result.models[0]: メインのUserモデル
  * // result.models[1..]: ネストしたモデル（visitSchema経由で抽出）
- * // result.enums: インラインenum（visitSchema経由で抽出）
+ * // result.models: インラインモデル（オブジェクト、列挙型、配列、マップを統一、visitSchema経由で抽出）
  *
  * // 内部では各プロパティに対してvisitSchemaを呼び出し
  * // 型判定と処理を委譲している
@@ -88,7 +86,6 @@ export function visitObject(
 ): ObjectVisitorResult {
   const result: ObjectVisitorResult = {
     models: [],
-    enums: [],
   };
 
   // documentPathから名前を抽出（最後の要素がモデル名）
@@ -118,9 +115,8 @@ export function visitObject(
   // 各プロパティをIRPropertyに変換
   const properties: IRProperty[] = [];
 
-  // ネストしたモデルとenumを収集
+  // ネストしたモデルを収集
   const nestedModels: IRModel[] = [];
-  const nestedEnums: IREnum[] = [];
 
   for (const [propName, propSchema] of Object.entries(schema.properties)) {
     const schemaObj = propSchema as SchemaObjectWithNullable;
@@ -135,9 +131,8 @@ export function visitObject(
       documentPath: [...context.documentPath.slice(0, -1), propTypeName],
     });
 
-    // 抽出されたモデルとenumを収集
+    // 抽出されたモデルを収集
     nestedModels.push(...propResult.models);
-    nestedEnums.push(...propResult.enums);
 
     // プロパティの型が取得できた場合のみ追加
     if (propResult.type) {
@@ -187,6 +182,7 @@ export function visitObject(
   }
 
   const mainModel: IRModel = {
+    kind: "object",
     name,
     referencePath: buildReferencePath(context.documentPath),
     properties,
@@ -200,7 +196,6 @@ export function visitObject(
   // メインモデルを最初に、ネストしたモデルをその後に追加
   result.models.push(mainModel);
   result.models.push(...nestedModels);
-  result.enums = nestedEnums;
 
   return result;
 }
@@ -228,6 +223,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Simple",
             referencePath: "#/components/schemas/Simple",
             properties: [
@@ -239,7 +235,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -257,6 +252,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.models[0]).toEqual({
+        kind: "object",
         name: "Model",
         referencePath: "#/components/schemas/Model",
         description: "Test model",
@@ -289,6 +285,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.models[0]).toEqual({
+        kind: "object",
         name: "User",
         referencePath: "#/components/schemas/User",
         properties: [
@@ -318,6 +315,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.models[0]).toEqual({
+        kind: "object",
         name: "Config",
         referencePath: "#/components/schemas/Config",
         properties: [
@@ -347,6 +345,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.models[0]).toEqual({
+        kind: "object",
         name: "Model",
         referencePath: "#/components/schemas/Model",
         properties: [
@@ -380,6 +379,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
             properties: [
@@ -396,7 +396,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -430,6 +429,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.models[0]).toEqual({
+        kind: "object",
         name: "NullableTest",
         referencePath: "#/components/schemas/NullableTest",
         properties: [
@@ -474,6 +474,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.models[0]).toEqual({
+        kind: "object",
         name: "TestModel",
         referencePath: "#/components/schemas/TestModel",
         properties: [
@@ -514,6 +515,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Person",
             referencePath: "#/components/schemas/Person",
             properties: [
@@ -525,6 +527,7 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "object",
             name: "PersonAddress",
             referencePath: "#/components/schemas/PersonAddress",
             properties: [
@@ -536,7 +539,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -558,6 +560,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Data",
             referencePath: "#/components/schemas/Data",
             properties: [
@@ -572,7 +575,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -591,6 +593,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Membership",
             referencePath: "#/components/schemas/Membership",
             properties: [
@@ -602,7 +605,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
     });
 
@@ -625,6 +627,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Document",
             referencePath: "#/components/schemas/Document",
             properties: [
@@ -636,9 +639,8 @@ if (import.meta.vitest) {
               },
             ],
           },
-        ],
-        enums: [
           {
+            kind: "enum",
             name: "DocumentStatus",
             referencePath: "#/components/schemas/DocumentStatus",
             description: "Document status",
@@ -673,7 +675,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid type for object visitor: string",
@@ -696,7 +697,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Object schema Empty has no properties",
@@ -719,7 +719,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Object schema NullProps has no properties",
@@ -742,7 +741,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "No valid properties found for model EmptyProps",
@@ -767,7 +765,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid model name: empty or whitespace only",
@@ -792,7 +789,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid model name: empty or whitespace only",
@@ -819,6 +815,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         models: [
           {
+            kind: "object",
             name: "Mixed",
             referencePath: "#/components/schemas/Mixed",
             properties: [
@@ -830,7 +827,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Skipping property invalid in Mixed: invalid type",
@@ -856,7 +852,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         models: [],
-        enums: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "No valid properties found for model AllInvalid",

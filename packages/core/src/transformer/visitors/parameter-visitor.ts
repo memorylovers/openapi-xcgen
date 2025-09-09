@@ -86,15 +86,25 @@ export function visitParameter(
   }
 
   // IRParameterを構築
-  return {
+  const irParameter: IRParameter = {
     name: parameter.name,
     in: parameterIn,
-    description: parameter.description,
     required: parameter.required || false,
     type,
-    defaultValue: schema.default,
-    deprecated: parameter.deprecated,
   };
+
+  // Optional properties: only include if they have actual values
+  if (parameter.description !== undefined) {
+    irParameter.description = parameter.description;
+  }
+  if (schema.default !== undefined) {
+    irParameter.defaultValue = schema.default;
+  }
+  if (parameter.deprecated !== undefined) {
+    irParameter.deprecated = parameter.deprecated;
+  }
+
+  return irParameter;
 }
 
 // === in-source testing ===

@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Article",
       "referencePath": "#/components/schemas/Article",
       "properties": [
@@ -46,6 +47,5 @@
       "description": "Article model with metadata"
     }
   ],
-  "enums": [],
   "services": []
 }

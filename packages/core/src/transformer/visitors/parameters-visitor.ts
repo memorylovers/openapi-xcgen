@@ -14,7 +14,7 @@
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
 import type { ParameterObject, ReferenceObject } from "../../types/index";
-import type { IREnum, IRModel, IRParameter } from "../../types/ir/index";
+import type { IRModel, IRObjectModel, IRParameter } from "../../types/ir/index";
 import { createParameterModel } from "../helpers/create-parameter-model";
 import type { VisitorContext } from "../types";
 import { visitParameter } from "./parameter-visitor";
@@ -36,11 +36,9 @@ export interface ParametersResult {
   /** 個別のパラメータ配列 */
   parameters: IRParameter[];
   /** パラメータ統合モデル（パラメータがない場合はnull） */
-  unifiedModel: IRModel | null;
-  /** インラインスキーマから抽出されたモデル */
+  unifiedModel: IRObjectModel | null;
+  /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
-  /** インラインスキーマから抽出された列挙型 */
-  enums: IREnum[];
 }
 
 /**
@@ -71,7 +69,6 @@ export function visitParameters(
 ): ParametersResult {
   const irParameters: IRParameter[] = [];
   const models: IRModel[] = [];
-  const enums: IREnum[] = [];
 
   // パラメータ配列が存在しない場合
   if (!parameters || parameters.length === 0) {
@@ -79,7 +76,6 @@ export function visitParameters(
       parameters: [],
       unifiedModel: null,
       models: [],
-      enums: [],
     };
   }
 
@@ -113,7 +109,6 @@ export function visitParameters(
     parameters: irParameters,
     unifiedModel,
     models,
-    enums,
   };
 }
 
@@ -132,7 +127,6 @@ if (import.meta.vitest) {
       expect(result.parameters).toEqual([]);
       expect(result.unifiedModel).toBeNull();
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should return empty result for empty parameters array", () => {
@@ -145,7 +139,6 @@ if (import.meta.vitest) {
       expect(result.parameters).toEqual([]);
       expect(result.unifiedModel).toBeNull();
       expect(result.models).toEqual([]);
-      expect(result.enums).toEqual([]);
     });
 
     it("should process single parameter", () => {

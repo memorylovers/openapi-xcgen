@@ -6,6 +6,7 @@
   },
   "models": [
     {
+      "kind": "object",
       "name": "Profile",
       "referencePath": "#/components/schemas/Profile",
       "properties": [
@@ -52,6 +53,7 @@
       ]
     },
     {
+      "kind": "object",
       "name": "ProfileSettings",
       "referencePath": "#/components/schemas/ProfileSettings",
       "properties": [
@@ -63,6 +65,5 @@
       ]
     }
   ],
-  "enums": [],
   "services": []
 }
