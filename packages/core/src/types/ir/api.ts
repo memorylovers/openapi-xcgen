@@ -66,7 +66,7 @@ export interface IRService {
   /** サービス名 */
   name: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** エンドポイントの配列 */
   endpoints: IREndpoint[];
 }
@@ -106,19 +106,19 @@ export interface IREndpoint {
   /** パス */
   path: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** サマリー */
-  summary?: string;
+  summary: string | null;
   /** パラメータ（統合モデルがある場合は参照、ない場合は個別配列） */
   parameters: IRType | IRParameter[];
   /** リクエストボディ */
-  requestBody?: IRRequestBody;
+  requestBody: IRRequestBody | null;
   /** レスポンス */
   responses: IRResponse[];
   /** 非推奨フラグ */
-  deprecated?: boolean;
+  deprecated: boolean | null;
   /** セキュリティ要件 */
-  security?: string[];
+  security: string[] | null;
 }
 
 /**
@@ -180,17 +180,17 @@ export interface IRParameter {
   /** パラメータの場所 */
   in: IRParameterInType;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** 必須フラグ */
   required: boolean;
   /** 型情報 */
   type: IRType;
   /** null許容フラグ */
-  nullable?: boolean;
+  nullable: boolean | null;
   /** デフォルト値 */
-  defaultValue?: unknown;
+  defaultValue: unknown | null;
   /** 非推奨フラグ */
-  deprecated?: boolean;
+  deprecated: boolean | null;
 }
 
 /**
@@ -245,7 +245,7 @@ export interface IRParameter {
  */
 export interface IRRequestBody {
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** 必須フラグ */
   required: boolean;
   /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
@@ -272,13 +272,13 @@ export interface IRResponseHeader {
   /** ヘッダー名 */
   name: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** 型情報 */
   type: IRType;
   /** デフォルト値 */
-  defaultValue?: unknown;
+  defaultValue: unknown | null;
   /** 非推奨フラグ */
-  deprecated?: boolean;
+  deprecated: boolean | null;
 }
 
 /**
@@ -330,9 +330,9 @@ export interface IRResponse {
   /** HTTPステータスコード */
   statusCode: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
-  content?: IRResponseContent[];
+  content: IRResponseContent[] | null;
   /** ヘッダー配列 */
-  headers?: IRResponseHeader[];
+  headers: IRResponseHeader[] | null;
 }

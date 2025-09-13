@@ -159,19 +159,19 @@ export interface IRProperty {
   /** プロパティ名 */
   name: string;
   /** プロパティの説明 */
-  description?: string;
+  description: string | null;
   /** 型情報 */
   type: IRType;
   /** 必須フラグ */
   required: boolean;
   /** null許容フラグ */
-  nullable?: boolean;
+  nullable: boolean | null;
   /** デフォルト値 */
-  defaultValue?: unknown;
+  defaultValue: unknown | null;
   /** 非推奨フラグ */
-  deprecated?: boolean;
+  deprecated: boolean | null;
   /** バリデーション情報 */
-  validation?: IRValidation;
+  validation: IRValidation | null;
 }
 
 /**

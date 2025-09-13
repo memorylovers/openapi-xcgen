@@ -76,6 +76,7 @@ export function visitPaths(
       if (!serviceMap.has(tag)) {
         serviceMap.set(tag, {
           name: tag,
+          description: null,
           endpoints: [],
         });
       }
@@ -125,18 +126,26 @@ if (import.meta.vitest) {
         services: [
           {
             name: "pets",
+            description: null,
             endpoints: [
               {
                 operationId: "listPets",
                 method: "get",
                 path: "/pets",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [
                   {
                     statusCode: "200",
                     description: "Success",
+                    content: null,
+                    headers: null,
                   },
                 ],
+                deprecated: null,
+                security: null,
               },
             ],
           },
@@ -180,32 +189,49 @@ if (import.meta.vitest) {
         services: [
           {
             name: "pets",
+            description: null,
             endpoints: [
               {
                 operationId: "listPets",
                 method: "get",
                 path: "/pets",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [],
+                deprecated: null,
+                security: null,
               },
               {
                 operationId: "getPet",
                 method: "get",
                 path: "/pets/{id}",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [],
+                deprecated: null,
+                security: null,
               },
             ],
           },
           {
             name: "users",
+            description: null,
             endpoints: [
               {
                 operationId: "listUsers",
                 method: "get",
                 path: "/users",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [],
+                deprecated: null,
+                security: null,
               },
             ],
           },
@@ -237,18 +263,26 @@ if (import.meta.vitest) {
         services: [
           {
             name: "default",
+            description: null,
             endpoints: [
               {
                 operationId: "healthCheck",
                 method: "get",
                 path: "/health",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [
                   {
                     statusCode: "200",
                     description: "OK",
+                    content: null,
+                    headers: null,
                   },
                 ],
+                deprecated: null,
+                security: null,
               },
             ],
           },

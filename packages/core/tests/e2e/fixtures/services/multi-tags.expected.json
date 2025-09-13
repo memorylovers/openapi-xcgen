@@ -8,12 +8,16 @@
   "services": [
     {
       "name": "users",
+      "description": null,
       "endpoints": [
         {
           "operationId": "endpoint1",
           "method": "get",
           "path": "/endpoint1",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -23,20 +27,27 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     },
     {
       "name": "admin",
+      "description": null,
       "endpoints": [
         {
           "operationId": "endpoint2",
           "method": "get",
           "path": "/endpoint2",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -46,20 +57,27 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     },
     {
       "name": "products",
+      "description": null,
       "endpoints": [
         {
           "operationId": "endpoint3",
           "method": "get",
           "path": "/endpoint3",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -69,9 +87,12 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

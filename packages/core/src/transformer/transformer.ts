@@ -199,13 +199,23 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "int",
                 required: true,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "name",
+                description: null,
                 type: "string",
                 required: true,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -296,36 +306,52 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "name",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
             required: false,
+            description: null,
           },
         ],
         services: [
           {
             name: "pets",
+            description: null,
             endpoints: [
               {
                 operationId: "listPets",
                 method: "get",
                 path: "/pets",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [
                   {
                     statusCode: "200",
                     description: "Success",
+                    content: null,
+                    headers: null,
                   },
                 ],
-                summary: undefined,
+                deprecated: null,
+                security: null,
               },
               {
                 operationId: "createPet",
                 method: "post",
                 path: "/pets",
+                summary: null,
+                description: null,
                 parameters: [],
                 requestBody: {
+                  description: null,
                   required: false,
                   content: [
                     {
@@ -341,27 +367,37 @@ if (import.meta.vitest) {
                   {
                     statusCode: "201",
                     description: "Created",
+                    content: null,
+                    headers: null,
                   },
                 ],
-                summary: undefined,
+                deprecated: null,
+                security: null,
               },
             ],
           },
           {
             name: "users",
+            description: null,
             endpoints: [
               {
                 operationId: "listUsers",
                 method: "get",
                 path: "/users",
+                summary: null,
+                description: null,
                 parameters: [],
+                requestBody: null,
                 responses: [
                   {
                     statusCode: "200",
                     description: "Success",
+                    content: null,
+                    headers: null,
                   },
                 ],
-                summary: undefined,
+                deprecated: null,
+                security: null,
               },
             ],
           },
@@ -441,21 +477,36 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "name",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "status",
+                description: null,
                 type: {
                   kind: "ref",
                   name: "#/components/schemas/PetStatus",
                 },
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -478,8 +529,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "string",
                 required: true,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
                 in: "path",
               },
             ],
@@ -488,15 +544,19 @@ if (import.meta.vitest) {
         services: [
           {
             name: "pets",
+            description: null,
             endpoints: [
               {
                 operationId: "getPet",
                 method: "get",
                 path: "/pets/{id}",
+                summary: null,
+                description: null,
                 parameters: {
                   kind: "ref",
                   name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
                 },
+                requestBody: null,
                 responses: [
                   {
                     statusCode: "200",
@@ -510,13 +570,17 @@ if (import.meta.vitest) {
                         },
                       },
                     ],
+                    headers: null,
                   },
                   {
                     statusCode: "404",
                     description: "Not found",
+                    content: null,
+                    headers: null,
                   },
                 ],
-                summary: undefined,
+                deprecated: null,
+                security: null,
               },
             ],
           },

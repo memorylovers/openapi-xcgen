@@ -156,6 +156,8 @@ if (import.meta.vitest) {
           {
             statusCode: "200",
             description: "Success",
+            content: null,
+            headers: null,
           },
         ],
         models: [],
@@ -186,14 +188,20 @@ if (import.meta.vitest) {
           {
             statusCode: "200",
             description: "Success",
+            content: null,
+            headers: null,
           },
           {
             statusCode: "404",
             description: "Not found",
+            content: null,
+            headers: null,
           },
           {
             statusCode: "500",
             description: "Internal server error",
+            content: null,
+            headers: null,
           },
         ],
         models: [],
@@ -252,6 +260,7 @@ if (import.meta.vitest) {
                 },
               },
             ],
+            headers: null,
           },
           {
             statusCode: "400",
@@ -265,6 +274,7 @@ if (import.meta.vitest) {
                 },
               },
             ],
+            headers: null,
           },
         ],
         models: [
@@ -277,13 +287,23 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "name",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -296,13 +316,23 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "error",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "message",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -361,10 +391,13 @@ if (import.meta.vitest) {
                 },
               },
             ],
+            headers: null,
           },
           {
             statusCode: "204",
             description: "No content",
+            content: null,
+            headers: null,
           },
           {
             statusCode: "404",
@@ -378,6 +411,7 @@ if (import.meta.vitest) {
                 },
               },
             ],
+            headers: null,
           },
         ],
         models: [
@@ -390,8 +424,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "data",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -420,10 +459,14 @@ if (import.meta.vitest) {
           {
             statusCode: "200",
             description: "OK",
+            content: null,
+            headers: null,
           },
           {
             statusCode: "500",
             description: "Error",
+            content: null,
+            headers: null,
           },
         ],
         models: [],
@@ -450,6 +493,8 @@ if (import.meta.vitest) {
           {
             statusCode: "200",
             description: "Success",
+            content: null,
+            headers: null,
           },
         ],
         models: [],

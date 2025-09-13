@@ -12,8 +12,13 @@
       "properties": [
         {
           "name": "id",
+          "description": null,
           "type": "string",
           "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
           "in": "path"
         }
       ],
@@ -23,12 +28,16 @@
   "services": [
     {
       "name": "default",
+      "description": null,
       "endpoints": [
         {
           "operationId": "listUsers",
           "method": "get",
           "path": "/users",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -38,18 +47,24 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/users/{id}",
+          "summary": null,
+          "description": null,
           "parameters": {
             "kind": "ref",
             "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
           },
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -59,15 +74,21 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/products",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -77,15 +98,21 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "post",
           "path": "/products",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "201",
@@ -95,9 +122,12 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

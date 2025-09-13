@@ -12,73 +12,128 @@
       "properties": [
         {
           "name": "id",
+          "description": null,
           "type": "int",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "score",
+          "description": null,
           "type": "double",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "isActive",
+          "description": null,
           "type": "boolean",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "birthDate",
+          "description": null,
           "type": "date",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "createdAt",
+          "description": null,
           "type": "datetime",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "profile",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/DataTypesProfile"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "tags",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "numbers",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": "int"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "scores",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": "double"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "flags",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": "boolean"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -89,8 +144,13 @@
       "properties": [
         {
           "name": "bio",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     }
@@ -98,13 +158,16 @@
   "services": [
     {
       "name": "default",
+      "description": null,
       "endpoints": [
         {
           "operationId": null,
           "method": "get",
           "path": "/data",
           "summary": "Get data",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -117,9 +180,12 @@
                     "name": "#/components/schemas/DataTypes"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

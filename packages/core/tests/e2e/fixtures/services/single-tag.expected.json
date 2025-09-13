@@ -8,12 +8,16 @@
   "services": [
     {
       "name": "users",
+      "description": null,
       "endpoints": [
         {
           "operationId": "getUsers",
           "method": "get",
           "path": "/users",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -23,20 +27,27 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     },
     {
       "name": "products",
+      "description": null,
       "endpoints": [
         {
           "operationId": "getProducts",
           "method": "get",
           "path": "/products",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -46,9 +57,12 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

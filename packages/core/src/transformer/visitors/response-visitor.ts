@@ -178,13 +178,10 @@ export function visitResponse(
 
   const irResponse: IRResponse = {
     statusCode,
-    description: response.description,
+    description: response.description || null,
+    content: content || null,
+    headers: null, // TODO: implement headers processing
   };
-
-  // Optional properties: only include if they have actual values
-  if (content !== undefined) {
-    irResponse.content = content;
-  }
 
   return { response: irResponse, models };
 }
@@ -209,6 +206,8 @@ if (import.meta.vitest) {
         response: {
           statusCode: "200",
           description: "Success",
+          content: null,
+          headers: null,
         },
         models: [],
       });
@@ -251,6 +250,7 @@ if (import.meta.vitest) {
               },
             },
           ],
+          headers: null,
         },
         models: [
           {
@@ -262,11 +262,16 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "users",
+                description: null,
                 type: {
                   kind: "array",
                   itemType: "string",
                 },
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -330,6 +335,7 @@ if (import.meta.vitest) {
               schema: "string",
             },
           ],
+          headers: null,
         },
         models: [
           {
@@ -341,8 +347,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "data",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -355,8 +366,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "data",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -388,6 +404,8 @@ if (import.meta.vitest) {
         response: {
           statusCode: "200",
           description: "Success with headers",
+          content: null,
+          headers: null,
         },
         models: [],
       });
@@ -451,6 +469,7 @@ if (import.meta.vitest) {
               },
             },
           ],
+          headers: null,
         },
         models: [
           {
@@ -462,13 +481,23 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "error",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "message",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },

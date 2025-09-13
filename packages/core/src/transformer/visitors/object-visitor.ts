@@ -144,8 +144,13 @@ export function visitObject(
     if (propResult.type) {
       const property: IRProperty = {
         name: propName,
+        description: null, // TODO: implement property description handling
         type: propResult.type,
         required: required.includes(propName),
+        nullable: null, // TODO: implement nullable handling
+        defaultValue: null, // TODO: implement default value handling
+        deprecated: null, // TODO: implement deprecated handling
+        validation: null, // TODO: implement validation handling
       };
 
       // descriptionがある場合は追加
@@ -281,8 +286,13 @@ export function visitResponseObject(
     if (propResult.type) {
       const property: IRProperty = {
         name: propName,
+        description: null, // TODO: implement property description handling
         type: propResult.type,
         required: required.includes(propName),
+        nullable: null, // TODO: implement nullable handling
+        defaultValue: null, // TODO: implement default value handling
+        deprecated: null, // TODO: implement deprecated handling
+        validation: null, // TODO: implement validation handling
       };
 
       // 追加プロパティの設定（visitObjectと同じロジック）
@@ -418,8 +428,13 @@ export function visitRequestBodyObject(
     if (propResult.type) {
       const property: IRProperty = {
         name: propName,
+        description: null, // TODO: implement property description handling
         type: propResult.type,
         required: requiredProps.includes(propName),
+        nullable: null, // TODO: implement nullable handling
+        defaultValue: null, // TODO: implement default value handling
+        deprecated: null, // TODO: implement deprecated handling
+        validation: null, // TODO: implement validation handling
       };
 
       // 追加プロパティの設定（visitObjectと同じロジック）
@@ -461,12 +476,8 @@ export function visitRequestBodyObject(
     referencePath: buildReferencePath(context.documentPath),
     properties,
     required,
+    description: schema.description || null,
   };
-
-  // descriptionがある場合のみ追加
-  if (schema.description) {
-    requestBodyModel.description = schema.description;
-  }
 
   // メインモデルを最初に、ネストしたモデルをその後に追加
   result.models.push(requestBodyModel);
@@ -504,8 +515,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -536,8 +552,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "int",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -572,9 +593,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "name",
+                description: "User's full name",
                 type: "string",
                 required: false,
-                description: "User's full name",
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -606,9 +631,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "status",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
                 defaultValue: "active",
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -640,9 +669,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "oldField",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
                 deprecated: true,
+                validation: null,
               },
             ],
           },
@@ -676,8 +709,12 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "username",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
                 validation: {
                   minLength: 3,
                   maxLength: 20,
@@ -728,25 +765,43 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "requiredNullable",
+                description: null,
                 type: "string",
-                nullable: true,
                 required: true,
+                nullable: true,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "requiredNotNullable",
+                description: null,
                 type: "string",
                 required: true,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "optionalNullable",
+                description: null,
                 type: "string",
-                nullable: true,
                 required: false,
+                nullable: true,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "optionalNotNullable",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -777,13 +832,23 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
+                description: null,
                 type: "int",
                 required: true, // 存在するプロパティは正しくrequired
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
               {
                 name: "name",
+                description: null,
                 type: "string",
                 required: false, // required配列に含まれていないのでfalse
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -820,11 +885,16 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "address",
+                description: null,
                 type: {
                   kind: "ref",
                   name: "#/components/schemas/PersonAddress",
                 },
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -835,8 +905,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "street",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -868,11 +943,16 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "tags",
+                description: null,
                 type: {
                   kind: "array",
                   itemType: "string",
                 },
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -901,8 +981,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "user",
+                description: null,
                 type: { kind: "ref", name: "#/components/schemas/User" },
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -935,12 +1020,16 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "status",
+                description: "Document status",
                 type: {
                   kind: "ref",
                   name: "#/components/schemas/DocumentStatus",
                 },
                 required: false,
-                description: "Document status",
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },
@@ -1126,8 +1215,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "valid",
+                description: null,
                 type: "string",
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },

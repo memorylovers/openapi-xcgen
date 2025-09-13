@@ -12,21 +12,35 @@
       "properties": [
         {
           "name": "id",
+          "description": null,
           "type": "long",
           "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "format": "int64"
           }
         },
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "tag",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -37,13 +51,23 @@
       "properties": [
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "tag",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -54,16 +78,25 @@
       "properties": [
         {
           "name": "code",
+          "description": null,
           "type": "int",
           "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "format": "int32"
           }
         },
         {
           "name": "message",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -74,11 +107,14 @@
       "properties": [
         {
           "name": "limit",
+          "description": "How many items to return at one time",
           "type": "int",
           "required": false,
-          "in": "query",
-          "description": "How many items to return at one time",
-          "defaultValue": 20
+          "nullable": null,
+          "defaultValue": 20,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
         }
       ],
       "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
@@ -90,10 +126,14 @@
       "properties": [
         {
           "name": "petId",
+          "description": "The id of the pet to retrieve",
           "type": "string",
           "required": true,
-          "in": "path",
-          "description": "The id of the pet to retrieve"
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "path"
         }
       ],
       "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
@@ -102,16 +142,19 @@
   "services": [
     {
       "name": "pets",
+      "description": null,
       "endpoints": [
         {
           "operationId": "listPets",
           "method": "get",
           "path": "/pets",
           "summary": "List all pets",
+          "description": null,
           "parameters": {
             "kind": "ref",
             "name": "#/paths/::pets/get/parameters/GetPetsParams"
           },
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -127,7 +170,8 @@
                     }
                   }
                 }
-              ]
+              ],
+              "headers": null
             },
             {
               "statusCode": "500",
@@ -140,16 +184,33 @@
                     "name": "#/components/schemas/Error"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": "createPet",
           "method": "post",
           "path": "/pets",
           "summary": "Create a pet",
+          "description": null,
           "parameters": [],
+          "requestBody": {
+            "description": null,
+            "required": true,
+            "content": [
+              {
+                "mimeType": "application/json",
+                "schema": {
+                  "kind": "ref",
+                  "name": "#/components/schemas/NewPet"
+                }
+              }
+            ]
+          },
           "responses": [
             {
               "statusCode": "201",
@@ -162,7 +223,8 @@
                     "name": "#/components/schemas/Pet"
                   }
                 }
-              ]
+              ],
+              "headers": null
             },
             {
               "statusCode": "500",
@@ -175,31 +237,24 @@
                     "name": "#/components/schemas/Error"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
           ],
-          "requestBody": {
-            "required": true,
-            "content": [
-              {
-                "mimeType": "application/json",
-                "schema": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/NewPet"
-                }
-              }
-            ]
-          }
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": "getPetById",
           "method": "get",
           "path": "/pets/{petId}",
           "summary": "Info for a specific pet",
+          "description": null,
           "parameters": {
             "kind": "ref",
             "name": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
           },
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -212,11 +267,14 @@
                     "name": "#/components/schemas/Pet"
                   }
                 }
-              ]
+              ],
+              "headers": null
             },
             {
               "statusCode": "404",
-              "description": "Pet not found"
+              "description": "Pet not found",
+              "content": null,
+              "headers": null
             },
             {
               "statusCode": "500",
@@ -229,9 +287,12 @@
                     "name": "#/components/schemas/Error"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

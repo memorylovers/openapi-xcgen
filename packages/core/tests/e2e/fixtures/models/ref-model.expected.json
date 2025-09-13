@@ -12,14 +12,20 @@
       "properties": [
         {
           "name": "customer",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Customer"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "items",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
@@ -27,7 +33,11 @@
               "name": "#/components/schemas/OrderItem"
             }
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -38,8 +48,13 @@
       "properties": [
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -50,8 +65,13 @@
       "properties": [
         {
           "name": "productId",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     }
@@ -59,13 +79,16 @@
   "services": [
     {
       "name": "default",
+      "description": null,
       "endpoints": [
         {
           "operationId": null,
           "method": "get",
           "path": "/orders",
           "summary": "Get orders",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -78,16 +101,21 @@
                     "name": "#/components/schemas/Order"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/customers",
           "summary": "Get customers",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -103,9 +131,12 @@
                     }
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

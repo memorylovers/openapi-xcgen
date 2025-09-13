@@ -118,8 +118,13 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "status",
+                description: null,
                 type: { kind: "ref", name: "#/components/schemas/ItemStatus" },
                 required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
               },
             ],
           },

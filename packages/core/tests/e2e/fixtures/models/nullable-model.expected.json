@@ -12,43 +12,69 @@
       "properties": [
         {
           "name": "id",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "bio",
+          "description": null,
           "type": "string",
           "required": false,
-          "nullable": true
+          "nullable": true,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "lastLoginDate",
+          "description": null,
           "type": "datetime",
           "required": false,
-          "nullable": true
+          "nullable": true,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "settings",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/ProfileSettings"
           },
           "required": false,
-          "nullable": true
+          "nullable": true,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "tags",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
           },
           "required": false,
-          "nullable": true
+          "nullable": true,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -59,8 +85,13 @@
       "properties": [
         {
           "name": "theme",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     }
@@ -68,13 +99,16 @@
   "services": [
     {
       "name": "default",
+      "description": null,
       "endpoints": [
         {
           "operationId": null,
           "method": "get",
           "path": "/profiles",
           "summary": "Get profiles",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -87,9 +121,12 @@
                     "name": "#/components/schemas/Profile"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

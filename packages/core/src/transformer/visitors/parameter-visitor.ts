@@ -89,20 +89,13 @@ export function visitParameter(
   const irParameter: IRParameter = {
     name: parameter.name,
     in: parameterIn,
+    description: parameter.description || null,
     required: parameter.required || false,
     type,
+    nullable: null, // TODO: implement nullable handling
+    defaultValue: schema.default || null,
+    deprecated: parameter.deprecated || null,
   };
-
-  // Optional properties: only include if they have actual values
-  if (parameter.description !== undefined) {
-    irParameter.description = parameter.description;
-  }
-  if (schema.default !== undefined) {
-    irParameter.defaultValue = schema.default;
-  }
-  if (parameter.deprecated !== undefined) {
-    irParameter.deprecated = parameter.deprecated;
-  }
 
   return irParameter;
 }
@@ -128,9 +121,12 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "id",
         in: "path",
-        required: true,
         description: "User ID",
+        required: true,
         type: "string",
+        nullable: null,
+        defaultValue: null,
+        deprecated: null,
       });
     });
 
@@ -153,9 +149,12 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "limit",
         in: "query",
+        description: null,
         required: false,
         type: "int",
+        nullable: null,
         defaultValue: 10,
+        deprecated: null,
       });
     });
 
@@ -174,8 +173,11 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "X-API-Version",
         in: "header",
+        description: null,
         required: false,
         type: "string",
+        nullable: null,
+        defaultValue: null,
         deprecated: true,
       });
     });
@@ -195,8 +197,12 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "session",
         in: "cookie",
+        description: null,
         required: false,
         type: "string",
+        nullable: null,
+        defaultValue: null,
+        deprecated: null,
       });
     });
 
@@ -282,11 +288,15 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "tags",
         in: "query",
+        description: null,
         required: false,
         type: {
           kind: "array",
           itemType: "string",
         },
+        nullable: null,
+        defaultValue: null,
+        deprecated: null,
       });
     });
   });

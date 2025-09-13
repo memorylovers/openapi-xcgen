@@ -8,12 +8,16 @@
   "services": [
     {
       "name": "default",
+      "description": null,
       "endpoints": [
         {
           "operationId": "health",
           "method": "get",
           "path": "/health",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -23,15 +27,21 @@
                   "mimeType": "text/plain",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": "version",
           "method": "get",
           "path": "/version",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -41,15 +51,21 @@
                   "mimeType": "application/json",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": "ping",
           "method": "get",
           "path": "/ping",
+          "summary": null,
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -59,9 +75,12 @@
                   "mimeType": "text/plain",
                   "schema": "string"
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }

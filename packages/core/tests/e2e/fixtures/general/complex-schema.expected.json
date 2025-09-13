@@ -12,14 +12,19 @@
       "properties": [
         {
           "name": "id",
+          "description": null,
           "type": "string",
           "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "format": "uuid"
           }
         },
         {
           "name": "items",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
@@ -28,51 +33,84 @@
             }
           },
           "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "minItems": 1
           }
         },
         {
           "name": "customer",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderCustomer"
           },
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "status",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderStatus"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "priority",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderPriority"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "tags",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "createdAt",
+          "description": null,
           "type": "datetime",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "updatedAt",
+          "description": null,
           "type": "datetime",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -83,29 +121,46 @@
       "properties": [
         {
           "name": "productId",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "quantity",
+          "description": null,
           "type": "int",
           "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "minimum": 1
           }
         },
         {
           "name": "price",
+          "description": null,
           "type": "float",
           "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "format": "float"
           }
         },
         {
           "name": "discount",
+          "description": null,
           "type": "float",
           "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "minimum": 0,
             "maximum": 100,
@@ -121,29 +176,48 @@
       "properties": [
         {
           "name": "id",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": true
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "email",
+          "description": null,
           "type": "string",
           "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "format": "email"
           }
         },
         {
           "name": "address",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderCustomerAddress"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -154,23 +228,42 @@
       "properties": [
         {
           "name": "street",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "city",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "country",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         },
         {
           "name": "zipCode",
+          "description": null,
           "type": "string",
           "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
           "validation": {
             "pattern": "^\\d{5}(-\\d{4})?$"
           }
@@ -233,13 +326,28 @@
   "services": [
     {
       "name": "orders",
+      "description": null,
       "endpoints": [
         {
           "operationId": "createOrder",
           "method": "post",
           "path": "/orders",
           "summary": "Create a new order",
+          "description": null,
           "parameters": [],
+          "requestBody": {
+            "description": null,
+            "required": true,
+            "content": [
+              {
+                "mimeType": "application/json",
+                "schema": {
+                  "kind": "ref",
+                  "name": "#/components/schemas/Order"
+                }
+              }
+            ]
+          },
           "responses": [
             {
               "statusCode": "201",
@@ -252,21 +360,12 @@
                     "name": "#/components/schemas/Order"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
           ],
-          "requestBody": {
-            "required": true,
-            "content": [
-              {
-                "mimeType": "application/json",
-                "schema": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Order"
-                }
-              }
-            ]
-          }
+          "deprecated": null,
+          "security": null
         }
       ]
     }

@@ -12,11 +12,16 @@
       "properties": [
         {
           "name": "data",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Level1Data"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -27,8 +32,13 @@
       "properties": [
         {
           "name": "value",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -39,11 +49,16 @@
       "properties": [
         {
           "name": "outer",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Level2Outer"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -54,11 +69,16 @@
       "properties": [
         {
           "name": "inner",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Level2OuterInner"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -69,8 +89,13 @@
       "properties": [
         {
           "name": "value",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -81,11 +106,16 @@
       "properties": [
         {
           "name": "level1",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Level3Level1"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -96,11 +126,16 @@
       "properties": [
         {
           "name": "level2",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Level3Level1Level2"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -111,11 +146,16 @@
       "properties": [
         {
           "name": "level3",
+          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Level3Level1Level2Level3"
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -126,8 +166,13 @@
       "properties": [
         {
           "name": "value",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -138,6 +183,7 @@
       "properties": [
         {
           "name": "members",
+          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
@@ -145,7 +191,11 @@
               "name": "#/components/schemas/TeamMembers"
             }
           },
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -156,8 +206,13 @@
       "properties": [
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     },
@@ -168,8 +223,13 @@
       "properties": [
         {
           "name": "name",
+          "description": null,
           "type": "string",
-          "required": false
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
         }
       ]
     }
@@ -177,13 +237,16 @@
   "services": [
     {
       "name": "default",
+      "description": null,
       "endpoints": [
         {
           "operationId": null,
           "method": "get",
           "path": "/level1",
           "summary": "1階層ネスト",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -196,16 +259,21 @@
                     "name": "#/components/schemas/Level1"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/level2",
           "summary": "2階層ネスト",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -218,16 +286,21 @@
                     "name": "#/components/schemas/Level2"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/level3",
           "summary": "3階層ネスト",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -240,16 +313,21 @@
                     "name": "#/components/schemas/Level3"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/teams",
           "summary": "オブジェクト内の配列",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -262,16 +340,21 @@
                     "name": "#/components/schemas/Team"
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         },
         {
           "operationId": null,
           "method": "get",
           "path": "/users",
           "summary": "トップレベルが配列",
+          "description": null,
           "parameters": [],
+          "requestBody": null,
           "responses": [
             {
               "statusCode": "200",
@@ -287,9 +370,12 @@
                     }
                   }
                 }
-              ]
+              ],
+              "headers": null
             }
-          ]
+          ],
+          "deprecated": null,
+          "security": null
         }
       ]
     }
