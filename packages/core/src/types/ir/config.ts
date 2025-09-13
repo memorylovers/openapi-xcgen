@@ -15,11 +15,11 @@
  */
 export interface IRContact {
   /** 連絡先名 */
-  name?: string;
+  name: string | null;
   /** メールアドレス */
-  email?: string;
+  email: string | null;
   /** URL */
-  url?: string;
+  url: string | null;
 }
 
 /**
@@ -36,7 +36,7 @@ export interface IRLicense {
   /** ライセンス名 */
   name: string;
   /** ライセンスURL */
-  url?: string;
+  url: string | null;
 }
 
 /**
@@ -74,13 +74,13 @@ export interface IRMetadata {
   /** APIバージョン */
   version: string;
   /** API説明 */
-  description?: string;
+  description: string | null;
   /** OpenAPIバージョン */
   openApiVersion: string;
   /** 連絡先情報 */
-  contact?: IRContact;
+  contact: IRContact | null;
   /** ライセンス情報 */
-  license?: IRLicense;
+  license: IRLicense | null;
 }
 
 /**
@@ -104,9 +104,9 @@ export interface IRServer {
   /** URL */
   url: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** 変数 */
-  variables?: IRServerVariableMap;
+  variables: IRServerVariableMap | null;
 }
 
 /**
@@ -116,9 +116,9 @@ export interface IRServerVariable {
   /** デフォルト値 */
   default: string;
   /** 選択可能な値 */
-  enum?: string[];
+  enum: string[] | null;
   /** 説明 */
-  description?: string;
+  description: string | null;
 }
 
 /**
@@ -142,13 +142,13 @@ export interface IRApiKeyConfig {
  */
 export interface IROAuth2Flow {
   /** 認可URL */
-  authorizationUrl?: string;
+  authorizationUrl: string | null;
   /** トークンURL */
-  tokenUrl?: string;
+  tokenUrl: string | null;
   /** リフレッシュURL */
-  refreshUrl?: string;
+  refreshUrl: string | null;
   /** スコープ定義 */
-  scopes?: IROAuth2ScopeMap;
+  scopes: IROAuth2ScopeMap | null;
 }
 
 /**
@@ -171,13 +171,13 @@ export interface IROAuth2Flow {
  */
 export interface IROAuth2Flows {
   /** Implicit フロー */
-  implicit?: IROAuth2Flow;
+  implicit: IROAuth2Flow | null;
   /** Password フロー */
-  password?: IROAuth2Flow;
+  password: IROAuth2Flow | null;
   /** Client Credentials フロー */
-  clientCredentials?: IROAuth2Flow;
+  clientCredentials: IROAuth2Flow | null;
   /** Authorization Code フロー */
-  authorizationCode?: IROAuth2Flow;
+  authorizationCode: IROAuth2Flow | null;
 }
 
 /**
@@ -213,15 +213,15 @@ export interface IRSecurityScheme {
   /** タイプ */
   type: "apiKey" | "http" | "oauth2" | "openIdConnect";
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** APIキーの場合の設定 */
-  apiKey?: IRApiKeyConfig;
+  apiKey: IRApiKeyConfig | null;
   /** HTTPの場合のスキーム */
-  scheme?: string;
+  scheme: string | null;
   /** Bearer形式の場合のフォーマット */
-  bearerFormat?: string;
+  bearerFormat: string | null;
   /** OAuth2フロー */
-  flows?: IROAuth2Flows;
+  flows: IROAuth2Flows | null;
   /** OpenID Connect URL */
-  openIdConnectUrl?: string;
+  openIdConnectUrl: string | null;
 }
