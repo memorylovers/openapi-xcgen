@@ -19,6 +19,18 @@
           "defaultValue": null,
           "deprecated": null,
           "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
             "format": "uuid"
           }
         },
@@ -37,7 +49,19 @@
           "defaultValue": null,
           "deprecated": null,
           "validation": {
-            "minItems": 1
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": 1,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
           }
         },
         {
@@ -138,7 +162,19 @@
           "defaultValue": null,
           "deprecated": null,
           "validation": {
-            "minimum": 1
+            "minimum": 1,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
           }
         },
         {
@@ -150,6 +186,18 @@
           "defaultValue": null,
           "deprecated": null,
           "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
             "format": "float"
           }
         },
@@ -164,6 +212,16 @@
           "validation": {
             "minimum": 0,
             "maximum": 100,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
             "format": "float"
           }
         }
@@ -203,6 +261,18 @@
           "defaultValue": null,
           "deprecated": null,
           "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
             "format": "email"
           }
         },
@@ -265,7 +335,19 @@
           "defaultValue": null,
           "deprecated": null,
           "validation": {
-            "pattern": "^\\d{5}(-\\d{4})?$"
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^\\d{5}(-\\d{4})?$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
           }
         }
       ]

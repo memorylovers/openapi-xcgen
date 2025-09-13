@@ -134,7 +134,7 @@ export interface IRObjectModel {
    */
   referencePath: string;
   /** モデルの説明 */
-  description?: string;
+  description: string | null;
   /** プロパティの配列 */
   properties: IRProperty[];
 }
@@ -232,7 +232,7 @@ export interface IREnumModel {
    */
   referencePath: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
   /** 値の型（OpenAPIの型をそのまま保持） */
   type: IRScalarType;
   /** Enum値の配列 */
@@ -258,7 +258,7 @@ export interface IREnumValue {
   /** 名前（コード生成用） */
   name: string;
   /** 説明 */
-  description?: string;
+  description: string | null;
 }
 
 /**
@@ -273,7 +273,7 @@ export interface IRArrayModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description?: string;
+  description: string | null;
   /** 配列アイテムの型 */
   itemType: IRType;
 }
@@ -290,7 +290,7 @@ export interface IRMapModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description?: string;
+  description: string | null;
   /** 値の型 */
   valueType: IRType;
 }
@@ -323,7 +323,7 @@ export interface IRParameterModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description?: string;
+  description: string | null;
   /** パラメータプロパティの配列（in情報を含む） */
   properties: IRParameterProperty[];
 }
@@ -357,7 +357,7 @@ export interface IRRequestBodyModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description?: string;
+  description: string | null;
   /** プロパティ配列（IRObjectModelから継承） */
   properties: IRProperty[];
   /** 必須フラグ（リクエストボディ固有） */
@@ -394,13 +394,13 @@ export interface IRResponseModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description?: string;
+  description: string | null;
   /** プロパティ配列（IRObjectModelから継承） */
   properties: IRProperty[];
   /** HTTPステータスコード（レスポンス固有） */
   statusCode: string;
   /** ヘッダー配列（レスポンス固有） */
-  headers?: IRResponseHeader[];
+  headers: IRResponseHeader[] | null;
 }
 
 // ============================================================================
@@ -463,29 +463,29 @@ export type IRModel =
  */
 export interface IRValidation {
   /** 最小値 */
-  minimum?: number;
+  minimum: number | null;
   /** 最大値 */
-  maximum?: number;
+  maximum: number | null;
   /** 排他的最小値 */
-  exclusiveMinimum?: boolean;
+  exclusiveMinimum: boolean | null;
   /** 排他的最大値 */
-  exclusiveMaximum?: boolean;
+  exclusiveMaximum: boolean | null;
   /** 最小長 */
-  minLength?: number;
+  minLength: number | null;
   /** 最大長 */
-  maxLength?: number;
+  maxLength: number | null;
   /** パターン（正規表現） */
-  pattern?: string;
+  pattern: string | null;
   /** 最小アイテム数 */
-  minItems?: number;
+  minItems: number | null;
   /** 最大アイテム数 */
-  maxItems?: number;
+  maxItems: number | null;
   /** ユニークアイテム */
-  uniqueItems?: boolean;
+  uniqueItems: boolean | null;
   /** 最小プロパティ数 */
-  minProperties?: number;
+  minProperties: number | null;
   /** 最大プロパティ数 */
-  maxProperties?: number;
+  maxProperties: number | null;
   /** フォーマット（uuid、email、uri、ipv4等のバリデーション用） */
-  format?: string;
+  format: string | null;
 }

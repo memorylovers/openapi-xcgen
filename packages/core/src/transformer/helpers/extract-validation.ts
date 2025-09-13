@@ -37,7 +37,22 @@ import type { IRValidation } from "../../types/ir/index";
  * ```
  */
 export function extractValidation(schema: SchemaObject): IRValidation | null {
-  const validation: IRValidation = {};
+  // すべてのフィールドを明示的にnullで初期化
+  const validation: IRValidation = {
+    minimum: null,
+    maximum: null,
+    exclusiveMinimum: null,
+    exclusiveMaximum: null,
+    minLength: null,
+    maxLength: null,
+    pattern: null,
+    minItems: null,
+    maxItems: null,
+    uniqueItems: null,
+    minProperties: null,
+    maxProperties: null,
+    format: null,
+  };
 
   // 文字列バリデーション
   if (schema.minLength !== undefined) {
@@ -93,7 +108,9 @@ export function extractValidation(schema: SchemaObject): IRValidation | null {
   }
 
   // バリデーションが空の場合はnullを返す
-  return Object.keys(validation).length > 0 ? validation : null;
+  // すべてのフィールドがnullの場合
+  const hasValidation = Object.values(validation).some((v) => v !== null);
+  return hasValidation ? validation : null;
 }
 
 // === in-source testing ===
@@ -112,9 +129,19 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
         minLength: 3,
         maxLength: 50,
         pattern: "^[a-zA-Z]+$",
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -134,6 +161,15 @@ if (import.meta.vitest) {
         maximum: 100,
         exclusiveMinimum: true,
         exclusiveMaximum: false,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -149,6 +185,17 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         minimum: 1,
         maximum: 10,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -164,9 +211,19 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
         minItems: 1,
         maxItems: 10,
         uniqueItems: true,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -180,8 +237,19 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
         minProperties: 2,
         maxProperties: 10,
+        format: null,
       });
     });
 
@@ -197,9 +265,19 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
         minLength: 1,
         maxLength: 100,
         pattern: "^[a-zA-Z0-9]+$",
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -231,7 +309,19 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
         minLength: 5,
+        maxLength: null,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -247,8 +337,18 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         minimum: 0,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
         minItems: 0,
+        maxItems: null,
+        uniqueItems: null,
         minProperties: 0,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -265,8 +365,19 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
         minLength: 3,
         maxLength: 20,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -286,6 +397,15 @@ if (import.meta.vitest) {
         maximum: 100,
         exclusiveMinimum: true,
         exclusiveMaximum: true,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
+        format: null,
       });
     });
 
@@ -298,6 +418,18 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
+        minLength: null,
+        maxLength: null,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
         format: "uuid",
       });
     });
@@ -337,8 +469,18 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
+        minimum: null,
+        maximum: null,
+        exclusiveMinimum: null,
+        exclusiveMaximum: null,
         minLength: 5,
         maxLength: 100,
+        pattern: null,
+        minItems: null,
+        maxItems: null,
+        uniqueItems: null,
+        minProperties: null,
+        maxProperties: null,
         format: "email",
       });
     });
