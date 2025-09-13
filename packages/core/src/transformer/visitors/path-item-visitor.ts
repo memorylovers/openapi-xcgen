@@ -133,7 +133,7 @@ if (import.meta.vitest) {
       expect(result).toEqual([
         {
           endpoint: {
-            id: "getPet",
+            operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
             parameters: [],
@@ -177,7 +177,7 @@ if (import.meta.vitest) {
       expect(result).toEqual([
         {
           endpoint: {
-            id: "getPet",
+            operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
             parameters: [],
@@ -188,7 +188,7 @@ if (import.meta.vitest) {
         },
         {
           endpoint: {
-            id: "updatePet",
+            operationId: "updatePet",
             method: "put",
             path: "/pets/{id}",
             parameters: [],
@@ -199,7 +199,7 @@ if (import.meta.vitest) {
         },
         {
           endpoint: {
-            id: "deletePet",
+            operationId: "deletePet",
             method: "delete",
             path: "/pets/{id}",
             parameters: [],
@@ -233,7 +233,7 @@ if (import.meta.vitest) {
       expect(result).toEqual([
         {
           endpoint: {
-            id: "getPet",
+            operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
             parameters: [],
@@ -272,7 +272,7 @@ if (import.meta.vitest) {
       expect(result).toEqual([
         {
           endpoint: {
-            id: "getPet",
+            operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
             parameters: [],

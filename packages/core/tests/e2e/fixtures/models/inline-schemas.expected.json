@@ -323,7 +323,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": "testParametersModelGeneration",
+          "operationId": "testParametersModelGeneration",
           "method": "get",
           "path": "/test-1-parameters/{id}",
           "summary": "Test 1: Parameters model generation (Basic)",
@@ -349,7 +349,7 @@
           "description": "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion."
         },
         {
-          "id": "testRequestInlineExtraction",
+          "operationId": "testRequestInlineExtraction",
           "method": "post",
           "path": "/test-2-request",
           "summary": "Test 2: Request body inline schema extraction (Basic)",
@@ -384,7 +384,7 @@
           }
         },
         {
-          "id": "testResponseInlineExtraction",
+          "operationId": "testResponseInlineExtraction",
           "method": "get",
           "path": "/test-3-response",
           "summary": "Test 3: Response inline schema extraction (Intermediate)",

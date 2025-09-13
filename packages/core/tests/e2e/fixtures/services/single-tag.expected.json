@@ -10,7 +10,7 @@
       "name": "users",
       "endpoints": [
         {
-          "id": "getUsers",
+          "operationId": "getUsers",
           "method": "get",
           "path": "/users",
           "parameters": [],
@@ -33,7 +33,7 @@
       "name": "products",
       "endpoints": [
         {
-          "id": "getProducts",
+          "operationId": "getProducts",
           "method": "get",
           "path": "/products",
           "parameters": [],

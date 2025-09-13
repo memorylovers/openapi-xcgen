@@ -127,7 +127,7 @@ if (import.meta.vitest) {
             name: "pets",
             endpoints: [
               {
-                id: "listPets",
+                operationId: "listPets",
                 method: "get",
                 path: "/pets",
                 parameters: [],
@@ -182,14 +182,14 @@ if (import.meta.vitest) {
             name: "pets",
             endpoints: [
               {
-                id: "listPets",
+                operationId: "listPets",
                 method: "get",
                 path: "/pets",
                 parameters: [],
                 responses: [],
               },
               {
-                id: "getPet",
+                operationId: "getPet",
                 method: "get",
                 path: "/pets/{id}",
                 parameters: [],
@@ -201,7 +201,7 @@ if (import.meta.vitest) {
             name: "users",
             endpoints: [
               {
-                id: "listUsers",
+                operationId: "listUsers",
                 method: "get",
                 path: "/users",
                 parameters: [],
@@ -239,7 +239,7 @@ if (import.meta.vitest) {
             name: "default",
             endpoints: [
               {
-                id: "healthCheck",
+                operationId: "healthCheck",
                 method: "get",
                 path: "/health",
                 parameters: [],

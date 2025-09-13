@@ -100,7 +100,7 @@
       "name": "users",
       "endpoints": [
         {
-          "id": "listUsers",
+          "operationId": "listUsers",
           "method": "get",
           "path": "/users",
           "summary": "List all users",
@@ -125,7 +125,7 @@
           ]
         },
         {
-          "id": "getUser",
+          "operationId": "getUser",
           "method": "get",
           "path": "/users/{userId}",
           "summary": "Get user by ID",
@@ -155,7 +155,7 @@
       "name": "posts",
       "endpoints": [
         {
-          "id": "listPosts",
+          "operationId": "listPosts",
           "method": "get",
           "path": "/posts",
           "summary": "List all posts",
@@ -168,7 +168,7 @@
           ]
         },
         {
-          "id": "createPost",
+          "operationId": "createPost",
           "method": "post",
           "path": "/posts",
           "summary": "Create a new post",
@@ -198,7 +198,7 @@
       "name": "admin",
       "endpoints": [
         {
-          "id": "getSettings",
+          "operationId": "getSettings",
           "method": "get",
           "path": "/admin/settings",
           "summary": "Get admin settings",
@@ -216,7 +216,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": "healthCheck",
+          "operationId": "healthCheck",
           "method": "get",
           "path": "/health",
           "summary": "Health check endpoint",

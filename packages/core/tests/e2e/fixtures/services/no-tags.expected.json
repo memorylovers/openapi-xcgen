@@ -10,7 +10,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": "health",
+          "operationId": "health",
           "method": "get",
           "path": "/health",
           "parameters": [],
@@ -28,7 +28,7 @@
           ]
         },
         {
-          "id": "version",
+          "operationId": "version",
           "method": "get",
           "path": "/version",
           "parameters": [],
@@ -46,7 +46,7 @@
           ]
         },
         {
-          "id": "ping",
+          "operationId": "ping",
           "method": "get",
           "path": "/ping",
           "parameters": [],

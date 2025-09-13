@@ -10,7 +10,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": "endpoint1",
+          "operationId": "endpoint1",
           "method": "get",
           "path": "/endpoint1",
           "summary": "Test summary",
@@ -30,7 +30,7 @@
           "description": "Test description"
         },
         {
-          "id": "endpoint2",
+          "operationId": "endpoint2",
           "method": "get",
           "path": "/endpoint2",
           "summary": "Test summary only",
@@ -49,7 +49,7 @@
           ]
         },
         {
-          "id": "endpoint3",
+          "operationId": "endpoint3",
           "method": "get",
           "path": "/endpoint3",
           "parameters": [],
@@ -68,7 +68,7 @@
           "description": "Test description only"
         },
         {
-          "id": "endpoint4",
+          "operationId": "endpoint4",
           "method": "get",
           "path": "/endpoint4",
           "parameters": [],

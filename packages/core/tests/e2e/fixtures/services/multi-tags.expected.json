@@ -10,7 +10,7 @@
       "name": "users",
       "endpoints": [
         {
-          "id": "endpoint1",
+          "operationId": "endpoint1",
           "method": "get",
           "path": "/endpoint1",
           "parameters": [],
@@ -33,7 +33,7 @@
       "name": "admin",
       "endpoints": [
         {
-          "id": "endpoint2",
+          "operationId": "endpoint2",
           "method": "get",
           "path": "/endpoint2",
           "parameters": [],
@@ -56,7 +56,7 @@
       "name": "products",
       "endpoints": [
         {
-          "id": "endpoint3",
+          "operationId": "endpoint3",
           "method": "get",
           "path": "/endpoint3",
           "parameters": [],

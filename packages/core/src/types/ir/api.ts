@@ -99,8 +99,8 @@ export interface IRService {
  * ```
  */
 export interface IREndpoint {
-  /** エンドポイントID（operationId）- OpenAPI仕様では任意項目 */
-  id: string | null;
+  /** OpenAPIのoperationId - エンドポイント識別子（任意項目） */
+  operationId: string | null;
   /** HTTPメソッド */
   method: IRHttpMethod;
   /** パス */

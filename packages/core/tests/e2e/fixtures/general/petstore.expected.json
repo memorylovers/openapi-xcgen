@@ -104,7 +104,7 @@
       "name": "pets",
       "endpoints": [
         {
-          "id": "listPets",
+          "operationId": "listPets",
           "method": "get",
           "path": "/pets",
           "summary": "List all pets",
@@ -145,7 +145,7 @@
           ]
         },
         {
-          "id": "createPet",
+          "operationId": "createPet",
           "method": "post",
           "path": "/pets",
           "summary": "Create a pet",
@@ -192,7 +192,7 @@
           }
         },
         {
-          "id": "getPetById",
+          "operationId": "getPetById",
           "method": "get",
           "path": "/pets/{petId}",
           "summary": "Info for a specific pet",

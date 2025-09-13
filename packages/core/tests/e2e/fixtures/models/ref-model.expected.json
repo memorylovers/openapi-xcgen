@@ -61,7 +61,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/orders",
           "summary": "Get orders",
@@ -83,7 +83,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/customers",
           "summary": "Get customers",

@@ -70,7 +70,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/profiles",
           "summary": "Get profiles",

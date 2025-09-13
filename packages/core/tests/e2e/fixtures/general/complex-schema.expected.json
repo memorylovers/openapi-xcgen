@@ -235,7 +235,7 @@
       "name": "orders",
       "endpoints": [
         {
-          "id": "createOrder",
+          "operationId": "createOrder",
           "method": "post",
           "path": "/orders",
           "summary": "Create a new order",

@@ -179,7 +179,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/level1",
           "summary": "1階層ネスト",
@@ -201,7 +201,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/level2",
           "summary": "2階層ネスト",
@@ -223,7 +223,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/level3",
           "summary": "3階層ネスト",
@@ -245,7 +245,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/teams",
           "summary": "オブジェクト内の配列",
@@ -267,7 +267,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/users",
           "summary": "トップレベルが配列",

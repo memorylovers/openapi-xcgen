@@ -25,7 +25,7 @@
       "name": "default",
       "endpoints": [
         {
-          "id": "listUsers",
+          "operationId": "listUsers",
           "method": "get",
           "path": "/users",
           "parameters": [],
@@ -43,7 +43,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/users/{id}",
           "parameters": {
@@ -64,7 +64,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "get",
           "path": "/products",
           "parameters": [],
@@ -82,7 +82,7 @@
           ]
         },
         {
-          "id": null,
+          "operationId": null,
           "method": "post",
           "path": "/products",
           "parameters": [],

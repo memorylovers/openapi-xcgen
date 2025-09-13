@@ -143,7 +143,7 @@ export function visitOperation(
     : parametersResult.parameters;
 
   const endpoint: IREndpoint = {
-    id: operation.operationId || null,
+    operationId: operation.operationId || null,
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
     summary: operation.summary,
@@ -194,7 +194,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "getPet",
+          operationId: "getPet",
           method: "get",
           path: "/pets/{id}",
           summary: "Get a pet by ID",
@@ -228,7 +228,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "oldEndpoint",
+          operationId: "oldEndpoint",
           method: "post",
           path: "/old/endpoint",
           parameters: [],
@@ -257,7 +257,7 @@ if (import.meta.vitest) {
       // operationIdが任意項目なので、処理は継続される
       expect(result).toEqual({
         endpoint: {
-          id: null,
+          operationId: null,
           method: "get",
           path: "/missing",
           summary: "Missing ID",
@@ -285,7 +285,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "noTags",
+          operationId: "noTags",
           method: "get",
           path: "/no-tags",
           parameters: [],
@@ -324,7 +324,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "withParams",
+          operationId: "withParams",
           method: "get",
           path: "/with/{id}",
           parameters: {
@@ -390,7 +390,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "createPet",
+          operationId: "createPet",
           method: "post",
           path: "/pets",
           summary: undefined,
@@ -468,7 +468,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "getPet",
+          operationId: "getPet",
           method: "get",
           path: "/pets/{id}",
           summary: undefined,
@@ -545,7 +545,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         endpoint: {
-          id: "withRefParam",
+          operationId: "withRefParam",
           method: "get",
           path: "/ref/{id}",
           parameters: {
