@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+  title: Single Tag Service Classification Test
+  version: 1.0.0
+  description: Test single tag service classification
+
+paths:
+  /users:
+    get:
+      operationId: getUsers
+      tags:
+        - users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /products:
+    get:
+      operationId: getProducts
+      tags:
+        - products
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string

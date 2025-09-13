@@ -1,0 +1,105 @@
+{
+  "info": {
+    "title": "Operation ID Optional Field Test",
+    "version": "1.0.0",
+    "description": "Test operationId as optional field per OpenAPI specification"
+  },
+  "models": [
+    {
+      "kind": "parameter",
+      "name": "GetUsersParams",
+      "description": "Parameters for GET /users/{id}",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "in": "path"
+        }
+      ],
+      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+    }
+  ],
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": "listUsers",
+          "method": "get",
+          "path": "/users",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "get",
+          "path": "/users/{id}",
+          "parameters": {
+            "kind": "ref",
+            "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+          },
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "get",
+          "path": "/products",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "post",
+          "path": "/products",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "201",
+              "description": "Created",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

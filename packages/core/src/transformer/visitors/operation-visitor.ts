@@ -76,16 +76,6 @@ export function visitOperation(
   operation: OperationObject,
   context: OperationContext,
 ): OperationResult | null {
-  // operationIdは必須
-  if (!operation.operationId) {
-    consola.warn(
-      `Operation without operationId at ${context.method.toUpperCase()} ${
-        context.pathTemplate
-      }`,
-    );
-    return null;
-  }
-
   // parameters処理
   const parametersContext: ParametersContext = {
     documentPath: [...context.documentPath, "parameters"],
@@ -111,7 +101,7 @@ export function visitOperation(
 
     const requestBodyResult = visitRequestBody(
       operation.requestBody,
-      operation.operationId,
+      operation.operationId || null,
       requestBodyContext,
     );
 
@@ -144,12 +134,20 @@ export function visitOperation(
     models.push(parametersResult.unifiedModel);
   }
 
+  // parameters設定: 統合モデルがある場合は参照、ない場合は個別配列
+  const parameters = parametersResult.unifiedModel
+    ? {
+        kind: "ref" as const,
+        name: parametersResult.unifiedModel.referencePath,
+      }
+    : parametersResult.parameters;
+
   const endpoint: IREndpoint = {
-    id: operation.operationId,
+    id: operation.operationId || null,
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
     summary: operation.summary,
-    parameters: parametersResult.parameters,
+    parameters,
     responses: responsesResult.responses,
   };
 
@@ -228,11 +226,9 @@ if (import.meta.vitest) {
       expect(result?.endpoint.deprecated).toBe(true);
     });
 
-    it("should return null for operations without operationId", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should handle operations without operationId as optional field", () => {
       const operation: OperationObject = {
-        // operationIdなし
+        // operationIdなし - OpenAPI仕様では任意項目
         summary: "Missing ID",
         responses: {},
       };
@@ -245,13 +241,12 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      // このテストは成功する（最小実装がnullを返すため）
-      expect(result).toBeNull();
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Operation without operationId at GET /missing",
-      );
-
-      warnSpy.mockRestore();
+      // operationIdが任意項目なので、処理は継続される
+      expect(result).not.toBeNull();
+      expect(result?.endpoint.id).toBeNull();
+      expect(result?.endpoint.summary).toBe("Missing ID");
+      expect(result?.endpoint.method).toBe("get");
+      expect(result?.endpoint.path).toBe("/missing");
     });
 
     it("should handle operations without tags", () => {
@@ -273,7 +268,7 @@ if (import.meta.vitest) {
       expect(result?.endpoint.id).toBe("noTags");
     });
 
-    it("should process parameters array", () => {
+    it("should process parameters array and create unified model reference", () => {
       const operation: OperationObject = {
         operationId: "withParams",
         parameters: [
@@ -301,24 +296,36 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       expect(result).not.toBeNull();
-      expect(result?.endpoint.parameters).toHaveLength(2);
-      expect(result?.endpoint.parameters[0]).toEqual({
-        name: "id",
-        in: "path",
-        required: true,
-        description: undefined,
-        type: "string",
-        defaultValue: undefined,
-        deprecated: undefined,
+
+      // parameters は統合モデルへの参照になる
+      expect(result?.endpoint.parameters).toEqual({
+        kind: "ref",
+        name: "#/paths/::with::{id}/get/parameters/GetWithParams",
       });
-      expect(result?.endpoint.parameters[1]).toEqual({
-        name: "limit",
-        in: "query",
-        required: false,
-        description: undefined,
-        type: "int",
-        defaultValue: 10,
-        deprecated: undefined,
+
+      // 統合モデルが models 配列に含まれる
+      expect(result?.models).toHaveLength(1);
+      const unifiedModel = result?.models[0];
+      expect(unifiedModel).toEqual({
+        kind: "parameter",
+        name: "GetWithParams",
+        description: "Parameters for GET /with/{id}",
+        properties: [
+          {
+            name: "id",
+            type: "string",
+            required: true,
+            in: "path",
+          },
+          {
+            name: "limit",
+            type: "int",
+            required: false,
+            defaultValue: 10,
+            in: "query",
+          },
+        ],
+        referencePath: expect.stringContaining("GetWithParams"),
       });
     });
 
@@ -357,11 +364,18 @@ if (import.meta.vitest) {
       expect(result?.endpoint.requestBody?.required).toBe(true);
       expect(result?.endpoint.requestBody?.content).toBeDefined();
       expect(
-        result?.endpoint.requestBody?.content?.["application/json"],
+        result?.endpoint.requestBody?.content?.find(
+          (c) => c.mimeType === "application/json",
+        ),
       ).toBeDefined();
-      // インラインオブジェクトスキーマはモデルとして抽出される
+      // インラインオブジェクトスキーマは独立したObjectModelとして抽出される
       expect(result?.models).toHaveLength(1);
-      expect(result?.models[0].name).toBe("PostPetsRequestBody");
+
+      // 独立したRequestBodyModelが生成される
+      const requestBodyModel = result?.models.find(
+        (m) => m.kind === "requestBody",
+      );
+      expect(requestBodyModel?.name).toBe("PostPetsRequestBody");
     });
 
     it("should process responses with content", () => {
@@ -404,7 +418,9 @@ if (import.meta.vitest) {
       );
       expect(response200).toBeDefined();
       expect(response200?.description).toBe("Success");
-      expect(response200?.content?.["application/json"]).toBeDefined();
+      expect(
+        response200?.content?.find((c) => c.mimeType === "application/json"),
+      ).toBeDefined();
 
       const response404 = result?.endpoint.responses.find(
         (r) => r.statusCode === "404",
@@ -441,8 +457,31 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       expect(result).not.toBeNull();
-      expect(result?.endpoint.parameters).toHaveLength(1); // 参照は飛ばされる
-      expect(result?.endpoint.parameters[0].name).toBe("limit");
+
+      // 有効なパラメータが1つあるので統合モデル参照になる
+      expect(result?.endpoint.parameters).toEqual({
+        kind: "ref",
+        name: "#/paths/::ref::{id}/get/parameters/GetRefParams",
+      });
+
+      // 統合モデルは有効なパラメータのみで構成される
+      expect(result?.models).toHaveLength(1);
+      const unifiedModel = result?.models[0];
+      expect(unifiedModel).toEqual({
+        kind: "parameter",
+        name: "GetRefParams",
+        description: "Parameters for GET /ref/{id}",
+        properties: [
+          {
+            name: "limit",
+            type: "int",
+            required: false,
+            in: "query",
+          },
+        ],
+        referencePath: expect.stringContaining("GetRefParams"),
+      });
+
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference parameter not supported yet: #/components/parameters/IdParam",
       );

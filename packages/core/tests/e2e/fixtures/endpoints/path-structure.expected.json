@@ -1,0 +1,146 @@
+{
+  "info": {
+    "title": "Path Structure Test",
+    "version": "1.0.0",
+    "description": "Test path parsing and normalization"
+  },
+  "models": [
+    {
+      "kind": "parameter",
+      "name": "GetUsersParams",
+      "description": "Parameters for GET /users/{id}",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "in": "path"
+        }
+      ],
+      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetOrgProjectsParams",
+      "description": "Parameters for GET /org/{orgId}/projects/{projectId}",
+      "properties": [
+        {
+          "name": "orgId",
+          "type": "string",
+          "required": true,
+          "in": "path"
+        },
+        {
+          "name": "projectId",
+          "type": "string",
+          "required": true,
+          "in": "path"
+        }
+      ],
+      "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
+    }
+  ],
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": "root",
+          "method": "get",
+          "path": "/",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "users",
+          "method": "get",
+          "path": "/users",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "userById",
+          "method": "get",
+          "path": "/users/{id}",
+          "parameters": {
+            "kind": "ref",
+            "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+          },
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "projectInOrg",
+          "method": "get",
+          "path": "/org/{orgId}/projects/{projectId}",
+          "parameters": {
+            "kind": "ref",
+            "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
+          },
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "healthCheck",
+          "method": "get",
+          "path": "/api-gateway/health_check",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "text/plain",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

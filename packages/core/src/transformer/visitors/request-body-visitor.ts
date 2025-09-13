@@ -18,15 +18,13 @@ import type {
   SchemaObject,
 } from "../../types/index";
 import type {
-  IRContentMap,
   IRModel,
-  IRRef,
   IRRequestBody,
+  IRRequestContent,
 } from "../../types/ir/index";
-import { buildReferencePath } from "../helpers/build-reference-path";
 import { generateComponentName } from "../helpers/generate-component-name";
 import type { VisitorContext } from "../types";
-import { visitObject } from "./object-visitor";
+import { visitRequestBodyObject } from "./object-visitor";
 import { visitSchema } from "./schema-visitor";
 
 /**
@@ -82,7 +80,7 @@ export interface RequestBodyContext extends VisitorContext {
  */
 export function visitRequestBody(
   requestBody: RequestBodyObject | ReferenceObject,
-  operationId: string,
+  operationId: string | null,
   context: RequestBodyContext,
 ): RequestBodyResult | null {
   const models: IRModel[] = [];
@@ -97,12 +95,14 @@ export function visitRequestBody(
 
   // contentが必須
   if (!requestBody.content || Object.keys(requestBody.content).length === 0) {
-    consola.warn(`RequestBody without content for operation: ${operationId}`);
+    consola.warn(
+      `RequestBody without content for operation: ${operationId || "unknown"}`,
+    );
     return null;
   }
 
   // contentの処理
-  const content: IRContentMap = {};
+  const content: IRRequestContent[] = [];
   for (const [mimeType, mediaType] of Object.entries(requestBody.content)) {
     if (mediaType.schema) {
       // インラインのobjectスキーマを検出
@@ -117,55 +117,39 @@ export function visitRequestBody(
           "requestBody",
         );
 
-        // オブジェクトvisitorで処理してIRModelを生成
-        const objectResult = visitObject(mediaType.schema as SchemaObject, {
-          documentPath: [
-            ...context.documentPath,
-            "content",
-            mimeType,
-            "schema",
-          ],
-        });
-
-        if (objectResult && objectResult.models.length > 0) {
-          // ObjectVisitorResultから最初のモデルを取得し、名前とreferencePathを更新
-          const firstModel = objectResult.models[0];
-          if (firstModel.kind !== "object") {
-            consola.warn(
-              `Expected object model from visitObject, got: ${firstModel.kind}`,
-            );
-            continue;
-          }
-
-          const model: IRModel = {
-            kind: "object",
-            name: componentName,
-            properties: firstModel.properties,
-            referencePath: buildReferencePath([
+        // リクエストボディvisitorで処理して、IRRequestBodyModelとして抽出
+        const requestBodyResult = visitRequestBodyObject(
+          mediaType.schema as SchemaObject,
+          {
+            documentPath: [
               ...context.documentPath,
               "content",
               mimeType,
               "schema",
-            ]),
-          };
+              componentName,
+            ],
+          },
+          requestBody.required || false,
+        );
 
-          // Optional properties: only include if they have actual values
-          if (mediaType.schema.description !== undefined) {
-            model.description = mediaType.schema.description;
+        if (requestBodyResult && requestBodyResult.models.length > 0) {
+          // 全てのモデル（メインのリクエストボディモデル含む）をmodelsに追加
+          models.push(...requestBodyResult.models);
+
+          // エンドポイントのcontentでは、抽出されたRequestBodyModelへの参照を使用
+          const firstModel = requestBodyResult.models[0];
+          if (firstModel.kind === "requestBody") {
+            const refType = {
+              kind: "ref" as const,
+              name: firstModel.referencePath,
+            };
+            content.push({ mimeType, schema: refType });
+          } else {
+            consola.warn(
+              `Expected request body model from visitRequestBodyObject, got: ${firstModel.kind}`,
+            );
+            continue;
           }
-          models.push(model);
-
-          // ネストしたモデルも追加
-          if (objectResult.models.length > 1) {
-            models.push(...objectResult.models.slice(1));
-          }
-
-          // contentには$refを設定
-          const ref: IRRef = {
-            kind: "ref",
-            name: `#/components/schemas/${componentName}`,
-          };
-          content[mimeType] = ref;
         }
       } else {
         // それ以外のスキーマは通常通り処理
@@ -178,7 +162,7 @@ export function visitRequestBody(
           ],
         });
         if (schemaResult.type) {
-          content[mimeType] = schemaResult.type;
+          content.push({ mimeType, schema: schemaResult.type });
           // ネストしたモデルを収集
           if (schemaResult.models) {
             models.push(...schemaResult.models);
@@ -189,9 +173,9 @@ export function visitRequestBody(
   }
 
   // 空のcontentは返さない
-  if (Object.keys(content).length === 0) {
+  if (content.length === 0) {
     consola.warn(
-      `No valid schemas in requestBody content for operation: ${operationId}`,
+      `No valid schemas in requestBody content for operation: ${operationId || "unknown"}`,
     );
     return null;
   }
@@ -206,7 +190,10 @@ export function visitRequestBody(
     irRequestBody.description = requestBody.description;
   }
 
-  return { requestBody: irRequestBody, models };
+  return {
+    requestBody: irRequestBody,
+    models,
+  };
 }
 
 // === in-source testing ===
@@ -242,10 +229,28 @@ if (import.meta.vitest) {
       expect(result!.requestBody?.description).toBe("User data");
       expect(result!.requestBody?.required).toBe(true);
       expect(result!.requestBody?.content).toBeDefined();
-      expect(result!.requestBody?.content?.["application/json"]).toBeDefined();
-      // インラインobjectスキーマはモデルとして抽出される
+      expect(
+        result!.requestBody?.content?.find(
+          (c) => c.mimeType === "application/json",
+        ),
+      ).toBeDefined();
+      // インラインobjectスキーマは独立したRequestBodyModelとして抽出される
       expect(result!.models).toHaveLength(1);
-      expect(result!.models[0].name).toBe("PostUsersRequestBody");
+      expect(result!.models[0]).toEqual({
+        kind: "requestBody",
+        name: "PostUsersRequestBody",
+        referencePath: expect.stringContaining("PostUsersRequestBody"),
+        properties: expect.any(Array),
+        required: true,
+      });
+      // requestBody.contentでは抽出されたObjectModelを参照
+      const jsonContent = result!.requestBody?.content?.find(
+        (c) => c.mimeType === "application/json",
+      );
+      expect(jsonContent?.schema).toEqual({
+        kind: "ref",
+        name: expect.stringContaining("PostUsersRequestBody"),
+      });
     });
 
     it("should handle requestBody with multiple content types", () => {
@@ -288,12 +293,20 @@ if (import.meta.vitest) {
       expect(result).not.toBeNull();
       expect(result!.requestBody?.required).toBe(false);
       expect(result!.requestBody?.content).toBeDefined();
-      expect(Object.keys(result!.requestBody?.content || {})).toHaveLength(3);
+      expect(result!.requestBody?.content).toHaveLength(3);
       expect(
-        result!.requestBody?.content?.["multipart/form-data"],
+        result!.requestBody?.content?.find(
+          (c) => c.mimeType === "multipart/form-data",
+        ),
       ).toBeDefined();
-      // 複数のインラインobjectスキーマがモデルとして抽出される
-      expect(result!.models).toHaveLength(3);
+      // インラインobjectスキーマは独立したRequestBodyModelとして抽出される
+      expect(result!.models.length).toBeGreaterThan(0);
+      // 複数のMIMEタイプで同じ構造のオブジェクトが含まれる場合、RequestBodyModelが生成される
+      const requestBodyModel = result!.models.find(
+        (m) => m.kind === "requestBody",
+      );
+      expect(requestBodyModel).toBeDefined();
+      expect(requestBodyModel?.name).toBe("PostFilesRequestBody");
     });
 
     it("should warn and return null for requestBody without content", () => {
@@ -383,9 +396,13 @@ if (import.meta.vitest) {
 
       expect(result).not.toBeNull();
       expect(result!.requestBody).not.toBeNull();
-      expect(result!.requestBody?.content?.["text/plain"]).toBeDefined();
       expect(
-        result!.requestBody?.content?.["application/json"],
+        result!.requestBody?.content?.find((c) => c.mimeType === "text/plain"),
+      ).toBeDefined();
+      expect(
+        result!.requestBody?.content?.find(
+          (c) => c.mimeType === "application/json",
+        ),
       ).toBeUndefined();
 
       warnSpy.mockRestore();

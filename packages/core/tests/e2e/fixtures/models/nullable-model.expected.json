@@ -36,7 +36,7 @@
           "name": "settings",
           "type": {
             "kind": "ref",
-            "name": "ProfileSettings"
+            "name": "#/components/schemas/ProfileSettings"
           },
           "required": false,
           "nullable": true
@@ -65,5 +65,33 @@
       ]
     }
   ],
-  "services": []
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": null,
+          "method": "get",
+          "path": "/profiles",
+          "summary": "Get profiles",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Profile"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

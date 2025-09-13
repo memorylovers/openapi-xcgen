@@ -16,7 +16,13 @@
 import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
 import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
-import type { IRModel, IRProperty } from "../../types/ir/data";
+import type {
+  IRModel,
+  IRProperty,
+  IRResponseModel,
+  IRRequestBodyModel,
+} from "../../types/ir/data";
+import type { IRResponseHeader } from "../../types/ir/api";
 import { buildReferencePath } from "../helpers/build-reference-path";
 import { extractValidation } from "../helpers/extract-validation";
 import type { VisitorContext } from "../types";
@@ -195,6 +201,275 @@ export function visitObject(
 
   // メインモデルを最初に、ネストしたモデルをその後に追加
   result.models.push(mainModel);
+  result.models.push(...nestedModels);
+
+  return result;
+}
+
+/**
+ * レスポンス専用モデル作成結果
+ */
+export interface ResponseObjectVisitorResult {
+  /** レスポンスモデル（メインモデル＋ネストしたモデル、enumを統一的に管理） */
+  models: IRModel[];
+}
+
+/**
+ * レスポンス用のObject型SchemaObjectをIRResponseModelに変換
+ *
+ * visitObjectの機能をベースにし、レスポンス固有のメタデータ（statusCode、headers）を追加
+ *
+ * @param schema - OpenAPI SchemaObject (type: "object")
+ * @param context - Visitor context with model name
+ * @param statusCode - HTTPステータスコード
+ * @param headers - レスポンスヘッダー（オプション）
+ * @returns ResponseObjectVisitorResult型の結果
+ */
+export function visitResponseObject(
+  schema: SchemaObjectWithNullable,
+  context: VisitorContext,
+  statusCode: string,
+  headers?: IRResponseHeader[],
+): ResponseObjectVisitorResult {
+  const result: ResponseObjectVisitorResult = {
+    models: [],
+  };
+
+  // documentPathから名前を抽出（最後の要素がモデル名）
+  const name = context.documentPath[context.documentPath.length - 1] || "";
+
+  // 名前の妥当性チェック
+  if (!name.trim()) {
+    consola.warn("Invalid model name: empty or whitespace only");
+    return result;
+  }
+
+  // object型でない場合
+  if (schema.type !== "object") {
+    consola.warn(`Invalid type for response object visitor: ${schema.type}`);
+    return result;
+  }
+
+  // propertiesがない場合
+  if (!schema.properties) {
+    consola.warn(`Response object schema ${name} has no properties`);
+    return result;
+  }
+
+  // requiredプロパティの配列を取得（未定義の場合は空配列）
+  const required = schema.required || [];
+
+  // 各プロパティをIRPropertyに変換（visitObjectと同じロジック）
+  const properties: IRProperty[] = [];
+  const nestedModels: IRModel[] = [];
+
+  for (const [propName, propSchema] of Object.entries(schema.properties)) {
+    const schemaObj = propSchema as SchemaObjectWithNullable;
+
+    // プロパティ名を含む適切な名前を生成
+    const propTypeName = `${name}${pascalCase(propName)}`;
+
+    // visitSchemaを使って型を判定・処理
+    const propResult = visitSchema(schemaObj, {
+      documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+    });
+
+    // 抽出されたモデルを収集
+    nestedModels.push(...propResult.models);
+
+    // プロパティの型が取得できた場合のみ追加
+    if (propResult.type) {
+      const property: IRProperty = {
+        name: propName,
+        type: propResult.type,
+        required: required.includes(propName),
+      };
+
+      // 追加プロパティの設定（visitObjectと同じロジック）
+      if (schemaObj.description) {
+        property.description = schemaObj.description;
+      }
+      if (schemaObj.default !== undefined) {
+        property.defaultValue = schemaObj.default;
+      }
+      if (schemaObj.deprecated === true) {
+        property.deprecated = true;
+      }
+      if (schemaObj.nullable === true) {
+        property.nullable = true;
+      }
+
+      // バリデーション情報を抽出
+      const validation = extractValidation(schemaObj);
+      if (validation) {
+        property.validation = validation;
+      }
+
+      properties.push(property);
+    } else {
+      // 型が無効な場合はスキップ
+      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+    }
+  }
+
+  // プロパティが1つも変換できなかった場合
+  if (properties.length === 0) {
+    consola.warn(`No valid properties found for response model ${name}`);
+    return result;
+  }
+
+  const responseModel: IRResponseModel = {
+    kind: "response",
+    name,
+    referencePath: buildReferencePath(context.documentPath),
+    properties,
+    statusCode,
+  };
+
+  // descriptionがある場合のみ追加
+  if (schema.description) {
+    responseModel.description = schema.description;
+  }
+
+  // headersがある場合のみ追加
+  if (headers && headers.length > 0) {
+    responseModel.headers = headers;
+  }
+
+  // メインモデルを最初に、ネストしたモデルをその後に追加
+  result.models.push(responseModel);
+  result.models.push(...nestedModels);
+
+  return result;
+}
+
+/**
+ * リクエストボディ専用モデル作成結果
+ */
+export interface RequestBodyObjectVisitorResult {
+  /** リクエストボディモデル（メインモデル＋ネストしたモデル、enumを統一的に管理） */
+  models: IRModel[];
+}
+
+/**
+ * リクエストボディ用のObject型SchemaObjectをIRRequestBodyModelに変換
+ *
+ * visitObjectの機能をベースにし、リクエストボディ固有のメタデータ（required）を追加
+ *
+ * @param schema - OpenAPI SchemaObject (type: "object")
+ * @param context - Visitor context with model name
+ * @param required - リクエストボディの必須フラグ
+ * @returns RequestBodyObjectVisitorResult型の結果
+ */
+export function visitRequestBodyObject(
+  schema: SchemaObjectWithNullable,
+  context: VisitorContext,
+  required: boolean = false,
+): RequestBodyObjectVisitorResult {
+  const result: RequestBodyObjectVisitorResult = {
+    models: [],
+  };
+
+  // documentPathから名前を抽出（最後の要素がモデル名）
+  const name = context.documentPath[context.documentPath.length - 1] || "";
+
+  // 名前の妥当性チェック
+  if (!name.trim()) {
+    consola.warn("Invalid model name: empty or whitespace only");
+    return result;
+  }
+
+  // object型でない場合
+  if (schema.type !== "object") {
+    consola.warn(
+      `Invalid type for request body object visitor: ${schema.type}`,
+    );
+    return result;
+  }
+
+  // propertiesがない場合
+  if (!schema.properties) {
+    consola.warn(`Request body object schema ${name} has no properties`);
+    return result;
+  }
+
+  // requiredプロパティの配列を取得（未定義の場合は空配列）
+  const requiredProps = schema.required || [];
+
+  // 各プロパティをIRPropertyに変換（visitObjectと同じロジック）
+  const properties: IRProperty[] = [];
+  const nestedModels: IRModel[] = [];
+
+  for (const [propName, propSchema] of Object.entries(schema.properties)) {
+    const schemaObj = propSchema as SchemaObjectWithNullable;
+
+    // プロパティ名を含む適切な名前を生成
+    const propTypeName = `${name}${pascalCase(propName)}`;
+
+    // visitSchemaを使って型を判定・処理
+    const propResult = visitSchema(schemaObj, {
+      documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+    });
+
+    // 抽出されたモデルを収集
+    nestedModels.push(...propResult.models);
+
+    // プロパティの型が取得できた場合のみ追加
+    if (propResult.type) {
+      const property: IRProperty = {
+        name: propName,
+        type: propResult.type,
+        required: requiredProps.includes(propName),
+      };
+
+      // 追加プロパティの設定（visitObjectと同じロジック）
+      if (schemaObj.description) {
+        property.description = schemaObj.description;
+      }
+      if (schemaObj.default !== undefined) {
+        property.defaultValue = schemaObj.default;
+      }
+      if (schemaObj.deprecated === true) {
+        property.deprecated = true;
+      }
+      if (schemaObj.nullable === true) {
+        property.nullable = true;
+      }
+
+      // バリデーション情報を抽出
+      const validation = extractValidation(schemaObj);
+      if (validation) {
+        property.validation = validation;
+      }
+
+      properties.push(property);
+    } else {
+      // 型が無効な場合はスキップ
+      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+    }
+  }
+
+  // プロパティが1つも変換できなかった場合
+  if (properties.length === 0) {
+    consola.warn(`No valid properties found for request body model ${name}`);
+    return result;
+  }
+
+  const requestBodyModel: IRRequestBodyModel = {
+    kind: "requestBody",
+    name,
+    referencePath: buildReferencePath(context.documentPath),
+    properties,
+    required,
+  };
+
+  // descriptionがある場合のみ追加
+  if (schema.description) {
+    requestBodyModel.description = schema.description;
+  }
+
+  // メインモデルを最初に、ネストしたモデルをその後に追加
+  result.models.push(requestBodyModel);
   result.models.push(...nestedModels);
 
   return result;
@@ -521,7 +796,10 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "address",
-                type: { kind: "ref", name: "PersonAddress" },
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/PersonAddress",
+                },
                 required: false,
               },
             ],
@@ -599,7 +877,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "user",
-                type: { kind: "ref", name: "User" },
+                type: { kind: "ref", name: "#/components/schemas/User" },
                 required: false,
               },
             ],
@@ -633,7 +911,10 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "status",
-                type: { kind: "ref", name: "DocumentStatus" },
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/DocumentStatus",
+                },
                 required: false,
                 description: "Document status",
               },

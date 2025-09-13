@@ -15,6 +15,7 @@
 
 import type { SchemaObjectWithNullable } from "../../types/index";
 import type { IRModel, IRType } from "../../types/ir/index";
+import { buildReferencePath } from "../helpers/build-reference-path";
 import type { VisitorContext } from "../types";
 import { visitEnum } from "./enum-visitor";
 import { visitObject } from "./object-visitor";
@@ -69,16 +70,16 @@ export function visitSchema(
     models: [],
   };
 
-  // documentPathから名前を抽出（最後の要素がスキーマ名）
-  const name = context.documentPath[context.documentPath.length - 1] || "";
-
   // enum型の処理
   if (schema.enum !== undefined) {
     const enumResult = visitEnum(schema, context);
     if (enumResult.models.length === 0) return result;
 
     result.models.push(...enumResult.models);
-    result.type = { kind: "ref", name };
+    result.type = {
+      kind: "ref",
+      name: buildReferencePath(context.documentPath),
+    };
     return result;
   }
   // object型の処理
@@ -91,7 +92,10 @@ export function visitSchema(
 
     // メインモデルが作成された場合は参照型を設定
     if (objectResult.models.length > 0) {
-      result.type = { kind: "ref", name };
+      result.type = {
+        kind: "ref",
+        name: buildReferencePath(context.documentPath),
+      };
     }
     return result;
   }
@@ -110,7 +114,10 @@ export function visitSchema(
       if (itemResult.models.length > 0) {
         result.type = {
           kind: "array",
-          itemType: { kind: "ref", name },
+          itemType: {
+            kind: "ref",
+            name: buildReferencePath(context.documentPath),
+          },
         };
       } else {
         // モデルが生成されなかった場合は通常の配列処理
@@ -157,7 +164,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "Status" },
+        type: { kind: "ref", name: "#/components/schemas/Status" },
         models: [
           {
             kind: "enum",
@@ -193,7 +200,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "User" },
+        type: { kind: "ref", name: "#/components/schemas/User" },
         models: [
           {
             kind: "object",
@@ -250,7 +257,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "Foo" },
+        type: { kind: "ref", name: "#/components/schemas/Foo" },
         models: [],
       });
     });
@@ -277,7 +284,7 @@ if (import.meta.vitest) {
       // typeフィールドがnumberでもenumフィールドが優先される
       // enum-visitorはtypeフィールドをそのまま使用する
       expect(result).toEqual({
-        type: { kind: "ref", name: "Status" },
+        type: { kind: "ref", name: "#/components/schemas/Status" },
         models: [
           {
             kind: "enum",
@@ -311,7 +318,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "Priority" },
+        type: { kind: "ref", name: "#/components/schemas/Priority" },
         models: [
           {
             kind: "enum",
@@ -352,7 +359,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         type: {
           kind: "array",
-          itemType: { kind: "ref", name: "Item" },
+          itemType: { kind: "ref", name: "#/components/schemas/Item" },
         },
         models: [
           {
@@ -404,7 +411,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "Root" },
+        type: { kind: "ref", name: "#/components/schemas/Root" },
         models: [
           {
             kind: "object",
@@ -413,12 +420,12 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "status",
-                type: { kind: "ref", name: "RootStatus" },
+                type: { kind: "ref", name: "#/components/schemas/RootStatus" },
                 required: false,
               },
               {
                 name: "nested",
-                type: { kind: "ref", name: "RootNested" },
+                type: { kind: "ref", name: "#/components/schemas/RootNested" },
                 required: false,
               },
             ],
@@ -488,7 +495,7 @@ if (import.meta.vitest) {
       const result = visitSchema(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "Blog" },
+        type: { kind: "ref", name: "#/components/schemas/Blog" },
         models: [
           {
             kind: "object",
@@ -504,7 +511,10 @@ if (import.meta.vitest) {
                 name: "posts",
                 type: {
                   kind: "array",
-                  itemType: { kind: "ref", name: "BlogPosts" },
+                  itemType: {
+                    kind: "ref",
+                    name: "#/components/schemas/BlogPosts",
+                  },
                 },
                 required: false,
               },
@@ -522,7 +532,10 @@ if (import.meta.vitest) {
               },
               {
                 name: "author",
-                type: { kind: "ref", name: "BlogPostsAuthor" },
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/BlogPostsAuthor",
+                },
                 required: false,
               },
             ],
@@ -539,7 +552,10 @@ if (import.meta.vitest) {
               },
               {
                 name: "role",
-                type: { kind: "ref", name: "BlogPostsAuthorRole" },
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/BlogPostsAuthorRole",
+                },
                 required: false,
               },
             ],
@@ -595,7 +611,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         type: {
           kind: "array",
-          itemType: { kind: "ref", name: "Items" },
+          itemType: { kind: "ref", name: "#/components/schemas/Items" },
         },
         models: [
           {
@@ -615,7 +631,10 @@ if (import.meta.vitest) {
               },
               {
                 name: "metadata",
-                type: { kind: "ref", name: "ItemsMetadata" },
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/ItemsMetadata",
+                },
                 required: false,
               },
             ],
@@ -632,7 +651,10 @@ if (import.meta.vitest) {
               },
               {
                 name: "category",
-                type: { kind: "ref", name: "ItemsMetadataCategory" },
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/ItemsMetadataCategory",
+                },
                 required: false,
               },
             ],

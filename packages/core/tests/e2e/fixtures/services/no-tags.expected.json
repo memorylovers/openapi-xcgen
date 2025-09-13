@@ -1,0 +1,69 @@
+{
+  "info": {
+    "title": "No Tags Service Classification Test",
+    "version": "1.0.0",
+    "description": "Test no-tags default service classification"
+  },
+  "models": [],
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": "health",
+          "method": "get",
+          "path": "/health",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "text/plain",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "version",
+          "method": "get",
+          "path": "/version",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ping",
+          "method": "get",
+          "path": "/ping",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "text/plain",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

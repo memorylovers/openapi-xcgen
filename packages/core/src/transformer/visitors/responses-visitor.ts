@@ -11,7 +11,7 @@
  * - インラインモデルとEnumの収集
  */
 
-import type { ResponseObject, ReferenceObject } from "../../types/index";
+import type { ReferenceObject, ResponseObject } from "../../types/index";
 import type { IRModel, IRResponse } from "../../types/ir/index";
 import type { VisitorContext } from "../types";
 import { visitResponse, type ResponseContext } from "./response-visitor";
@@ -232,22 +232,36 @@ if (import.meta.vitest) {
 
       expect(result.responses).toHaveLength(2);
 
-      // インラインスキーマがモデルとして抽出される
+      // インラインスキーマは独立したObjectModelとして抽出される
       expect(result.models).toHaveLength(2);
-      expect(result.models[0].name).toBe("PostUsers200Response");
-      expect(result.models[1].name).toBe("PostUsers400Response");
 
-      // レスポンス内容が$refに置き換えられる
+      // ResponseModelが生成される
+      const responseModels = result.models.filter((m) => m.kind === "response");
+      expect(responseModels).toHaveLength(2);
+      expect(responseModels[0].name).toBe("PostUsers200Response");
+      expect(responseModels[1].name).toBe("PostUsers400Response");
+
+      // ObjectModelは生成されない（ResponseModelとして統一）
+      const objectModels = result.models.filter((m) => m.kind === "object");
+      expect(objectModels).toHaveLength(0);
+
+      // レスポンス内容は抽出されたObjectModelへの$refを保持
       const response200 = result.responses.find((r) => r.statusCode === "200");
-      expect(response200!.content!["application/json"]).toEqual({
+      expect(
+        response200!.content!.find((c) => c.mimeType === "application/json")!
+          .schema,
+      ).toEqual({
         kind: "ref",
-        name: "#/components/schemas/PostUsers200Response",
+        name: expect.stringContaining("PostUsers200Response"),
       });
 
       const response400 = result.responses.find((r) => r.statusCode === "400");
-      expect(response400!.content!["application/json"]).toEqual({
+      expect(
+        response400!.content!.find((c) => c.mimeType === "application/json")!
+          .schema,
+      ).toEqual({
         kind: "ref",
-        name: "#/components/schemas/PostUsers400Response",
+        name: expect.stringContaining("PostUsers400Response"),
       });
     });
 
@@ -290,9 +304,16 @@ if (import.meta.vitest) {
 
       expect(result.responses).toHaveLength(3);
 
-      // 200はインラインスキーマなのでモデル抽出
+      // 200はインラインスキーマなので独立したObjectModelが生成される
       expect(result.models).toHaveLength(1);
-      expect(result.models[0].name).toBe("DeleteApiResourceId200Response");
+
+      // ResponseModelが生成される
+      const responseModel = result.models.find((m) => m.kind === "response");
+      expect(responseModel?.name).toBe("DeleteApiResourceId200Response");
+
+      // ObjectModelは生成されない（ResponseModelとして統一）
+      const objectModel = result.models.find((m) => m.kind === "object");
+      expect(objectModel).toBeUndefined();
 
       // 204はcontentなし
       const response204 = result.responses.find((r) => r.statusCode === "204");
@@ -300,9 +321,12 @@ if (import.meta.vitest) {
 
       // 404は$refなので抽出されない
       const response404 = result.responses.find((r) => r.statusCode === "404");
-      expect(response404!.content!["application/json"]).toEqual({
+      expect(
+        response404!.content!.find((c) => c.mimeType === "application/json")!
+          .schema,
+      ).toEqual({
         kind: "ref",
-        name: "Error",
+        name: "#/components/schemas/Error",
       });
     });
 

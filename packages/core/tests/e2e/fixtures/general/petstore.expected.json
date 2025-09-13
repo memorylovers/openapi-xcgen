@@ -68,30 +68,32 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "parameter",
       "name": "GetPetsParams",
       "description": "Parameters for GET /pets\nlimit: How many items to return at one time",
       "properties": [
         {
           "name": "limit",
-          "description": "How many items to return at one time",
           "type": "int",
           "required": false,
+          "in": "query",
+          "description": "How many items to return at one time",
           "defaultValue": 20
         }
       ],
       "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
     },
     {
-      "kind": "object",
+      "kind": "parameter",
       "name": "GetPetsParams",
       "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
       "properties": [
         {
           "name": "petId",
-          "description": "The id of the pet to retrieve",
           "type": "string",
-          "required": true
+          "required": true,
+          "in": "path",
+          "description": "The id of the pet to retrieve"
         }
       ],
       "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
@@ -106,39 +108,39 @@
           "method": "get",
           "path": "/pets",
           "summary": "List all pets",
-          "parameters": [
-            {
-              "name": "limit",
-              "in": "query",
-              "description": "How many items to return at one time",
-              "required": false,
-              "type": "int",
-              "defaultValue": 20
-            }
-          ],
+          "parameters": {
+            "kind": "ref",
+            "name": "#/paths/::pets/get/parameters/GetPetsParams"
+          },
           "responses": [
             {
               "statusCode": "200",
               "description": "A paged array of pets",
-              "content": {
-                "application/json": {
-                  "kind": "array",
-                  "itemType": {
-                    "kind": "ref",
-                    "name": "Pet"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "array",
+                    "itemType": {
+                      "kind": "ref",
+                      "name": "#/components/schemas/Pet"
+                    }
                   }
                 }
-              }
+              ]
             },
             {
               "statusCode": "500",
               "description": "Unexpected error",
-              "content": {
-                "application/json": {
-                  "kind": "ref",
-                  "name": "Error"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Error"
+                  }
                 }
-              }
+              ]
             }
           ]
         },
@@ -148,62 +150,69 @@
           "path": "/pets",
           "summary": "Create a pet",
           "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "kind": "ref",
-                "name": "NewPet"
-              }
-            }
-          },
           "responses": [
             {
               "statusCode": "201",
               "description": "Pet created",
-              "content": {
-                "application/json": {
-                  "kind": "ref",
-                  "name": "Pet"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Pet"
+                  }
                 }
-              }
+              ]
             },
             {
               "statusCode": "500",
               "description": "Unexpected error",
-              "content": {
-                "application/json": {
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Error"
+                  }
+                }
+              ]
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": [
+              {
+                "mimeType": "application/json",
+                "schema": {
                   "kind": "ref",
-                  "name": "Error"
+                  "name": "#/components/schemas/NewPet"
                 }
               }
-            }
-          ]
+            ]
+          }
         },
         {
           "id": "getPetById",
           "method": "get",
           "path": "/pets/{petId}",
           "summary": "Info for a specific pet",
-          "parameters": [
-            {
-              "name": "petId",
-              "in": "path",
-              "description": "The id of the pet to retrieve",
-              "required": true,
-              "type": "string"
-            }
-          ],
+          "parameters": {
+            "kind": "ref",
+            "name": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
+          },
           "responses": [
             {
               "statusCode": "200",
               "description": "Expected response to a valid request",
-              "content": {
-                "application/json": {
-                  "kind": "ref",
-                  "name": "Pet"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Pet"
+                  }
                 }
-              }
+              ]
             },
             {
               "statusCode": "404",
@@ -212,12 +221,15 @@
             {
               "statusCode": "500",
               "description": "Unexpected error",
-              "content": {
-                "application/json": {
-                  "kind": "ref",
-                  "name": "Error"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Error"
+                  }
                 }
-              }
+              ]
             }
           ]
         }

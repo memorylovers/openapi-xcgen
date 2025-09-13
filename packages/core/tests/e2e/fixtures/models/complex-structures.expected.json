@@ -14,7 +14,7 @@
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "Level1Data"
+            "name": "#/components/schemas/Level1Data"
           },
           "required": false
         }
@@ -41,7 +41,7 @@
           "name": "outer",
           "type": {
             "kind": "ref",
-            "name": "Level2Outer"
+            "name": "#/components/schemas/Level2Outer"
           },
           "required": false
         }
@@ -56,7 +56,7 @@
           "name": "inner",
           "type": {
             "kind": "ref",
-            "name": "Level2OuterInner"
+            "name": "#/components/schemas/Level2OuterInner"
           },
           "required": false
         }
@@ -83,7 +83,7 @@
           "name": "level1",
           "type": {
             "kind": "ref",
-            "name": "Level3Level1"
+            "name": "#/components/schemas/Level3Level1"
           },
           "required": false
         }
@@ -98,7 +98,7 @@
           "name": "level2",
           "type": {
             "kind": "ref",
-            "name": "Level3Level1Level2"
+            "name": "#/components/schemas/Level3Level1Level2"
           },
           "required": false
         }
@@ -113,7 +113,7 @@
           "name": "level3",
           "type": {
             "kind": "ref",
-            "name": "Level3Level1Level2Level3"
+            "name": "#/components/schemas/Level3Level1Level2Level3"
           },
           "required": false
         }
@@ -142,7 +142,7 @@
             "kind": "array",
             "itemType": {
               "kind": "ref",
-              "name": "TeamMembers"
+              "name": "#/components/schemas/TeamMembers"
             }
           },
           "required": false
@@ -174,5 +174,124 @@
       ]
     }
   ],
-  "services": []
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": null,
+          "method": "get",
+          "path": "/level1",
+          "summary": "1階層ネスト",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Level1"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "get",
+          "path": "/level2",
+          "summary": "2階層ネスト",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Level2"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "get",
+          "path": "/level3",
+          "summary": "3階層ネスト",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Level3"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "get",
+          "path": "/teams",
+          "summary": "オブジェクト内の配列",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Team"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": null,
+          "method": "get",
+          "path": "/users",
+          "summary": "トップレベルが配列",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "array",
+                    "itemType": {
+                      "kind": "ref",
+                      "name": "#/components/schemas/User"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

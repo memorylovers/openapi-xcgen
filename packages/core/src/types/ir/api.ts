@@ -23,9 +23,24 @@ export type MimeType =
   | string; // その他のカスタムMIMEタイプも許可
 
 /**
- * IRContentMap - コンテンツタイプごとのスキーママップ
+ * IRResponseContent - レスポンスコンテンツ（MIMEタイプとスキーマの組み合わせ）
  */
-export type IRContentMap = Record<MimeType, IRType>;
+export interface IRResponseContent {
+  /** MIMEタイプ */
+  mimeType: MimeType;
+  /** スキーマ */
+  schema: IRType;
+}
+
+/**
+ * IRRequestContent - リクエストコンテンツ（MIMEタイプとスキーマの組み合わせ）
+ */
+export interface IRRequestContent {
+  /** MIMEタイプ */
+  mimeType: MimeType;
+  /** スキーマ */
+  schema: IRType;
+}
 
 /**
  * IRService - APIサービス（タグでグループ化）
@@ -84,8 +99,8 @@ export interface IRService {
  * ```
  */
 export interface IREndpoint {
-  /** エンドポイントID（operationId） */
-  id: string;
+  /** エンドポイントID（operationId）- OpenAPI仕様では任意項目 */
+  id: string | null;
   /** HTTPメソッド */
   method: IRHttpMethod;
   /** パス */
@@ -94,8 +109,8 @@ export interface IREndpoint {
   description?: string;
   /** サマリー */
   summary?: string;
-  /** パラメータ */
-  parameters: IRParameter[];
+  /** パラメータ（統合モデルがある場合は参照、ない場合は個別配列） */
+  parameters: IRType | IRParameter[];
   /** リクエストボディ */
   requestBody?: IRRequestBody;
   /** レスポンス */
@@ -233,8 +248,8 @@ export interface IRRequestBody {
   description?: string;
   /** 必須フラグ */
   required: boolean;
-  /** コンテンツタイプごとのスキーマ */
-  content: IRContentMap;
+  /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
+  content: IRRequestContent[];
 }
 
 /**
@@ -254,6 +269,8 @@ export interface IRRequestBody {
  * ```
  */
 export interface IRResponseHeader {
+  /** ヘッダー名 */
+  name: string;
   /** 説明 */
   description?: string;
   /** 型情報 */
@@ -263,11 +280,6 @@ export interface IRResponseHeader {
   /** 非推奨フラグ */
   deprecated?: boolean;
 }
-
-/**
- * IRResponseHeaderMap - レスポンスヘッダーのマップ
- */
-export type IRResponseHeaderMap = Record<string, IRResponseHeader>;
 
 /**
  * IRResponse - レスポンス
@@ -319,8 +331,8 @@ export interface IRResponse {
   statusCode: string;
   /** 説明 */
   description?: string;
-  /** コンテンツタイプごとのスキーマ */
-  content?: IRContentMap;
-  /** ヘッダー */
-  headers?: IRResponseHeaderMap;
+  /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
+  content?: IRResponseContent[];
+  /** ヘッダー配列 */
+  headers?: IRResponseHeader[];
 }

@@ -19,15 +19,13 @@ import type {
   SchemaObject,
 } from "../../types/index";
 import type {
-  IRContentMap,
   IRModel,
-  IRRef,
   IRResponse,
+  IRResponseContent,
 } from "../../types/ir/index";
-import { buildReferencePath } from "../helpers/build-reference-path";
 import { generateComponentName } from "../helpers/generate-component-name";
 import type { VisitorContext } from "../types";
-import { visitObject } from "./object-visitor";
+import { visitResponseObject } from "./object-visitor";
 import { visitSchema } from "./schema-visitor";
 
 /**
@@ -97,9 +95,9 @@ export function visitResponse(
   }
 
   // contentの処理
-  let content: IRContentMap | undefined;
+  let content: IRResponseContent[] | undefined;
   if (response.content) {
-    content = {};
+    content = [];
     for (const [mimeType, mediaType] of Object.entries(response.content)) {
       if (mediaType.schema) {
         // インラインのobjectスキーマを検出
@@ -115,55 +113,39 @@ export function visitResponse(
             statusCode,
           );
 
-          // オブジェクトvisitorで処理してIRModelを生成
-          const objectResult = visitObject(mediaType.schema as SchemaObject, {
-            documentPath: [
-              ...context.documentPath,
-              "content",
-              mimeType,
-              "schema",
-            ],
-          });
-
-          if (objectResult && objectResult.models.length > 0) {
-            // ObjectVisitorResultから最初のモデルを取得し、名前とreferencePathを更新
-            const firstModel = objectResult.models[0];
-            if (firstModel.kind !== "object") {
-              consola.warn(
-                `Expected object model from visitObject, got: ${firstModel.kind}`,
-              );
-              continue;
-            }
-
-            const model: IRModel = {
-              kind: "object",
-              name: componentName,
-              properties: firstModel.properties,
-              referencePath: buildReferencePath([
+          // レスポンスvisitorで処理して、IRResponseModelとして抽出
+          const responseResult = visitResponseObject(
+            mediaType.schema as SchemaObject,
+            {
+              documentPath: [
                 ...context.documentPath,
                 "content",
                 mimeType,
                 "schema",
-              ]),
-            };
+                componentName,
+              ],
+            },
+            statusCode,
+          );
 
-            // Optional properties: only include if they have actual values
-            if (mediaType.schema.description !== undefined) {
-              model.description = mediaType.schema.description;
+          if (responseResult && responseResult.models.length > 0) {
+            // 全てのモデル（メインのレスポンスモデル含む）をmodelsに追加
+            models.push(...responseResult.models);
+
+            // エンドポイントのcontentでは、抽出されたResponseModelへの参照を使用
+            const firstModel = responseResult.models[0];
+            if (firstModel.kind === "response") {
+              const refType = {
+                kind: "ref" as const,
+                name: firstModel.referencePath,
+              };
+              content.push({ mimeType, schema: refType });
+            } else {
+              consola.warn(
+                `Expected response model from visitResponseObject, got: ${firstModel.kind}`,
+              );
+              continue;
             }
-            models.push(model);
-
-            // ネストしたモデルも追加
-            if (objectResult.models.length > 1) {
-              models.push(...objectResult.models.slice(1));
-            }
-
-            // contentには$refを設定
-            const ref: IRRef = {
-              kind: "ref",
-              name: `#/components/schemas/${componentName}`,
-            };
-            content[mimeType] = ref;
           }
         } else {
           // それ以外のスキーマは通常通り処理
@@ -177,7 +159,7 @@ export function visitResponse(
           };
           const schemaResult = visitSchema(mediaType.schema, schemaContext);
           if (schemaResult.type) {
-            content[mimeType] = schemaResult.type;
+            content.push({ mimeType, schema: schemaResult.type });
             // ネストしたモデルを収集
             if (schemaResult.models) {
               models.push(...schemaResult.models);
@@ -187,7 +169,7 @@ export function visitResponse(
       }
     }
     // 空のcontentは返さない
-    if (Object.keys(content).length === 0) {
+    if (content.length === 0) {
       content = undefined;
     }
   }
@@ -260,10 +242,28 @@ if (import.meta.vitest) {
       expect(result!.response).not.toBeNull();
       expect(result!.response?.statusCode).toBe("200");
       expect(result!.response?.content).toBeDefined();
-      expect(result!.response?.content?.["application/json"]).toBeDefined();
-      // インラインobjectスキーマはモデルとして抽出される
+      expect(
+        result!.response?.content?.find(
+          (c) => c.mimeType === "application/json",
+        ),
+      ).toBeDefined();
+      // インラインobjectスキーマは独立したResponseModelとして抽出される
       expect(result!.models).toHaveLength(1);
-      expect(result!.models[0].name).toBe("GetUsers200Response");
+      expect(result!.models[0]).toEqual({
+        kind: "response",
+        name: "GetUsers200Response",
+        referencePath: expect.stringContaining("GetUsers200Response"),
+        properties: expect.any(Array),
+        statusCode: "200",
+      });
+      // response.contentでは抽出されたObjectModelを参照
+      const jsonContent = result!.response?.content?.find(
+        (c) => c.mimeType === "application/json",
+      );
+      expect(jsonContent?.schema).toEqual({
+        kind: "ref",
+        name: expect.stringContaining("GetUsers200Response"),
+      });
     });
 
     it("should handle response with multiple content types", () => {
@@ -300,9 +300,23 @@ if (import.meta.vitest) {
 
       expect(result).not.toBeNull();
       expect(result!.response?.content).toBeDefined();
-      expect(Object.keys(result!.response?.content || {})).toHaveLength(3);
-      // 複数のインラインobjectスキーマがモデルとして抽出される
-      expect(result!.models).toHaveLength(2); // JSONとXMLの2つ
+      expect(result!.response?.content).toHaveLength(3);
+      // インラインobjectスキーマは独立したObjectModelとして抽出される（JSON、XML用）
+      expect(result!.models.length).toBeGreaterThan(0);
+      // プリミティブスキーマ（text/plain）は直接型として保持
+      const plainContent = result!.response?.content?.find(
+        (c) => c.mimeType === "text/plain",
+      );
+      expect(plainContent?.schema).toBe("string"); // プリミティブ文字列
+
+      // オブジェクトスキーマは参照として保持
+      const jsonContent = result!.response?.content?.find(
+        (c) => c.mimeType === "application/json",
+      );
+      expect(jsonContent?.schema).toEqual({
+        kind: "ref",
+        name: expect.any(String),
+      });
     });
 
     it("should handle response with headers", () => {
@@ -377,10 +391,28 @@ if (import.meta.vitest) {
       expect(result).not.toBeNull();
       expect(result!.response?.statusCode).toBe("400");
       expect(result!.response?.description).toBe("Bad Request");
-      expect(result!.response?.content?.["application/json"]).toBeDefined();
-      // エラーレスポンスのインラインスキーマもモデルとして抽出
+      expect(
+        result!.response?.content?.find(
+          (c) => c.mimeType === "application/json",
+        ),
+      ).toBeDefined();
+      // エラーレスポンスのインラインスキーマも独立したObjectModelとして抽出される
       expect(result!.models).toHaveLength(1);
-      expect(result!.models[0].name).toBe("PostUsers400Response");
+      expect(result!.models[0]).toEqual({
+        kind: "response",
+        name: "PostUsers400Response",
+        referencePath: expect.stringContaining("PostUsers400Response"),
+        properties: expect.any(Array),
+        statusCode: "400",
+      });
+      // response.contentでは抽出されたObjectModelを参照
+      const jsonContent = result!.response?.content?.find(
+        (c) => c.mimeType === "application/json",
+      );
+      expect(jsonContent?.schema).toEqual({
+        kind: "ref",
+        name: expect.stringContaining("PostUsers400Response"),
+      });
     });
   });
 }

@@ -68,7 +68,8 @@ export function visitType(
       consola.warn(`Invalid $ref in schema: ${schema.$ref}`);
       return null;
     }
-    return { kind: "ref", name: refName };
+    // IRRef設計に従い完全パス形式を使用
+    return { kind: "ref", name: schema.$ref };
   }
 
   // プリミティブ型: 直接IRScalarTypeを返す
@@ -206,7 +207,7 @@ if (import.meta.vitest) {
       });
       expect(result).toEqual({
         kind: "ref",
-        name: "User",
+        name: "#/components/schemas/User",
       });
     });
 

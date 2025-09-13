@@ -1,0 +1,91 @@
+{
+  "info": {
+    "title": "Endpoint Metadata Test",
+    "version": "1.0.0",
+    "description": "Test summary and description preservation"
+  },
+  "models": [],
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": "endpoint1",
+          "method": "get",
+          "path": "/endpoint1",
+          "summary": "Test summary",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ],
+          "description": "Test description"
+        },
+        {
+          "id": "endpoint2",
+          "method": "get",
+          "path": "/endpoint2",
+          "summary": "Test summary only",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "endpoint3",
+          "method": "get",
+          "path": "/endpoint3",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ],
+          "description": "Test description only"
+        },
+        {
+          "id": "endpoint4",
+          "method": "get",
+          "path": "/endpoint4",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

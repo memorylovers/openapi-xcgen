@@ -24,7 +24,7 @@
             "kind": "array",
             "itemType": {
               "kind": "ref",
-              "name": "OrderItems"
+              "name": "#/components/schemas/OrderItems"
             }
           },
           "required": true,
@@ -36,7 +36,7 @@
           "name": "customer",
           "type": {
             "kind": "ref",
-            "name": "OrderCustomer"
+            "name": "#/components/schemas/OrderCustomer"
           },
           "required": true
         },
@@ -44,7 +44,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "OrderStatus"
+            "name": "#/components/schemas/OrderStatus"
           },
           "required": false
         },
@@ -52,7 +52,7 @@
           "name": "priority",
           "type": {
             "kind": "ref",
-            "name": "OrderPriority"
+            "name": "#/components/schemas/OrderPriority"
           },
           "required": false
         },
@@ -141,7 +141,7 @@
           "name": "address",
           "type": {
             "kind": "ref",
-            "name": "OrderCustomerAddress"
+            "name": "#/components/schemas/OrderCustomerAddress"
           },
           "required": false
         }
@@ -240,27 +240,33 @@
           "path": "/orders",
           "summary": "Create a new order",
           "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "kind": "ref",
-                "name": "Order"
-              }
-            }
-          },
           "responses": [
             {
               "statusCode": "201",
               "description": "Order created",
-              "content": {
-                "application/json": {
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Order"
+                  }
+                }
+              ]
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": [
+              {
+                "mimeType": "application/json",
+                "schema": {
                   "kind": "ref",
-                  "name": "Order"
+                  "name": "#/components/schemas/Order"
                 }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     }

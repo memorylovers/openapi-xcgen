@@ -36,6 +36,12 @@ const testCases = [
   "general/petstore",
   "general/complex-schema",
   "general/multi-service",
+  "services/single-tag",
+  "services/multi-tags",
+  "services/no-tags",
+  "endpoints/operation-id",
+  "endpoints/path-structure",
+  "endpoints/endpoint-metadata",
 ];
 
 async function generateAll() {

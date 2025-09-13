@@ -47,5 +47,33 @@
       "description": "Article model with metadata"
     }
   ],
-  "services": []
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": null,
+          "method": "get",
+          "path": "/articles",
+          "summary": "Get articles",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Article"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

@@ -44,7 +44,7 @@
           "name": "profile",
           "type": {
             "kind": "ref",
-            "name": "DataTypesProfile"
+            "name": "#/components/schemas/DataTypesProfile"
           },
           "required": false
         },
@@ -95,5 +95,33 @@
       ]
     }
   ],
-  "services": []
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": null,
+          "method": "get",
+          "path": "/data",
+          "summary": "Get data",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/DataTypes"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

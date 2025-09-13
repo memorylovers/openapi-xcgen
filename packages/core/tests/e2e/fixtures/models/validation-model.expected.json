@@ -91,5 +91,33 @@
       ]
     }
   ],
-  "services": []
+  "services": [
+    {
+      "name": "default",
+      "endpoints": [
+        {
+          "id": null,
+          "method": "get",
+          "path": "/products",
+          "summary": "Get products",
+          "parameters": [],
+          "responses": [
+            {
+              "statusCode": "200",
+              "description": "Success",
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/Product"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

@@ -30,7 +30,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "regenerate:expected": "pnpm jiti tests/e2e/transformer/generate-expected.ts"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.0.0",

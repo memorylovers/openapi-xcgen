@@ -71,16 +71,19 @@ export function transform(document: OpenAPIDocument): IRDocument {
     models.push(...pathsResult.models);
   }
 
-  // 重複検出と警告
-  const names = new Set<string>();
+  // 重複検出と警告（name + kindの組み合わせで判定）
+  const modelKeys = new Set<string>();
   const duplicates = new Set<string>();
 
-  // モデルの名前をチェック（オブジェクト、列挙型等を統一的に処理）
+  // モデルのname + kindをチェック（オブジェクト、列挙型等を統一的に処理）
   models.forEach((item) => {
-    if (names.has(item.name)) {
+    const modelKey = `${item.kind}:${item.name}`;
+    // デバッグ用：モデルキー出力
+    // consola.debug(`Checking model: ${modelKey}`);
+    if (modelKeys.has(modelKey)) {
       duplicates.add(item.name);
     }
-    names.add(item.name);
+    modelKeys.add(modelKey);
   });
 
   // 重複があれば警告
@@ -112,9 +115,14 @@ export function transform(document: OpenAPIDocument): IRDocument {
   const enumCount = models.filter((m) => m.kind === "enum").length;
   const arrayCount = models.filter((m) => m.kind === "array").length;
   const mapCount = models.filter((m) => m.kind === "map").length;
+  const parameterCount = models.filter((m) => m.kind === "parameter").length;
+  const requestBodyCount = models.filter(
+    (m) => m.kind === "requestBody",
+  ).length;
+  const responseCount = models.filter((m) => m.kind === "response").length;
 
   consola.success(
-    `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps), ${services.length} services`,
+    `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps, ${parameterCount} parameters, ${requestBodyCount} requestBodies, ${responseCount} responses), ${services.length} services`,
   );
 
   return irDocument;
@@ -337,7 +345,12 @@ if (import.meta.vitest) {
 
       expect(result.services).toHaveLength(1);
       expect(result.services[0].endpoints).toHaveLength(1);
-      expect(result.services[0].endpoints[0].parameters).toHaveLength(1);
+
+      // parameters は統合モデル参照になる
+      expect(result.services[0].endpoints[0].parameters).toEqual({
+        kind: "ref",
+        name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+      });
     });
 
     it("should throw error for unsupported OpenAPI version", () => {
@@ -439,18 +452,18 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn when model duplicates exist", () => {
+    it("should not warn when same names exist for different kinds", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const doc: OpenAPIDocument = {
         openapi: "3.1.0",
         info: {
-          title: "Duplicate Models API",
+          title: "Same Name Different Kinds API",
           version: "1.0.0",
         },
         components: {
           schemas: {
-            PostUsersRequestBody: {
+            UserRequest: {
               type: "object",
               properties: { id: { type: "string" } },
             },
@@ -470,6 +483,71 @@ if (import.meta.vitest) {
                   },
                 },
               },
+              responses: {
+                "200": {
+                  description: "Created",
+                  content: {
+                    "application/json": {
+                      schema: {
+                        type: "object",
+                        properties: { result: { type: "string" } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      transform(doc);
+
+      // Should not warn because different model kinds can have same names:
+      // - object kind (from components.schemas): UserRequest
+      // - object kind (from inline schemas): PostUsersRequestBody, PostUsers200Response
+      // - requestBody kind (unified model): PostUsersRequestBody
+      // - response kind (unified model): PostUsers200Response
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("Duplicate component name detected"),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("should not warn when using $ref to avoid duplicates", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const doc: OpenAPIDocument = {
+        openapi: "3.1.0",
+        info: {
+          title: "No Duplicate Models API",
+          version: "1.0.0",
+        },
+        components: {
+          schemas: {
+            UserRequestBody: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                name: { type: "string" },
+              },
+            },
+          },
+        },
+        paths: {
+          "/users": {
+            post: {
+              operationId: "createUser",
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      $ref: "#/components/schemas/UserRequestBody",
+                    },
+                  },
+                },
+              },
               responses: { "200": { description: "Created" } },
             },
           },
@@ -478,14 +556,9 @@ if (import.meta.vitest) {
 
       transform(doc);
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        'Duplicate component name detected: "PostUsersRequestBody"',
-      );
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Consider reviewing your OpenAPI design for naming conflicts.",
-      );
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Components with duplicate names may cause issues in code generation.",
+      // Should NOT warn because using $ref properly avoids naming conflicts
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("Duplicate component name detected"),
       );
 
       warnSpy.mockRestore();
@@ -502,9 +575,9 @@ if (import.meta.vitest) {
         },
         components: {
           schemas: {
-            schemaStatus: {
+            PostUsersRequestBodyStatus: {
               type: "string",
-              enum: ["success", "failure"],
+              enum: ["pending", "processing"],
             },
           },
         },
@@ -512,23 +585,24 @@ if (import.meta.vitest) {
           "/users": {
             post: {
               operationId: "createUser",
-              responses: {
-                "200": {
-                  description: "Success",
-                  content: {
-                    "application/json": {
-                      schema: {
-                        type: "object",
-                        properties: {
-                          status: {
-                            type: "string",
-                            enum: ["active", "inactive"],
-                          },
+              requestBody: {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        status: {
+                          type: "string",
+                          enum: ["active", "inactive"],
                         },
                       },
                     },
                   },
                 },
+              },
+              responses: {
+                "200": { description: "Success" },
               },
             },
           },
@@ -538,7 +612,7 @@ if (import.meta.vitest) {
       transform(doc);
 
       expect(warnSpy).toHaveBeenCalledWith(
-        'Duplicate component name detected: "schemaStatus"',
+        'Duplicate component name detected: "PostUsersRequestBodyStatus"',
       );
       expect(warnSpy).toHaveBeenCalledWith(
         "Consider reviewing your OpenAPI design for naming conflicts.",
@@ -550,24 +624,20 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn for multiple duplicates", () => {
+    it("should handle separate inline schemas without naming conflicts", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const doc: OpenAPIDocument = {
         openapi: "3.1.0",
         info: {
-          title: "Multiple Duplicates API",
+          title: "Separate Models API",
           version: "1.0.0",
         },
         components: {
           schemas: {
-            PostUsersRequestBody: {
+            UserProfile: {
               type: "object",
-              properties: { id: { type: "string" } },
-            },
-            GetUsersParams: {
-              type: "object",
-              properties: { limit: { type: "integer" } },
+              properties: { bio: { type: "string" } },
             },
           },
         },
@@ -577,7 +647,7 @@ if (import.meta.vitest) {
               operationId: "getUsers",
               parameters: [
                 {
-                  name: "offset",
+                  name: "limit",
                   in: "query",
                   schema: { type: "integer" },
                 },
@@ -591,7 +661,10 @@ if (import.meta.vitest) {
                   "application/json": {
                     schema: {
                       type: "object",
-                      properties: { name: { type: "string" } },
+                      properties: {
+                        name: { type: "string" },
+                        email: { type: "string" },
+                      },
                     },
                   },
                 },
@@ -604,11 +677,11 @@ if (import.meta.vitest) {
 
       transform(doc);
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        'Duplicate component name detected: "PostUsersRequestBody"',
-      );
-      expect(warnSpy).toHaveBeenCalledWith(
-        'Duplicate component name detected: "GetUsersParams"',
+      // Should NOT warn because components and inline schemas have different names
+      // - UserProfile (from components)
+      // - PostUsersRequestBody (generated from inline)
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("Duplicate component name detected"),
       );
 
       warnSpy.mockRestore();

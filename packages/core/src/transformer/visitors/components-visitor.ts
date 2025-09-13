@@ -118,7 +118,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "status",
-                type: { kind: "ref", name: "ItemStatus" },
+                type: { kind: "ref", name: "#/components/schemas/ItemStatus" },
                 required: false,
               },
             ],

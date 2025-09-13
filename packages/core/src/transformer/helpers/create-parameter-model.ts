@@ -12,9 +12,9 @@
 
 import { pascalCase } from "es-toolkit/string";
 import type {
-  IRObjectModel,
   IRParameter,
-  IRProperty,
+  IRParameterModel,
+  IRParameterProperty,
 } from "../../types/ir/index";
 import { buildReferencePath } from "./build-reference-path";
 
@@ -48,7 +48,7 @@ export function createParameterModel(
   pathTemplate: string,
   method: string,
   documentPath: string[],
-): IRObjectModel | null {
+): IRParameterModel | null {
   // パラメータがない場合はnull
   if (parameters.length === 0) {
     return null;
@@ -57,8 +57,10 @@ export function createParameterModel(
   // 統合モデル名を生成（パスパラメータを除外）
   const componentName = generateParameterModelName(pathTemplate, method);
 
-  // IRParameterをIRPropertyに変換
-  const properties: IRProperty[] = parameters.map(parameterToProperty);
+  // IRParameterをIRParameterPropertyに変換
+  const properties: IRParameterProperty[] = parameters.map(
+    parameterToParameterProperty,
+  );
 
   // パラメータの説明をまとめる（すべてのパラメータの説明を結合）
   const descriptions = parameters
@@ -70,8 +72,8 @@ export function createParameterModel(
       : `Parameters for ${method.toUpperCase()} ${pathTemplate}`;
 
   // 統合モデルを生成
-  const model: IRObjectModel = {
-    kind: "object",
+  const model: IRParameterModel = {
+    kind: "parameter",
     name: componentName,
     description,
     properties,
@@ -116,23 +118,27 @@ function generateParameterModelName(
 }
 
 /**
- * IRParameterをIRPropertyに変換
+ * IRParameterをIRParameterPropertyに変換
+ * `in`フィールドを保持してパラメータ情報を完全に保存
  *
  * @param parameter - 変換対象のパラメータ
- * @returns 変換されたプロパティ
+ * @returns 変換されたパラメータプロパティ
  *
  * @example
  * ```typescript
  * const param = { name: "id", in: "path", required: true, type: "string" };
- * const prop = parameterToProperty(param);
- * // => { name: "id", required: true, type: "string", ... }
+ * const prop = parameterToParameterProperty(param);
+ * // => { name: "id", in: "path", required: true, type: "string", ... }
  * ```
  */
-function parameterToProperty(parameter: IRParameter): IRProperty {
-  const property: IRProperty = {
+function parameterToParameterProperty(
+  parameter: IRParameter,
+): IRParameterProperty {
+  const property: IRParameterProperty = {
     name: parameter.name,
     type: parameter.type,
     required: parameter.required,
+    in: parameter.in, // 重要: in情報を保持
   };
 
   // Optional properties: only include if they have actual values
@@ -187,6 +193,7 @@ if (import.meta.vitest) {
       ]);
 
       expect(result).not.toBeNull();
+      expect(result!.kind).toBe("parameter");
       expect(result!.name).toBe("GetUsersParams");
       expect(result!.properties).toHaveLength(1);
       expect(result!.properties[0]).toEqual({
@@ -194,6 +201,7 @@ if (import.meta.vitest) {
         description: "User ID",
         type: "string",
         required: true,
+        in: "path",
         nullable: undefined,
         defaultValue: undefined,
         deprecated: undefined,
@@ -236,6 +244,7 @@ if (import.meta.vitest) {
       );
 
       expect(result).not.toBeNull();
+      expect(result!.kind).toBe("parameter");
       expect(result!.name).toBe("GetUsersPostsParams");
       expect(result!.properties).toHaveLength(3);
 
@@ -245,6 +254,7 @@ if (import.meta.vitest) {
         description: "User ID",
         type: "string",
         required: true,
+        in: "path",
         nullable: undefined,
         defaultValue: undefined,
         deprecated: undefined,
@@ -256,6 +266,7 @@ if (import.meta.vitest) {
         description: "Maximum number of results",
         type: "int",
         required: false,
+        in: "query",
         nullable: undefined,
         defaultValue: 10,
         deprecated: undefined,
@@ -266,6 +277,7 @@ if (import.meta.vitest) {
         description: undefined,
         type: "int",
         required: false,
+        in: "query",
         nullable: undefined,
         defaultValue: 0,
         deprecated: undefined,
@@ -329,13 +341,14 @@ if (import.meta.vitest) {
       );
 
       expect(result).not.toBeNull();
+      expect(result!.kind).toBe("parameter");
       expect(result!.properties[0].deprecated).toBe(true);
       expect(result!.name).toBe("PostApiV1LegacyParams");
     });
   });
 
-  describe("parameterToProperty", () => {
-    it("should convert parameter to property correctly", () => {
+  describe("parameterToParameterProperty", () => {
+    it("should convert parameter to parameter property correctly", () => {
       const parameter = {
         name: "testParam",
         in: "query" as const,
@@ -347,13 +360,14 @@ if (import.meta.vitest) {
         deprecated: false,
       };
 
-      const result = parameterToProperty(parameter);
+      const result = parameterToParameterProperty(parameter);
 
       expect(result).toEqual({
         name: "testParam",
         description: "A test parameter",
         type: "string",
         required: true,
+        in: "query",
         nullable: true,
         defaultValue: "default",
         deprecated: false,
@@ -368,13 +382,14 @@ if (import.meta.vitest) {
         type: "string" as const,
       };
 
-      const result = parameterToProperty(parameter);
+      const result = parameterToParameterProperty(parameter);
 
       expect(result).toEqual({
         name: "minimal",
         description: undefined,
         type: "string",
         required: true,
+        in: "path",
         nullable: undefined,
         defaultValue: undefined,
         deprecated: undefined,

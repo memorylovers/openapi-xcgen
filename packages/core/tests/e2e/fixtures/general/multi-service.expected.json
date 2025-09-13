@@ -32,7 +32,7 @@
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "UserRole"
+            "name": "#/components/schemas/UserRole"
           },
           "required": false
         }
@@ -81,14 +81,15 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "parameter",
       "name": "GetUsersParams",
       "description": "Parameters for GET /users/{userId}",
       "properties": [
         {
           "name": "userId",
           "type": "string",
-          "required": true
+          "required": true,
+          "in": "path"
         }
       ],
       "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
@@ -108,15 +109,18 @@
             {
               "statusCode": "200",
               "description": "List of users",
-              "content": {
-                "application/json": {
-                  "kind": "array",
-                  "itemType": {
-                    "kind": "ref",
-                    "name": "User"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "array",
+                    "itemType": {
+                      "kind": "ref",
+                      "name": "#/components/schemas/User"
+                    }
                   }
                 }
-              }
+              ]
             }
           ]
         },
@@ -125,24 +129,23 @@
           "method": "get",
           "path": "/users/{userId}",
           "summary": "Get user by ID",
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "path",
-              "required": true,
-              "type": "string"
-            }
-          ],
+          "parameters": {
+            "kind": "ref",
+            "name": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
+          },
           "responses": [
             {
               "statusCode": "200",
               "description": "User details",
-              "content": {
-                "application/json": {
-                  "kind": "ref",
-                  "name": "User"
+              "content": [
+                {
+                  "mimeType": "application/json",
+                  "schema": {
+                    "kind": "ref",
+                    "name": "#/components/schemas/User"
+                  }
                 }
-              }
+              ]
             }
           ]
         }
@@ -170,21 +173,24 @@
           "path": "/posts",
           "summary": "Create a new post",
           "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "kind": "ref",
-                "name": "NewPost"
-              }
-            }
-          },
           "responses": [
             {
               "statusCode": "201",
               "description": "Post created"
             }
-          ]
+          ],
+          "requestBody": {
+            "required": true,
+            "content": [
+              {
+                "mimeType": "application/json",
+                "schema": {
+                  "kind": "ref",
+                  "name": "#/components/schemas/NewPost"
+                }
+              }
+            ]
+          }
         }
       ]
     },

@@ -1,0 +1,58 @@
+openapi: 3.1.0
+info:
+  title: Endpoint Metadata Test
+  version: 1.0.0
+  description: Test summary and description preservation
+
+paths:
+  # Summary and description
+  /endpoint1:
+    get:
+      operationId: endpoint1
+      summary: Test summary
+      description: Test description
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Summary only
+  /endpoint2:
+    get:
+      operationId: endpoint2
+      summary: Test summary only
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Description only
+  /endpoint3:
+    get:
+      operationId: endpoint3
+      description: Test description only
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Neither summary nor description
+  /endpoint4:
+    get:
+      operationId: endpoint4
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string

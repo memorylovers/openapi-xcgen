@@ -14,7 +14,11 @@
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
 import type { ParameterObject, ReferenceObject } from "../../types/index";
-import type { IRModel, IRObjectModel, IRParameter } from "../../types/ir/index";
+import type {
+  IRModel,
+  IRParameter,
+  IRParameterModel,
+} from "../../types/ir/index";
 import { createParameterModel } from "../helpers/create-parameter-model";
 import type { VisitorContext } from "../types";
 import { visitParameter } from "./parameter-visitor";
@@ -36,7 +40,7 @@ export interface ParametersResult {
   /** 個別のパラメータ配列 */
   parameters: IRParameter[];
   /** パラメータ統合モデル（パラメータがない場合はnull） */
-  unifiedModel: IRObjectModel | null;
+  unifiedModel: IRParameterModel | null;
   /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
 }
@@ -171,6 +175,7 @@ if (import.meta.vitest) {
 
       // 統合モデルが生成される
       expect(result.unifiedModel).not.toBeNull();
+      expect(result.unifiedModel!.kind).toBe("parameter");
       expect(result.unifiedModel!.name).toBe("GetUsersParams");
       expect(result.unifiedModel!.properties).toHaveLength(1);
     });
@@ -213,6 +218,7 @@ if (import.meta.vitest) {
 
       // 統合モデルが生成される
       expect(result.unifiedModel).not.toBeNull();
+      expect(result.unifiedModel!.kind).toBe("parameter");
       expect(result.unifiedModel!.name).toBe("GetUsersPostsParams");
       expect(result.unifiedModel!.properties).toHaveLength(3);
     });
@@ -245,6 +251,7 @@ if (import.meta.vitest) {
 
       // 統合モデルは有効なパラメータのみで生成される
       expect(result.unifiedModel).not.toBeNull();
+      expect(result.unifiedModel!.kind).toBe("parameter");
       expect(result.unifiedModel!.name).toBe("GetRefParams");
       expect(result.unifiedModel!.properties).toHaveLength(1);
 
@@ -328,6 +335,7 @@ if (import.meta.vitest) {
 
       expect(result.parameters).toHaveLength(2);
       expect(result.unifiedModel).not.toBeNull();
+      expect(result.unifiedModel!.kind).toBe("parameter");
       expect(result.unifiedModel!.name).toBe("PostApiTestParams");
 
       // documentPathが適切に継承されていることを確認

@@ -30,7 +30,14 @@ export function buildReferencePath(documentPath: string[]): string {
     const restPath = documentPath.slice(2);
 
     if (restPath.length > 0) {
-      return `#/paths/${convertedPath}/${restPath.join("/")}`;
+      // restPath内でスラッシュを含むセグメント（MIMEタイプなど）も::でエンコード
+      const encodedRestPath = restPath.map((segment) => {
+        if (segment.includes("/")) {
+          return segment.replace(/\//g, "::");
+        }
+        return segment;
+      });
+      return `#/paths/${convertedPath}/${encodedRestPath.join("/")}`;
     }
     return `#/paths/${convertedPath}`;
   }
@@ -56,6 +63,24 @@ export function buildReferencePath(documentPath: string[]): string {
 export function convertPathToEndpointNotation(path: string): string {
   // 先頭の/を削除し、残りの/を::に置換
   return "::" + path.slice(1).replace(/\//g, "::");
+}
+
+/**
+ * components/schemasへの参照パスを生成
+ * @param modelName - モデル名
+ * @returns components/schemasへの参照パス
+ *
+ * @example
+ * ```typescript
+ * buildComponentsSchemaReferencePath("GetUsersParams")
+ * // => "#/components/schemas/GetUsersParams"
+ *
+ * buildComponentsSchemaReferencePath("User")
+ * // => "#/components/schemas/User"
+ * ```
+ */
+export function buildComponentsSchemaReferencePath(modelName: string): string {
+  return `#/components/schemas/${modelName}`;
 }
 
 // === in-source testing ===
@@ -103,6 +128,55 @@ if (import.meta.vitest) {
       const result = buildReferencePath(["info", "title"]);
       expect(result).toBe("#/info/title");
     });
+
+    it("should encode MIME types in path segments", () => {
+      const result = buildReferencePath([
+        "paths",
+        "/users",
+        "post",
+        "responses",
+        "200",
+        "content",
+        "application/json",
+        "schema",
+      ]);
+      expect(result).toBe(
+        "#/paths/::users/post/responses/200/content/application::json/schema",
+      );
+    });
+
+    it("should encode multiple MIME types", () => {
+      const result = buildReferencePath([
+        "paths",
+        "/files",
+        "post",
+        "requestBody",
+        "content",
+        "multipart/form-data",
+        "schema",
+      ]);
+      expect(result).toBe(
+        "#/paths/::files/post/requestBody/content/multipart::form-data/schema",
+      );
+    });
+
+    it("should handle mixed segments with and without slashes", () => {
+      const result = buildReferencePath([
+        "paths",
+        "/api/v1/users",
+        "get",
+        "responses",
+        "200",
+        "content",
+        "application/json",
+        "schema",
+        "properties",
+        "data",
+      ]);
+      expect(result).toBe(
+        "#/paths/::api::v1::users/get/responses/200/content/application::json/schema/properties/data",
+      );
+    });
   });
 
   describe("convertPathToEndpointNotation", () => {
@@ -126,6 +200,23 @@ if (import.meta.vitest) {
       expect(
         convertPathToEndpointNotation("/users/{userId}/posts/{postId}"),
       ).toBe("::users::{userId}::posts::{postId}");
+    });
+  });
+
+  describe("buildComponentsSchemaReferencePath", () => {
+    it("should generate components schema reference path", () => {
+      const result = buildComponentsSchemaReferencePath("GetUsersParams");
+      expect(result).toBe("#/components/schemas/GetUsersParams");
+    });
+
+    it("should handle simple model name", () => {
+      const result = buildComponentsSchemaReferencePath("User");
+      expect(result).toBe("#/components/schemas/User");
+    });
+
+    it("should handle complex model name", () => {
+      const result = buildComponentsSchemaReferencePath("PostUsers200Response");
+      expect(result).toBe("#/components/schemas/PostUsers200Response");
     });
   });
 }
