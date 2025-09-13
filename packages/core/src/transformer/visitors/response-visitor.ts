@@ -205,13 +205,13 @@ if (import.meta.vitest) {
         pathTemplate: "/users",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.response).toEqual({
-        statusCode: "200",
-        description: "Success",
-        content: undefined,
+      expect(result).toEqual({
+        response: {
+          statusCode: "200",
+          description: "Success",
+        },
+        models: [],
       });
-      expect(result!.models).toEqual([]);
     });
 
     it("should handle response with JSON content", () => {
@@ -238,31 +238,39 @@ if (import.meta.vitest) {
         pathTemplate: "/users",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.response).not.toBeNull();
-      expect(result!.response?.statusCode).toBe("200");
-      expect(result!.response?.content).toBeDefined();
-      expect(
-        result!.response?.content?.find(
-          (c) => c.mimeType === "application/json",
-        ),
-      ).toBeDefined();
-      // インラインobjectスキーマは独立したResponseModelとして抽出される
-      expect(result!.models).toHaveLength(1);
-      expect(result!.models[0]).toEqual({
-        kind: "response",
-        name: "GetUsers200Response",
-        referencePath: expect.stringContaining("GetUsers200Response"),
-        properties: expect.any(Array),
-        statusCode: "200",
-      });
-      // response.contentでは抽出されたObjectModelを参照
-      const jsonContent = result!.response?.content?.find(
-        (c) => c.mimeType === "application/json",
-      );
-      expect(jsonContent?.schema).toEqual({
-        kind: "ref",
-        name: expect.stringContaining("GetUsers200Response"),
+      expect(result).toEqual({
+        response: {
+          statusCode: "200",
+          description: "User list",
+          content: [
+            {
+              mimeType: "application/json",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+              },
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "response",
+            name: "GetUsers200Response",
+            referencePath:
+              "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+            statusCode: "200",
+            properties: [
+              {
+                name: "users",
+                type: {
+                  kind: "array",
+                  itemType: "string",
+                },
+                required: false,
+              },
+            ],
+          },
+        ],
       });
     });
 
@@ -298,24 +306,61 @@ if (import.meta.vitest) {
         pathTemplate: "/data",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.response?.content).toBeDefined();
-      expect(result!.response?.content).toHaveLength(3);
-      // インラインobjectスキーマは独立したObjectModelとして抽出される（JSON、XML用）
-      expect(result!.models.length).toBeGreaterThan(0);
-      // プリミティブスキーマ（text/plain）は直接型として保持
-      const plainContent = result!.response?.content?.find(
-        (c) => c.mimeType === "text/plain",
-      );
-      expect(plainContent?.schema).toBe("string"); // プリミティブ文字列
-
-      // オブジェクトスキーマは参照として保持
-      const jsonContent = result!.response?.content?.find(
-        (c) => c.mimeType === "application/json",
-      );
-      expect(jsonContent?.schema).toEqual({
-        kind: "ref",
-        name: expect.any(String),
+      expect(result).toEqual({
+        response: {
+          statusCode: "200",
+          description: "Multi-format response",
+          content: [
+            {
+              mimeType: "application/json",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::data/get/responses/200/content/application::json/schema/GetData200Response",
+              },
+            },
+            {
+              mimeType: "application/xml",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200Response",
+              },
+            },
+            {
+              mimeType: "text/plain",
+              schema: "string",
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "response",
+            name: "GetData200Response",
+            referencePath:
+              "#/paths/::data/get/responses/200/content/application::json/schema/GetData200Response",
+            statusCode: "200",
+            properties: [
+              {
+                name: "data",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+          {
+            kind: "response",
+            name: "GetData200Response",
+            referencePath:
+              "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200Response",
+            statusCode: "200",
+            properties: [
+              {
+                name: "data",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+        ],
       });
     });
 
@@ -339,10 +384,15 @@ if (import.meta.vitest) {
         pathTemplate: "/users",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.response).not.toBeNull();
+      expect(result).toEqual({
+        response: {
+          statusCode: "200",
+          description: "Success with headers",
+        },
+        models: [],
+      });
       // TODO: headersの処理はStep 12で実装
-      // expect(result?.headers).toBeDefined();
+      // Headers processing will be added in Step 12
     });
 
     it("should warn and return null for reference response", () => {
@@ -358,7 +408,7 @@ if (import.meta.vitest) {
         pathTemplate: "/users/{id}",
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference response not supported yet: #/components/responses/NotFound",
       );
@@ -388,30 +438,41 @@ if (import.meta.vitest) {
         pathTemplate: "/users",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.response?.statusCode).toBe("400");
-      expect(result!.response?.description).toBe("Bad Request");
-      expect(
-        result!.response?.content?.find(
-          (c) => c.mimeType === "application/json",
-        ),
-      ).toBeDefined();
-      // エラーレスポンスのインラインスキーマも独立したObjectModelとして抽出される
-      expect(result!.models).toHaveLength(1);
-      expect(result!.models[0]).toEqual({
-        kind: "response",
-        name: "PostUsers400Response",
-        referencePath: expect.stringContaining("PostUsers400Response"),
-        properties: expect.any(Array),
-        statusCode: "400",
-      });
-      // response.contentでは抽出されたObjectModelを参照
-      const jsonContent = result!.response?.content?.find(
-        (c) => c.mimeType === "application/json",
-      );
-      expect(jsonContent?.schema).toEqual({
-        kind: "ref",
-        name: expect.stringContaining("PostUsers400Response"),
+      expect(result).toEqual({
+        response: {
+          statusCode: "400",
+          description: "Bad Request",
+          content: [
+            {
+              mimeType: "application/json",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
+              },
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "response",
+            name: "PostUsers400Response",
+            referencePath:
+              "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
+            statusCode: "400",
+            properties: [
+              {
+                name: "error",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "message",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+        ],
       });
     });
   });

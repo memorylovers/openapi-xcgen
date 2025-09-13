@@ -224,32 +224,41 @@ if (import.meta.vitest) {
         pathTemplate: "/users",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.requestBody).not.toBeNull();
-      expect(result!.requestBody?.description).toBe("User data");
-      expect(result!.requestBody?.required).toBe(true);
-      expect(result!.requestBody?.content).toBeDefined();
-      expect(
-        result!.requestBody?.content?.find(
-          (c) => c.mimeType === "application/json",
-        ),
-      ).toBeDefined();
-      // インラインobjectスキーマは独立したRequestBodyModelとして抽出される
-      expect(result!.models).toHaveLength(1);
-      expect(result!.models[0]).toEqual({
-        kind: "requestBody",
-        name: "PostUsersRequestBody",
-        referencePath: expect.stringContaining("PostUsersRequestBody"),
-        properties: expect.any(Array),
-        required: true,
-      });
-      // requestBody.contentでは抽出されたObjectModelを参照
-      const jsonContent = result!.requestBody?.content?.find(
-        (c) => c.mimeType === "application/json",
-      );
-      expect(jsonContent?.schema).toEqual({
-        kind: "ref",
-        name: expect.stringContaining("PostUsersRequestBody"),
+      expect(result).toEqual({
+        requestBody: {
+          description: "User data",
+          required: true,
+          content: [
+            {
+              mimeType: "application/json",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::users/post/requestBody/content/application::json/schema/PostUsersRequestBody",
+              },
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "requestBody",
+            name: "PostUsersRequestBody",
+            referencePath:
+              "#/paths/::users/post/requestBody/content/application::json/schema/PostUsersRequestBody",
+            properties: [
+              {
+                name: "name",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "email",
+                type: "string",
+                required: false,
+              },
+            ],
+            required: true,
+          },
+        ],
       });
     });
 
@@ -290,23 +299,78 @@ if (import.meta.vitest) {
         pathTemplate: "/files",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.requestBody?.required).toBe(false);
-      expect(result!.requestBody?.content).toBeDefined();
-      expect(result!.requestBody?.content).toHaveLength(3);
-      expect(
-        result!.requestBody?.content?.find(
-          (c) => c.mimeType === "multipart/form-data",
-        ),
-      ).toBeDefined();
-      // インラインobjectスキーマは独立したRequestBodyModelとして抽出される
-      expect(result!.models.length).toBeGreaterThan(0);
-      // 複数のMIMEタイプで同じ構造のオブジェクトが含まれる場合、RequestBodyModelが生成される
-      const requestBodyModel = result!.models.find(
-        (m) => m.kind === "requestBody",
-      );
-      expect(requestBodyModel).toBeDefined();
-      expect(requestBodyModel?.name).toBe("PostFilesRequestBody");
+      expect(result).toEqual({
+        requestBody: {
+          required: false,
+          content: [
+            {
+              mimeType: "application/json",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::files/post/requestBody/content/application::json/schema/PostFilesRequestBody",
+              },
+            },
+            {
+              mimeType: "application/xml",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::files/post/requestBody/content/application::xml/schema/PostFilesRequestBody",
+              },
+            },
+            {
+              mimeType: "multipart/form-data",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::files/post/requestBody/content/multipart::form-data/schema/PostFilesRequestBody",
+              },
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "requestBody",
+            name: "PostFilesRequestBody",
+            referencePath:
+              "#/paths/::files/post/requestBody/content/application::json/schema/PostFilesRequestBody",
+            properties: [
+              {
+                name: "data",
+                type: "string",
+                required: false,
+              },
+            ],
+            required: false,
+          },
+          {
+            kind: "requestBody",
+            name: "PostFilesRequestBody",
+            referencePath:
+              "#/paths/::files/post/requestBody/content/application::xml/schema/PostFilesRequestBody",
+            properties: [
+              {
+                name: "data",
+                type: "string",
+                required: false,
+              },
+            ],
+            required: false,
+          },
+          {
+            kind: "requestBody",
+            name: "PostFilesRequestBody",
+            referencePath:
+              "#/paths/::files/post/requestBody/content/multipart::form-data/schema/PostFilesRequestBody",
+            properties: [
+              {
+                name: "file",
+                type: "binary",
+                required: false,
+              },
+            ],
+            required: false,
+          },
+        ],
+      });
     });
 
     it("should warn and return null for requestBody without content", () => {
@@ -324,7 +388,7 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "RequestBody without content for operation: testOp",
       );
@@ -345,7 +409,7 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "RequestBody without content for operation: testOp",
       );
@@ -366,7 +430,7 @@ if (import.meta.vitest) {
         pathTemplate: "/users/{id}",
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference requestBody not supported yet: #/components/requestBodies/UserInput",
       );
@@ -394,16 +458,18 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.requestBody).not.toBeNull();
-      expect(
-        result!.requestBody?.content?.find((c) => c.mimeType === "text/plain"),
-      ).toBeDefined();
-      expect(
-        result!.requestBody?.content?.find(
-          (c) => c.mimeType === "application/json",
-        ),
-      ).toBeUndefined();
+      expect(result).toEqual({
+        requestBody: {
+          required: false,
+          content: [
+            {
+              mimeType: "text/plain",
+              schema: "string",
+            },
+          ],
+        },
+        models: [],
+      });
 
       warnSpy.mockRestore();
     });
@@ -428,8 +494,36 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result).not.toBeNull();
-      expect(result!.requestBody?.required).toBe(false);
+      expect(result).toEqual({
+        requestBody: {
+          required: false,
+          content: [
+            {
+              mimeType: "application/json",
+              schema: {
+                kind: "ref",
+                name: "#/paths/::test/post/requestBody/content/application::json/schema/PostTestRequestBody",
+              },
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "requestBody",
+            name: "PostTestRequestBody",
+            referencePath:
+              "#/paths/::test/post/requestBody/content/application::json/schema/PostTestRequestBody",
+            properties: [
+              {
+                name: "data",
+                type: "string",
+                required: false,
+              },
+            ],
+            required: false,
+          },
+        ],
+      });
     });
   });
 }

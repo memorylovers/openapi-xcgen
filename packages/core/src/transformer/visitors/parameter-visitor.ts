@@ -131,8 +131,6 @@ if (import.meta.vitest) {
         required: true,
         description: "User ID",
         type: "string",
-        deprecated: undefined,
-        defaultValue: undefined,
       });
     });
 
@@ -156,10 +154,8 @@ if (import.meta.vitest) {
         name: "limit",
         in: "query",
         required: false,
-        description: undefined,
         type: "int",
         defaultValue: 10,
-        deprecated: undefined,
       });
     });
 
@@ -179,9 +175,7 @@ if (import.meta.vitest) {
         name: "X-API-Version",
         in: "header",
         required: false,
-        description: undefined,
         type: "string",
-        defaultValue: undefined,
         deprecated: true,
       });
     });
@@ -202,10 +196,7 @@ if (import.meta.vitest) {
         name: "session",
         in: "cookie",
         required: false,
-        description: undefined,
         type: "string",
-        defaultValue: undefined,
-        deprecated: undefined,
       });
     });
 
@@ -222,7 +213,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith("Parameter without schema: invalid");
 
       warnSpy.mockRestore();
@@ -243,7 +234,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference schema not supported yet in parameter: userId",
       );
@@ -264,7 +255,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
       });
 
-      expect(result).toBeNull();
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid parameter location: body for parameter: body",
       );
@@ -292,13 +283,10 @@ if (import.meta.vitest) {
         name: "tags",
         in: "query",
         required: false,
-        description: undefined,
         type: {
           kind: "array",
           itemType: "string",
         },
-        defaultValue: undefined,
-        deprecated: undefined,
       });
     });
   });

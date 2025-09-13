@@ -116,8 +116,10 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result.responses).toEqual([]);
-      expect(result.models).toEqual([]);
+      expect(result).toEqual({
+        responses: [],
+        models: [],
+      });
     });
 
     it("should return empty result for empty responses object", () => {
@@ -130,8 +132,10 @@ if (import.meta.vitest) {
         },
       );
 
-      expect(result.responses).toEqual([]);
-      expect(result.models).toEqual([]);
+      expect(result).toEqual({
+        responses: [],
+        models: [],
+      });
     });
 
     it("should process single response without content", () => {
@@ -147,13 +151,15 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result.responses).toHaveLength(1);
-      expect(result.responses[0]).toEqual({
-        statusCode: "200",
-        description: "Success",
-        content: undefined,
+      expect(result).toEqual({
+        responses: [
+          {
+            statusCode: "200",
+            description: "Success",
+          },
+        ],
+        models: [],
       });
-      expect(result.models).toEqual([]);
     });
 
     it("should process multiple responses", () => {
@@ -175,21 +181,23 @@ if (import.meta.vitest) {
         pathTemplate: "/api/users/{id}",
       });
 
-      expect(result.responses).toHaveLength(3);
-
-      const response200 = result.responses.find((r) => r.statusCode === "200");
-      expect(response200).toBeDefined();
-      expect(response200!.description).toBe("Success");
-
-      const response404 = result.responses.find((r) => r.statusCode === "404");
-      expect(response404).toBeDefined();
-      expect(response404!.description).toBe("Not found");
-
-      const response500 = result.responses.find((r) => r.statusCode === "500");
-      expect(response500).toBeDefined();
-      expect(response500!.description).toBe("Internal server error");
-
-      expect(result.models).toEqual([]);
+      expect(result).toEqual({
+        responses: [
+          {
+            statusCode: "200",
+            description: "Success",
+          },
+          {
+            statusCode: "404",
+            description: "Not found",
+          },
+          {
+            statusCode: "500",
+            description: "Internal server error",
+          },
+        ],
+        models: [],
+      });
     });
 
     it("should process responses with inline schemas", () => {
@@ -230,38 +238,75 @@ if (import.meta.vitest) {
         pathTemplate: "/users",
       });
 
-      expect(result.responses).toHaveLength(2);
-
-      // インラインスキーマは独立したObjectModelとして抽出される
-      expect(result.models).toHaveLength(2);
-
-      // ResponseModelが生成される
-      const responseModels = result.models.filter((m) => m.kind === "response");
-      expect(responseModels).toHaveLength(2);
-      expect(responseModels[0].name).toBe("PostUsers200Response");
-      expect(responseModels[1].name).toBe("PostUsers400Response");
-
-      // ObjectModelは生成されない（ResponseModelとして統一）
-      const objectModels = result.models.filter((m) => m.kind === "object");
-      expect(objectModels).toHaveLength(0);
-
-      // レスポンス内容は抽出されたObjectModelへの$refを保持
-      const response200 = result.responses.find((r) => r.statusCode === "200");
-      expect(
-        response200!.content!.find((c) => c.mimeType === "application/json")!
-          .schema,
-      ).toEqual({
-        kind: "ref",
-        name: expect.stringContaining("PostUsers200Response"),
-      });
-
-      const response400 = result.responses.find((r) => r.statusCode === "400");
-      expect(
-        response400!.content!.find((c) => c.mimeType === "application/json")!
-          .schema,
-      ).toEqual({
-        kind: "ref",
-        name: expect.stringContaining("PostUsers400Response"),
+      expect(result).toEqual({
+        responses: [
+          {
+            statusCode: "200",
+            description: "Success",
+            content: [
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  name: "#/paths/::users/post/responses/200/content/application::json/schema/PostUsers200Response",
+                },
+              },
+            ],
+          },
+          {
+            statusCode: "400",
+            description: "Bad request",
+            content: [
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  name: "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
+                },
+              },
+            ],
+          },
+        ],
+        models: [
+          {
+            kind: "response",
+            name: "PostUsers200Response",
+            referencePath:
+              "#/paths/::users/post/responses/200/content/application::json/schema/PostUsers200Response",
+            statusCode: "200",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "name",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+          {
+            kind: "response",
+            name: "PostUsers400Response",
+            referencePath:
+              "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
+            statusCode: "400",
+            properties: [
+              {
+                name: "error",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "message",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+        ],
       });
     });
 
@@ -302,31 +347,55 @@ if (import.meta.vitest) {
         pathTemplate: "/api/resource/{id}",
       });
 
-      expect(result.responses).toHaveLength(3);
-
-      // 200はインラインスキーマなので独立したObjectModelが生成される
-      expect(result.models).toHaveLength(1);
-
-      // ResponseModelが生成される
-      const responseModel = result.models.find((m) => m.kind === "response");
-      expect(responseModel?.name).toBe("DeleteApiResourceId200Response");
-
-      // ObjectModelは生成されない（ResponseModelとして統一）
-      const objectModel = result.models.find((m) => m.kind === "object");
-      expect(objectModel).toBeUndefined();
-
-      // 204はcontentなし
-      const response204 = result.responses.find((r) => r.statusCode === "204");
-      expect(response204!.content).toBeUndefined();
-
-      // 404は$refなので抽出されない
-      const response404 = result.responses.find((r) => r.statusCode === "404");
-      expect(
-        response404!.content!.find((c) => c.mimeType === "application/json")!
-          .schema,
-      ).toEqual({
-        kind: "ref",
-        name: "#/components/schemas/Error",
+      expect(result).toEqual({
+        responses: [
+          {
+            statusCode: "200",
+            description: "Success",
+            content: [
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  name: "#/paths/::api::resource::{id}/delete/responses/200/content/application::json/schema/DeleteApiResourceId200Response",
+                },
+              },
+            ],
+          },
+          {
+            statusCode: "204",
+            description: "No content",
+          },
+          {
+            statusCode: "404",
+            description: "Not found",
+            content: [
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  name: "#/components/schemas/Error",
+                },
+              },
+            ],
+          },
+        ],
+        models: [
+          {
+            kind: "response",
+            name: "DeleteApiResourceId200Response",
+            referencePath:
+              "#/paths/::api::resource::{id}/delete/responses/200/content/application::json/schema/DeleteApiResourceId200Response",
+            statusCode: "200",
+            properties: [
+              {
+                name: "data",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+        ],
       });
     });
 
@@ -346,12 +415,19 @@ if (import.meta.vitest) {
         pathTemplate: "/complex/api/endpoint",
       });
 
-      expect(result.responses).toHaveLength(2);
-
-      // documentPathが適切に各レスポンスに渡されていることは
-      // visitResponseの内部で確認される（テストはresponse-visitorで実施）
-      expect(result.responses[0].statusCode).toMatch(/^(200|500)$/);
-      expect(result.responses[1].statusCode).toMatch(/^(200|500)$/);
+      expect(result).toEqual({
+        responses: [
+          {
+            statusCode: "200",
+            description: "OK",
+          },
+          {
+            statusCode: "500",
+            description: "Error",
+          },
+        ],
+        models: [],
+      });
     });
 
     it("should handle null responses from visitResponse gracefully", () => {
@@ -369,9 +445,15 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      // visitResponseの結果に応じてレスポンスが含まれる
-      expect(result.responses.length).toBeGreaterThanOrEqual(0);
-      expect(result.models).toEqual([]);
+      expect(result).toEqual({
+        responses: [
+          {
+            statusCode: "200",
+            description: "Success",
+          },
+        ],
+        models: [],
+      });
     });
   });
 }

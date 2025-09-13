@@ -185,24 +185,44 @@ if (import.meta.vitest) {
 
       const result = transform(doc);
 
-      expect(result.info).toEqual({
-        title: "Pet Store API",
-        version: "1.0.0",
-        description: "A sample API",
+      expect(result).toEqual({
+        info: {
+          title: "Pet Store API",
+          version: "1.0.0",
+          description: "A sample API",
+        },
+        models: [
+          {
+            kind: "object",
+            name: "Pet",
+            referencePath: "#/components/schemas/Pet",
+            properties: [
+              {
+                name: "id",
+                type: "int",
+                required: true,
+              },
+              {
+                name: "name",
+                type: "string",
+                required: true,
+              },
+            ],
+          },
+          {
+            kind: "enum",
+            name: "Status",
+            referencePath: "#/components/schemas/Status",
+            type: "string",
+            values: [
+              { value: "available", name: "AVAILABLE" },
+              { value: "pending", name: "PENDING" },
+              { value: "sold", name: "SOLD" },
+            ],
+          },
+        ],
+        services: [],
       });
-      expect(result.models).toHaveLength(2);
-
-      // Petオブジェクトモデルを確認
-      const petModel = result.models.find((m) => m.name === "Pet");
-      expect(petModel).toBeDefined();
-      expect(petModel?.kind).toBe("object");
-
-      // Statusenumモデルを確認
-      const statusModel = result.models.find((m) => m.name === "Status");
-      expect(statusModel).toBeDefined();
-      expect(statusModel?.kind).toBe("enum");
-
-      expect(result.services).toHaveLength(0);
     });
 
     it("should transform document with paths", () => {
@@ -261,19 +281,92 @@ if (import.meta.vitest) {
 
       const result = transform(doc);
 
-      expect(result.services).toHaveLength(2);
-
-      const petsService = result.services.find(
-        (s: IRService) => s.name === "pets",
-      );
-      expect(petsService).toBeDefined();
-      expect(petsService?.endpoints).toHaveLength(2);
-
-      const usersService = result.services.find(
-        (s: IRService) => s.name === "users",
-      );
-      expect(usersService).toBeDefined();
-      expect(usersService?.endpoints).toHaveLength(1);
+      expect(result).toEqual({
+        info: {
+          title: "Pet Store API",
+          version: "1.0.0",
+          description: undefined,
+        },
+        models: [
+          {
+            kind: "requestBody",
+            name: "PostPetsRequestBody",
+            referencePath:
+              "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+            properties: [
+              {
+                name: "name",
+                type: "string",
+                required: false,
+              },
+            ],
+            required: false,
+          },
+        ],
+        services: [
+          {
+            name: "pets",
+            endpoints: [
+              {
+                id: "listPets",
+                method: "get",
+                path: "/pets",
+                parameters: [],
+                responses: [
+                  {
+                    statusCode: "200",
+                    description: "Success",
+                  },
+                ],
+                summary: undefined,
+              },
+              {
+                id: "createPet",
+                method: "post",
+                path: "/pets",
+                parameters: [],
+                requestBody: {
+                  required: false,
+                  content: [
+                    {
+                      mimeType: "application/json",
+                      schema: {
+                        kind: "ref",
+                        name: "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+                      },
+                    },
+                  ],
+                },
+                responses: [
+                  {
+                    statusCode: "201",
+                    description: "Created",
+                  },
+                ],
+                summary: undefined,
+              },
+            ],
+          },
+          {
+            name: "users",
+            endpoints: [
+              {
+                id: "listUsers",
+                method: "get",
+                path: "/users",
+                parameters: [],
+                responses: [
+                  {
+                    statusCode: "200",
+                    description: "Success",
+                  },
+                ],
+                summary: undefined,
+              },
+            ],
+          },
+        ],
+      });
     });
 
     it("should transform complete document", () => {
@@ -334,22 +427,100 @@ if (import.meta.vitest) {
 
       const result = transform(doc);
 
-      expect(result.info.title).toBe("Complete API");
-      expect(result.info.version).toBe("2.0.0");
-      expect(result.models).toHaveLength(3); // Pet object + inline status enum + GetPetsParams
-
-      // Petオブジェクトモデルを確認
-      const petModel = result.models.find((m) => m.name === "Pet");
-      expect(petModel).toBeDefined();
-      expect(petModel?.kind).toBe("object");
-
-      expect(result.services).toHaveLength(1);
-      expect(result.services[0].endpoints).toHaveLength(1);
-
-      // parameters は統合モデル参照になる
-      expect(result.services[0].endpoints[0].parameters).toEqual({
-        kind: "ref",
-        name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+      expect(result).toEqual({
+        info: {
+          title: "Complete API",
+          version: "2.0.0",
+          description: "A complete example",
+        },
+        models: [
+          {
+            kind: "object",
+            name: "Pet",
+            referencePath: "#/components/schemas/Pet",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "name",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "status",
+                type: {
+                  kind: "ref",
+                  name: "#/components/schemas/PetStatus",
+                },
+                required: false,
+              },
+            ],
+          },
+          {
+            kind: "enum",
+            name: "PetStatus",
+            referencePath: "#/components/schemas/PetStatus",
+            type: "string",
+            values: [
+              { value: "available", name: "AVAILABLE" },
+              { value: "pending", name: "PENDING" },
+              { value: "sold", name: "SOLD" },
+            ],
+          },
+          {
+            kind: "parameter",
+            name: "GetPetsParams",
+            referencePath: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+            description: "Parameters for GET /pets/{id}",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                required: true,
+                in: "path",
+              },
+            ],
+          },
+        ],
+        services: [
+          {
+            name: "pets",
+            endpoints: [
+              {
+                id: "getPet",
+                method: "get",
+                path: "/pets/{id}",
+                parameters: {
+                  kind: "ref",
+                  name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+                },
+                responses: [
+                  {
+                    statusCode: "200",
+                    description: "Success",
+                    content: [
+                      {
+                        mimeType: "application/json",
+                        schema: {
+                          kind: "ref",
+                          name: "#/components/schemas/Pet",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    statusCode: "404",
+                    description: "Not found",
+                  },
+                ],
+                summary: undefined,
+              },
+            ],
+          },
+        ],
       });
     });
 
@@ -396,8 +567,15 @@ if (import.meta.vitest) {
 
       const result = transform(doc);
 
-      expect(result.models).toEqual([]);
-      expect(result.services).toEqual([]);
+      expect(result).toEqual({
+        info: {
+          title: "Empty API",
+          version: "1.0.0",
+          description: undefined,
+        },
+        models: [],
+        services: [],
+      });
     });
   });
 

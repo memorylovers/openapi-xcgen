@@ -128,9 +128,11 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result.parameters).toEqual([]);
-      expect(result.unifiedModel).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result).toEqual({
+        parameters: [],
+        unifiedModel: null,
+        models: [],
+      });
     });
 
     it("should return empty result for empty parameters array", () => {
@@ -140,9 +142,11 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result.parameters).toEqual([]);
-      expect(result.unifiedModel).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result).toEqual({
+        parameters: [],
+        unifiedModel: null,
+        models: [],
+      });
     });
 
     it("should process single parameter", () => {
@@ -162,22 +166,33 @@ if (import.meta.vitest) {
         pathTemplate: "/users/{id}",
       });
 
-      expect(result.parameters).toHaveLength(1);
-      expect(result.parameters[0]).toEqual({
-        name: "id",
-        in: "path",
-        required: true,
-        description: "User ID",
-        type: "string",
-        defaultValue: undefined,
-        deprecated: undefined,
+      expect(result).toEqual({
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "User ID",
+            type: "string",
+          },
+        ],
+        unifiedModel: {
+          kind: "parameter",
+          name: "GetUsersParams",
+          description: "Parameters for GET /users/{id}\nid: User ID",
+          properties: [
+            {
+              name: "id",
+              type: "string",
+              required: true,
+              description: "User ID",
+              in: "path",
+            },
+          ],
+          referencePath: "#/paths/::users::{id}/get/GetUsersParams",
+        },
+        models: [],
       });
-
-      // 統合モデルが生成される
-      expect(result.unifiedModel).not.toBeNull();
-      expect(result.unifiedModel!.kind).toBe("parameter");
-      expect(result.unifiedModel!.name).toBe("GetUsersParams");
-      expect(result.unifiedModel!.properties).toHaveLength(1);
     });
 
     it("should process multiple parameters", () => {
@@ -208,19 +223,59 @@ if (import.meta.vitest) {
         pathTemplate: "/users/{id}/posts",
       });
 
-      expect(result.parameters).toHaveLength(3);
-      expect(result.parameters[0].name).toBe("id");
-      expect(result.parameters[0].in).toBe("path");
-      expect(result.parameters[1].name).toBe("limit");
-      expect(result.parameters[1].in).toBe("query");
-      expect(result.parameters[2].name).toBe("offset");
-      expect(result.parameters[2].in).toBe("query");
-
-      // 統合モデルが生成される
-      expect(result.unifiedModel).not.toBeNull();
-      expect(result.unifiedModel!.kind).toBe("parameter");
-      expect(result.unifiedModel!.name).toBe("GetUsersPostsParams");
-      expect(result.unifiedModel!.properties).toHaveLength(3);
+      expect(result).toEqual({
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            type: "string",
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            type: "int",
+            defaultValue: 10,
+          },
+          {
+            name: "offset",
+            in: "query",
+            required: false,
+            type: "int",
+            defaultValue: 0,
+          },
+        ],
+        unifiedModel: {
+          kind: "parameter",
+          name: "GetUsersPostsParams",
+          description: "Parameters for GET /users/{id}/posts",
+          properties: [
+            {
+              name: "id",
+              type: "string",
+              required: true,
+              in: "path",
+            },
+            {
+              name: "limit",
+              type: "int",
+              required: false,
+              defaultValue: 10,
+              in: "query",
+            },
+            {
+              name: "offset",
+              type: "int",
+              required: false,
+              defaultValue: 0,
+              in: "query",
+            },
+          ],
+          referencePath: "#/paths/::users::{id}::posts/get/GetUsersPostsParams",
+        },
+        models: [],
+      });
     });
 
     it("should warn and skip reference parameters", () => {
@@ -243,17 +298,34 @@ if (import.meta.vitest) {
         pathTemplate: "/ref/{id}",
       });
 
-      expect(result.parameters).toHaveLength(1); // 参照は飛ばされる
-      expect(result.parameters[0].name).toBe("limit");
+      expect(result).toEqual({
+        parameters: [
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            type: "int",
+          },
+        ],
+        unifiedModel: {
+          kind: "parameter",
+          name: "GetRefParams",
+          description: "Parameters for GET /ref/{id}",
+          properties: [
+            {
+              name: "limit",
+              type: "int",
+              required: false,
+              in: "query",
+            },
+          ],
+          referencePath: "#/paths/::ref::{id}/get/GetRefParams",
+        },
+        models: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference parameter not supported yet: #/components/parameters/IdParam",
       );
-
-      // 統合モデルは有効なパラメータのみで生成される
-      expect(result.unifiedModel).not.toBeNull();
-      expect(result.unifiedModel!.kind).toBe("parameter");
-      expect(result.unifiedModel!.name).toBe("GetRefParams");
-      expect(result.unifiedModel!.properties).toHaveLength(1);
 
       warnSpy.mockRestore();
     });
@@ -279,13 +351,31 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      // 有効なパラメータのみ含まれる
-      expect(result.parameters).toHaveLength(1);
-      expect(result.parameters[0].name).toBe("validParam");
-
-      // 統合モデルは有効なパラメータのみで生成される
-      expect(result.unifiedModel).not.toBeNull();
-      expect(result.unifiedModel!.properties).toHaveLength(1);
+      expect(result).toEqual({
+        parameters: [
+          {
+            name: "validParam",
+            in: "query",
+            required: false,
+            type: "string",
+          },
+        ],
+        unifiedModel: {
+          kind: "parameter",
+          name: "GetTestParams",
+          description: "Parameters for GET /test",
+          properties: [
+            {
+              name: "validParam",
+              type: "string",
+              required: false,
+              in: "query",
+            },
+          ],
+          referencePath: "#/paths/::test/get/GetTestParams",
+        },
+        models: [],
+      });
     });
 
     it("should handle all invalid parameters", () => {
@@ -309,8 +399,11 @@ if (import.meta.vitest) {
         pathTemplate: "/test",
       });
 
-      expect(result.parameters).toEqual([]);
-      expect(result.unifiedModel).toBeNull(); // 有効なパラメータがないので統合モデルもnull
+      expect(result).toEqual({
+        parameters: [],
+        unifiedModel: null,
+        models: [],
+      });
     });
 
     it("should use correct documentPath for each parameter", () => {
@@ -333,15 +426,43 @@ if (import.meta.vitest) {
         pathTemplate: "/api/test",
       });
 
-      expect(result.parameters).toHaveLength(2);
-      expect(result.unifiedModel).not.toBeNull();
-      expect(result.unifiedModel!.kind).toBe("parameter");
-      expect(result.unifiedModel!.name).toBe("PostApiTestParams");
-
-      // documentPathが適切に継承されていることを確認
-      expect(result.unifiedModel!.referencePath).toContain("paths");
-      expect(result.unifiedModel!.referencePath).toContain("api");
-      expect(result.unifiedModel!.referencePath).toContain("test");
+      expect(result).toEqual({
+        parameters: [
+          {
+            name: "first",
+            in: "query",
+            required: false,
+            type: "string",
+          },
+          {
+            name: "second",
+            in: "query",
+            required: false,
+            type: "int",
+          },
+        ],
+        unifiedModel: {
+          kind: "parameter",
+          name: "PostApiTestParams",
+          description: "Parameters for POST /api/test",
+          properties: [
+            {
+              name: "first",
+              type: "string",
+              required: false,
+              in: "query",
+            },
+            {
+              name: "second",
+              type: "int",
+              required: false,
+              in: "query",
+            },
+          ],
+          referencePath: "#/paths/::api::test/post/PostApiTestParams",
+        },
+        models: [],
+      });
     });
   });
 }

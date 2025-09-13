@@ -121,16 +121,27 @@ if (import.meta.vitest) {
       const result = visitPaths(paths, context);
 
       // Red Phase: このテストは失敗する
-      expect(result.services).toHaveLength(1);
-      expect(result.services[0]).toEqual({
-        name: "pets",
-        endpoints: [
-          expect.objectContaining({
-            id: "listPets",
-            method: "get",
-            path: "/pets",
-          }),
+      expect(result).toEqual({
+        services: [
+          {
+            name: "pets",
+            endpoints: [
+              {
+                id: "listPets",
+                method: "get",
+                path: "/pets",
+                parameters: [],
+                responses: [
+                  {
+                    statusCode: "200",
+                    description: "Success",
+                  },
+                ],
+              },
+            ],
+          },
         ],
+        models: [],
       });
     });
 
@@ -165,13 +176,42 @@ if (import.meta.vitest) {
       const result = visitPaths(paths, context);
 
       // Red Phase: このテストは失敗する
-      expect(result.services).toHaveLength(2);
-
-      const petsService = result.services.find((s) => s.name === "pets");
-      expect(petsService?.endpoints).toHaveLength(2);
-
-      const usersService = result.services.find((s) => s.name === "users");
-      expect(usersService?.endpoints).toHaveLength(1);
+      expect(result).toEqual({
+        services: [
+          {
+            name: "pets",
+            endpoints: [
+              {
+                id: "listPets",
+                method: "get",
+                path: "/pets",
+                parameters: [],
+                responses: [],
+              },
+              {
+                id: "getPet",
+                method: "get",
+                path: "/pets/{id}",
+                parameters: [],
+                responses: [],
+              },
+            ],
+          },
+          {
+            name: "users",
+            endpoints: [
+              {
+                id: "listUsers",
+                method: "get",
+                path: "/users",
+                parameters: [],
+                responses: [],
+              },
+            ],
+          },
+        ],
+        models: [],
+      });
     });
 
     it("should use 'default' tag for endpoints without tags", () => {
@@ -193,8 +233,28 @@ if (import.meta.vitest) {
       const result = visitPaths(paths, context);
 
       // Red Phase: このテストは失敗する
-      expect(result.services).toHaveLength(1);
-      expect(result.services[0].name).toBe("default");
+      expect(result).toEqual({
+        services: [
+          {
+            name: "default",
+            endpoints: [
+              {
+                id: "healthCheck",
+                method: "get",
+                path: "/health",
+                parameters: [],
+                responses: [
+                  {
+                    statusCode: "200",
+                    description: "OK",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        models: [],
+      });
     });
   });
 }

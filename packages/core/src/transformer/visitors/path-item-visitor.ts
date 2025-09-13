@@ -130,15 +130,24 @@ if (import.meta.vitest) {
       const result = visitPathItem(pathItem, context);
 
       // Red Phase: このテストは失敗する
-      expect(result).toHaveLength(1);
-      expect(result[0].endpoint).toEqual(
-        expect.objectContaining({
-          id: "getPet",
-          method: "get",
-          path: "/pets/{id}",
-        }),
-      );
-      expect(result[0].tags).toEqual(["pets"]);
+      expect(result).toEqual([
+        {
+          endpoint: {
+            id: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            parameters: [],
+            responses: [
+              {
+                statusCode: "200",
+                description: "Success",
+              },
+            ],
+          },
+          tags: ["pets"],
+          models: [],
+        },
+      ]);
     });
 
     it("should extract multiple HTTP methods", () => {
@@ -165,12 +174,41 @@ if (import.meta.vitest) {
       const result = visitPathItem(pathItem, context);
 
       // Red Phase: このテストは失敗する
-      expect(result).toHaveLength(3);
-
-      const methods = result.map((r) => r.endpoint.method);
-      expect(methods).toContain("get");
-      expect(methods).toContain("put");
-      expect(methods).toContain("delete");
+      expect(result).toEqual([
+        {
+          endpoint: {
+            id: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            parameters: [],
+            responses: [],
+          },
+          tags: undefined,
+          models: [],
+        },
+        {
+          endpoint: {
+            id: "updatePet",
+            method: "put",
+            path: "/pets/{id}",
+            parameters: [],
+            responses: [],
+          },
+          tags: undefined,
+          models: [],
+        },
+        {
+          endpoint: {
+            id: "deletePet",
+            method: "delete",
+            path: "/pets/{id}",
+            parameters: [],
+            responses: [],
+          },
+          tags: undefined,
+          models: [],
+        },
+      ]);
     });
 
     it("should skip operations that are null or undefined", () => {
@@ -192,8 +230,19 @@ if (import.meta.vitest) {
       const result = visitPathItem(pathItem, context);
 
       // Red Phase: このテストは失敗する
-      expect(result).toHaveLength(1);
-      expect(result[0].endpoint.method).toBe("get");
+      expect(result).toEqual([
+        {
+          endpoint: {
+            id: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            parameters: [],
+            responses: [],
+          },
+          tags: undefined,
+          models: [],
+        },
+      ]);
     });
 
     it("should handle path with common parameters", () => {
@@ -220,7 +269,19 @@ if (import.meta.vitest) {
       const result = visitPathItem(pathItem, context);
 
       // Red Phase: このテストは失敗する（パラメータはStep 12で実装）
-      expect(result).toHaveLength(1);
+      expect(result).toEqual([
+        {
+          endpoint: {
+            id: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            parameters: [],
+            responses: [],
+          },
+          tags: undefined,
+          models: [],
+        },
+      ]);
       // パラメータの処理は今回のスコープ外
     });
   });

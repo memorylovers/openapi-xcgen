@@ -113,7 +113,7 @@ if (import.meta.vitest) {
           "name",
         ],
       });
-      expect(result).toBe("string");
+      expect(result).toEqual("string");
     });
 
     it("should resolve integer with format", () => {
@@ -124,7 +124,7 @@ if (import.meta.vitest) {
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Example", "properties", "id"],
       });
-      expect(result).toBe("long");
+      expect(result).toEqual("long");
     });
 
     it("should resolve string with date format", () => {
@@ -141,7 +141,7 @@ if (import.meta.vitest) {
           "createdAt",
         ],
       });
-      expect(result).toBe("datetime");
+      expect(result).toEqual("datetime");
     });
 
     it("should resolve array types", () => {
@@ -158,11 +158,10 @@ if (import.meta.vitest) {
           "tags",
         ],
       });
-      expect(result).not.toBe(null);
-      expect(
-        result && typeof result === "object" && "kind" in result && result.kind,
-      ).toBe("array");
-      expect((result as IRArray).itemType).toBe("string");
+      expect(result).toEqual({
+        kind: "array",
+        itemType: "string",
+      });
     });
 
     it("should resolve nested array types", () => {
@@ -176,18 +175,13 @@ if (import.meta.vitest) {
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Matrix", "properties", "data"],
       });
-      expect(result).not.toBe(null);
-      expect(
-        result && typeof result === "object" && "kind" in result && result.kind,
-      ).toBe("array");
-      const outerArray = result as IRArray;
-      expect(
-        typeof outerArray.itemType === "object" &&
-          "kind" in outerArray.itemType &&
-          outerArray.itemType.kind,
-      ).toBe("array");
-      const innerArray = outerArray.itemType as IRArray;
-      expect(innerArray.itemType).toBe("double");
+      expect(result).toEqual({
+        kind: "array",
+        itemType: {
+          kind: "array",
+          itemType: "double",
+        },
+      });
     });
 
     it("should resolve $ref types", () => {
@@ -219,7 +213,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Invalid"],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledTimes(2); // extractRefNameとvisitTypeの両方で警告
 
       warnSpy.mockRestore();
@@ -232,7 +226,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Empty"],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid or unsupported schema type: undefined",
       );
@@ -247,7 +241,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "ObjectType"],
       });
 
-      expect(result).toBe(null);
+      expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
         "Invalid or unsupported schema type: object",
       );
@@ -261,7 +255,7 @@ if (import.meta.vitest) {
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "ArrayWithoutItems"],
       });
-      expect(result).toBe(null);
+      expect(result).toEqual(null);
     });
 
     it("should return null for array with invalid item type", () => {
@@ -277,7 +271,7 @@ if (import.meta.vitest) {
 
       // When items have an unknown type, visitType returns null
       // So the array visitor also returns null
-      expect(result).toBe(null);
+      expect(result).toEqual(null);
     });
 
     it("should handle nullable primitive", () => {
@@ -289,7 +283,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "NullableString"],
       });
       // nullableはプロパティレベルで管理されるため、scalar typeにはnullableプロパティがない
-      expect(result).toBe("string");
+      expect(result).toEqual("string");
     });
 
     it("should handle format in primitive", () => {
@@ -301,7 +295,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Email"],
       });
       // email formatは通常のstringとして扱われる
-      expect(result).toBe("string");
+      expect(result).toEqual("string");
     });
 
     it("should handle special format in primitive", () => {
@@ -313,7 +307,7 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "DateTime"],
       });
       // date-time formatは特別な型として扱われる
-      expect(result).toBe("datetime");
+      expect(result).toEqual("datetime");
     });
   });
 

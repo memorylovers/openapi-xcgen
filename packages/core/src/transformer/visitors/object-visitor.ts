@@ -526,16 +526,20 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Model"],
       });
 
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "Model",
-        referencePath: "#/components/schemas/Model",
-        description: "Test model",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "id",
-            type: "int",
-            required: false,
+            kind: "object",
+            name: "Model",
+            referencePath: "#/components/schemas/Model",
+            description: "Test model",
+            properties: [
+              {
+                name: "id",
+                type: "int",
+                required: false,
+              },
+            ],
           },
         ],
       });
@@ -559,16 +563,20 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "User"],
       });
 
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "User",
-        referencePath: "#/components/schemas/User",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "name",
-            type: "string",
-            required: false,
-            description: "User's full name",
+            kind: "object",
+            name: "User",
+            referencePath: "#/components/schemas/User",
+            properties: [
+              {
+                name: "name",
+                type: "string",
+                required: false,
+                description: "User's full name",
+              },
+            ],
           },
         ],
       });
@@ -589,16 +597,20 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Config"],
       });
 
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "Config",
-        referencePath: "#/components/schemas/Config",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "status",
-            type: "string",
-            required: false,
-            defaultValue: "active",
+            kind: "object",
+            name: "Config",
+            referencePath: "#/components/schemas/Config",
+            properties: [
+              {
+                name: "status",
+                type: "string",
+                required: false,
+                defaultValue: "active",
+              },
+            ],
           },
         ],
       });
@@ -619,16 +631,20 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Model"],
       });
 
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "Model",
-        referencePath: "#/components/schemas/Model",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "oldField",
-            type: "string",
-            required: false,
-            deprecated: true,
+            kind: "object",
+            name: "Model",
+            referencePath: "#/components/schemas/Model",
+            properties: [
+              {
+                name: "oldField",
+                type: "string",
+                required: false,
+                deprecated: true,
+              },
+            ],
           },
         ],
       });
@@ -703,32 +719,36 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "NullableTest"],
       });
 
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "NullableTest",
-        referencePath: "#/components/schemas/NullableTest",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "requiredNullable",
-            type: "string",
-            nullable: true,
-            required: true,
-          },
-          {
-            name: "requiredNotNullable",
-            type: "string",
-            required: true,
-          },
-          {
-            name: "optionalNullable",
-            type: "string",
-            nullable: true,
-            required: false,
-          },
-          {
-            name: "optionalNotNullable",
-            type: "string",
-            required: false,
+            kind: "object",
+            name: "NullableTest",
+            referencePath: "#/components/schemas/NullableTest",
+            properties: [
+              {
+                name: "requiredNullable",
+                type: "string",
+                nullable: true,
+                required: true,
+              },
+              {
+                name: "requiredNotNullable",
+                type: "string",
+                required: true,
+              },
+              {
+                name: "optionalNullable",
+                type: "string",
+                nullable: true,
+                required: false,
+              },
+              {
+                name: "optionalNotNullable",
+                type: "string",
+                required: false,
+              },
+            ],
           },
         ],
       });
@@ -748,20 +768,24 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "TestModel"],
       });
 
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "TestModel",
-        referencePath: "#/components/schemas/TestModel",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "id",
-            type: "int",
-            required: true, // 存在するプロパティは正しくrequired
-          },
-          {
-            name: "name",
-            type: "string",
-            required: false, // required配列に含まれていないのでfalse
+            kind: "object",
+            name: "TestModel",
+            referencePath: "#/components/schemas/TestModel",
+            properties: [
+              {
+                name: "id",
+                type: "int",
+                required: true, // 存在するプロパティは正しくrequired
+              },
+              {
+                name: "name",
+                type: "string",
+                required: false, // required配列に含まれていないのでfalse
+              },
+            ],
           },
         ],
       });

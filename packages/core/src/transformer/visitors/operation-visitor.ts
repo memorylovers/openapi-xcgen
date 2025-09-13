@@ -192,19 +192,23 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-      expect(result?.endpoint).toEqual(
-        expect.objectContaining({
+      expect(result).toEqual({
+        endpoint: {
           id: "getPet",
           method: "get",
           path: "/pets/{id}",
           summary: "Get a pet by ID",
           description: "Returns a single pet",
           parameters: [],
-          responses: expect.any(Array),
-        }),
-      );
-      expect(result?.models).toEqual([]);
+          responses: [
+            {
+              statusCode: "200",
+              description: "Success",
+            },
+          ],
+        },
+        models: [],
+      });
     });
 
     it("should handle deprecated operations", () => {
@@ -222,8 +226,17 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-      expect(result?.endpoint.deprecated).toBe(true);
+      expect(result).toEqual({
+        endpoint: {
+          id: "oldEndpoint",
+          method: "post",
+          path: "/old/endpoint",
+          parameters: [],
+          responses: [],
+          deprecated: true,
+        },
+        models: [],
+      });
     });
 
     it("should handle operations without operationId as optional field", () => {
@@ -242,11 +255,17 @@ if (import.meta.vitest) {
       const result = visitOperation(operation, context);
 
       // operationIdが任意項目なので、処理は継続される
-      expect(result).not.toBeNull();
-      expect(result?.endpoint.id).toBeNull();
-      expect(result?.endpoint.summary).toBe("Missing ID");
-      expect(result?.endpoint.method).toBe("get");
-      expect(result?.endpoint.path).toBe("/missing");
+      expect(result).toEqual({
+        endpoint: {
+          id: null,
+          method: "get",
+          path: "/missing",
+          summary: "Missing ID",
+          parameters: [],
+          responses: [],
+        },
+        models: [],
+      });
     });
 
     it("should handle operations without tags", () => {
@@ -264,8 +283,16 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-      expect(result?.endpoint.id).toBe("noTags");
+      expect(result).toEqual({
+        endpoint: {
+          id: "noTags",
+          method: "get",
+          path: "/no-tags",
+          parameters: [],
+          responses: [],
+        },
+        models: [],
+      });
     });
 
     it("should process parameters array and create unified model reference", () => {
@@ -295,37 +322,40 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-
-      // parameters は統合モデルへの参照になる
-      expect(result?.endpoint.parameters).toEqual({
-        kind: "ref",
-        name: "#/paths/::with::{id}/get/parameters/GetWithParams",
-      });
-
-      // 統合モデルが models 配列に含まれる
-      expect(result?.models).toHaveLength(1);
-      const unifiedModel = result?.models[0];
-      expect(unifiedModel).toEqual({
-        kind: "parameter",
-        name: "GetWithParams",
-        description: "Parameters for GET /with/{id}",
-        properties: [
-          {
-            name: "id",
-            type: "string",
-            required: true,
-            in: "path",
+      expect(result).toEqual({
+        endpoint: {
+          id: "withParams",
+          method: "get",
+          path: "/with/{id}",
+          parameters: {
+            kind: "ref",
+            name: "#/paths/::with::{id}/get/parameters/GetWithParams",
           },
+          responses: [],
+        },
+        models: [
           {
-            name: "limit",
-            type: "int",
-            required: false,
-            defaultValue: 10,
-            in: "query",
+            kind: "parameter",
+            name: "GetWithParams",
+            description: "Parameters for GET /with/{id}",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                required: true,
+                in: "path",
+              },
+              {
+                name: "limit",
+                type: "int",
+                required: false,
+                defaultValue: 10,
+                in: "query",
+              },
+            ],
+            referencePath: "#/paths/::with::{id}/get/parameters/GetWithParams",
           },
         ],
-        referencePath: expect.stringContaining("GetWithParams"),
       });
     });
 
@@ -358,24 +388,50 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-      expect(result?.endpoint.requestBody).toBeDefined();
-      expect(result?.endpoint.requestBody?.description).toBe("Pet to add");
-      expect(result?.endpoint.requestBody?.required).toBe(true);
-      expect(result?.endpoint.requestBody?.content).toBeDefined();
-      expect(
-        result?.endpoint.requestBody?.content?.find(
-          (c) => c.mimeType === "application/json",
-        ),
-      ).toBeDefined();
-      // インラインオブジェクトスキーマは独立したObjectModelとして抽出される
-      expect(result?.models).toHaveLength(1);
-
-      // 独立したRequestBodyModelが生成される
-      const requestBodyModel = result?.models.find(
-        (m) => m.kind === "requestBody",
-      );
-      expect(requestBodyModel?.name).toBe("PostPetsRequestBody");
+      expect(result).toEqual({
+        endpoint: {
+          id: "createPet",
+          method: "post",
+          path: "/pets",
+          summary: undefined,
+          parameters: [],
+          requestBody: {
+            description: "Pet to add",
+            required: true,
+            content: [
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  name: "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+                },
+              },
+            ],
+          },
+          responses: [],
+        },
+        models: [
+          {
+            kind: "requestBody",
+            name: "PostPetsRequestBody",
+            referencePath:
+              "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+            properties: [
+              {
+                name: "name",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "age",
+                type: "int",
+                required: false,
+              },
+            ],
+            required: true,
+          },
+        ],
+      });
     });
 
     it("should process responses with content", () => {
@@ -410,24 +466,55 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-      expect(result?.endpoint.responses).toHaveLength(2);
-
-      const response200 = result?.endpoint.responses.find(
-        (r) => r.statusCode === "200",
-      );
-      expect(response200).toBeDefined();
-      expect(response200?.description).toBe("Success");
-      expect(
-        response200?.content?.find((c) => c.mimeType === "application/json"),
-      ).toBeDefined();
-
-      const response404 = result?.endpoint.responses.find(
-        (r) => r.statusCode === "404",
-      );
-      expect(response404).toBeDefined();
-      expect(response404?.description).toBe("Not found");
-      expect(response404?.content).toBeUndefined();
+      expect(result).toEqual({
+        endpoint: {
+          id: "getPet",
+          method: "get",
+          path: "/pets/{id}",
+          summary: undefined,
+          parameters: [],
+          responses: [
+            {
+              statusCode: "200",
+              description: "Success",
+              content: [
+                {
+                  mimeType: "application/json",
+                  schema: {
+                    kind: "ref",
+                    name: "#/paths/::pets::{id}/get/responses/responses/200/content/application::json/schema/GetPetsId200Response",
+                  },
+                },
+              ],
+            },
+            {
+              statusCode: "404",
+              description: "Not found",
+            },
+          ],
+        },
+        models: [
+          {
+            kind: "response",
+            name: "GetPetsId200Response",
+            referencePath:
+              "#/paths/::pets::{id}/get/responses/responses/200/content/application::json/schema/GetPetsId200Response",
+            statusCode: "200",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                required: false,
+              },
+              {
+                name: "name",
+                type: "string",
+                required: false,
+              },
+            ],
+          },
+        ],
+      });
     });
 
     it("should warn and skip reference parameters", () => {
@@ -456,30 +543,33 @@ if (import.meta.vitest) {
 
       const result = visitOperation(operation, context);
 
-      expect(result).not.toBeNull();
-
-      // 有効なパラメータが1つあるので統合モデル参照になる
-      expect(result?.endpoint.parameters).toEqual({
-        kind: "ref",
-        name: "#/paths/::ref::{id}/get/parameters/GetRefParams",
-      });
-
-      // 統合モデルは有効なパラメータのみで構成される
-      expect(result?.models).toHaveLength(1);
-      const unifiedModel = result?.models[0];
-      expect(unifiedModel).toEqual({
-        kind: "parameter",
-        name: "GetRefParams",
-        description: "Parameters for GET /ref/{id}",
-        properties: [
+      expect(result).toEqual({
+        endpoint: {
+          id: "withRefParam",
+          method: "get",
+          path: "/ref/{id}",
+          parameters: {
+            kind: "ref",
+            name: "#/paths/::ref::{id}/get/parameters/GetRefParams",
+          },
+          responses: [],
+        },
+        models: [
           {
-            name: "limit",
-            type: "int",
-            required: false,
-            in: "query",
+            kind: "parameter",
+            name: "GetRefParams",
+            description: "Parameters for GET /ref/{id}",
+            properties: [
+              {
+                name: "limit",
+                type: "int",
+                required: false,
+                in: "query",
+              },
+            ],
+            referencePath: "#/paths/::ref::{id}/get/parameters/GetRefParams",
           },
         ],
-        referencePath: expect.stringContaining("GetRefParams"),
       });
 
       expect(warnSpy).toHaveBeenCalledWith(

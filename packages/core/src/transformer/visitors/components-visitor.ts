@@ -197,7 +197,7 @@ if (import.meta.vitest) {
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Invalid schema"),
       );
-      expect(result.models).toHaveLength(1); // Validのenumのみ
+      expect(result.models.length).toEqual(1); // Validのenumのみ
 
       warnSpy.mockRestore();
     });
