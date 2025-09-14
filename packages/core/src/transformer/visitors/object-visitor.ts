@@ -145,7 +145,7 @@ export function visitObject(
     if (propResult.type) {
       const property: IRProperty = {
         name: propName,
-        description: null, // TODO: implement property description handling
+        description: schemaObj.description || null,
         type: propResult.type,
         required: required.includes(propName),
         nullable: null, // TODO: implement nullable handling
@@ -153,11 +153,6 @@ export function visitObject(
         deprecated: null, // TODO: implement deprecated handling
         validation: null, // TODO: implement validation handling
       };
-
-      // descriptionがある場合は追加
-      if (schemaObj.description) {
-        property.description = schemaObj.description;
-      }
 
       // defaultValueがある場合は追加
       if (schemaObj.default !== undefined) {
@@ -284,7 +279,7 @@ export function visitResponseObject(
     if (propResult.type) {
       const property: IRProperty = {
         name: propName,
-        description: null, // TODO: implement property description handling
+        description: schemaObj.description || null,
         type: propResult.type,
         required: required.includes(propName),
         nullable: null, // TODO: implement nullable handling
@@ -292,11 +287,6 @@ export function visitResponseObject(
         deprecated: null, // TODO: implement deprecated handling
         validation: null, // TODO: implement validation handling
       };
-
-      // 追加プロパティの設定（visitObjectと同じロジック）
-      if (schemaObj.description) {
-        property.description = schemaObj.description;
-      }
       if (schemaObj.default !== undefined) {
         property.defaultValue = schemaObj.default;
       }
@@ -424,7 +414,7 @@ export function visitRequestBodyObject(
     if (propResult.type) {
       const property: IRProperty = {
         name: propName,
-        description: null, // TODO: implement property description handling
+        description: schemaObj.description || null,
         type: propResult.type,
         required: requiredProps.includes(propName),
         nullable: null, // TODO: implement nullable handling
@@ -432,11 +422,6 @@ export function visitRequestBodyObject(
         deprecated: null, // TODO: implement deprecated handling
         validation: null, // TODO: implement validation handling
       };
-
-      // 追加プロパティの設定（visitObjectと同じロジック）
-      if (schemaObj.description) {
-        property.description = schemaObj.description;
-      }
       if (schemaObj.default !== undefined) {
         property.defaultValue = schemaObj.default;
       }
