@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "Pet",
       "referencePath": "#/components/schemas/Pet",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -60,6 +61,7 @@
       "kind": "object",
       "name": "NewPet",
       "referencePath": "#/components/schemas/NewPet",
+      "description": null,
       "properties": [
         {
           "name": "name",
@@ -87,6 +89,7 @@
       "kind": "object",
       "name": "Error",
       "referencePath": "#/components/schemas/Error",
+      "description": null,
       "properties": [
         {
           "name": "code",

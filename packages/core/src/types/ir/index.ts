@@ -40,7 +40,7 @@ export interface IRInfo {
   /** APIバージョン */
   version: string;
   /** API説明 */
-  description?: string;
+  description: string | null;
 }
 
 /**

@@ -24,7 +24,7 @@ import type {
   IRResponseContent,
 } from "../../types/ir/index";
 import { generateComponentName } from "../helpers/generate-component-name";
-import type { VisitorContext } from "../types";
+import type { ResponseContext, VisitorContext } from "../types";
 import { visitResponseObject } from "./object-visitor";
 import { visitSchema } from "./schema-visitor";
 
@@ -36,16 +36,6 @@ export interface ResponseResult {
   response: IRResponse | null;
   /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
-}
-
-/**
- * Responseの処理用コンテキスト
- */
-export interface ResponseContext extends VisitorContext {
-  /** HTTPメソッド */
-  method: string;
-  /** パステンプレート */
-  pathTemplate: string;
 }
 
 /**
@@ -83,7 +73,6 @@ export interface ResponseContext extends VisitorContext {
  */
 export function visitResponse(
   response: ResponseObject | ReferenceObject,
-  statusCode: string,
   context: ResponseContext,
 ): ResponseResult | null {
   const models: IRModel[] = [];
@@ -95,7 +84,7 @@ export function visitResponse(
   }
 
   // contentの処理
-  let content: IRResponseContent[] | undefined;
+  let content: IRResponseContent[] | null = null;
   if (response.content) {
     content = [];
     for (const [mimeType, mediaType] of Object.entries(response.content)) {
@@ -110,7 +99,7 @@ export function visitResponse(
             context.pathTemplate,
             context.method,
             "response",
-            statusCode,
+            context.statusCode,
           );
 
           // レスポンスvisitorで処理して、IRResponseModelとして抽出
@@ -124,8 +113,9 @@ export function visitResponse(
                 "schema",
                 componentName,
               ],
+              rootSegment: "paths",
             },
-            statusCode,
+            context.statusCode,
           );
 
           if (responseResult && responseResult.models.length > 0) {
@@ -156,6 +146,7 @@ export function visitResponse(
               mimeType,
               "schema",
             ],
+            rootSegment: "paths",
           };
           const schemaResult = visitSchema(mediaType.schema, schemaContext);
           if (schemaResult.type) {
@@ -170,14 +161,14 @@ export function visitResponse(
     }
     // 空のcontentは返さない
     if (content.length === 0) {
-      content = undefined;
+      content = null;
     }
   }
 
   // TODO: headersの処理（Step 12で実装予定）
 
   const irResponse: IRResponse = {
-    statusCode,
+    statusCode: context.statusCode,
     description: response.description || null,
     content: content || null,
     headers: null, // TODO: implement headers processing
@@ -196,10 +187,14 @@ if (import.meta.vitest) {
         description: "Success",
       };
 
-      const result = visitResponse(response, "200", {
+      const result = visitResponse(response, {
         documentPath: ["paths", "/users", "get", "responses", "200"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/users",
+        statusCode: "200",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -231,10 +226,14 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "200", {
+      const result = visitResponse(response, {
         documentPath: ["paths", "/users", "get", "responses", "200"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/users",
+        statusCode: "200",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -258,6 +257,7 @@ if (import.meta.vitest) {
             name: "GetUsers200Response",
             referencePath:
               "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+            description: null,
             statusCode: "200",
             properties: [
               {
@@ -274,6 +274,7 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
         ],
       });
@@ -305,10 +306,14 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "200", {
+      const result = visitResponse(response, {
         documentPath: ["paths", "/data", "get", "responses", "200"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/data",
+        statusCode: "200",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -343,6 +348,7 @@ if (import.meta.vitest) {
             name: "GetData200Response",
             referencePath:
               "#/paths/::data/get/responses/200/content/application::json/schema/GetData200Response",
+            description: null,
             statusCode: "200",
             properties: [
               {
@@ -356,12 +362,14 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
           {
             kind: "response",
             name: "GetData200Response",
             referencePath:
               "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200Response",
+            description: null,
             statusCode: "200",
             properties: [
               {
@@ -375,6 +383,7 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
         ],
       });
@@ -394,10 +403,14 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "200", {
+      const result = visitResponse(response, {
         documentPath: ["paths", "/users", "get", "responses", "200"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/users",
+        statusCode: "200",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -420,10 +433,14 @@ if (import.meta.vitest) {
         $ref: "#/components/responses/NotFound",
       };
 
-      const result = visitResponse(response, "404", {
+      const result = visitResponse(response, {
         documentPath: ["paths", "/users/{id}", "get", "responses", "404"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/users/{id}",
+        statusCode: "404",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual(null);
@@ -450,10 +467,14 @@ if (import.meta.vitest) {
         },
       };
 
-      const result = visitResponse(response, "400", {
+      const result = visitResponse(response, {
         documentPath: ["paths", "/users", "post", "responses", "400"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/users",
+        statusCode: "400",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -477,6 +498,7 @@ if (import.meta.vitest) {
             name: "PostUsers400Response",
             referencePath:
               "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
+            description: null,
             statusCode: "400",
             properties: [
               {
@@ -500,6 +522,7 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
         ],
       });

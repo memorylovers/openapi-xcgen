@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "DataTypes",
       "referencePath": "#/components/schemas/DataTypes",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -141,6 +142,7 @@
       "kind": "object",
       "name": "DataTypesProfile",
       "referencePath": "#/components/schemas/DataTypesProfile",
+      "description": null,
       "properties": [
         {
           "name": "bio",

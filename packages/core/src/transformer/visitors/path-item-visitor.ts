@@ -12,16 +12,8 @@
 
 import type { PathItemObject } from "../../types/index";
 import type { IREndpoint, IRModel } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
-import { visitOperation, type OperationContext } from "./operation-visitor";
-
-/**
- * PathItem処理用の拡張コンテキスト
- */
-export interface PathItemContext extends VisitorContext {
-  /** パステンプレート（例: "/pets/{id}"） */
-  pathTemplate: string;
-}
+import type { OperationContext, PathItemContext } from "../types";
+import { visitOperation } from "./operation-visitor";
 
 /**
  * サポートするHTTPメソッドの配列
@@ -87,13 +79,14 @@ export function visitPathItem(
         documentPath: [...context.documentPath, method],
         method,
         pathTemplate: context.pathTemplate,
+        rootSegment: "paths",
       };
 
       const operationResult = visitOperation(operation, operationContext);
       if (operationResult) {
         results.push({
           endpoint: operationResult.endpoint,
-          tags: operation.tags, // tagsを保持
+          tags: operation.tags, // tagsを保持（undefinedをそのまま渡す）
           models: operationResult.models,
         });
       }
@@ -124,6 +117,7 @@ if (import.meta.vitest) {
 
       const context: PathItemContext = {
         documentPath: ["paths", "/pets/{id}"],
+        rootSegment: "paths",
         pathTemplate: "/pets/{id}",
       };
 
@@ -175,6 +169,7 @@ if (import.meta.vitest) {
 
       const context: PathItemContext = {
         documentPath: ["paths", "/pets/{id}"],
+        rootSegment: "paths",
         pathTemplate: "/pets/{id}",
       };
 
@@ -233,19 +228,20 @@ if (import.meta.vitest) {
       ]);
     });
 
-    it("should skip operations that are null or undefined", () => {
+    it("should skip operations that are undefined", () => {
       const pathItem: PathItemObject = {
         get: {
           operationId: "getPet",
           responses: {},
         },
-        // postがundefined/null
-        post: undefined,
-        put: undefined,
-      } as PathItemObject;
+        // postとputは未定義
+        // post: undefined,
+        // put: undefined,
+      };
 
       const context: PathItemContext = {
         documentPath: ["paths", "/pets/{id}"],
+        rootSegment: "paths",
         pathTemplate: "/pets/{id}",
       };
 
@@ -290,6 +286,7 @@ if (import.meta.vitest) {
 
       const context: PathItemContext = {
         documentPath: ["paths", "/pets/{id}"],
+        rootSegment: "paths",
         pathTemplate: "/pets/{id}",
       };
 

@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "Profile",
       "referencePath": "#/components/schemas/Profile",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -82,6 +83,7 @@
       "kind": "object",
       "name": "ProfileSettings",
       "referencePath": "#/components/schemas/ProfileSettings",
+      "description": null,
       "properties": [
         {
           "name": "theme",

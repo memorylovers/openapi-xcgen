@@ -159,6 +159,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -170,10 +171,11 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "Status",
             referencePath: "#/components/schemas/Status",
+            description: null,
             type: "string",
             values: [
-              { value: "a", name: "A" },
-              { value: "b", name: "B" },
+              { value: "a", name: "A", description: null },
+              { value: "b", name: "B", description: null },
             ],
           },
         ],
@@ -195,6 +197,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -206,6 +209,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -235,6 +239,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Name"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -257,6 +262,7 @@ if (import.meta.vitest) {
       } as unknown as SchemaObjectWithNullable;
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Bar"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -282,6 +288,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -295,10 +302,11 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "Status",
             referencePath: "#/components/schemas/Status",
+            description: null,
             type: "double", // typeフィールドの値
             values: [
-              { value: "a", name: "A" },
-              { value: "b", name: "B" },
+              { value: "a", name: "A", description: null },
+              { value: "b", name: "B", description: null },
             ],
           },
         ],
@@ -318,6 +326,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Priority"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -329,10 +338,11 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "Priority",
             referencePath: "#/components/schemas/Priority",
+            description: null,
             type: "int",
             values: [
-              { value: 1, name: "VALUE_1" },
-              { value: 2, name: "VALUE_2" },
+              { value: 1, name: "VALUE_1", description: null },
+              { value: 2, name: "VALUE_2", description: null },
             ],
           },
         ],
@@ -357,6 +367,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Item"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -371,6 +382,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Item",
             referencePath: "#/components/schemas/Item",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -416,6 +428,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Root"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -427,6 +440,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Root",
             referencePath: "#/components/schemas/Root",
+            description: null,
             properties: [
               {
                 name: "status",
@@ -454,16 +468,18 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "RootStatus",
             referencePath: "#/components/schemas/RootStatus",
+            description: null,
             type: "string",
             values: [
-              { value: "a", name: "A" },
-              { value: "b", name: "B" },
+              { value: "a", name: "A", description: null },
+              { value: "b", name: "B", description: null },
             ],
           },
           {
             kind: "object",
             name: "RootNested",
             referencePath: "#/components/schemas/RootNested",
+            description: null,
             properties: [
               {
                 name: "value",
@@ -515,6 +531,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Blog"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -526,6 +543,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Blog",
             referencePath: "#/components/schemas/Blog",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -559,6 +577,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "BlogPosts",
             referencePath: "#/components/schemas/BlogPosts",
+            description: null,
             properties: [
               {
                 name: "title",
@@ -589,6 +608,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "BlogPostsAuthor",
             referencePath: "#/components/schemas/BlogPostsAuthor",
+            description: null,
             properties: [
               {
                 name: "name",
@@ -619,11 +639,12 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "BlogPostsAuthorRole",
             referencePath: "#/components/schemas/BlogPostsAuthorRole",
+            description: null,
             type: "string",
             values: [
-              { value: "admin", name: "ADMIN" },
-              { value: "editor", name: "EDITOR" },
-              { value: "viewer", name: "VIEWER" },
+              { value: "admin", name: "ADMIN", description: null },
+              { value: "editor", name: "EDITOR", description: null },
+              { value: "viewer", name: "VIEWER", description: null },
             ],
           },
         ],
@@ -659,6 +680,7 @@ if (import.meta.vitest) {
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Items"],
+        rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
@@ -673,6 +695,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Items",
             referencePath: "#/components/schemas/Items",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -713,6 +736,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "ItemsMetadata",
             referencePath: "#/components/schemas/ItemsMetadata",
+            description: null,
             properties: [
               {
                 name: "created",
@@ -743,11 +767,12 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "ItemsMetadataCategory",
             referencePath: "#/components/schemas/ItemsMetadataCategory",
+            description: null,
             type: "string",
             values: [
-              { value: "product", name: "PRODUCT" },
-              { value: "service", name: "SERVICE" },
-              { value: "other", name: "OTHER" },
+              { value: "product", name: "PRODUCT", description: null },
+              { value: "service", name: "SERVICE", description: null },
+              { value: "other", name: "OTHER", description: null },
             ],
           },
         ],

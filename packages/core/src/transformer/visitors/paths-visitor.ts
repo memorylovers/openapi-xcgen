@@ -13,8 +13,8 @@
 
 import type { PathsObject } from "../../types/index";
 import type { IRModel, IRService } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
-import { visitPathItem, type PathItemContext } from "./path-item-visitor";
+import type { PathItemContext, VisitorContext } from "../types";
+import { visitPathItem } from "./path-item-visitor";
 
 /**
  * Paths処理の結果
@@ -64,6 +64,7 @@ export function visitPaths(
     const pathItemContext: PathItemContext = {
       documentPath: [...context.documentPath, pathTemplate],
       pathTemplate,
+      rootSegment: "paths",
     };
 
     const results = visitPathItem(pathItem, pathItemContext);
@@ -118,6 +119,7 @@ if (import.meta.vitest) {
 
       const context: VisitorContext = {
         documentPath: ["paths"],
+        rootSegment: "paths",
       };
       const result = visitPaths(paths, context);
 
@@ -181,6 +183,7 @@ if (import.meta.vitest) {
 
       const context: VisitorContext = {
         documentPath: ["paths"],
+        rootSegment: "paths",
       };
       const result = visitPaths(paths, context);
 
@@ -255,6 +258,7 @@ if (import.meta.vitest) {
 
       const context: VisitorContext = {
         documentPath: ["paths"],
+        rootSegment: "paths",
       };
       const result = visitPaths(paths, context);
 

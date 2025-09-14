@@ -103,7 +103,7 @@ export function visitEnum(
   // enum値をIREnumValueに変換
   const values: IREnumValue[] = schema.enum.map((value) => {
     const enumName = generateEnumName(value);
-    return { value, name: enumName };
+    return { value, name: enumName, description: null };
   });
 
   // IREnumModelを作成
@@ -111,14 +111,10 @@ export function visitEnum(
     kind: "enum",
     name,
     referencePath: buildReferencePath(context.documentPath),
+    description: schema.description || null,
     type,
     values,
   };
-
-  // descriptionがある場合のみ追加
-  if (schema.description) {
-    enumModel.description = schema.description;
-  }
 
   return { models: [enumModel] };
 }
@@ -137,6 +133,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -148,9 +145,9 @@ if (import.meta.vitest) {
             type: "string",
             description: "Status of the item",
             values: [
-              { value: "pending", name: "PENDING" },
-              { value: "approved", name: "APPROVED" },
-              { value: "rejected", name: "REJECTED" },
+              { value: "pending", name: "PENDING", description: null },
+              { value: "approved", name: "APPROVED", description: null },
+              { value: "rejected", name: "REJECTED", description: null },
             ],
           },
         ],
@@ -166,6 +163,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", "Priority"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -177,9 +175,9 @@ if (import.meta.vitest) {
             type: "int", // integerはIRScalarTypeのintに変換される
             description: "Priority level",
             values: [
-              { value: 1, name: "VALUE_1" },
-              { value: 2, name: "VALUE_2" },
-              { value: 3, name: "VALUE_3" },
+              { value: 1, name: "VALUE_1", description: null },
+              { value: 2, name: "VALUE_2", description: null },
+              { value: 3, name: "VALUE_3", description: null },
             ],
           },
         ],
@@ -194,6 +192,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", "TaskStatus"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -201,13 +200,14 @@ if (import.meta.vitest) {
           {
             kind: "enum",
             name: "TaskStatus",
+            description: null,
             referencePath: "#/components/schemas/TaskStatus",
             type: "string",
             values: [
-              { value: "in-progress", name: "IN_PROGRESS" },
-              { value: "on_hold", name: "ON_HOLD" },
-              { value: "completed!", name: "COMPLETED_" },
-              { value: "new/pending", name: "NEW_PENDING" },
+              { value: "in-progress", name: "IN_PROGRESS", description: null },
+              { value: "on_hold", name: "ON_HOLD", description: null },
+              { value: "completed!", name: "COMPLETED_", description: null },
+              { value: "new/pending", name: "NEW_PENDING", description: null },
             ],
           },
         ],
@@ -223,6 +223,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({ models: [] });
@@ -239,6 +240,7 @@ if (import.meta.vitest) {
 
       const emptyResult = visitEnum(emptySchema, {
         documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
       });
       expect(emptyResult).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith("Empty enum array for Status");
@@ -251,6 +253,7 @@ if (import.meta.vitest) {
 
       const invalidResult = visitEnum(invalidSchema, {
         documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
       });
       expect(invalidResult).toEqual({ models: [] });
       expect(warnSpy).toHaveBeenCalledWith(
@@ -270,6 +273,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", "Numbers"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({ models: [] });
@@ -290,6 +294,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", ""],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({ models: [] });
@@ -310,6 +315,7 @@ if (import.meta.vitest) {
 
       const result = visitEnum(schema, {
         documentPath: ["components", "schemas", "   "],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({ models: [] });

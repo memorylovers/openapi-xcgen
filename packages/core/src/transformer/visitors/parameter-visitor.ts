@@ -16,7 +16,7 @@ import { isReferenceObject } from "../../types/guards";
 import type { ParameterObject, SchemaObject } from "../../types/index";
 import type { IRParameter } from "../../types/ir/index";
 import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type";
-import type { VisitorContext } from "../types";
+import type { ParameterContext } from "../types";
 import { visitType } from "./type-visitor";
 
 /**
@@ -48,7 +48,7 @@ import { visitType } from "./type-visitor";
  */
 export function visitParameter(
   parameter: ParameterObject,
-  context: VisitorContext,
+  context: ParameterContext,
 ): IRParameter | null {
   // schemaが必須
   if (!parameter.schema) {
@@ -79,6 +79,7 @@ export function visitParameter(
   // visitTypeでschemaから型情報を取得
   const type = visitType(schema, {
     documentPath: [...context.documentPath, "schema"],
+    rootSegment: context.rootSegment,
   });
   if (!type) {
     consola.warn(`Invalid parameter type for: ${parameter.name}`);
@@ -116,6 +117,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "id",
+        in: "path",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -144,6 +150,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "limit",
+        in: "query",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -168,6 +179,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "X-API-Version",
+        in: "header",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -192,6 +208,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "session",
+        in: "cookie",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -217,6 +238,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "invalid",
+        in: "query",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual(null);
@@ -238,6 +264,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "userId",
+        in: "path",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual(null);
@@ -251,14 +282,19 @@ if (import.meta.vitest) {
     it("should warn and return null for invalid parameter location", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
-      const param = {
+      const param: ParameterObject = {
         name: "body",
-        in: "body", // OpenAPI 2.xのbodyはOpenAPI 3.xでは無効
+        in: "body" as "path", // OpenAPI 2.xのbodyはOpenAPI 3.xでは無効なのでテスト用にpathとしてキャスト
         schema: { type: "object" },
-      } as ParameterObject;
+      };
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "body",
+        in: "body" as "path" | "query" | "header" | "cookie", // 型アサーションでParameterContextの型に合わせる
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual(null);
@@ -283,6 +319,11 @@ if (import.meta.vitest) {
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "tags",
+        in: "query",
+        method: "get",
+        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({

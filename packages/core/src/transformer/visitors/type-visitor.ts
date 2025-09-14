@@ -76,7 +76,7 @@ export function visitType(
   // OpenAPI 3.1ではtypeが配列の場合もあるので、文字列の場合のみ処理
   if (typeof schema.type === "string") {
     const formatValue =
-      typeof schema.format === "string" ? schema.format : undefined;
+      typeof schema.format === "string" ? schema.format : null;
     const scalarType = toIRScalarType(schema.type, formatValue);
     if (scalarType) return scalarType;
   }
@@ -85,6 +85,7 @@ export function visitType(
   if (schema.type === "array" && schema.items) {
     const itemType = visitType(schema.items as SchemaObjectWithNullable, {
       documentPath: [...context.documentPath, "items"],
+      rootSegment: context.rootSegment,
     });
     // 配列の要素型が無効な場合はnullを返す
     if (itemType === null) return null;
@@ -112,6 +113,7 @@ if (import.meta.vitest) {
           "properties",
           "name",
         ],
+        rootSegment: "components",
       });
       expect(result).toEqual("string");
     });
@@ -123,6 +125,7 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Example", "properties", "id"],
+        rootSegment: "components",
       });
       expect(result).toEqual("long");
     });
@@ -140,6 +143,7 @@ if (import.meta.vitest) {
           "properties",
           "createdAt",
         ],
+        rootSegment: "components",
       });
       expect(result).toEqual("datetime");
     });
@@ -157,6 +161,7 @@ if (import.meta.vitest) {
           "properties",
           "tags",
         ],
+        rootSegment: "components",
       });
       expect(result).toEqual({
         kind: "array",
@@ -174,6 +179,7 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Matrix", "properties", "data"],
+        rootSegment: "components",
       });
       expect(result).toEqual({
         kind: "array",
@@ -198,6 +204,7 @@ if (import.meta.vitest) {
           "application/json",
           "schema",
         ],
+        rootSegment: "components",
       });
       expect(result).toEqual({
         kind: "ref",
@@ -211,6 +218,7 @@ if (import.meta.vitest) {
       const schema = { $ref: "" } as any;
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Invalid"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual(null);
@@ -224,6 +232,7 @@ if (import.meta.vitest) {
       const schema: SchemaObjectWithNullable = {};
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Empty"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual(null);
@@ -239,6 +248,7 @@ if (import.meta.vitest) {
       const schema: SchemaObjectWithNullable = { type: "object" };
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "ObjectType"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual(null);
@@ -254,6 +264,7 @@ if (import.meta.vitest) {
       const schema = { type: "array" } as any;
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "ArrayWithoutItems"],
+        rootSegment: "components",
       });
       expect(result).toEqual(null);
     });
@@ -267,6 +278,7 @@ if (import.meta.vitest) {
 
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "ArrayWithInvalidItems"],
+        rootSegment: "components",
       });
 
       // When items have an unknown type, visitType returns null
@@ -281,6 +293,7 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "NullableString"],
+        rootSegment: "components",
       });
       // nullableはプロパティレベルで管理されるため、scalar typeにはnullableプロパティがない
       expect(result).toEqual("string");
@@ -293,6 +306,7 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "Email"],
+        rootSegment: "components",
       });
       // email formatは通常のstringとして扱われる
       expect(result).toEqual("string");
@@ -305,6 +319,7 @@ if (import.meta.vitest) {
       };
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "DateTime"],
+        rootSegment: "components",
       });
       // date-time formatは特別な型として扱われる
       expect(result).toEqual("datetime");
@@ -316,6 +331,7 @@ if (import.meta.vitest) {
       const schema: SchemaObjectWithNullable = { type: "string" };
       const context = {
         documentPath: ["components", "schemas", "Test"],
+        rootSegment: "components" as const,
       };
       const result1 = visitType(schema, context);
       const result2 = visitType(schema, context); // Use visitType instead of deprecated resolveType

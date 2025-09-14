@@ -36,7 +36,7 @@ import type { IRScalarType } from "../../types/ir/index";
  */
 export function toIRScalarType(
   type: string,
-  format?: string,
+  format?: string | null,
 ): IRScalarType | null {
   // 整数型
   if (type === "integer") {

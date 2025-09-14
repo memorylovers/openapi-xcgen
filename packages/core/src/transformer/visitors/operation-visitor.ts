@@ -14,23 +14,15 @@
 import { consola } from "consola";
 import type { OperationObject, ReferenceObject } from "../../types/index";
 import type { IREndpoint, IRHttpMethod, IRModel } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
-import { visitParameters, type ParametersContext } from "./parameters-visitor";
-import {
-  visitRequestBody,
-  type RequestBodyContext,
-} from "./request-body-visitor";
-import { visitResponses, type ResponsesContext } from "./responses-visitor";
-
-/**
- * Operation処理用の拡張コンテキスト
- */
-export interface OperationContext extends VisitorContext {
-  /** HTTPメソッド（get/post/put等） */
-  method: string;
-  /** パステンプレート（例: "/pets/{id}"） */
-  pathTemplate: string;
-}
+import type {
+  OperationContext,
+  ParametersContext,
+  RequestBodyContext,
+  ResponsesContext,
+} from "../types";
+import { visitParameters } from "./parameters-visitor";
+import { visitRequestBody } from "./request-body-visitor";
+import { visitResponses } from "./responses-visitor";
 
 /**
  * Operation処理の結果
@@ -81,10 +73,11 @@ export function visitOperation(
     documentPath: [...context.documentPath, "parameters"],
     method: context.method,
     pathTemplate: context.pathTemplate,
+    rootSegment: "paths",
   };
 
   const parametersResult = visitParameters(
-    operation.parameters,
+    operation.parameters || null,
     parametersContext,
   );
 
@@ -97,6 +90,9 @@ export function visitOperation(
       documentPath: [...context.documentPath, "requestBody"],
       method: context.method,
       pathTemplate: context.pathTemplate,
+      rootSegment: "paths",
+      contentType: null,
+      schemaPath: null,
     };
 
     const requestBodyResult = visitRequestBody(
@@ -120,9 +116,13 @@ export function visitOperation(
     documentPath: [...context.documentPath, "responses"],
     method: context.method,
     pathTemplate: context.pathTemplate,
+    rootSegment: "paths",
   };
 
-  const responsesResult = visitResponses(operation.responses, responsesContext);
+  const responsesResult = visitResponses(
+    operation.responses || null,
+    responsesContext,
+  );
 
   // 全てのモデルを収集（オブジェクト、列挙型、配列、マップを統一）
   models.push(...parametersResult.models);
@@ -181,6 +181,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/pets/{id}", "get"],
         method: "get",
         pathTemplate: "/pets/{id}",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -220,6 +221,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/old/endpoint", "post"],
         method: "post",
         pathTemplate: "/old/endpoint",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -252,6 +254,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/missing", "get"],
         method: "get",
         pathTemplate: "/missing",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -285,6 +288,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/no-tags", "get"],
         method: "get",
         pathTemplate: "/no-tags",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -329,6 +333,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/with/{id}", "get"],
         method: "get",
         pathTemplate: "/with/{id}",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -409,6 +414,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/pets", "post"],
         method: "post",
         pathTemplate: "/pets",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -501,6 +507,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/pets/{id}", "get"],
         method: "get",
         pathTemplate: "/pets/{id}",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);
@@ -545,6 +552,7 @@ if (import.meta.vitest) {
             name: "GetPetsId200Response",
             referencePath:
               "#/paths/::pets::{id}/get/responses/responses/200/content/application::json/schema/GetPetsId200Response",
+            description: null,
             statusCode: "200",
             properties: [
               {
@@ -568,6 +576,7 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
         ],
       });
@@ -595,6 +604,7 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/ref/{id}", "get"],
         method: "get",
         pathTemplate: "/ref/{id}",
+        rootSegment: "paths",
       };
 
       const result = visitOperation(operation, context);

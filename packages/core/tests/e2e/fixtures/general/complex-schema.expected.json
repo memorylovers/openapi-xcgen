@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -142,6 +143,7 @@
       "kind": "object",
       "name": "OrderItems",
       "referencePath": "#/components/schemas/OrderItems",
+      "description": null,
       "properties": [
         {
           "name": "productId",
@@ -231,6 +233,7 @@
       "kind": "object",
       "name": "OrderCustomer",
       "referencePath": "#/components/schemas/OrderCustomer",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -295,6 +298,7 @@
       "kind": "object",
       "name": "OrderCustomerAddress",
       "referencePath": "#/components/schemas/OrderCustomerAddress",
+      "description": null,
       "properties": [
         {
           "name": "street",
@@ -356,27 +360,33 @@
       "kind": "enum",
       "name": "OrderStatus",
       "referencePath": "#/components/schemas/OrderStatus",
+      "description": null,
       "type": "string",
       "values": [
         {
           "value": "pending",
-          "name": "PENDING"
+          "name": "PENDING",
+          "description": null
         },
         {
           "value": "processing",
-          "name": "PROCESSING"
+          "name": "PROCESSING",
+          "description": null
         },
         {
           "value": "shipped",
-          "name": "SHIPPED"
+          "name": "SHIPPED",
+          "description": null
         },
         {
           "value": "delivered",
-          "name": "DELIVERED"
+          "name": "DELIVERED",
+          "description": null
         },
         {
           "value": "cancelled",
-          "name": "CANCELLED"
+          "name": "CANCELLED",
+          "description": null
         }
       ]
     },
@@ -384,23 +394,28 @@
       "kind": "enum",
       "name": "OrderPriority",
       "referencePath": "#/components/schemas/OrderPriority",
+      "description": null,
       "type": "string",
       "values": [
         {
           "value": "low",
-          "name": "LOW"
+          "name": "LOW",
+          "description": null
         },
         {
           "value": "normal",
-          "name": "NORMAL"
+          "name": "NORMAL",
+          "description": null
         },
         {
           "value": "high",
-          "name": "HIGH"
+          "name": "HIGH",
+          "description": null
         },
         {
           "value": "urgent",
-          "name": "URGENT"
+          "name": "URGENT",
+          "description": null
         }
       ]
     }

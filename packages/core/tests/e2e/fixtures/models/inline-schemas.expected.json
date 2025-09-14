@@ -9,15 +9,18 @@
       "kind": "enum",
       "name": "RoleEnum",
       "referencePath": "#/components/schemas/RoleEnum",
+      "description": null,
       "type": "string",
       "values": [
         {
           "value": "admin",
-          "name": "ADMIN"
+          "name": "ADMIN",
+          "description": null
         },
         {
           "value": "user",
-          "name": "USER"
+          "name": "USER",
+          "description": null
         }
       ]
     },
@@ -25,15 +28,18 @@
       "kind": "enum",
       "name": "StatusEnum",
       "referencePath": "#/components/schemas/StatusEnum",
+      "description": null,
       "type": "string",
       "values": [
         {
           "value": "active",
-          "name": "ACTIVE"
+          "name": "ACTIVE",
+          "description": null
         },
         {
           "value": "inactive",
-          "name": "INACTIVE"
+          "name": "INACTIVE",
+          "description": null
         }
       ]
     },
@@ -41,6 +47,7 @@
       "kind": "object",
       "name": "UserResponse",
       "referencePath": "#/components/schemas/UserResponse",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -81,6 +88,7 @@
       "kind": "object",
       "name": "UserProfile",
       "referencePath": "#/components/schemas/UserProfile",
+      "description": null,
       "properties": [
         {
           "name": "bio",
@@ -108,6 +116,7 @@
       "kind": "response",
       "name": "GetTest1ParametersId200Response",
       "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response",
+      "description": null,
       "properties": [
         {
           "name": "result",
@@ -120,7 +129,8 @@
           "validation": null
         }
       ],
-      "statusCode": "200"
+      "statusCode": "200",
+      "headers": null
     },
     {
       "kind": "parameter",
@@ -211,7 +221,6 @@
       "kind": "requestBody",
       "name": "PostTest2RequestRequestBody",
       "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody",
-      "description": null,
       "properties": [
         {
           "name": "name",
@@ -261,12 +270,14 @@
           "validation": null
         }
       ],
-      "required": true
+      "required": true,
+      "description": null
     },
     {
       "kind": "object",
       "name": "PostTest2RequestRequestBodyNested",
       "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested",
+      "description": null,
       "properties": [
         {
           "name": "value",
@@ -307,6 +318,7 @@
       "kind": "response",
       "name": "PostTest2Request201Response",
       "referencePath": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response",
+      "description": null,
       "properties": [
         {
           "name": "result",
@@ -319,12 +331,14 @@
           "validation": null
         }
       ],
-      "statusCode": "201"
+      "statusCode": "201",
+      "headers": null
     },
     {
       "kind": "object",
       "name": "schema",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/201/content/application::json/schema",
+      "description": null,
       "properties": [
         {
           "name": "name",
@@ -365,6 +379,7 @@
       "kind": "response",
       "name": "GetTest3Response202Response",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response",
+      "description": null,
       "properties": [
         {
           "name": "count",
@@ -390,12 +405,14 @@
           "validation": null
         }
       ],
-      "statusCode": "202"
+      "statusCode": "202",
+      "headers": null
     },
     {
       "kind": "object",
       "name": "GetTest3Response202ResponseResult",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
+      "description": null,
       "properties": [
         {
           "name": "status",
@@ -416,15 +433,18 @@
       "kind": "enum",
       "name": "GetTest3Response202ResponseResultStatus",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus",
+      "description": null,
       "type": "string",
       "values": [
         {
           "value": "success",
-          "name": "SUCCESS"
+          "name": "SUCCESS",
+          "description": null
         },
         {
           "value": "failed",
-          "name": "FAILED"
+          "name": "FAILED",
+          "description": null
         }
       ]
     },

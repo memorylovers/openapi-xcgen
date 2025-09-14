@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
+      "description": null,
       "properties": [
         {
           "name": "customer",
@@ -45,6 +46,7 @@
       "kind": "object",
       "name": "Customer",
       "referencePath": "#/components/schemas/Customer",
+      "description": null,
       "properties": [
         {
           "name": "name",
@@ -62,6 +64,7 @@
       "kind": "object",
       "name": "OrderItem",
       "referencePath": "#/components/schemas/OrderItem",
+      "description": null,
       "properties": [
         {
           "name": "productId",

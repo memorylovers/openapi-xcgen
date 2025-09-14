@@ -135,6 +135,7 @@ export function visitObject(
     // 親のコンテキストのパスを継承し、最後の要素を新しい名前に置き換える
     const propResult = visitSchema(schemaObj, {
       documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+      rootSegment: context.rootSegment,
     });
 
     // 抽出されたモデルを収集
@@ -196,13 +197,9 @@ export function visitObject(
     kind: "object",
     name,
     referencePath: buildReferencePath(context.documentPath),
+    description: schema.description || null,
     properties,
   };
-
-  // descriptionがある場合のみ追加
-  if (schema.description) {
-    mainModel.description = schema.description;
-  }
 
   // メインモデルを最初に、ネストしたモデルをその後に追加
   result.models.push(mainModel);
@@ -277,6 +274,7 @@ export function visitResponseObject(
     // visitSchemaを使って型を判定・処理
     const propResult = visitSchema(schemaObj, {
       documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+      rootSegment: context.rootSegment,
     });
 
     // 抽出されたモデルを収集
@@ -332,14 +330,11 @@ export function visitResponseObject(
     kind: "response",
     name,
     referencePath: buildReferencePath(context.documentPath),
+    description: schema.description || null,
     properties,
     statusCode,
+    headers: null, // TODO: Implement headers processing
   };
-
-  // descriptionがある場合のみ追加
-  if (schema.description) {
-    responseModel.description = schema.description;
-  }
 
   // headersがある場合のみ追加
   if (headers && headers.length > 0) {
@@ -419,6 +414,7 @@ export function visitRequestBodyObject(
     // visitSchemaを使って型を判定・処理
     const propResult = visitSchema(schemaObj, {
       documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+      rootSegment: context.rootSegment,
     });
 
     // 抽出されたモデルを収集
@@ -504,6 +500,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Simple"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -512,6 +509,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Simple",
             referencePath: "#/components/schemas/Simple",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -540,6 +538,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Model"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -582,6 +581,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -590,6 +590,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
+            description: null,
             properties: [
               {
                 name: "name",
@@ -620,6 +621,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Config"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -628,6 +630,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Config",
             referencePath: "#/components/schemas/Config",
+            description: null,
             properties: [
               {
                 name: "status",
@@ -658,6 +661,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Model"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -666,6 +670,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Model",
             referencePath: "#/components/schemas/Model",
+            description: null,
             properties: [
               {
                 name: "oldField",
@@ -698,6 +703,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -706,6 +712,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
+            description: null,
             properties: [
               {
                 name: "username",
@@ -764,6 +771,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "NullableTest"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -772,6 +780,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "NullableTest",
             referencePath: "#/components/schemas/NullableTest",
+            description: null,
             properties: [
               {
                 name: "requiredNullable",
@@ -831,6 +840,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "TestModel"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -839,6 +849,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "TestModel",
             referencePath: "#/components/schemas/TestModel",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -884,6 +895,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Person"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -892,6 +904,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Person",
             referencePath: "#/components/schemas/Person",
+            description: null,
             properties: [
               {
                 name: "address",
@@ -912,6 +925,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "PersonAddress",
             referencePath: "#/components/schemas/PersonAddress",
+            description: null,
             properties: [
               {
                 name: "street",
@@ -942,6 +956,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Data"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -950,6 +965,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Data",
             referencePath: "#/components/schemas/Data",
+            description: null,
             properties: [
               {
                 name: "tags",
@@ -980,6 +996,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Membership"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -988,6 +1005,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Membership",
             referencePath: "#/components/schemas/Membership",
+            description: null,
             properties: [
               {
                 name: "user",
@@ -1019,6 +1037,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Document"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1027,6 +1046,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Document",
             referencePath: "#/components/schemas/Document",
+            description: null,
             properties: [
               {
                 name: "status",
@@ -1050,9 +1070,9 @@ if (import.meta.vitest) {
             description: "Document status",
             type: "string",
             values: [
-              { value: "draft", name: "DRAFT" },
-              { value: "published", name: "PUBLISHED" },
-              { value: "archived", name: "ARCHIVED" },
+              { value: "draft", name: "DRAFT", description: null },
+              { value: "published", name: "PUBLISHED", description: null },
+              { value: "archived", name: "ARCHIVED", description: null },
             ],
           },
         ],
@@ -1075,6 +1095,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Invalid"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1097,6 +1118,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Empty"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1119,6 +1141,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "NullProps"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1141,6 +1164,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "EmptyProps"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1165,6 +1189,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", ""],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1189,6 +1214,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "   "],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1214,6 +1240,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "Mixed"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -1222,6 +1249,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Mixed",
             referencePath: "#/components/schemas/Mixed",
+            description: null,
             properties: [
               {
                 name: "valid",
@@ -1257,6 +1285,7 @@ if (import.meta.vitest) {
 
       const result = visitObject(schema, {
         documentPath: ["components", "schemas", "AllInvalid"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({

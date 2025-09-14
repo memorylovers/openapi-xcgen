@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "User",
       "referencePath": "#/components/schemas/User",
+      "description": null,
       "properties": [
         {
           "name": "id",
@@ -73,19 +74,23 @@
       "kind": "enum",
       "name": "UserRole",
       "referencePath": "#/components/schemas/UserRole",
+      "description": null,
       "type": "string",
       "values": [
         {
           "value": "admin",
-          "name": "ADMIN"
+          "name": "ADMIN",
+          "description": null
         },
         {
           "value": "user",
-          "name": "USER"
+          "name": "USER",
+          "description": null
         },
         {
           "value": "guest",
-          "name": "GUEST"
+          "name": "GUEST",
+          "description": null
         }
       ]
     },
@@ -93,6 +98,7 @@
       "kind": "object",
       "name": "NewPost",
       "referencePath": "#/components/schemas/NewPost",
+      "description": null,
       "properties": [
         {
           "name": "title",

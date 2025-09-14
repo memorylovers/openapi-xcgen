@@ -23,7 +23,7 @@ import type {
   IRRequestContent,
 } from "../../types/ir/index";
 import { generateComponentName } from "../helpers/generate-component-name";
-import type { VisitorContext } from "../types";
+import type { RequestBodyContext } from "../types";
 import { visitRequestBodyObject } from "./object-visitor";
 import { visitSchema } from "./schema-visitor";
 
@@ -35,16 +35,6 @@ export interface RequestBodyResult {
   requestBody: IRRequestBody | null;
   /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
-}
-
-/**
- * RequestBodyの処理用コンテキスト
- */
-export interface RequestBodyContext extends VisitorContext {
-  /** HTTPメソッド */
-  method: string;
-  /** パステンプレート */
-  pathTemplate: string;
 }
 
 /**
@@ -128,6 +118,7 @@ export function visitRequestBody(
               "schema",
               componentName,
             ],
+            rootSegment: "paths",
           },
           requestBody.required || false,
         );
@@ -160,6 +151,7 @@ export function visitRequestBody(
             mimeType,
             "schema",
           ],
+          rootSegment: "paths",
         });
         if (schemaResult.type) {
           content.push({ mimeType, schema: schemaResult.type });
@@ -216,8 +208,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "createUser", {
         documentPath: ["paths", "/users", "post", "requestBody"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/users",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -302,8 +297,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "uploadFile", {
         documentPath: ["paths", "/files", "post", "requestBody"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/files",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -410,8 +408,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual(null);
@@ -431,8 +432,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual(null);
@@ -452,8 +456,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "updateUser", {
         documentPath: ["paths", "/users/{id}", "put", "requestBody"],
+        rootSegment: "paths",
         method: "put",
         pathTemplate: "/users/{id}",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual(null);
@@ -480,8 +487,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -517,8 +527,11 @@ if (import.meta.vitest) {
 
       const result = visitRequestBody(requestBody, "testOp", {
         documentPath: ["paths", "/test", "post", "requestBody"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
+        contentType: null,
+        schemaPath: null,
       });
 
       expect(result).toEqual({

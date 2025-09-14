@@ -20,18 +20,8 @@ import type {
   IRParameterModel,
 } from "../../types/ir/index";
 import { createParameterModel } from "../helpers/create-parameter-model";
-import type { VisitorContext } from "../types";
+import type { ParameterContext, ParametersContext } from "../types";
 import { visitParameter } from "./parameter-visitor";
-
-/**
- * Parameters処理用の拡張コンテキスト
- */
-export interface ParametersContext extends VisitorContext {
-  /** HTTPメソッド */
-  method: string;
-  /** パステンプレート */
-  pathTemplate: string;
-}
 
 /**
  * Parameters処理の結果
@@ -68,7 +58,7 @@ export interface ParametersResult {
  * ```
  */
 export function visitParameters(
-  parameters: (ParameterObject | ReferenceObject)[] | undefined,
+  parameters: (ParameterObject | ReferenceObject)[] | null,
   context: ParametersContext,
 ): ParametersResult {
   const irParameters: IRParameter[] = [];
@@ -92,9 +82,15 @@ export function visitParameters(
       continue;
     }
 
-    const irParam = visitParameter(param, {
+    const paramContext: ParameterContext = {
       documentPath: [...context.documentPath, "parameters", param.name],
-    });
+      parameterName: param.name,
+      in: param.in as "path" | "query" | "header" | "cookie",
+      method: context.method,
+      pathTemplate: context.pathTemplate,
+      rootSegment: "paths",
+    };
+    const irParam = visitParameter(param, paramContext);
 
     if (irParam) {
       irParameters.push(irParam);
@@ -121,9 +117,10 @@ if (import.meta.vitest) {
   const { describe, it, expect, vi } = import.meta.vitest;
 
   describe("visitParameters", () => {
-    it("should return empty result for undefined parameters", () => {
-      const result = visitParameters(undefined, {
+    it("should return empty result for null parameters", () => {
+      const result = visitParameters(null, {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });
@@ -138,6 +135,7 @@ if (import.meta.vitest) {
     it("should return empty result for empty parameters array", () => {
       const result = visitParameters([], {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });
@@ -162,6 +160,7 @@ if (import.meta.vitest) {
 
       const result = visitParameters(parameters, {
         documentPath: ["paths", "/users/{id}", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/users/{id}",
       });
@@ -226,6 +225,7 @@ if (import.meta.vitest) {
 
       const result = visitParameters(parameters, {
         documentPath: ["paths", "/users/{id}/posts", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/users/{id}/posts",
       });
@@ -324,6 +324,7 @@ if (import.meta.vitest) {
 
       const result = visitParameters(parameters, {
         documentPath: ["paths", "/ref/{id}", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/ref/{id}",
       });
@@ -386,6 +387,7 @@ if (import.meta.vitest) {
 
       const result = visitParameters(parameters, {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });
@@ -443,6 +445,7 @@ if (import.meta.vitest) {
 
       const result = visitParameters(parameters, {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });
@@ -470,6 +473,7 @@ if (import.meta.vitest) {
 
       const result = visitParameters(parameters, {
         documentPath: ["paths", "/api/test", "post"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/api/test",
       });

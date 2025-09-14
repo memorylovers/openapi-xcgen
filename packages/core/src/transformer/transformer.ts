@@ -54,7 +54,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const componentsResult = visitComponents(
       document.components as ComponentsObject,
-      { documentPath: ["components", "schemas"] },
+      { documentPath: ["components", "schemas"], rootSegment: "components" },
     );
     models = componentsResult.models;
   }
@@ -65,6 +65,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const pathsResult = visitPaths(document.paths as PathsObject, {
       documentPath: ["paths"],
+      rootSegment: "paths",
     });
     services = pathsResult.services;
     // インラインスキーマから抽出されたモデルを追加
@@ -104,7 +105,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
     info: {
       title: document.info.title,
       version: document.info.version,
-      description: document.info.description,
+      description: document.info.description || null,
     },
     models,
     services,
@@ -149,7 +150,7 @@ if (import.meta.vitest) {
         info: {
           title: "Test API",
           version: "1.0.0",
-          description: undefined,
+          description: null,
         },
         models: [],
         services: [],
@@ -196,6 +197,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Pet",
             referencePath: "#/components/schemas/Pet",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -223,11 +225,12 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "Status",
             referencePath: "#/components/schemas/Status",
+            description: null,
             type: "string",
             values: [
-              { value: "available", name: "AVAILABLE" },
-              { value: "pending", name: "PENDING" },
-              { value: "sold", name: "SOLD" },
+              { value: "available", name: "AVAILABLE", description: null },
+              { value: "pending", name: "PENDING", description: null },
+              { value: "sold", name: "SOLD", description: null },
             ],
           },
         ],
@@ -295,7 +298,7 @@ if (import.meta.vitest) {
         info: {
           title: "Pet Store API",
           version: "1.0.0",
-          description: undefined,
+          description: null,
         },
         models: [
           {
@@ -474,6 +477,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Pet",
             referencePath: "#/components/schemas/Pet",
+            description: null,
             properties: [
               {
                 name: "id",
@@ -514,11 +518,12 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "PetStatus",
             referencePath: "#/components/schemas/PetStatus",
+            description: null,
             type: "string",
             values: [
-              { value: "available", name: "AVAILABLE" },
-              { value: "pending", name: "PENDING" },
-              { value: "sold", name: "SOLD" },
+              { value: "available", name: "AVAILABLE", description: null },
+              { value: "pending", name: "PENDING", description: null },
+              { value: "sold", name: "SOLD", description: null },
             ],
           },
           {
@@ -635,7 +640,7 @@ if (import.meta.vitest) {
         info: {
           title: "Empty API",
           version: "1.0.0",
-          description: undefined,
+          description: null,
         },
         models: [],
         services: [],

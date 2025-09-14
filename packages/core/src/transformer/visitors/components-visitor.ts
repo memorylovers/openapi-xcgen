@@ -11,7 +11,7 @@ import type {
   SchemaObjectWithNullable,
 } from "../../types/index";
 import type { IRModel } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
+import type { SchemaContext, VisitorContext } from "../types";
 import { visitSchema } from "./schema-visitor";
 
 /**
@@ -68,10 +68,16 @@ export function visitComponents(
     }
 
     try {
-      // visitSchemaを呼び出し（VisitorContextを作成）
-      const schemaResult = visitSchema(schema as SchemaObjectWithNullable, {
+      // visitSchemaを呼び出し（SchemaContextを作成）
+      const schemaContext: SchemaContext = {
         documentPath: [...context.documentPath, name],
-      });
+        schemaName: name,
+        rootSegment: "components",
+      };
+      const schemaResult = visitSchema(
+        schema as SchemaObjectWithNullable,
+        schemaContext,
+      );
 
       // 結果をマージ（統一されたモデル配列）
       result.models.push(...schemaResult.models);
@@ -107,6 +113,7 @@ if (import.meta.vitest) {
 
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       expect(result).toEqual({
@@ -115,6 +122,7 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Item",
             referencePath: "#/components/schemas/Item",
+            description: null,
             properties: [
               {
                 name: "status",
@@ -132,20 +140,22 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "ItemStatus",
             referencePath: "#/components/schemas/ItemStatus",
+            description: null,
             type: "string",
             values: [
-              { value: "a", name: "A" },
-              { value: "b", name: "B" },
+              { value: "a", name: "A", description: null },
+              { value: "b", name: "B", description: null },
             ],
           },
           {
             kind: "enum",
             name: "Type",
             referencePath: "#/components/schemas/Type",
+            description: null,
             type: "string",
             values: [
-              { value: "x", name: "X" },
-              { value: "y", name: "Y" },
+              { value: "x", name: "X", description: null },
+              { value: "y", name: "Y", description: null },
             ],
           },
         ],
@@ -156,28 +166,31 @@ if (import.meta.vitest) {
       const components: ComponentsObject = { schemas: {} };
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       expect(result.models).toEqual([]);
     });
 
-    it("should handle undefined or missing schemas", () => {
+    it("should handle null or missing schemas", () => {
       // schemasプロパティが存在しない場合
       const componentsWithoutSchemas: ComponentsObject = {};
       const result1 = visitComponents(componentsWithoutSchemas, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       expect(result1).toEqual({
         models: [],
       });
 
-      // schemasプロパティがundefinedの場合
-      const componentsWithUndefined: ComponentsObject = {
-        schemas: undefined,
+      // schemasプロパティが未定義の場合
+      const componentsWithNull: ComponentsObject = {
+        // schemasは未定義
       };
-      const result2 = visitComponents(componentsWithUndefined, {
+      const result2 = visitComponents(componentsWithNull, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       expect(result2).toEqual({
@@ -197,6 +210,7 @@ if (import.meta.vitest) {
 
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       expect(warnSpy).toHaveBeenCalledWith(
@@ -222,6 +236,7 @@ if (import.meta.vitest) {
 
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       // BadSchemaの処理でエラーは出るが、GoodSchemaは正常に処理される
@@ -231,10 +246,11 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "GoodSchema",
             referencePath: "#/components/schemas/GoodSchema",
+            description: null,
             type: "string",
             values: [
-              { value: "a", name: "A" },
-              { value: "b", name: "B" },
+              { value: "a", name: "A", description: null },
+              { value: "b", name: "B", description: null },
             ],
           },
         ],
@@ -255,6 +271,7 @@ if (import.meta.vitest) {
 
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       // 配列型はモデル/enumとして扱われない
@@ -272,6 +289,7 @@ if (import.meta.vitest) {
 
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       // プリミティブ型はモデル/enumとして扱われない
@@ -291,6 +309,7 @@ if (import.meta.vitest) {
 
       const result = visitComponents(components, {
         documentPath: ["components", "schemas"],
+        rootSegment: "components",
       });
 
       // $ref参照はモデル/enumとして扱われない

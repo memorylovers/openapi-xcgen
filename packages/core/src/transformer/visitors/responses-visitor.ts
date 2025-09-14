@@ -13,18 +13,8 @@
 
 import type { ReferenceObject, ResponseObject } from "../../types/index";
 import type { IRModel, IRResponse } from "../../types/ir/index";
-import type { VisitorContext } from "../types";
-import { visitResponse, type ResponseContext } from "./response-visitor";
-
-/**
- * Responses処理用の拡張コンテキスト
- */
-export interface ResponsesContext extends VisitorContext {
-  /** HTTPメソッド */
-  method: string;
-  /** パステンプレート */
-  pathTemplate: string;
-}
+import type { ResponseContext, ResponsesContext } from "../types";
+import { visitResponse } from "./response-visitor";
 
 /**
  * Responses処理の結果
@@ -64,7 +54,7 @@ export interface ResponsesResult {
  * ```
  */
 export function visitResponses(
-  responses: Record<string, ResponseObject | ReferenceObject> | undefined,
+  responses: Record<string, ResponseObject | ReferenceObject> | null,
   context: ResponsesContext,
 ): ResponsesResult {
   const irResponses: IRResponse[] = [];
@@ -84,9 +74,13 @@ export function visitResponses(
       documentPath: [...context.documentPath, "responses", statusCode],
       method: context.method,
       pathTemplate: context.pathTemplate,
+      statusCode,
+      rootSegment: "paths",
+      contentType: null,
+      schemaPath: null,
     };
 
-    const responseResult = visitResponse(response, statusCode, responseContext);
+    const responseResult = visitResponse(response, responseContext);
 
     if (responseResult) {
       if (responseResult.response) {
@@ -109,9 +103,10 @@ if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
   describe("visitResponses", () => {
-    it("should return empty result for undefined responses", () => {
-      const result = visitResponses(undefined, {
+    it("should return empty result for null responses", () => {
+      const result = visitResponses(null, {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });
@@ -127,6 +122,7 @@ if (import.meta.vitest) {
         {},
         {
           documentPath: ["paths", "/test", "get"],
+          rootSegment: "paths",
           method: "get",
           pathTemplate: "/test",
         },
@@ -147,6 +143,7 @@ if (import.meta.vitest) {
 
       const result = visitResponses(responses, {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });
@@ -179,6 +176,7 @@ if (import.meta.vitest) {
 
       const result = visitResponses(responses, {
         documentPath: ["paths", "/api/users/{id}", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/api/users/{id}",
       });
@@ -242,6 +240,7 @@ if (import.meta.vitest) {
 
       const result = visitResponses(responses, {
         documentPath: ["paths", "/users", "post"],
+        rootSegment: "paths",
         method: "post",
         pathTemplate: "/users",
       });
@@ -283,6 +282,7 @@ if (import.meta.vitest) {
             name: "PostUsers200Response",
             referencePath:
               "#/paths/::users/post/responses/200/content/application::json/schema/PostUsers200Response",
+            description: null,
             statusCode: "200",
             properties: [
               {
@@ -306,12 +306,14 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
           {
             kind: "response",
             name: "PostUsers400Response",
             referencePath:
               "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
+            description: null,
             statusCode: "400",
             properties: [
               {
@@ -335,6 +337,7 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
         ],
       });
@@ -373,6 +376,7 @@ if (import.meta.vitest) {
 
       const result = visitResponses(responses, {
         documentPath: ["paths", "/api/resource/{id}", "delete"],
+        rootSegment: "paths",
         method: "delete",
         pathTemplate: "/api/resource/{id}",
       });
@@ -420,6 +424,7 @@ if (import.meta.vitest) {
             name: "DeleteApiResourceId200Response",
             referencePath:
               "#/paths/::api::resource::{id}/delete/responses/200/content/application::json/schema/DeleteApiResourceId200Response",
+            description: null,
             statusCode: "200",
             properties: [
               {
@@ -433,6 +438,7 @@ if (import.meta.vitest) {
                 validation: null,
               },
             ],
+            headers: null,
           },
         ],
       });
@@ -450,6 +456,7 @@ if (import.meta.vitest) {
 
       const result = visitResponses(responses, {
         documentPath: ["paths", "/complex/api/endpoint", "patch"],
+        rootSegment: "paths",
         method: "patch",
         pathTemplate: "/complex/api/endpoint",
       });
@@ -484,6 +491,7 @@ if (import.meta.vitest) {
 
       const result = visitResponses(responses, {
         documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
         method: "get",
         pathTemplate: "/test",
       });

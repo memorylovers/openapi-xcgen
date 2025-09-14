@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "Product",
       "referencePath": "#/components/schemas/Product",
+      "description": null,
       "properties": [
         {
           "name": "name",

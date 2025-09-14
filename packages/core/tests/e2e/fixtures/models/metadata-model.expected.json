@@ -9,6 +9,7 @@
       "kind": "object",
       "name": "Article",
       "referencePath": "#/components/schemas/Article",
+      "description": "Article model with metadata",
       "properties": [
         {
           "name": "name",
@@ -70,8 +71,7 @@
           "deprecated": true,
           "validation": null
         }
-      ],
-      "description": "Article model with metadata"
+      ]
     }
   ],
   "services": [
