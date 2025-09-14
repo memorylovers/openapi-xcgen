@@ -25,6 +25,7 @@ import type {
 import type { IRResponseHeader } from "../../types/ir/api";
 import { buildReferencePath } from "../helpers/build-reference-path";
 import { extractValidation } from "../helpers/extract-validation";
+import { isNullable } from "../helpers/is-nullable";
 import type { VisitorContext } from "../types";
 import { visitSchema } from "./schema-visitor";
 
@@ -148,7 +149,7 @@ export function visitObject(
         description: schemaObj.description || null,
         type: propResult.type,
         required: required.includes(propName),
-        nullable: null, // TODO: implement nullable handling
+        nullable: isNullable(schemaObj) ? true : null,
         defaultValue: null, // TODO: implement default value handling
         deprecated: null, // TODO: implement deprecated handling
         validation: null, // TODO: implement validation handling
@@ -282,7 +283,7 @@ export function visitResponseObject(
         description: schemaObj.description || null,
         type: propResult.type,
         required: required.includes(propName),
-        nullable: null, // TODO: implement nullable handling
+        nullable: isNullable(schemaObj) ? true : null,
         defaultValue: null, // TODO: implement default value handling
         deprecated: null, // TODO: implement deprecated handling
         validation: null, // TODO: implement validation handling
@@ -417,7 +418,7 @@ export function visitRequestBodyObject(
         description: schemaObj.description || null,
         type: propResult.type,
         required: requiredProps.includes(propName),
-        nullable: null, // TODO: implement nullable handling
+        nullable: isNullable(schemaObj) ? true : null,
         defaultValue: null, // TODO: implement default value handling
         deprecated: null, // TODO: implement deprecated handling
         validation: null, // TODO: implement validation handling

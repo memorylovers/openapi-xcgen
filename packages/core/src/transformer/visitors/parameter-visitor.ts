@@ -15,9 +15,10 @@ import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
 import type { ParameterObject, SchemaObject } from "../../types/index";
 import type { IRParameter } from "../../types/ir/index";
-import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type";
+import { isNullable } from "../helpers/is-nullable.js";
+import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type.js";
 import type { ParameterContext } from "../types";
-import { visitType } from "./type-visitor";
+import { visitType } from "./type-visitor.js";
 
 /**
  * ParameterObjectをIRParameterに変換
@@ -93,7 +94,7 @@ export function visitParameter(
     description: parameter.description || null,
     required: parameter.required || false,
     type,
-    nullable: null, // TODO: implement nullable handling
+    nullable: isNullable(schema) ? true : null,
     defaultValue: schema.default || null,
     deprecated: parameter.deprecated || null,
   };
@@ -336,6 +337,71 @@ if (import.meta.vitest) {
           itemType: "string",
         },
         nullable: null,
+        defaultValue: null,
+        deprecated: null,
+      });
+    });
+
+    it("should handle nullable parameter with OpenAPI 3.0 format", () => {
+      const param: ParameterObject = {
+        name: "filter",
+        in: "query",
+        schema: {
+          type: "string",
+          nullable: true,
+        },
+      };
+
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "filter",
+        in: "query",
+        method: "get",
+        pathTemplate: "/users",
+      });
+
+      expect(result).toEqual({
+        name: "filter",
+        in: "query",
+        description: null,
+        required: false,
+        type: "string",
+        nullable: true,
+        defaultValue: null,
+        deprecated: null,
+      });
+    });
+
+    // TODO: OpenAPI 3.1形式のtype配列はtype-visitorでまだサポートされていない
+    // type配列形式（["string", "null"]）はtype-visitorがnullを返すため、
+    // parameter全体もnullになってしまう。
+    // type-visitorの改修が必要。
+    it.skip("should handle nullable parameter with OpenAPI 3.1 format", () => {
+      const param: ParameterObject = {
+        name: "category",
+        in: "query",
+        schema: {
+          type: ["string", "null"],
+        } as SchemaObject,
+      };
+
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/products", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "category",
+        in: "query",
+        method: "get",
+        pathTemplate: "/products",
+      });
+
+      expect(result).toEqual({
+        name: "category",
+        in: "query",
+        description: null,
+        required: false,
+        type: "string", // 本来はstringを返すべき
+        nullable: true,
         defaultValue: null,
         deprecated: null,
       });
