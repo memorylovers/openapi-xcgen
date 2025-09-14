@@ -150,31 +150,11 @@ export function visitObject(
         type: propResult.type,
         required: required.includes(propName),
         nullable: isNullable(schemaObj) ? true : null,
-        defaultValue: null, // TODO: implement default value handling
-        deprecated: null, // TODO: implement deprecated handling
-        validation: null, // TODO: implement validation handling
+        defaultValue:
+          schemaObj.default !== undefined ? schemaObj.default : null,
+        deprecated: schemaObj.deprecated === true ? true : null,
+        validation: extractValidation(schemaObj),
       };
-
-      // defaultValueがある場合は追加
-      if (schemaObj.default !== undefined) {
-        property.defaultValue = schemaObj.default;
-      }
-
-      // deprecatedがある場合は追加
-      if (schemaObj.deprecated === true) {
-        property.deprecated = true;
-      }
-
-      // nullableがある場合は追加
-      if (schemaObj.nullable === true) {
-        property.nullable = true;
-      }
-
-      // バリデーション情報を抽出
-      const validation = extractValidation(schemaObj);
-      if (validation) {
-        property.validation = validation;
-      }
 
       properties.push(property);
     } else {
@@ -284,25 +264,11 @@ export function visitResponseObject(
         type: propResult.type,
         required: required.includes(propName),
         nullable: isNullable(schemaObj) ? true : null,
-        defaultValue: null, // TODO: implement default value handling
-        deprecated: null, // TODO: implement deprecated handling
-        validation: null, // TODO: implement validation handling
+        defaultValue:
+          schemaObj.default !== undefined ? schemaObj.default : null,
+        deprecated: schemaObj.deprecated === true ? true : null,
+        validation: extractValidation(schemaObj),
       };
-      if (schemaObj.default !== undefined) {
-        property.defaultValue = schemaObj.default;
-      }
-      if (schemaObj.deprecated === true) {
-        property.deprecated = true;
-      }
-      if (schemaObj.nullable === true) {
-        property.nullable = true;
-      }
-
-      // バリデーション情報を抽出
-      const validation = extractValidation(schemaObj);
-      if (validation) {
-        property.validation = validation;
-      }
 
       properties.push(property);
     } else {
@@ -419,25 +385,11 @@ export function visitRequestBodyObject(
         type: propResult.type,
         required: requiredProps.includes(propName),
         nullable: isNullable(schemaObj) ? true : null,
-        defaultValue: null, // TODO: implement default value handling
-        deprecated: null, // TODO: implement deprecated handling
-        validation: null, // TODO: implement validation handling
+        defaultValue:
+          schemaObj.default !== undefined ? schemaObj.default : null,
+        deprecated: schemaObj.deprecated === true ? true : null,
+        validation: extractValidation(schemaObj),
       };
-      if (schemaObj.default !== undefined) {
-        property.defaultValue = schemaObj.default;
-      }
-      if (schemaObj.deprecated === true) {
-        property.deprecated = true;
-      }
-      if (schemaObj.nullable === true) {
-        property.nullable = true;
-      }
-
-      // バリデーション情報を抽出
-      const validation = extractValidation(schemaObj);
-      if (validation) {
-        property.validation = validation;
-      }
 
       properties.push(property);
     } else {

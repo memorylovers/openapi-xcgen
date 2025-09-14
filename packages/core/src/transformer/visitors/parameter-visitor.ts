@@ -378,13 +378,13 @@ if (import.meta.vitest) {
     // parameter全体もnullになってしまう。
     // type-visitorの改修が必要。
     it.skip("should handle nullable parameter with OpenAPI 3.1 format", () => {
-      const param: ParameterObject = {
+      const param = {
         name: "category",
         in: "query",
         schema: {
           type: ["string", "null"],
-        } as SchemaObject,
-      };
+        },
+      } as unknown as ParameterObject;
 
       const result = visitParameter(param, {
         documentPath: ["paths", "/products", "get", "parameters", "0"],
