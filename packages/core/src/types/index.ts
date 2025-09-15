@@ -48,6 +48,8 @@ export type {
   IROAuth2ScopeMap,
   IRParameter,
   IRParameterInType,
+  IRParameterModel,
+  IRParameterProperty,
   IRProperty,
   IRRef,
   IRRequestBody,

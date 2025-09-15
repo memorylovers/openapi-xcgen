@@ -12,14 +12,19 @@
  */
 
 import { consola } from "consola";
-import type { OperationObject, ReferenceObject } from "../../types";
-import type { IREndpoint, IRHttpMethod, IRModel } from "../../types/ir";
+import type {
+  OperationObject,
+  ReferenceObject,
+  IREndpoint,
+  IRHttpMethod,
+  IRModel,
+} from "../../../types";
 import type {
   OperationContext,
   ParametersContext,
   RequestBodyContext,
   ResponsesContext,
-} from "../types";
+} from "../../types";
 import { visitParameters } from "./parameters-visitor";
 import { visitRequestBody } from "./request-body-visitor";
 import { visitResponses } from "./responses-visitor";

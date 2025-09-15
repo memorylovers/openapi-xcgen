@@ -12,17 +12,19 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../types/guards";
+import { isReferenceObject } from "../../../types";
 import type {
   ReferenceObject,
   ResponseObject,
   SchemaObject,
-} from "../../types";
-import type { IRModel, IRResponse, IRResponseContent } from "../../types/ir";
-import { generateComponentName } from "../helpers/generate-component-name";
-import type { ResponseContext, VisitorContext } from "../types";
-import { visitResponseObject } from "./object-visitor";
-import { visitSchema } from "./schema-visitor";
+  IRModel,
+  IRResponse,
+  IRResponseContent,
+} from "../../../types";
+import { generateComponentName } from "../../helpers/generate-component-name";
+import type { ResponseContext, VisitorContext } from "../../types";
+import { visitResponseObject } from "../schema/object-visitor";
+import { visitSchema } from "../schema/schema-visitor";
 
 /**
  * Responseの処理結果

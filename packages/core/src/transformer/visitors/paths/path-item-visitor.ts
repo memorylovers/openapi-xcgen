@@ -10,10 +10,9 @@
  * - パラメータの継承（PathItem共通パラメータ）の処理
  */
 
-import type { PathItemObject } from "../../types";
-import type { IREndpoint, IRModel } from "../../types/ir";
-import type { OperationContext, PathItemContext } from "../types";
-import { visitOperation } from "./operation-visitor";
+import type { PathItemObject, IREndpoint, IRModel } from "../../../types";
+import type { OperationContext, PathItemContext } from "../../types";
+import { visitOperation } from "../operations/operation-visitor";
 
 /**
  * サポートするHTTPメソッドの配列
@@ -58,7 +57,7 @@ const HTTP_METHODS = [
 /**
  * PathItemの結果
  */
-export interface PathItemEndpoint {
+export interface PathItemResult {
   endpoint: IREndpoint;
   /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models?: IRModel[];
@@ -67,8 +66,8 @@ export interface PathItemEndpoint {
 export function visitPathItem(
   pathItem: PathItemObject,
   context: PathItemContext,
-): PathItemEndpoint[] {
-  const results: PathItemEndpoint[] = [];
+): PathItemResult[] {
+  const results: PathItemResult[] = [];
 
   // 各HTTPメソッドを処理
   for (const method of HTTP_METHODS) {

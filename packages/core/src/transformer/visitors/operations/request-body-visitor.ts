@@ -11,17 +11,19 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../types/guards";
+import { isReferenceObject } from "../../../types";
 import type {
   ReferenceObject,
   RequestBodyObject,
   SchemaObject,
-} from "../../types";
-import type { IRModel, IRRequestBody, IRRequestContent } from "../../types/ir";
-import { generateComponentName } from "../helpers/generate-component-name";
-import type { RequestBodyContext } from "../types";
-import { visitRequestBodyObject } from "./object-visitor";
-import { visitSchema } from "./schema-visitor";
+  IRModel,
+  IRRequestBody,
+  IRRequestContent,
+} from "../../../types";
+import { generateComponentName } from "../../helpers/generate-component-name";
+import type { RequestBodyContext } from "../../types";
+import { visitRequestBodyObject } from "../schema/object-visitor";
+import { visitSchema } from "../schema/schema-visitor";
 
 /**
  * RequestBodyの処理結果

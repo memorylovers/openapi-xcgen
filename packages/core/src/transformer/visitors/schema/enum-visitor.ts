@@ -6,12 +6,17 @@
  */
 
 import { consola } from "consola";
-import type { SchemaObject, SchemaObjectWithNullable } from "../../types";
-import type { IRModel, IREnumModel, IREnumValue } from "../../types/ir";
-import type { VisitorContext } from "../types";
-import { generateEnumName } from "../helpers/generate-enum-name";
-import { toIRScalarType } from "../helpers/to-ir-scalar-type";
-import { buildReferencePath } from "../helpers/build-reference-path";
+import type {
+  SchemaObject,
+  SchemaObjectWithNullable,
+  IRModel,
+  IREnumModel,
+  IREnumValue,
+} from "../../../types";
+import type { VisitorContext } from "../../types";
+import { generateEnumName } from "../../helpers/generate-enum-name";
+import { toIRScalarType } from "../../helpers/to-ir-scalar-type";
+import { buildReferencePath } from "../../helpers/build-reference-path";
 
 /**
  * Enum visitor結果の型

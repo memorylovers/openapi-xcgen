@@ -19,10 +19,10 @@ import type {
   IRTag,
   IRMetadata,
 } from "../types/ir";
-import { visitComponents } from "./visitors/components-visitor";
-import { visitMetadata } from "./visitors/metadata-visitor";
-import { visitPaths } from "./visitors/paths-visitor";
-import { visitTags } from "./visitors/tags-visitor";
+import { visitComponents } from "./visitors/components/components-visitor";
+import { visitMetadata } from "./visitors/metadata/metadata-visitor";
+import { visitPaths } from "./visitors/paths/paths-visitor";
+import { visitTags } from "./visitors/metadata/tags-visitor";
 
 /**
  * OpenAPIDocumentをXcgenIRに変換

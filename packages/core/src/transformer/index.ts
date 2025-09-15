@@ -6,7 +6,19 @@
 export { transform } from "./transformer";
 
 // Types
-export type { SchemaVisitor, VisitorContext, VisitorResult } from "./types";
+export type {
+  SchemaVisitor,
+  VisitorContext,
+  VisitorResult,
+  SchemaContext,
+  ParameterContext,
+  PathItemContext,
+  OperationContext,
+  ParametersContext,
+  RequestBodyContext,
+  ResponsesContext,
+  ResponseContext,
+} from "./types";
 
 // Helper functions
 export {

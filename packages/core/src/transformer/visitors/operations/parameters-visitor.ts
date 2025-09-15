@@ -12,11 +12,16 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../types/guards";
-import type { ParameterObject, ReferenceObject } from "../../types";
-import type { IRModel, IRParameter, IRParameterModel } from "../../types/ir";
-import { createParameterModel } from "../helpers/create-parameter-model";
-import type { ParameterContext, ParametersContext } from "../types";
+import { isReferenceObject } from "../../../types";
+import type {
+  ParameterObject,
+  ReferenceObject,
+  IRModel,
+  IRParameter,
+  IRParameterModel,
+} from "../../../types";
+import { createParameterModel } from "../../helpers/create-parameter-model";
+import type { ParameterContext, ParametersContext } from "../../types";
 import { visitParameter } from "./parameter-visitor";
 
 /**

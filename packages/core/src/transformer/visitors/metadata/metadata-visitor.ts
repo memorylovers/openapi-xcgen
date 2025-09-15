@@ -10,7 +10,7 @@ import type {
   IRContact,
   IRLicense,
   IRMetadata,
-} from "../../types";
+} from "../../../types";
 
 /**
  * InfoObjectをIRMetadataに変換

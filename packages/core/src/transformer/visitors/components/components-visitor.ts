@@ -6,10 +6,13 @@
  */
 
 import { consola } from "consola";
-import type { ComponentsObject, SchemaObjectWithNullable } from "../../types";
-import type { IRModel } from "../../types/ir";
-import type { SchemaContext, VisitorContext } from "../types";
-import { visitSchema } from "./schema-visitor";
+import type {
+  ComponentsObject,
+  SchemaObjectWithNullable,
+  IRModel,
+} from "../../../types";
+import type { SchemaContext, VisitorContext } from "../../types";
+import { visitSchema } from "../schema/schema-visitor";
 
 /**
  * Components処理の結果

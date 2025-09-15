@@ -10,9 +10,13 @@
  * - IREndpoint[]とIRModel[]の生成
  */
 
-import type { PathsObject, PathItemObject } from "../../types";
-import type { IREndpoint, IRModel } from "../../types/ir";
-import type { PathItemContext, VisitorContext } from "../types";
+import type {
+  PathsObject,
+  PathItemObject,
+  IREndpoint,
+  IRModel,
+} from "../../../types";
+import type { PathItemContext, VisitorContext } from "../../types";
 import { visitPathItem } from "./path-item-visitor";
 
 /**
