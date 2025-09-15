@@ -7,7 +7,7 @@
 
 import type { IRModel } from "./data";
 
-import type { IRService } from "./api";
+import type { IREndpoint, IRTag } from "./api";
 
 import type { IRMetadata, IRSecurityScheme, IRServer } from "./config";
 
@@ -20,8 +20,10 @@ export interface XcgenIR {
   metadata: IRMetadata;
   /** データモデルの配列（オブジェクト、列挙型、配列、マップを統一的に管理） */
   models: IRModel[];
-  /** APIサービスの配列（タグでグループ化） */
-  services: IRService[];
+  /** タグ定義の配列 */
+  tags: IRTag[];
+  /** APIエンドポイントの配列 */
+  endpoints: IREndpoint[];
   /** サーバー情報の配列 */
   servers: IRServer[];
   /** セキュリティ定義 */
@@ -54,8 +56,10 @@ export interface IRDocument {
   info: IRInfo;
   /** データモデルの配列（オブジェクト、列挙型、配列、マップを統一的に管理） */
   models: IRModel[];
-  /** APIサービスの配列（タグでグループ化） */
-  services: IRService[];
+  /** タグ定義の配列 */
+  tags: IRTag[];
+  /** APIエンドポイントの配列 */
+  endpoints: IREndpoint[];
 }
 
 // Re-export all types from sub-modules

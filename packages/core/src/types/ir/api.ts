@@ -43,32 +43,37 @@ export interface IRRequestContent {
 }
 
 /**
- * IRService - APIサービス（タグでグループ化）
+ * IRTagExternalDocs - タグの外部ドキュメント
+ */
+export interface IRTagExternalDocs {
+  /** ドキュメントURL */
+  url: string;
+  /** ドキュメントの説明 */
+  description: string | null;
+}
+
+/**
+ * IRTag - OpenAPIのタグ定義
  * @example
  * ```yaml
- * # OpenAPI → IRService
+ * # OpenAPI → IRTag
  * tags:
  *   - name: users
  *     description: User management operations
- *
- * paths:
- *   /users:
- *     get:
- *       tags: [users]  # この"users"タグでグループ化
- *       operationId: listUsers
- *   /users/{id}:
- *     get:
- *       tags: [users]  # 同じタグのエンドポイント
- *       operationId: getUser
+ *     externalDocs:
+ *       url: https://example.com/docs/users
+ *       description: User API documentation
+ *   - name: pets
+ *     description: Pet management operations
  * ```
  */
-export interface IRService {
-  /** サービス名 */
+export interface IRTag {
+  /** タグ名 */
   name: string;
   /** 説明 */
   description: string | null;
-  /** エンドポイントの配列 */
-  endpoints: IREndpoint[];
+  /** 外部ドキュメント */
+  externalDocs: IRTagExternalDocs | null;
 }
 
 /**
@@ -109,6 +114,8 @@ export interface IREndpoint {
   description: string | null;
   /** サマリー */
   summary: string | null;
+  /** タグ（OpenAPIのtags配列） */
+  tags: string[];
   /** パラメータ（統合モデルがある場合は参照、ない場合は個別配列） */
   parameters: IRType | IRParameter[];
   /** リクエストボディ */

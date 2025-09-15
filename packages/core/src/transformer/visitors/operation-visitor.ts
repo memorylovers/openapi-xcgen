@@ -148,6 +148,7 @@ export function visitOperation(
     path: context.pathTemplate,
     summary: operation.summary || null,
     description: operation.description || null,
+    tags: operation.tags || [],
     parameters,
     requestBody: requestBody || null,
     responses: responsesResult.responses,
@@ -193,6 +194,7 @@ if (import.meta.vitest) {
           path: "/pets/{id}",
           summary: "Get a pet by ID",
           description: "Returns a single pet",
+          tags: ["pets"],
           parameters: [],
           requestBody: null,
           responses: [
@@ -233,6 +235,7 @@ if (import.meta.vitest) {
           path: "/old/endpoint",
           summary: null,
           description: null,
+          tags: [],
           parameters: [],
           requestBody: null,
           responses: [],
@@ -267,6 +270,7 @@ if (import.meta.vitest) {
           path: "/missing",
           summary: "Missing ID",
           description: null,
+          tags: [],
           parameters: [],
           requestBody: null,
           responses: [],
@@ -300,6 +304,7 @@ if (import.meta.vitest) {
           path: "/no-tags",
           summary: null,
           description: null,
+          tags: [],
           parameters: [],
           requestBody: null,
           responses: [],
@@ -345,6 +350,7 @@ if (import.meta.vitest) {
           path: "/with/{id}",
           summary: null,
           description: null,
+          tags: [],
           parameters: {
             kind: "ref",
             name: "#/paths/::with::{id}/get/parameters/GetWithParams",
@@ -426,6 +432,7 @@ if (import.meta.vitest) {
           path: "/pets",
           summary: null,
           description: null,
+          tags: [],
           parameters: [],
           requestBody: {
             description: "Pet to add",
@@ -519,6 +526,7 @@ if (import.meta.vitest) {
           path: "/pets/{id}",
           summary: null,
           description: null,
+          tags: [],
           parameters: [],
           requestBody: null,
           responses: [
@@ -616,6 +624,7 @@ if (import.meta.vitest) {
           path: "/ref/{id}",
           summary: null,
           description: null,
+          tags: [],
           parameters: {
             kind: "ref",
             name: "#/paths/::ref::{id}/get/parameters/GetRefParams",

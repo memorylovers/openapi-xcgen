@@ -56,11 +56,10 @@ const HTTP_METHODS = [
  * ```
  */
 /**
- * PathItemの結果（タグ情報を含む）
+ * PathItemの結果
  */
 export interface PathItemEndpoint {
   endpoint: IREndpoint;
-  tags?: string[];
   /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models?: IRModel[];
 }
@@ -86,7 +85,6 @@ export function visitPathItem(
       if (operationResult) {
         results.push({
           endpoint: operationResult.endpoint,
-          tags: operation.tags, // tagsを保持（undefinedをそのまま渡す）
           models: operationResult.models,
         });
       }
@@ -132,6 +130,7 @@ if (import.meta.vitest) {
             path: "/pets/{id}",
             summary: null,
             description: null,
+            tags: ["pets"],
             parameters: [],
             requestBody: null,
             responses: [
@@ -145,7 +144,6 @@ if (import.meta.vitest) {
             deprecated: null,
             security: null,
           },
-          tags: ["pets"],
           models: [],
         },
       ]);
@@ -184,13 +182,13 @@ if (import.meta.vitest) {
             path: "/pets/{id}",
             summary: null,
             description: null,
+            tags: [],
             parameters: [],
             requestBody: null,
             responses: [],
             deprecated: null,
             security: null,
           },
-          tags: undefined,
           models: [],
         },
         {
@@ -200,13 +198,13 @@ if (import.meta.vitest) {
             path: "/pets/{id}",
             summary: null,
             description: null,
+            tags: [],
             parameters: [],
             requestBody: null,
             responses: [],
             deprecated: null,
             security: null,
           },
-          tags: undefined,
           models: [],
         },
         {
@@ -216,13 +214,13 @@ if (import.meta.vitest) {
             path: "/pets/{id}",
             summary: null,
             description: null,
+            tags: [],
             parameters: [],
             requestBody: null,
             responses: [],
             deprecated: null,
             security: null,
           },
-          tags: undefined,
           models: [],
         },
       ]);
@@ -256,13 +254,13 @@ if (import.meta.vitest) {
             path: "/pets/{id}",
             summary: null,
             description: null,
+            tags: [],
             parameters: [],
             requestBody: null,
             responses: [],
             deprecated: null,
             security: null,
           },
-          tags: undefined,
           models: [],
         },
       ]);
@@ -301,13 +299,13 @@ if (import.meta.vitest) {
             path: "/pets/{id}",
             summary: null,
             description: null,
+            tags: [],
             parameters: [],
             requestBody: null,
             responses: [],
             deprecated: null,
             security: null,
           },
-          tags: undefined,
           models: [],
         },
       ]);

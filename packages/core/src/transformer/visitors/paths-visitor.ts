@@ -1,18 +1,17 @@
 /**
- * paths-visitor.ts - PathsObjectを処理してIRService[]に変換
+ * paths-visitor.ts - PathsObjectを処理してIREndpoint[]に変換
  *
  * OpenAPIのpathsセクションを処理し、
- * エンドポイントをタグでグループ化してサービスとして分類する。
+ * エンドポイントとインラインモデルを抽出する。
  *
  * 責務:
  * - PathsObjectのイテレーション
  * - 各PathItemObjectの処理をpath-item-visitorに委譲
- * - エンドポイントのタグによるグループ化
- * - IRService[]の生成
+ * - IREndpoint[]とIRModel[]の生成
  */
 
 import type { PathsObject } from "../../types/index";
-import type { IRModel, IRService } from "../../types/ir/index";
+import type { IREndpoint, IRModel } from "../../types/ir/index";
 import type { PathItemContext, VisitorContext } from "../types";
 import { visitPathItem } from "./path-item-visitor";
 
@@ -20,18 +19,18 @@ import { visitPathItem } from "./path-item-visitor";
  * Paths処理の結果
  */
 export interface PathsResult {
-  /** 抽出されたサービス（タグでグループ化） */
-  services: IRService[];
+  /** 抽出されたエンドポイント */
+  endpoints: IREndpoint[];
   /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
   models: IRModel[];
 }
 
 /**
- * PathsObjectを処理してIRService[]に変換
+ * PathsObjectを処理してIREndpoint[]に変換
  *
  * @param paths - OpenAPIのPathsObject
  * @param context - Visitorコンテキスト
- * @returns タグでグループ化されたサービス配列
+ * @returns エンドポイントとモデルの配列
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -54,7 +53,7 @@ export function visitPaths(
   paths: PathsObject,
   context: VisitorContext,
 ): PathsResult {
-  const serviceMap = new Map<string, IRService>();
+  const endpoints: IREndpoint[] = [];
   const models: IRModel[] = [];
 
   // 各パスを処理
@@ -69,20 +68,9 @@ export function visitPaths(
 
     const results = visitPathItem(pathItem, pathItemContext);
 
-    // エンドポイントをタグでグループ化、インラインモデルを収集
+    // エンドポイントとモデルを収集
     for (const result of results) {
-      // tagsが指定されていない場合は'default'を使用
-      const tag = result.tags?.[0] || "default";
-
-      if (!serviceMap.has(tag)) {
-        serviceMap.set(tag, {
-          name: tag,
-          description: null,
-          endpoints: [],
-        });
-      }
-
-      serviceMap.get(tag)!.endpoints.push(result.endpoint);
+      endpoints.push(result.endpoint);
 
       // インラインモデル収集（オブジェクト、列挙型、配列、マップを統一）
       if (result.models) {
@@ -92,7 +80,7 @@ export function visitPaths(
   }
 
   return {
-    services: Array.from(serviceMap.values()),
+    endpoints,
     models,
   };
 }
@@ -123,40 +111,34 @@ if (import.meta.vitest) {
       };
       const result = visitPaths(paths, context);
 
-      // Red Phase: このテストは失敗する
       expect(result).toEqual({
-        services: [
+        endpoints: [
           {
-            name: "pets",
+            operationId: "listPets",
+            method: "get",
+            path: "/pets",
+            summary: null,
             description: null,
-            endpoints: [
+            tags: ["pets"],
+            parameters: [],
+            requestBody: null,
+            responses: [
               {
-                operationId: "listPets",
-                method: "get",
-                path: "/pets",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [
-                  {
-                    statusCode: "200",
-                    description: "Success",
-                    content: null,
-                    headers: null,
-                  },
-                ],
-                deprecated: null,
-                security: null,
+                statusCode: "200",
+                description: "Success",
+                content: null,
+                headers: null,
               },
             ],
+            deprecated: null,
+            security: null,
           },
         ],
         models: [],
       });
     });
 
-    it("should group endpoints by tags", () => {
+    it("should extract multiple endpoints", () => {
       const paths: PathsObject = {
         "/pets": {
           get: {
@@ -187,63 +169,15 @@ if (import.meta.vitest) {
       };
       const result = visitPaths(paths, context);
 
-      // Red Phase: このテストは失敗する
-      expect(result).toEqual({
-        services: [
-          {
-            name: "pets",
-            description: null,
-            endpoints: [
-              {
-                operationId: "listPets",
-                method: "get",
-                path: "/pets",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [],
-                deprecated: null,
-                security: null,
-              },
-              {
-                operationId: "getPet",
-                method: "get",
-                path: "/pets/{id}",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [],
-                deprecated: null,
-                security: null,
-              },
-            ],
-          },
-          {
-            name: "users",
-            description: null,
-            endpoints: [
-              {
-                operationId: "listUsers",
-                method: "get",
-                path: "/users",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [],
-                deprecated: null,
-                security: null,
-              },
-            ],
-          },
-        ],
-        models: [],
-      });
+      expect(result.endpoints).toHaveLength(3);
+      expect(result.endpoints.map((e) => e.operationId)).toEqual([
+        "listPets",
+        "getPet",
+        "listUsers",
+      ]);
     });
 
-    it("should use 'default' tag for endpoints without tags", () => {
+    it("should handle endpoints without tags", () => {
       const paths: PathsObject = {
         "/health": {
           get: {
@@ -262,37 +196,28 @@ if (import.meta.vitest) {
       };
       const result = visitPaths(paths, context);
 
-      // Red Phase: このテストは失敗する
-      expect(result).toEqual({
-        services: [
-          {
-            name: "default",
-            description: null,
-            endpoints: [
-              {
-                operationId: "healthCheck",
-                method: "get",
-                path: "/health",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [
-                  {
-                    statusCode: "200",
-                    description: "OK",
-                    content: null,
-                    headers: null,
-                  },
-                ],
-                deprecated: null,
-                security: null,
-              },
-            ],
+      expect(result.endpoints[0].tags).toEqual([]);
+    });
+
+    it("should skip null path items", () => {
+      const paths: PathsObject = {
+        "/valid": {
+          get: {
+            operationId: "validOp",
+            responses: {},
           },
-        ],
-        models: [],
-      });
+        },
+        "/null": null as any,
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths"],
+        rootSegment: "paths",
+      };
+      const result = visitPaths(paths, context);
+
+      expect(result.endpoints).toHaveLength(1);
+      expect(result.endpoints[0].operationId).toBe("validOp");
     });
   });
 }

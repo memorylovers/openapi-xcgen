@@ -16,9 +16,10 @@ import type {
   OpenAPIDocument,
   PathsObject,
 } from "../types/index";
-import type { IRDocument, IRModel, IRService } from "../types/ir/index";
+import type { IRDocument, IREndpoint, IRModel, IRTag } from "../types/ir/index";
 import { visitComponents } from "./visitors/components-visitor";
 import { visitPaths } from "./visitors/paths-visitor";
+import { visitTags } from "./visitors/tags-visitor";
 
 /**
  * OpenAPIDocumentをIRDocumentに変換
@@ -59,15 +60,18 @@ export function transform(document: OpenAPIDocument): IRDocument {
     models = componentsResult.models;
   }
 
-  // Paths処理（services/endpoints）
-  let services: IRService[] = [];
+  // Tags処理
+  const tags: IRTag[] = visitTags(document.tags);
+
+  // Paths処理（endpoints）
+  let endpoints: IREndpoint[] = [];
   if (document.paths) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const pathsResult = visitPaths(document.paths as PathsObject, {
       documentPath: ["paths"],
       rootSegment: "paths",
     });
-    services = pathsResult.services;
+    endpoints = pathsResult.endpoints;
     // インラインスキーマから抽出されたモデルを追加
     models.push(...pathsResult.models);
   }
@@ -108,7 +112,8 @@ export function transform(document: OpenAPIDocument): IRDocument {
       description: document.info.description || null,
     },
     models,
-    services,
+    tags,
+    endpoints,
   };
 
   // 統計情報をログ出力（種類別にカウント）
@@ -123,7 +128,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
   const responseCount = models.filter((m) => m.kind === "response").length;
 
   consola.success(
-    `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps, ${parameterCount} parameters, ${requestBodyCount} requestBodies, ${responseCount} responses), ${services.length} services`,
+    `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps, ${parameterCount} parameters, ${requestBodyCount} requestBodies, ${responseCount} responses), ${tags.length} tags, ${endpoints.length} endpoints`,
   );
 
   return irDocument;
@@ -153,7 +158,8 @@ if (import.meta.vitest) {
           description: null,
         },
         models: [],
-        services: [],
+        tags: [],
+        endpoints: [],
       });
     });
 
@@ -234,7 +240,8 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        services: [],
+        tags: [],
+        endpoints: [],
       });
     });
 
@@ -322,87 +329,79 @@ if (import.meta.vitest) {
             description: null,
           },
         ],
-        services: [
+        tags: [],
+        endpoints: [
           {
-            name: "pets",
+            operationId: "listPets",
+            method: "get",
+            path: "/pets",
+            summary: null,
             description: null,
-            endpoints: [
+            tags: ["pets"],
+            parameters: [],
+            requestBody: null,
+            responses: [
               {
-                operationId: "listPets",
-                method: "get",
-                path: "/pets",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [
-                  {
-                    statusCode: "200",
-                    description: "Success",
-                    content: null,
-                    headers: null,
-                  },
-                ],
-                deprecated: null,
-                security: null,
-              },
-              {
-                operationId: "createPet",
-                method: "post",
-                path: "/pets",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: {
-                  description: null,
-                  required: false,
-                  content: [
-                    {
-                      mimeType: "application/json",
-                      schema: {
-                        kind: "ref",
-                        name: "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
-                      },
-                    },
-                  ],
-                },
-                responses: [
-                  {
-                    statusCode: "201",
-                    description: "Created",
-                    content: null,
-                    headers: null,
-                  },
-                ],
-                deprecated: null,
-                security: null,
+                statusCode: "200",
+                description: "Success",
+                content: null,
+                headers: null,
               },
             ],
+            deprecated: null,
+            security: null,
           },
           {
-            name: "users",
+            operationId: "createPet",
+            method: "post",
+            path: "/pets",
+            summary: null,
             description: null,
-            endpoints: [
-              {
-                operationId: "listUsers",
-                method: "get",
-                path: "/users",
-                summary: null,
-                description: null,
-                parameters: [],
-                requestBody: null,
-                responses: [
-                  {
-                    statusCode: "200",
-                    description: "Success",
-                    content: null,
-                    headers: null,
+            tags: ["pets"],
+            parameters: [],
+            requestBody: {
+              description: null,
+              required: false,
+              content: [
+                {
+                  mimeType: "application/json",
+                  schema: {
+                    kind: "ref",
+                    name: "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
                   },
-                ],
-                deprecated: null,
-                security: null,
+                },
+              ],
+            },
+            responses: [
+              {
+                statusCode: "201",
+                description: "Created",
+                content: null,
+                headers: null,
               },
             ],
+            deprecated: null,
+            security: null,
+          },
+          {
+            operationId: "listUsers",
+            method: "get",
+            path: "/users",
+            summary: null,
+            description: null,
+            tags: ["users"],
+            parameters: [],
+            requestBody: null,
+            responses: [
+              {
+                statusCode: "200",
+                description: "Success",
+                content: null,
+                headers: null,
+              },
+            ],
+            deprecated: null,
+            security: null,
           },
         ],
       });
@@ -546,48 +545,44 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        services: [
+        tags: [],
+        endpoints: [
           {
-            name: "pets",
+            operationId: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            summary: null,
             description: null,
-            endpoints: [
+            tags: ["pets"],
+            parameters: {
+              kind: "ref",
+              name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+            },
+            requestBody: null,
+            responses: [
               {
-                operationId: "getPet",
-                method: "get",
-                path: "/pets/{id}",
-                summary: null,
-                description: null,
-                parameters: {
-                  kind: "ref",
-                  name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
-                },
-                requestBody: null,
-                responses: [
+                statusCode: "200",
+                description: "Success",
+                content: [
                   {
-                    statusCode: "200",
-                    description: "Success",
-                    content: [
-                      {
-                        mimeType: "application/json",
-                        schema: {
-                          kind: "ref",
-                          name: "#/components/schemas/Pet",
-                        },
-                      },
-                    ],
-                    headers: null,
-                  },
-                  {
-                    statusCode: "404",
-                    description: "Not found",
-                    content: null,
-                    headers: null,
+                    mimeType: "application/json",
+                    schema: {
+                      kind: "ref",
+                      name: "#/components/schemas/Pet",
+                    },
                   },
                 ],
-                deprecated: null,
-                security: null,
+                headers: null,
+              },
+              {
+                statusCode: "404",
+                description: "Not found",
+                content: null,
+                headers: null,
               },
             ],
+            deprecated: null,
+            security: null,
           },
         ],
       });
@@ -643,7 +638,8 @@ if (import.meta.vitest) {
           description: null,
         },
         models: [],
-        services: [],
+        tags: [],
+        endpoints: [],
       });
     });
   });

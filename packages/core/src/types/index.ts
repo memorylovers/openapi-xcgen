@@ -55,7 +55,7 @@ export type {
   IRServer,
   IRServerVariable,
   IRServerVariableMap,
-  IRService,
+  IRTag,
   IRType,
   IRValidation,
   MimeType,
