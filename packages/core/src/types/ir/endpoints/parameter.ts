@@ -2,7 +2,7 @@
  * パラメータ関連のIR型定義
  */
 
-import type { IRType } from "./type";
+import type { IRType } from "../common/type";
 
 /**
  * IRParameterInType - パラメータの配置場所

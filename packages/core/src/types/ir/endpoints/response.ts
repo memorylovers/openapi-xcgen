@@ -2,8 +2,8 @@
  * レスポンス関連のIR型定義
  */
 
-import type { MimeType } from "./common";
-import type { IRType } from "./type";
+import type { MimeType } from "../common/mime-type";
+import type { IRType } from "../common/type";
 
 /**
  * IRResponseContent - レスポンスコンテンツ（MIMEタイプとスキーマの組み合わせ）

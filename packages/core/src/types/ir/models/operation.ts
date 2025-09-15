@@ -7,9 +7,9 @@ import type {
   IREnumModel,
   IRMapModel,
   IRObjectModel,
-} from "./model";
+} from "./base";
 import type { IRParameterProperty, IRProperty } from "./property";
-import type { IRResponseHeader } from "./response";
+import type { IRResponseHeader } from "../endpoints/response";
 
 /**
  * IRParameterModel - パラメータ統合モデル定義

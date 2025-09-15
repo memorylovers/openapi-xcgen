@@ -3,7 +3,7 @@
  */
 
 import type { IRProperty } from "./property";
-import type { IRScalarType, IRType } from "./type";
+import type { IRScalarType, IRType } from "../common/type";
 
 /**
  * IRObjectModel - オブジェクト型モデル定義

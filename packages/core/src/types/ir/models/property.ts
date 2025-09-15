@@ -2,8 +2,8 @@
  * プロパティ関連のIR型定義
  */
 
-import type { IRParameterInType } from "./parameter";
-import type { IRType } from "./type";
+import type { IRParameterInType } from "../endpoints/parameter";
+import type { IRType } from "../common/type";
 import type { IRValidation } from "./validation";
 
 /**

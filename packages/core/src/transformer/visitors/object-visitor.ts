@@ -20,9 +20,9 @@ import type {
   IRModel,
   IRResponseModel,
   IRRequestBodyModel,
-} from "../../types/ir/operation-model";
-import type { IRProperty } from "../../types/ir/property";
-import type { IRResponseHeader } from "../../types/ir/response";
+} from "../../types/ir/models/operation";
+import type { IRProperty } from "../../types/ir/models/property";
+import type { IRResponseHeader } from "../../types/ir/endpoints/response";
 import { buildReferencePath } from "../helpers/build-reference-path";
 import { extractValidation } from "../helpers/extract-validation";
 import { isNullable } from "../helpers/is-nullable";

@@ -2,7 +2,7 @@
  * エンドポイント関連のIR型定義
  */
 
-import type { IRType } from "./type";
+import type { IRType } from "../common/type";
 import type { IRParameter } from "./parameter";
 import type { IRRequestBody } from "./request";
 import type { IRResponse } from "./response";
