@@ -1,5 +1,6 @@
 import type { SchemaObject } from "../types/index";
-import type { IRHttpMethod, MimeType } from "../types/ir/api";
+import type { MimeType } from "../types/ir/common";
+import type { IRHttpMethod } from "../types/ir/endpoint";
 import type { IRType } from "../types/ir/index";
 
 /**

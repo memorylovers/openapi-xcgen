@@ -18,11 +18,11 @@ import { pascalCase } from "es-toolkit/string";
 import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
 import type {
   IRModel,
-  IRProperty,
   IRResponseModel,
   IRRequestBodyModel,
-} from "../../types/ir/data";
-import type { IRResponseHeader } from "../../types/ir/api";
+} from "../../types/ir/operation-model";
+import type { IRProperty } from "../../types/ir/property";
+import type { IRResponseHeader } from "../../types/ir/response";
 import { buildReferencePath } from "../helpers/build-reference-path";
 import { extractValidation } from "../helpers/extract-validation";
 import { isNullable } from "../helpers/is-nullable";

@@ -10,7 +10,7 @@
  * - IREndpoint[]とIRModel[]の生成
  */
 
-import type { PathsObject } from "../../types/index";
+import type { PathsObject, PathItemObject } from "../../types/index";
 import type { IREndpoint, IRModel } from "../../types/ir/index";
 import type { PathItemContext, VisitorContext } from "../types";
 import { visitPathItem } from "./path-item-visitor";
@@ -207,7 +207,7 @@ if (import.meta.vitest) {
             responses: {},
           },
         },
-        "/null": null as any,
+        "/null": null as unknown as PathItemObject,
       };
 
       const context: VisitorContext = {

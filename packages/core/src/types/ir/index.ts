@@ -5,11 +5,12 @@
  * TDDアプローチに従い、段階的に拡張していく。
  */
 
-import type { IRModel } from "./data";
-
-import type { IREndpoint, IRTag } from "./api";
-
-import type { IRMetadata, IRSecurityScheme, IRServer } from "./config";
+import type { IRModel } from "./operation-model";
+import type { IREndpoint } from "./endpoint";
+import type { IRTag } from "./tag";
+import type { IRMetadata } from "./metadata";
+import type { IRSecurityScheme } from "./security";
+import type { IRServer } from "./server";
 
 /**
  * XcgenIR - 中間表現のルート型
@@ -63,6 +64,17 @@ export interface IRDocument {
 }
 
 // Re-export all types from sub-modules
-export * from "./api";
-export * from "./config";
-export * from "./data";
+export * from "./common";
+export * from "./endpoint";
+export * from "./metadata";
+export * from "./model";
+export * from "./operation-model";
+export * from "./parameter";
+export * from "./property";
+export * from "./request";
+export * from "./response";
+export * from "./security";
+export * from "./server";
+export * from "./tag";
+export * from "./type";
+export * from "./validation";
