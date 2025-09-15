@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Path Structure Test",
     "version": "1.0.0",
-    "description": "Test path parsing and normalization"
+    "description": "Test path parsing and normalization",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -55,138 +58,140 @@
       "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
+      "operationId": "root",
+      "method": "get",
+      "path": "/",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "root",
-          "method": "get",
-          "path": "/",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "users",
-          "method": "get",
-          "path": "/users",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "userById",
-          "method": "get",
-          "path": "/users/{id}",
-          "summary": null,
-          "description": null,
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
-          },
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "projectInOrg",
-          "method": "get",
-          "path": "/org/{orgId}/projects/{projectId}",
-          "summary": null,
-          "description": null,
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
-          },
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "healthCheck",
-          "method": "get",
-          "path": "/api-gateway/health_check",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "text/plain",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "users",
+      "method": "get",
+      "path": "/users",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "userById",
+      "method": "get",
+      "path": "/users/{id}",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "projectInOrg",
+      "method": "get",
+      "path": "/org/{orgId}/projects/{projectId}",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "healthCheck",
+      "method": "get",
+      "path": "/api-gateway/health_check",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "text/plain",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

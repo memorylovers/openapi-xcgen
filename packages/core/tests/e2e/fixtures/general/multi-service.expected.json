@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Multi-Service API",
     "version": "2.0.0",
-    "description": "API with multiple services/tags"
+    "description": "API with multiple services/tags",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -152,178 +155,173 @@
       "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "users",
+      "operationId": "listUsers",
+      "method": "get",
+      "path": "/users",
+      "summary": "List all users",
       "description": null,
-      "endpoints": [
+      "tags": [
+        "users"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "listUsers",
-          "method": "get",
-          "path": "/users",
-          "summary": "List all users",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "List of users",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "List of users",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "array",
-                    "itemType": {
-                      "kind": "ref",
-                      "name": "#/components/schemas/User"
-                    }
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "getUser",
-          "method": "get",
-          "path": "/users/{userId}",
-          "summary": "Get user by ID",
-          "description": null,
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
-          },
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "User details",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/User"
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        }
-      ]
-    },
-    {
-      "name": "posts",
-      "description": null,
-      "endpoints": [
-        {
-          "operationId": "listPosts",
-          "method": "get",
-          "path": "/posts",
-          "summary": "List all posts",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "List of posts",
-              "content": null,
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "createPost",
-          "method": "post",
-          "path": "/posts",
-          "summary": "Create a new post",
-          "description": null,
-          "parameters": [],
-          "requestBody": {
-            "description": null,
-            "required": true,
-            "content": [
-              {
-                "mimeType": "application/json",
-                "schema": {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "array",
+                "itemType": {
                   "kind": "ref",
-                  "name": "#/components/schemas/NewPost"
+                  "name": "#/components/schemas/User"
                 }
               }
-            ]
-          },
-          "responses": [
-            {
-              "statusCode": "201",
-              "description": "Post created",
-              "content": null,
-              "headers": null
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     },
     {
-      "name": "admin",
+      "operationId": "getUser",
+      "method": "get",
+      "path": "/users/{userId}",
+      "summary": "Get user by ID",
       "description": null,
-      "endpoints": [
+      "tags": [
+        "users"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
+      },
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "getSettings",
-          "method": "get",
-          "path": "/admin/settings",
-          "summary": "Get admin settings",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "User details",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Settings retrieved",
-              "content": null,
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/User"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     },
     {
-      "name": "default",
+      "operationId": "listPosts",
+      "method": "get",
+      "path": "/posts",
+      "summary": "List all posts",
       "description": null,
-      "endpoints": [
+      "tags": [
+        "posts"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "healthCheck",
-          "method": "get",
-          "path": "/health",
-          "summary": "Health check endpoint",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Service is healthy",
-              "content": null,
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
+          "statusCode": "200",
+          "description": "List of posts",
+          "content": null,
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "createPost",
+      "method": "post",
+      "path": "/posts",
+      "summary": "Create a new post",
+      "description": null,
+      "tags": [
+        "posts"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/NewPost"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Post created",
+          "content": null,
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getSettings",
+      "method": "get",
+      "path": "/admin/settings",
+      "summary": "Get admin settings",
+      "description": null,
+      "tags": [
+        "admin"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Settings retrieved",
+          "content": null,
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "healthCheck",
+      "method": "get",
+      "path": "/health",
+      "summary": "Health check endpoint",
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Service is healthy",
+          "content": null,
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Metadata Model Test",
     "version": "1.0.0",
-    "description": "Test metadata attributes"
+    "description": "Test metadata attributes",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -74,39 +77,37 @@
       ]
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
+      "operationId": null,
+      "method": "get",
+      "path": "/articles",
+      "summary": "Get articles",
       "description": null,
-      "endpoints": [
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": null,
-          "method": "get",
-          "path": "/articles",
-          "summary": "Get articles",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Article"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Article"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

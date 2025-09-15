@@ -49,6 +49,7 @@ export interface IRLicense {
  *   title: User Management API  # → title
  *   version: 1.0.0              # → version
  *   description: API for managing users
+ *   termsOfService: https://example.com/terms
  *   contact:
  *     name: API Support
  *     email: support@example.com
@@ -65,8 +66,8 @@ export interface IRMetadata {
   version: string;
   /** API説明 */
   description: string | null;
-  /** OpenAPIバージョン */
-  openApiVersion: string;
+  /** 利用規約URL */
+  termsOfService: string | null;
   /** 連絡先情報 */
   contact: IRContact | null;
   /** ライセンス情報 */

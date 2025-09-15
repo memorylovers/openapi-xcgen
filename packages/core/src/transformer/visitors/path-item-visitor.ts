@@ -10,8 +10,8 @@
  * - パラメータの継承（PathItem共通パラメータ）の処理
  */
 
-import type { PathItemObject } from "../../types/index";
-import type { IREndpoint, IRModel } from "../../types/ir/index";
+import type { PathItemObject } from "../../types";
+import type { IREndpoint, IRModel } from "../../types/ir";
 import type { OperationContext, PathItemContext } from "../types";
 import { visitOperation } from "./operation-visitor";
 

@@ -16,12 +16,8 @@ import type {
   ReferenceObject,
   RequestBodyObject,
   SchemaObject,
-} from "../../types/index";
-import type {
-  IRModel,
-  IRRequestBody,
-  IRRequestContent,
-} from "../../types/ir/index";
+} from "../../types";
+import type { IRModel, IRRequestBody, IRRequestContent } from "../../types/ir";
 import { generateComponentName } from "../helpers/generate-component-name";
 import type { RequestBodyContext } from "../types";
 import { visitRequestBodyObject } from "./object-visitor";

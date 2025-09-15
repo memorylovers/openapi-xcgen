@@ -14,7 +14,7 @@ export {
   extractValidation,
   generateEnumName,
   toIRScalarType,
-} from "./helpers/index";
+} from "./helpers";
 
 // Visitor functions
 export {
@@ -26,4 +26,4 @@ export {
   type ComponentsResult,
   type ObjectVisitorResult,
   type SchemaVisitorResult,
-} from "./visitors/index";
+} from "./visitors";

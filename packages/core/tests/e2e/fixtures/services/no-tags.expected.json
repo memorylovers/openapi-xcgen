@@ -1,88 +1,91 @@
 {
-  "info": {
+  "metadata": {
     "title": "No Tags Service Classification Test",
     "version": "1.0.0",
-    "description": "Test no-tags default service classification"
+    "description": "Test no-tags default service classification",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
+      "operationId": "health",
+      "method": "get",
+      "path": "/health",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "health",
-          "method": "get",
-          "path": "/health",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "text/plain",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "text/plain",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "version",
-          "method": "get",
-          "path": "/version",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "ping",
-          "method": "get",
-          "path": "/ping",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "text/plain",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "version",
+      "method": "get",
+      "path": "/version",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "ping",
+      "method": "get",
+      "path": "/ping",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "text/plain",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

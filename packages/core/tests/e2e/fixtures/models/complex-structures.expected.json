@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Complex Structures Test",
     "version": "1.0.0",
-    "description": "Test complex object structures and arrays"
+    "description": "Test complex object structures and arrays",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -246,150 +249,152 @@
       ]
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
+      "operationId": null,
+      "method": "get",
+      "path": "/level1",
+      "summary": "1階層ネスト",
       "description": null,
-      "endpoints": [
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": null,
-          "method": "get",
-          "path": "/level1",
-          "summary": "1階層ネスト",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Level1"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Level1"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "get",
-          "path": "/level2",
-          "summary": "2階層ネスト",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Level2"
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "get",
-          "path": "/level3",
-          "summary": "3階層ネスト",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Level3"
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "get",
-          "path": "/teams",
-          "summary": "オブジェクト内の配列",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Team"
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "get",
-          "path": "/users",
-          "summary": "トップレベルが配列",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "array",
-                    "itemType": {
-                      "kind": "ref",
-                      "name": "#/components/schemas/User"
-                    }
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/level2",
+      "summary": "2階層ネスト",
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Level2"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/level3",
+      "summary": "3階層ネスト",
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Level3"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/teams",
+      "summary": "オブジェクト内の配列",
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Team"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/users",
+      "summary": "トップレベルが配列",
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "array",
+                "itemType": {
+                  "kind": "ref",
+                  "name": "#/components/schemas/User"
+                }
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

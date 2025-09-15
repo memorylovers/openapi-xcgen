@@ -7,8 +7,8 @@
 
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
-import type { SchemaObjectWithNullable } from "../../types/index";
-import type { IRArray, IRType } from "../../types/ir/index";
+import type { SchemaObjectWithNullable } from "../../types";
+import type { IRArray, IRType } from "../../types/ir";
 import type { VisitorContext } from "../types";
 import { extractRefName } from "../helpers/extract-ref-name";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type";

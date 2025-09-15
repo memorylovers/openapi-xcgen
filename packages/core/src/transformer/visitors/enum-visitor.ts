@@ -6,8 +6,8 @@
  */
 
 import { consola } from "consola";
-import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
-import type { IRModel, IREnumModel, IREnumValue } from "../../types/ir/index";
+import type { SchemaObject, SchemaObjectWithNullable } from "../../types";
+import type { IRModel, IREnumModel, IREnumValue } from "../../types/ir";
 import type { VisitorContext } from "../types";
 import { generateEnumName } from "../helpers/generate-enum-name";
 import { toIRScalarType } from "../helpers/to-ir-scalar-type";

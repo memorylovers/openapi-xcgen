@@ -15,7 +15,7 @@
 
 import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
-import type { SchemaObject, SchemaObjectWithNullable } from "../../types/index";
+import type { SchemaObject, SchemaObjectWithNullable } from "../../types";
 import type {
   IRModel,
   IRResponseModel,

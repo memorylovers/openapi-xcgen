@@ -13,12 +13,8 @@
 
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
-import type { ParameterObject, ReferenceObject } from "../../types/index";
-import type {
-  IRModel,
-  IRParameter,
-  IRParameterModel,
-} from "../../types/ir/index";
+import type { ParameterObject, ReferenceObject } from "../../types";
+import type { IRModel, IRParameter, IRParameterModel } from "../../types/ir";
 import { createParameterModel } from "../helpers/create-parameter-model";
 import type { ParameterContext, ParametersContext } from "../types";
 import { visitParameter } from "./parameter-visitor";

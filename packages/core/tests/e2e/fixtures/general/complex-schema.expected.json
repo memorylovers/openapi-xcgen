@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Complex Schema API",
     "version": "1.0.0",
-    "description": "API with complex nested schemas"
+    "description": "API with complex nested schemas",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -420,51 +423,51 @@
       ]
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "orders",
+      "operationId": "createOrder",
+      "method": "post",
+      "path": "/orders",
+      "summary": "Create a new order",
       "description": null,
-      "endpoints": [
+      "tags": [
+        "orders"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Order"
+            }
+          }
+        ]
+      },
+      "responses": [
         {
-          "operationId": "createOrder",
-          "method": "post",
-          "path": "/orders",
-          "summary": "Create a new order",
-          "description": null,
-          "parameters": [],
-          "requestBody": {
-            "description": null,
-            "required": true,
-            "content": [
-              {
-                "mimeType": "application/json",
-                "schema": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Order"
-                }
-              }
-            ]
-          },
-          "responses": [
+          "statusCode": "201",
+          "description": "Order created",
+          "content": [
             {
-              "statusCode": "201",
-              "description": "Order created",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Order"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

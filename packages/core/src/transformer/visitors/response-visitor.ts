@@ -17,12 +17,8 @@ import type {
   ReferenceObject,
   ResponseObject,
   SchemaObject,
-} from "../../types/index";
-import type {
-  IRModel,
-  IRResponse,
-  IRResponseContent,
-} from "../../types/ir/index";
+} from "../../types";
+import type { IRModel, IRResponse, IRResponseContent } from "../../types/ir";
 import { generateComponentName } from "../helpers/generate-component-name";
 import type { ResponseContext, VisitorContext } from "../types";
 import { visitResponseObject } from "./object-visitor";

@@ -11,8 +11,8 @@
  * - インラインモデルとEnumの収集
  */
 
-import type { ReferenceObject, ResponseObject } from "../../types/index";
-import type { IRModel, IRResponse } from "../../types/ir/index";
+import type { ReferenceObject, ResponseObject } from "../../types";
+import type { IRModel, IRResponse } from "../../types/ir";
 import type { ResponseContext, ResponsesContext } from "../types";
 import { visitResponse } from "./response-visitor";
 

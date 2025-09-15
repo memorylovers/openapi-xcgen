@@ -28,39 +28,7 @@ export interface XcgenIR {
   /** サーバー情報の配列 */
   servers: IRServer[];
   /** セキュリティ定義 */
-  security?: IRSecurityScheme[];
-}
-
-/**
- * IRInfo - API基本情報（簡易版）
- *
- * transformer.tsで使用される簡易版のAPI情報。
- * 完全な実装ではIRMetadataに移行予定。
- */
-export interface IRInfo {
-  /** APIタイトル */
-  title: string;
-  /** APIバージョン */
-  version: string;
-  /** API説明 */
-  description: string | null;
-}
-
-/**
- * IRDocument - 中間表現のドキュメント型（簡易版）
- *
- * 現在のtransformer実装で使用される簡易版。
- * 将来的にXcgenIRに移行予定。
- */
-export interface IRDocument {
-  /** API基本情報 */
-  info: IRInfo;
-  /** データモデルの配列（オブジェクト、列挙型、配列、マップを統一的に管理） */
-  models: IRModel[];
-  /** タグ定義の配列 */
-  tags: IRTag[];
-  /** APIエンドポイントの配列 */
-  endpoints: IREndpoint[];
+  security: IRSecurityScheme[];
 }
 
 // Re-export all types from sub-modules

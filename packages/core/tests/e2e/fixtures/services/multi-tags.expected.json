@@ -1,100 +1,101 @@
 {
-  "info": {
+  "metadata": {
     "title": "Multi Tags Service Classification Test",
     "version": "1.0.0",
-    "description": "Test multi-tag service classification"
+    "description": "Test multi-tag service classification",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "users",
+      "operationId": "endpoint1",
+      "method": "get",
+      "path": "/endpoint1",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [
+        "users",
+        "admin"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "endpoint1",
-          "method": "get",
-          "path": "/endpoint1",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     },
     {
-      "name": "admin",
+      "operationId": "endpoint2",
+      "method": "get",
+      "path": "/endpoint2",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [
+        "admin",
+        "users"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "endpoint2",
-          "method": "get",
-          "path": "/endpoint2",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     },
     {
-      "name": "products",
+      "operationId": "endpoint3",
+      "method": "get",
+      "path": "/endpoint3",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [
+        "products",
+        "admin",
+        "moderation"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "endpoint3",
-          "method": "get",
-          "path": "/endpoint3",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

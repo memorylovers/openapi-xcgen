@@ -1,8 +1,18 @@
 {
-  "info": {
+  "metadata": {
     "title": "Petstore API",
     "version": "1.0.0",
-    "description": "A simple petstore API"
+    "description": "A simple petstore API",
+    "termsOfService": null,
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com",
+      "url": null
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
   },
   "models": [
     {
@@ -166,162 +176,168 @@
       "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "pets",
+      "operationId": "listPets",
+      "method": "get",
+      "path": "/pets",
+      "summary": "List all pets",
       "description": null,
-      "endpoints": [
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets/get/parameters/GetPetsParams"
+      },
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "listPets",
-          "method": "get",
-          "path": "/pets",
-          "summary": "List all pets",
-          "description": null,
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::pets/get/parameters/GetPetsParams"
-          },
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "A paged array of pets",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "A paged array of pets",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "array",
-                    "itemType": {
-                      "kind": "ref",
-                      "name": "#/components/schemas/Pet"
-                    }
-                  }
-                }
-              ],
-              "headers": null
-            },
-            {
-              "statusCode": "500",
-              "description": "Unexpected error",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Error"
-                  }
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "createPet",
-          "method": "post",
-          "path": "/pets",
-          "summary": "Create a pet",
-          "description": null,
-          "parameters": [],
-          "requestBody": {
-            "description": null,
-            "required": true,
-            "content": [
-              {
-                "mimeType": "application/json",
-                "schema": {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "array",
+                "itemType": {
                   "kind": "ref",
-                  "name": "#/components/schemas/NewPet"
+                  "name": "#/components/schemas/Pet"
                 }
               }
-            ]
-          },
-          "responses": [
-            {
-              "statusCode": "201",
-              "description": "Pet created",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Pet"
-                  }
-                }
-              ],
-              "headers": null
-            },
-            {
-              "statusCode": "500",
-              "description": "Unexpected error",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Error"
-                  }
-                }
-              ],
-              "headers": null
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         },
         {
-          "operationId": "getPetById",
-          "method": "get",
-          "path": "/pets/{petId}",
-          "summary": "Info for a specific pet",
-          "description": null,
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
-          },
-          "requestBody": null,
-          "responses": [
+          "statusCode": "500",
+          "description": "Unexpected error",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Expected response to a valid request",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Pet"
-                  }
-                }
-              ],
-              "headers": null
-            },
-            {
-              "statusCode": "404",
-              "description": "Pet not found",
-              "content": null,
-              "headers": null
-            },
-            {
-              "statusCode": "500",
-              "description": "Unexpected error",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Error"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "createPet",
+      "method": "post",
+      "path": "/pets",
+      "summary": "Create a pet",
+      "description": null,
+      "tags": [
+        "pets"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/NewPet"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Pet created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "500",
+          "description": "Unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getPetById",
+      "method": "get",
+      "path": "/pets/{petId}",
+      "summary": "Info for a specific pet",
+      "description": null,
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets::{petId}/get/parameters/GetPetsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Expected response to a valid request",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "404",
+          "description": "Pet not found",
+          "content": null,
+          "headers": null
+        },
+        {
+          "statusCode": "500",
+          "description": "Unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

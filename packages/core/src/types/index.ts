@@ -19,6 +19,8 @@ export type ComponentsObject = OpenAPIV3_1.ComponentsObject;
 export type SecuritySchemeObject = OpenAPIV3_1.SecuritySchemeObject;
 export type ServerObject = OpenAPIV3_1.ServerObject;
 export type InfoObject = OpenAPIV3_1.InfoObject;
+export type ContactObject = OpenAPIV3_1.ContactObject;
+export type LicenseObject = OpenAPIV3_1.LicenseObject;
 export type TagObject = OpenAPIV3_1.TagObject;
 
 // Re-export guard functions
@@ -60,4 +62,4 @@ export type {
   IRValidation,
   MimeType,
   XcgenIR,
-} from "./ir/index";
+} from "./ir";

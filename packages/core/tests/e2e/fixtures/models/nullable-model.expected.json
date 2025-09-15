@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Nullable Model Test",
     "version": "1.0.0",
-    "description": "Test nullable property handling"
+    "description": "Test nullable property handling",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -98,39 +101,37 @@
       ]
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
+      "operationId": null,
+      "method": "get",
+      "path": "/profiles",
+      "summary": "Get profiles",
       "description": null,
-      "endpoints": [
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": null,
-          "method": "get",
-          "path": "/profiles",
-          "summary": "Get profiles",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/Profile"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Profile"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

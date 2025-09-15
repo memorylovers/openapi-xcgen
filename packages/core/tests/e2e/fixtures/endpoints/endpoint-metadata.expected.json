@@ -1,112 +1,116 @@
 {
-  "info": {
+  "metadata": {
     "title": "Endpoint Metadata Test",
     "version": "1.0.0",
-    "description": "Test summary and description preservation"
+    "description": "Test summary and description preservation",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
-      "description": null,
-      "endpoints": [
+      "operationId": "endpoint1",
+      "method": "get",
+      "path": "/endpoint1",
+      "summary": "Test summary",
+      "description": "Test description",
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "endpoint1",
-          "method": "get",
-          "path": "/endpoint1",
-          "summary": "Test summary",
-          "description": "Test description",
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "endpoint2",
-          "method": "get",
-          "path": "/endpoint2",
-          "summary": "Test summary only",
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "endpoint3",
-          "method": "get",
-          "path": "/endpoint3",
-          "summary": null,
-          "description": "Test description only",
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": "endpoint4",
-          "method": "get",
-          "path": "/endpoint4",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "endpoint2",
+      "method": "get",
+      "path": "/endpoint2",
+      "summary": "Test summary only",
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "endpoint3",
+      "method": "get",
+      "path": "/endpoint3",
+      "summary": null,
+      "description": "Test description only",
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "endpoint4",
+      "method": "get",
+      "path": "/endpoint4",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

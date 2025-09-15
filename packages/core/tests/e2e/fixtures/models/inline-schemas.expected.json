@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Inline Schemas Test API",
     "version": "1.0.0",
-    "description": "Test cases for inline schema extraction - validates conversion from inline schemas to independent models"
+    "description": "Test cases for inline schema extraction - validates conversion from inline schemas to independent models",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -479,153 +482,153 @@
       "referencePath": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
-      "description": null,
-      "endpoints": [
+      "operationId": "testParametersModelGeneration",
+      "method": "get",
+      "path": "/test-1-parameters/{id}",
+      "summary": "Test 1: Parameters model generation (Basic)",
+      "description": "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion.",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersParams"
+      },
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "testParametersModelGeneration",
-          "method": "get",
-          "path": "/test-1-parameters/{id}",
-          "summary": "Test 1: Parameters model generation (Basic)",
-          "description": "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion.",
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersParams"
-          },
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success - validates parameter model generation",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success - validates parameter model generation",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "testRequestInlineExtraction",
+      "method": "post",
+      "path": "/test-2-request",
+      "summary": "Test 2: Request body inline schema extraction (Basic)",
+      "description": "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.",
+      "tags": [],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Created - validates simple response schema extraction",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "testResponseInlineExtraction",
+      "method": "get",
+      "path": "/test-3-response",
+      "summary": "Test 3: Response inline schema extraction (Intermediate)",
+      "description": "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation.",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Primitive response - validates direct string return",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
         },
         {
-          "operationId": "testRequestInlineExtraction",
-          "method": "post",
-          "path": "/test-2-request",
-          "summary": "Test 2: Request body inline schema extraction (Basic)",
-          "description": "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.",
-          "parameters": [],
-          "requestBody": {
-            "description": null,
-            "required": true,
-            "content": [
-              {
-                "mimeType": "application/json",
-                "schema": {
+          "statusCode": "201",
+          "description": "Array response - validates direct array with inline objects",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "array",
+                "itemType": {
                   "kind": "ref",
-                  "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody"
+                  "name": "#/paths/::test-3-response/get/responses/responses/201/content/application::json/schema"
                 }
               }
-            ]
-          },
-          "responses": [
-            {
-              "statusCode": "201",
-              "description": "Created - validates simple response schema extraction",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response"
-                  }
-                }
-              ],
-              "headers": null
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         },
         {
-          "operationId": "testResponseInlineExtraction",
-          "method": "get",
-          "path": "/test-3-response",
-          "summary": "Test 3: Response inline schema extraction (Intermediate)",
-          "description": "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation.",
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
-          },
-          "requestBody": null,
-          "responses": [
+          "statusCode": "202",
+          "description": "Complex object response - validates nested object extraction",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Primitive response - validates direct string return",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            },
-            {
-              "statusCode": "201",
-              "description": "Array response - validates direct array with inline objects",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "array",
-                    "itemType": {
-                      "kind": "ref",
-                      "name": "#/paths/::test-3-response/get/responses/responses/201/content/application::json/schema"
-                    }
-                  }
-                }
-              ],
-              "headers": null
-            },
-            {
-              "statusCode": "202",
-              "description": "Complex object response - validates nested object extraction",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response"
-                  }
-                }
-              ],
-              "headers": null
-            },
-            {
-              "statusCode": "203",
-              "description": "Direct schema reference - validates full schema $ref",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": {
-                    "kind": "ref",
-                    "name": "#/components/schemas/UserResponse"
-                  }
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response"
+              }
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
+        },
+        {
+          "statusCode": "203",
+          "description": "Direct schema reference - validates full schema $ref",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/UserResponse"
+              }
+            }
+          ],
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

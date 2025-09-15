@@ -11,21 +11,24 @@
  */
 
 import { consola } from "consola";
+import type { ComponentsObject, OpenAPIDocument, PathsObject } from "../types";
 import type {
-  ComponentsObject,
-  OpenAPIDocument,
-  PathsObject,
-} from "../types/index";
-import type { IRDocument, IREndpoint, IRModel, IRTag } from "../types/ir/index";
+  XcgenIR,
+  IREndpoint,
+  IRModel,
+  IRTag,
+  IRMetadata,
+} from "../types/ir";
 import { visitComponents } from "./visitors/components-visitor";
+import { visitMetadata } from "./visitors/metadata-visitor";
 import { visitPaths } from "./visitors/paths-visitor";
 import { visitTags } from "./visitors/tags-visitor";
 
 /**
- * OpenAPIDocumentをIRDocumentに変換
+ * OpenAPIDocumentをXcgenIRに変換
  *
  * @param document - OpenAPIドキュメント
- * @returns IRDocument
+ * @returns XcgenIR
  *
  * @example
  * ```typescript
@@ -38,7 +41,7 @@ import { visitTags } from "./visitors/tags-visitor";
  * const ir = transform(doc);
  * ```
  */
-export function transform(document: OpenAPIDocument): IRDocument {
+export function transform(document: OpenAPIDocument): XcgenIR {
   // OpenAPIバージョンチェック
   if (!document.openapi || !document.openapi.startsWith("3.")) {
     throw new Error(`Unsupported OpenAPI version: ${document.openapi}`);
@@ -104,16 +107,16 @@ export function transform(document: OpenAPIDocument): IRDocument {
     );
   }
 
-  // IRDocument生成
-  const irDocument: IRDocument = {
-    info: {
-      title: document.info.title,
-      version: document.info.version,
-      description: document.info.description || null,
-    },
+  // XcgenIR生成
+  const metadata: IRMetadata = visitMetadata(document.info);
+
+  const xcgenIR: XcgenIR = {
+    metadata,
     models,
     tags,
     endpoints,
+    servers: [],
+    security: [],
   };
 
   // 統計情報をログ出力（種類別にカウント）
@@ -131,7 +134,7 @@ export function transform(document: OpenAPIDocument): IRDocument {
     `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps, ${parameterCount} parameters, ${requestBodyCount} requestBodies, ${responseCount} responses), ${tags.length} tags, ${endpoints.length} endpoints`,
   );
 
-  return irDocument;
+  return xcgenIR;
 }
 
 // === in-source testing ===
@@ -152,14 +155,19 @@ if (import.meta.vitest) {
       const result = transform(doc);
 
       expect(result).toEqual({
-        info: {
+        metadata: {
           title: "Test API",
           version: "1.0.0",
           description: null,
+          termsOfService: null,
+          contact: null,
+          license: null,
         },
         models: [],
         tags: [],
         endpoints: [],
+        servers: [],
+        security: [],
       });
     });
 
@@ -193,10 +201,13 @@ if (import.meta.vitest) {
       const result = transform(doc);
 
       expect(result).toEqual({
-        info: {
+        metadata: {
           title: "Pet Store API",
           version: "1.0.0",
           description: "A sample API",
+          termsOfService: null,
+          contact: null,
+          license: null,
         },
         models: [
           {
@@ -242,6 +253,8 @@ if (import.meta.vitest) {
         ],
         tags: [],
         endpoints: [],
+        servers: [],
+        security: [],
       });
     });
 
@@ -302,10 +315,13 @@ if (import.meta.vitest) {
       const result = transform(doc);
 
       expect(result).toEqual({
-        info: {
+        metadata: {
           title: "Pet Store API",
           version: "1.0.0",
           description: null,
+          termsOfService: null,
+          contact: null,
+          license: null,
         },
         models: [
           {
@@ -404,6 +420,8 @@ if (import.meta.vitest) {
             security: null,
           },
         ],
+        servers: [],
+        security: [],
       });
     });
 
@@ -466,10 +484,13 @@ if (import.meta.vitest) {
       const result = transform(doc);
 
       expect(result).toEqual({
-        info: {
+        metadata: {
           title: "Complete API",
           version: "2.0.0",
           description: "A complete example",
+          termsOfService: null,
+          contact: null,
+          license: null,
         },
         models: [
           {
@@ -585,6 +606,8 @@ if (import.meta.vitest) {
             security: null,
           },
         ],
+        servers: [],
+        security: [],
       });
     });
 
@@ -632,14 +655,19 @@ if (import.meta.vitest) {
       const result = transform(doc);
 
       expect(result).toEqual({
-        info: {
+        metadata: {
           title: "Empty API",
           version: "1.0.0",
           description: null,
+          termsOfService: null,
+          contact: null,
+          license: null,
         },
         models: [],
         tags: [],
         endpoints: [],
+        servers: [],
+        security: [],
       });
     });
   });

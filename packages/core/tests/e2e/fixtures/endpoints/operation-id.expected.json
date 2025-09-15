@@ -1,8 +1,11 @@
 {
-  "info": {
+  "metadata": {
     "title": "Operation ID Optional Field Test",
     "version": "1.0.0",
-    "description": "Test operationId as optional field per OpenAPI specification"
+    "description": "Test operationId as optional field per OpenAPI specification",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [
     {
@@ -25,111 +28,112 @@
       "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersParams"
     }
   ],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "default",
+      "operationId": "listUsers",
+      "method": "get",
+      "path": "/users",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "listUsers",
-          "method": "get",
-          "path": "/users",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "get",
-          "path": "/users/{id}",
-          "summary": null,
-          "description": null,
-          "parameters": {
-            "kind": "ref",
-            "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
-          },
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "get",
-          "path": "/products",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
-        },
-        {
-          "operationId": null,
-          "method": "post",
-          "path": "/products",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
-            {
-              "statusCode": "201",
-              "description": "Created",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
-            }
-          ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/users/{id}",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/products",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": null,
+      "method": "post",
+      "path": "/products",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }

@@ -1,12 +1,12 @@
 // Export type definitions
-export * from "./types/index";
+export * from "./types";
 
 // Export utilities
 export * from "./utils/http";
 export * from "./utils/path";
 
 // Export parser
-export * from "./parser/index";
+export * from "./parser";
 
 // Export transformer
-export * from "./transformer/index";
+export * from "./transformer";

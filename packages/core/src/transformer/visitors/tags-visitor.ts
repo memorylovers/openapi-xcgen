@@ -10,8 +10,8 @@
  * - externalDocsの処理
  */
 
-import type { TagObject } from "../../types/index";
-import type { IRTag } from "../../types/ir/index";
+import type { TagObject } from "../../types";
+import type { IRTag } from "../../types/ir";
 
 /**
  * TagObject[]を処理してIRTag[]に変換

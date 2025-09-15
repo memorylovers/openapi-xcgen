@@ -6,11 +6,8 @@
  */
 
 import { consola } from "consola";
-import type {
-  ComponentsObject,
-  SchemaObjectWithNullable,
-} from "../../types/index";
-import type { IRModel } from "../../types/ir/index";
+import type { ComponentsObject, SchemaObjectWithNullable } from "../../types";
+import type { IRModel } from "../../types/ir";
 import type { SchemaContext, VisitorContext } from "../types";
 import { visitSchema } from "./schema-visitor";
 

@@ -1,4 +1,4 @@
-import type { SchemaObjectWithNullable } from "../../types/index";
+import type { SchemaObjectWithNullable } from "../../types";
 
 /**
  * スキーマがnullableかどうかを判定

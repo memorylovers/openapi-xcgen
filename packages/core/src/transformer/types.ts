@@ -1,7 +1,7 @@
-import type { SchemaObject } from "../types/index";
+import type { SchemaObject } from "../types";
 import type { MimeType } from "../types/ir/common";
 import type { IRHttpMethod } from "../types/ir/endpoint";
-import type { IRType } from "../types/ir/index";
+import type { IRType } from "../types/ir";
 
 /**
  * Visitor実行コンテキスト

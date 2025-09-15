@@ -13,8 +13,8 @@
 
 import { consola } from "consola";
 import { isReferenceObject } from "../../types/guards";
-import type { ParameterObject, SchemaObject } from "../../types/index";
-import type { IRParameter } from "../../types/ir/index";
+import type { ParameterObject, SchemaObject } from "../../types";
+import type { IRParameter } from "../../types/ir";
 import { isNullable } from "../helpers/is-nullable.js";
 import { toIRParameterInType } from "../helpers/to-ir-parameter-in-type.js";
 import type { ParameterContext } from "../types";

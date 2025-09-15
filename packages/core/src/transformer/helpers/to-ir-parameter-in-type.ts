@@ -1,4 +1,4 @@
-import type { IRParameterInType } from "../../types/ir/index";
+import type { IRParameterInType } from "../../types/ir";
 
 /**
  * OpenAPIのparameter.in値をIRParameterInTypeに変換

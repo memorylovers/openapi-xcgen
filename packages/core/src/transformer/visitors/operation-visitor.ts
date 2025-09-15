@@ -12,8 +12,8 @@
  */
 
 import { consola } from "consola";
-import type { OperationObject, ReferenceObject } from "../../types/index";
-import type { IREndpoint, IRHttpMethod, IRModel } from "../../types/ir/index";
+import type { OperationObject, ReferenceObject } from "../../types";
+import type { IREndpoint, IRHttpMethod, IRModel } from "../../types/ir";
 import type {
   OperationContext,
   ParametersContext,

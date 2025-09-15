@@ -1,70 +1,70 @@
 {
-  "info": {
+  "metadata": {
     "title": "Single Tag Service Classification Test",
     "version": "1.0.0",
-    "description": "Test single tag service classification"
+    "description": "Test single tag service classification",
+    "termsOfService": null,
+    "contact": null,
+    "license": null
   },
   "models": [],
-  "services": [
+  "tags": [],
+  "endpoints": [
     {
-      "name": "users",
+      "operationId": "getUsers",
+      "method": "get",
+      "path": "/users",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [
+        "users"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "getUsers",
-          "method": "get",
-          "path": "/users",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     },
     {
-      "name": "products",
+      "operationId": "getProducts",
+      "method": "get",
+      "path": "/products",
+      "summary": null,
       "description": null,
-      "endpoints": [
+      "tags": [
+        "products"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
         {
-          "operationId": "getProducts",
-          "method": "get",
-          "path": "/products",
-          "summary": null,
-          "description": null,
-          "parameters": [],
-          "requestBody": null,
-          "responses": [
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
             {
-              "statusCode": "200",
-              "description": "Success",
-              "content": [
-                {
-                  "mimeType": "application/json",
-                  "schema": "string"
-                }
-              ],
-              "headers": null
+              "mimeType": "application/json",
+              "schema": "string"
             }
           ],
-          "deprecated": null,
-          "security": null
+          "headers": null
         }
-      ]
+      ],
+      "deprecated": null,
+      "security": null
     }
-  ]
+  ],
+  "servers": [],
+  "security": []
 }
