@@ -1,4 +1,4 @@
-import type { IRScalarType } from "../../types/ir";
+import type { IRScalarType } from "../../types";
 
 /**
  * OpenAPIのtype+formatをIRScalarTypeに変換

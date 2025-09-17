@@ -15,17 +15,20 @@
 
 import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
-import type { SchemaObject, SchemaObjectWithNullable } from "../../../types";
 import type {
   IRModel,
-  IRResponseModel,
+  IRProperty,
   IRRequestBodyModel,
-} from "../../../types/ir/models/operation";
-import type { IRProperty } from "../../../types/ir/models/property";
-import type { IRResponseHeader } from "../../../types/ir/endpoints/response";
-import { buildReferencePath } from "../../helpers/build-reference-path";
-import { extractValidation } from "../../helpers/extract-validation";
-import { isNullable } from "../../helpers/is-nullable";
+  IRResponseHeader,
+  IRResponseModel,
+  SchemaObject,
+  SchemaObjectWithNullable,
+} from "../../../types";
+import {
+  buildReferencePath,
+  extractValidation,
+  isNullable,
+} from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitSchema } from "./schema-visitor";
 

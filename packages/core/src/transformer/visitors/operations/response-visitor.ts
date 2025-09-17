@@ -12,16 +12,16 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../../types";
 import type {
-  ReferenceObject,
-  ResponseObject,
-  SchemaObject,
   IRModel,
   IRResponse,
   IRResponseContent,
+  ReferenceObject,
+  ResponseObject,
+  SchemaObject,
 } from "../../../types";
-import { generateComponentName } from "../../helpers/generate-component-name";
+import { isReferenceObject } from "../../../types";
+import { generateComponentName } from "../../helpers";
 import type { ResponseContext, VisitorContext } from "../../types";
 import { visitResponseObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";

@@ -2,7 +2,18 @@
  * Model type definitions
  */
 
-export * from "./base";
-export * from "./operation";
-export * from "./property";
-export * from "./validation";
+export type {
+  IRArrayModel,
+  IREnumModel,
+  IREnumValue,
+  IRMapModel,
+  IRObjectModel,
+} from "./base";
+export type {
+  IRModel,
+  IRParameterModel,
+  IRRequestBodyModel,
+  IRResponseModel,
+} from "./operation";
+export type { IRParameterProperty, IRProperty } from "./property";
+export type { IRValidation } from "./validation";

@@ -5,12 +5,12 @@
  * TDDアプローチに従い、段階的に拡張していく。
  */
 
-import type { IRModel } from "./models/operation";
 import type { IREndpoint } from "./endpoints/endpoint";
-import type { IRTag } from "./tags";
 import type { IRMetadata } from "./metadata";
+import type { IRModel } from "./models/operation";
 import type { IRSecurityScheme } from "./security";
 import type { IRServer } from "./servers";
+import type { IRTag } from "./tags";
 
 /**
  * XcgenIR - 中間表現のルート型
@@ -32,10 +32,57 @@ export interface XcgenIR {
 }
 
 // Re-export all types from sub-modules
-export * from "./common";
-export * from "./metadata";
-export * from "./models";
-export * from "./tags";
-export * from "./endpoints";
-export * from "./servers";
-export * from "./security";
+// common
+export type {
+  IRArray,
+  IRMap,
+  IRRef,
+  IRScalarType,
+  IRType,
+  MimeType,
+} from "./common";
+// metadata
+export type { IRContact, IRLicense, IRMetadata } from "./metadata";
+// models
+export type {
+  IRArrayModel,
+  IREnumModel,
+  IREnumValue,
+  IRMapModel,
+  IRModel,
+  IRObjectModel,
+  IRParameterModel,
+  IRParameterProperty,
+  IRProperty,
+  IRRequestBodyModel,
+  IRResponseModel,
+  IRValidation,
+} from "./models";
+// tags
+export type { IRTag, IRTagExternalDocs } from "./tags";
+// endpoints
+export type {
+  IREndpoint,
+  IRHttpMethod,
+  IRParameter,
+  IRParameterInType,
+  IRRequestBody,
+  IRRequestContent,
+  IRResponse,
+  IRResponseContent,
+  IRResponseHeader,
+} from "./endpoints";
+// servers
+export type {
+  IRServer,
+  IRServerVariable,
+  IRServerVariableMap,
+} from "./servers";
+// security
+export type {
+  IRApiKeyConfig,
+  IROAuth2Flow,
+  IROAuth2Flows,
+  IROAuth2ScopeMap,
+  IRSecurityScheme,
+} from "./security";

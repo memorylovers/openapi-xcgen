@@ -1,5 +1,4 @@
-import { XcgenError } from "../errors/base";
-import type { ParserErrorCode } from "../errors/codes";
+import { XcgenError, type ParserErrorCode } from "../errors";
 
 /**
  * Custom error class for OpenAPI parsing errors

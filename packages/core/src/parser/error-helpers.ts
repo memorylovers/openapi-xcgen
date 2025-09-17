@@ -1,4 +1,4 @@
-import { PARSER_ERROR_CODES, type ParserErrorCode } from "../errors/codes";
+import { PARSER_ERROR_CODES, type ParserErrorCode } from "../errors";
 import { XcgenParserError } from "./error";
 
 /**

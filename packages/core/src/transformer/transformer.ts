@@ -11,18 +11,22 @@
  */
 
 import { consola } from "consola";
-import type { ComponentsObject, OpenAPIDocument, PathsObject } from "../types";
 import type {
-  XcgenIR,
+  ComponentsObject,
   IREndpoint,
+  IRMetadata,
   IRModel,
   IRTag,
-  IRMetadata,
-} from "../types/ir";
-import { visitComponents } from "./visitors/components/components-visitor";
-import { visitMetadata } from "./visitors/metadata/metadata-visitor";
-import { visitPaths } from "./visitors/paths/paths-visitor";
-import { visitTags } from "./visitors/metadata/tags-visitor";
+  OpenAPIDocument,
+  PathsObject,
+  XcgenIR,
+} from "../types";
+import {
+  visitComponents,
+  visitMetadata,
+  visitPaths,
+  visitTags,
+} from "./visitors";
 
 /**
  * OpenAPIDocumentをXcgenIRに変換

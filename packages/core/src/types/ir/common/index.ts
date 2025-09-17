@@ -2,5 +2,5 @@
  * Common type definitions
  */
 
-export * from "./mime-type";
-export * from "./type";
+export type { MimeType } from "./mime-type";
+export type { IRArray, IRMap, IRRef, IRScalarType, IRType } from "./type";

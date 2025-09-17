@@ -9,8 +9,7 @@ import { consola } from "consola";
 import { isReferenceObject } from "../../../types";
 import type { SchemaObjectWithNullable, IRArray, IRType } from "../../../types";
 import type { VisitorContext } from "../../types";
-import { extractRefName } from "../../helpers/extract-ref-name";
-import { toIRScalarType } from "../../helpers/to-ir-scalar-type";
+import { extractRefName, toIRScalarType } from "../../helpers";
 
 /**
  * SchemaObjectをIRTypeに解決

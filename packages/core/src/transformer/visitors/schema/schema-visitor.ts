@@ -13,8 +13,8 @@
  * 他のVisitorは各自の専門処理に専念できます。
  */
 
-import type { SchemaObjectWithNullable, IRModel, IRType } from "../../../types";
-import { buildReferencePath } from "../../helpers/build-reference-path";
+import type { IRModel, IRType, SchemaObjectWithNullable } from "../../../types";
+import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitEnum } from "./enum-visitor";
 import { visitObject } from "./object-visitor";

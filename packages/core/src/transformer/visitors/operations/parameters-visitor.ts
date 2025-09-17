@@ -12,15 +12,15 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../../types";
 import type {
-  ParameterObject,
-  ReferenceObject,
   IRModel,
   IRParameter,
   IRParameterModel,
+  ParameterObject,
+  ReferenceObject,
 } from "../../../types";
-import { createParameterModel } from "../../helpers/create-parameter-model";
+import { isReferenceObject } from "../../../types";
+import { createParameterModel } from "../../helpers";
 import type { ParameterContext, ParametersContext } from "../../types";
 import { visitParameter } from "./parameter-visitor";
 

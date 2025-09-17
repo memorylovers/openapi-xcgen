@@ -15,7 +15,7 @@ import type {
   IRParameter,
   IRParameterModel,
   IRParameterProperty,
-} from "../../types/ir";
+} from "../../types";
 import { buildReferencePath } from "./build-reference-path";
 
 /**

@@ -12,16 +12,15 @@
  */
 
 import { consola } from "consola";
-import { isReferenceObject } from "../../../types";
 import type {
+  IRParameter,
   ParameterObject,
   SchemaObject,
-  IRParameter,
 } from "../../../types";
-import { isNullable } from "../../helpers/is-nullable.js";
-import { toIRParameterInType } from "../../helpers/to-ir-parameter-in-type.js";
+import { isReferenceObject } from "../../../types";
+import { isNullable, toIRParameterInType } from "../../helpers";
 import type { ParameterContext } from "../../types";
-import { visitType } from "../schema/type-visitor.js";
+import { visitType } from "../schema";
 
 /**
  * ParameterObjectをIRParameterに変換
