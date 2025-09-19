@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "title": "Swagger Petstore",
+    "version": "1.0.0",
+    "description": null,
+    "termsOfService": null,
+    "contact": null,
+    "license": {
+      "name": "MIT",
+      "url": null
+    }
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "long",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "tag",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Error",
+      "referencePath": "#/components/schemas/Error",
+      "description": null,
+      "properties": [
+        {
+          "name": "code",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int32"
+          }
+        },
+        {
+          "name": "message",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "ListPetsParams",
+      "description": "Parameters for GET /pets\nlimit: How many items to return at one time (max 100)",
+      "properties": [
+        {
+          "name": "limit",
+          "description": "How many items to return at one time (max 100)",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::pets/get/parameters/ListPetsParams"
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostPetsRequestBody",
+      "referencePath": "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+      "properties": [
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "tag",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ],
+      "required": true,
+      "description": null
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetByIdParams",
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
+      "properties": [
+        {
+          "name": "petId",
+          "description": "The id of the pet to retrieve",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "path"
+        }
+      ],
+      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetByIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "operationId": "listPets",
+      "method": "get",
+      "path": "/pets",
+      "summary": "List all pets",
+      "description": null,
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets/get/parameters/ListPetsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "A paged array of pets",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pets"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "createPets",
+      "method": "post",
+      "path": "/pets",
+      "summary": "Create a pet",
+      "description": null,
+      "tags": [
+        "pets"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Null response",
+          "content": null,
+          "headers": null
+        },
+        {
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "showPetById",
+      "method": "get",
+      "path": "/pets/{petId}",
+      "summary": "Info for a specific pet",
+      "description": null,
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets::{petId}/get/parameters/GetPetByIdParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Expected response to a valid request",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    }
+  ],
+  "servers": [],
+  "security": []
+}

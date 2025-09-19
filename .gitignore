@@ -683,5 +683,8 @@ doc/api/
 .claude/settings.local.json
 .serena/cache/
 
+# Test debug files
+*.actual.json
+
 # Turbo
 .turbo

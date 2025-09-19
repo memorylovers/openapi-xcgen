@@ -7,6 +7,7 @@ import prettierPlugin from "eslint-plugin-prettier";
 export default [
   {
     ignores: [
+      ".claude/**",
       "**/dist/**",
       "**/coverage/**",
       "**/node_modules/**",

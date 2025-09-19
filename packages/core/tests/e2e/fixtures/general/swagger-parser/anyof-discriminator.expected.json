@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "title": "fruity",
+    "version": "0.0.1",
+    "description": null,
+    "termsOfService": null,
+    "contact": null,
+    "license": null
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "AppleReqDisc",
+      "referencePath": "#/components/schemas/AppleReqDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "seeds",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "fruitType",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BananaReqDisc",
+      "referencePath": "#/components/schemas/BananaReqDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "length",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "fruitType",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AppleAllOfDisc",
+      "referencePath": "#/components/schemas/AppleAllOfDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "seeds",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BananaAllOfDisc",
+      "referencePath": "#/components/schemas/BananaAllOfDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "length",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AppleAnyOfDisc",
+      "referencePath": "#/components/schemas/AppleAnyOfDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "seeds",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BananaAnyOfDisc",
+      "referencePath": "#/components/schemas/BananaAnyOfDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "length",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AppleGrandparentDisc",
+      "referencePath": "#/components/schemas/AppleGrandparentDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "seeds",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BananaGrandparentDisc",
+      "referencePath": "#/components/schemas/BananaGrandparentDisc",
+      "description": null,
+      "properties": [
+        {
+          "name": "length",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscMissingFromProperties",
+      "referencePath": "#/components/schemas/DiscMissingFromProperties",
+      "description": null,
+      "properties": [
+        {
+          "name": "length",
+          "description": null,
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscOptionalTypeCorrect",
+      "referencePath": "#/components/schemas/DiscOptionalTypeCorrect",
+      "description": null,
+      "properties": [
+        {
+          "name": "fruitType",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscOptionalTypeIncorrect",
+      "referencePath": "#/components/schemas/DiscOptionalTypeIncorrect",
+      "description": null,
+      "properties": [
+        {
+          "name": "fruitType",
+          "description": null,
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscTypeIncorrect",
+      "referencePath": "#/components/schemas/DiscTypeIncorrect",
+      "description": null,
+      "properties": [
+        {
+          "name": "fruitType",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "desc",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/FruitAllOfDisc"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    }
+  ],
+  "servers": [],
+  "security": []
+}

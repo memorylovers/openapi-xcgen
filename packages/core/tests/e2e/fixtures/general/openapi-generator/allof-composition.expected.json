@@ -1,0 +1,384 @@
+{
+  "metadata": {
+    "title": "Example",
+    "version": "1.0.0",
+    "description": null,
+    "termsOfService": null,
+    "contact": null,
+    "license": {
+      "name": "MIT",
+      "url": null
+    }
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Hero",
+      "referencePath": "#/components/schemas/Hero",
+      "description": "Hero",
+      "properties": [
+        {
+          "name": "reward",
+          "description": null,
+          "type": "long",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "origin",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Human",
+      "referencePath": "#/components/schemas/Human",
+      "description": "Human",
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "long",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SuperBaby",
+      "referencePath": "#/components/schemas/SuperBaby",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "long",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "gender",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "age",
+          "description": null,
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "level",
+          "description": null,
+          "type": "any",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SuperBoy",
+      "referencePath": "#/components/schemas/SuperBoy",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "long",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "category",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "level",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SuperMan",
+      "referencePath": "#/components/schemas/SuperMan",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "long",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "reward",
+          "description": null,
+          "type": "long",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "origin",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "category",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "level",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPersonDisplayParams",
+      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve",
+      "properties": [
+        {
+          "name": "personId",
+          "description": "The id of the person to retrieve",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "path"
+        }
+      ],
+      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "operationId": "list",
+      "method": "get",
+      "path": "/person/display/{personId}",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/SuperMan"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    }
+  ],
+  "servers": [],
+  "security": []
+}

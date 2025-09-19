@@ -1,0 +1,176 @@
+{
+  "metadata": {
+    "title": "OpenAPI 3.1.1 transformers all of example",
+    "version": "1.0.0",
+    "description": null,
+    "termsOfService": null,
+    "contact": null,
+    "license": null
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Foo",
+      "referencePath": "#/components/schemas/Foo",
+      "description": null,
+      "properties": [
+        {
+          "name": "foo",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/Bar"
+            }
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Bar",
+      "referencePath": "#/components/schemas/Bar",
+      "description": null,
+      "properties": [
+        {
+          "name": "bar",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BarBar"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BarBar",
+      "referencePath": "#/components/schemas/BarBar",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "foo",
+          "name": "FOO",
+          "description": null
+        },
+        {
+          "value": "bar",
+          "name": "BAR",
+          "description": null
+        },
+        {
+          "value": "baz",
+          "name": "BAZ",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Qux",
+      "referencePath": "#/components/schemas/Qux",
+      "description": null,
+      "properties": [
+        {
+          "name": "foo",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int32"
+          }
+        },
+        {
+          "name": "bar",
+          "description": null,
+          "type": "double",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "baz",
+          "description": null,
+          "type": "datetime",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "operationId": null,
+      "method": "get",
+      "path": "/foo",
+      "summary": null,
+      "description": null,
+      "tags": [],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "*/*",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Foo"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    }
+  ],
+  "servers": [],
+  "security": []
+}

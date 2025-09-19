@@ -1,0 +1,2507 @@
+{
+  "metadata": {
+    "title": "Museum API",
+    "version": "2.3.0",
+    "description": "An imaginary, but delightful Museum API for interacting with museum services and information.\nBuilt with love by Redocly.\n",
+    "termsOfService": null,
+    "contact": {
+      "name": "Museum API Support",
+      "email": "support@museum-api.com",
+      "url": "https://museum-api.com/support"
+    },
+    "license": {
+      "name": "MIT",
+      "url": null
+    }
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "DailyHours",
+      "referencePath": "#/components/schemas/DailyHours",
+      "description": null,
+      "properties": [
+        {
+          "name": "date",
+          "description": null,
+          "type": "date",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "open",
+          "description": "Opening time in 24-hour format",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "close",
+          "description": "Closing time in 24-hour format",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "special_hours",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": false,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "note",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": 500,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "closed",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": false,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SpecialEvent",
+      "referencePath": "#/components/schemas/SpecialEvent",
+      "description": null,
+      "properties": [
+        {
+          "name": "event_id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "description",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "start_date",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "end_date",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "category",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/SpecialEventCategory"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "location",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/SpecialEventLocation"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "price",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Money"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "capacity",
+          "description": null,
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 1,
+            "maximum": 1000,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "registration_required",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": false,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "registration_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "image_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "created_at",
+          "description": null,
+          "type": "datetime",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "updated_at",
+          "description": null,
+          "type": "datetime",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "SpecialEventCategory",
+      "referencePath": "#/components/schemas/SpecialEventCategory",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "exhibition",
+          "name": "EXHIBITION",
+          "description": null
+        },
+        {
+          "value": "workshop",
+          "name": "WORKSHOP",
+          "description": null
+        },
+        {
+          "value": "tour",
+          "name": "TOUR",
+          "description": null
+        },
+        {
+          "value": "lecture",
+          "name": "LECTURE",
+          "description": null
+        },
+        {
+          "value": "family",
+          "name": "FAMILY",
+          "description": null
+        },
+        {
+          "value": "members-only",
+          "name": "MEMBERS_ONLY",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "SpecialEventLocation",
+      "referencePath": "#/components/schemas/SpecialEventLocation",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "main-hall",
+          "name": "MAIN_HALL",
+          "description": null
+        },
+        {
+          "value": "gallery-a",
+          "name": "GALLERY_A",
+          "description": null
+        },
+        {
+          "value": "gallery-b",
+          "name": "GALLERY_B",
+          "description": null
+        },
+        {
+          "value": "gallery-c",
+          "name": "GALLERY_C",
+          "description": null
+        },
+        {
+          "value": "auditorium",
+          "name": "AUDITORIUM",
+          "description": null
+        },
+        {
+          "value": "classroom-1",
+          "name": "CLASSROOM_1",
+          "description": null
+        },
+        {
+          "value": "classroom-2",
+          "name": "CLASSROOM_2",
+          "description": null
+        },
+        {
+          "value": "outdoor",
+          "name": "OUTDOOR",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SpecialEventRequest",
+      "referencePath": "#/components/schemas/SpecialEventRequest",
+      "description": null,
+      "properties": [
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "description",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "start_date",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "end_date",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "category",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/SpecialEventRequestCategory"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "location",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/SpecialEventRequestLocation"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "price",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Money"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "capacity",
+          "description": null,
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 1,
+            "maximum": 1000,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "registration_required",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": false,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "registration_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "image_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "SpecialEventRequestCategory",
+      "referencePath": "#/components/schemas/SpecialEventRequestCategory",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "exhibition",
+          "name": "EXHIBITION",
+          "description": null
+        },
+        {
+          "value": "workshop",
+          "name": "WORKSHOP",
+          "description": null
+        },
+        {
+          "value": "tour",
+          "name": "TOUR",
+          "description": null
+        },
+        {
+          "value": "lecture",
+          "name": "LECTURE",
+          "description": null
+        },
+        {
+          "value": "family",
+          "name": "FAMILY",
+          "description": null
+        },
+        {
+          "value": "members-only",
+          "name": "MEMBERS_ONLY",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "SpecialEventRequestLocation",
+      "referencePath": "#/components/schemas/SpecialEventRequestLocation",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "main-hall",
+          "name": "MAIN_HALL",
+          "description": null
+        },
+        {
+          "value": "gallery-a",
+          "name": "GALLERY_A",
+          "description": null
+        },
+        {
+          "value": "gallery-b",
+          "name": "GALLERY_B",
+          "description": null
+        },
+        {
+          "value": "gallery-c",
+          "name": "GALLERY_C",
+          "description": null
+        },
+        {
+          "value": "auditorium",
+          "name": "AUDITORIUM",
+          "description": null
+        },
+        {
+          "value": "classroom-1",
+          "name": "CLASSROOM_1",
+          "description": null
+        },
+        {
+          "value": "classroom-2",
+          "name": "CLASSROOM_2",
+          "description": null
+        },
+        {
+          "value": "outdoor",
+          "name": "OUTDOOR",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SpecialEventUpdate",
+      "referencePath": "#/components/schemas/SpecialEventUpdate",
+      "description": null,
+      "properties": [
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "description",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "start_date",
+          "description": null,
+          "type": "datetime",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "end_date",
+          "description": null,
+          "type": "datetime",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "category",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/SpecialEventUpdateCategory"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "location",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/SpecialEventUpdateLocation"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "price",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Money"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "capacity",
+          "description": null,
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 1,
+            "maximum": 1000,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "registration_required",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "registration_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "image_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "SpecialEventUpdateCategory",
+      "referencePath": "#/components/schemas/SpecialEventUpdateCategory",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "exhibition",
+          "name": "EXHIBITION",
+          "description": null
+        },
+        {
+          "value": "workshop",
+          "name": "WORKSHOP",
+          "description": null
+        },
+        {
+          "value": "tour",
+          "name": "TOUR",
+          "description": null
+        },
+        {
+          "value": "lecture",
+          "name": "LECTURE",
+          "description": null
+        },
+        {
+          "value": "family",
+          "name": "FAMILY",
+          "description": null
+        },
+        {
+          "value": "members-only",
+          "name": "MEMBERS_ONLY",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "SpecialEventUpdateLocation",
+      "referencePath": "#/components/schemas/SpecialEventUpdateLocation",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "main-hall",
+          "name": "MAIN_HALL",
+          "description": null
+        },
+        {
+          "value": "gallery-a",
+          "name": "GALLERY_A",
+          "description": null
+        },
+        {
+          "value": "gallery-b",
+          "name": "GALLERY_B",
+          "description": null
+        },
+        {
+          "value": "gallery-c",
+          "name": "GALLERY_C",
+          "description": null
+        },
+        {
+          "value": "auditorium",
+          "name": "AUDITORIUM",
+          "description": null
+        },
+        {
+          "value": "classroom-1",
+          "name": "CLASSROOM_1",
+          "description": null
+        },
+        {
+          "value": "classroom-2",
+          "name": "CLASSROOM_2",
+          "description": null
+        },
+        {
+          "value": "outdoor",
+          "name": "OUTDOOR",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "TicketPurchaseRequest",
+      "referencePath": "#/components/schemas/TicketPurchaseRequest",
+      "description": null,
+      "properties": [
+        {
+          "name": "visitor_email",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "email"
+          }
+        },
+        {
+          "name": "visitor_name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "visit_date",
+          "description": null,
+          "type": "date",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "visit_time",
+          "description": "Preferred entry time in 24-hour format",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "ticket_type",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/TicketPurchaseRequestTicketType"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "quantity",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 1,
+            "maximum": 20,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "special_requests",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": 500,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "TicketPurchaseRequestTicketType",
+      "referencePath": "#/components/schemas/TicketPurchaseRequestTicketType",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "adult",
+          "name": "ADULT",
+          "description": null
+        },
+        {
+          "value": "senior",
+          "name": "SENIOR",
+          "description": null
+        },
+        {
+          "value": "student",
+          "name": "STUDENT",
+          "description": null
+        },
+        {
+          "value": "child",
+          "name": "CHILD",
+          "description": null
+        },
+        {
+          "value": "family",
+          "name": "FAMILY",
+          "description": null
+        },
+        {
+          "value": "group",
+          "name": "GROUP",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "TicketPurchaseConfirmation",
+      "referencePath": "#/components/schemas/TicketPurchaseConfirmation",
+      "description": null,
+      "properties": [
+        {
+          "name": "confirmation_id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[A-Z0-9]{8}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "purchase_date",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "visitor_email",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "email"
+          }
+        },
+        {
+          "name": "visitor_name",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "visit_date",
+          "description": null,
+          "type": "date",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "visit_time",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "ticket_type",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/TicketPurchaseConfirmationTicketType"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "quantity",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "total_amount",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Money"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "status",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/TicketPurchaseConfirmationStatus"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "qr_code_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "special_requests",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "TicketPurchaseConfirmationTicketType",
+      "referencePath": "#/components/schemas/TicketPurchaseConfirmationTicketType",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "adult",
+          "name": "ADULT",
+          "description": null
+        },
+        {
+          "value": "senior",
+          "name": "SENIOR",
+          "description": null
+        },
+        {
+          "value": "student",
+          "name": "STUDENT",
+          "description": null
+        },
+        {
+          "value": "child",
+          "name": "CHILD",
+          "description": null
+        },
+        {
+          "value": "family",
+          "name": "FAMILY",
+          "description": null
+        },
+        {
+          "value": "group",
+          "name": "GROUP",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "TicketPurchaseConfirmationStatus",
+      "referencePath": "#/components/schemas/TicketPurchaseConfirmationStatus",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "pending",
+          "name": "PENDING",
+          "description": null
+        },
+        {
+          "value": "confirmed",
+          "name": "CONFIRMED",
+          "description": null
+        },
+        {
+          "value": "used",
+          "name": "USED",
+          "description": null
+        },
+        {
+          "value": "cancelled",
+          "name": "CANCELLED",
+          "description": null
+        },
+        {
+          "value": "refunded",
+          "name": "REFUNDED",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "CreditCardPayment",
+      "referencePath": "#/components/schemas/CreditCardPayment",
+      "description": null,
+      "properties": [
+        {
+          "name": "type",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "card_number",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[0-9]{13,19}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "card_holder_name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "expiry_date",
+          "description": "MM/YY format",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^(0[1-9]|1[0-2])\\/[0-9]{2}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "cvv",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[0-9]{3,4}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PayPalPayment",
+      "referencePath": "#/components/schemas/PayPalPayment",
+      "description": null,
+      "properties": [
+        {
+          "name": "type",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "paypal_email",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "email"
+          }
+        },
+        {
+          "name": "paypal_auth_code",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Money",
+      "referencePath": "#/components/schemas/Money",
+      "description": null,
+      "properties": [
+        {
+          "name": "amount",
+          "description": null,
+          "type": "double",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 0,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "currency",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": "USD",
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[A-Z]{3}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Pagination",
+      "referencePath": "#/components/schemas/Pagination",
+      "description": null,
+      "properties": [
+        {
+          "name": "total",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 0,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "limit",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 1,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "offset",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 0,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "has_more",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Problem",
+      "referencePath": "#/components/schemas/Problem",
+      "description": null,
+      "properties": [
+        {
+          "name": "type",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": "about:blank",
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "title",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "status",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 100,
+            "maximum": 599,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "detail",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "instance",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "timestamp",
+          "description": null,
+          "type": "datetime",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "correlation_id",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "response",
+      "name": "GetMuseumHours200Response",
+      "referencePath": "#/paths/::museum-hours/get/responses/responses/200/content/application::json/schema/GetMuseumHours200Response",
+      "description": null,
+      "properties": [
+        {
+          "name": "timezone",
+          "description": "Timezone used for the hours",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "daily_hours",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/DailyHours"
+            }
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ],
+      "statusCode": "200",
+      "headers": null
+    },
+    {
+      "kind": "parameter",
+      "name": "GetMuseumHoursParams",
+      "description": "Parameters for GET /museum-hours\ndate: Specific date to retrieve hours for (ISO 8601 format)\ntimezone: Timezone for displaying hours (IANA timezone format)",
+      "properties": [
+        {
+          "name": "date",
+          "description": "Specific date to retrieve hours for (ISO 8601 format)",
+          "type": "date",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "timezone",
+          "description": "Timezone for displaying hours (IANA timezone format)",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": "America/New_York",
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
+    },
+    {
+      "kind": "response",
+      "name": "GetSpecialEvents200Response",
+      "referencePath": "#/paths/::special-events/get/responses/responses/200/content/application::json/schema/GetSpecialEvents200Response",
+      "description": null,
+      "properties": [
+        {
+          "name": "events",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEvent"
+            }
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "pagination",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pagination"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ],
+      "statusCode": "200",
+      "headers": null
+    },
+    {
+      "kind": "parameter",
+      "name": "GetSpecialEventsParams",
+      "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)",
+      "properties": [
+        {
+          "name": "start_date",
+          "description": "Filter events starting from this date",
+          "type": "date",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "end_date",
+          "description": "Filter events until this date",
+          "type": "date",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "category",
+          "description": "Filter by event category",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "limit",
+          "description": "Maximum number of events to return",
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": 20,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "offset",
+          "description": "Number of events to skip (for pagination)",
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTicketsParams",
+      "description": "Parameters for GET /tickets/{confirmationId}\nemail: Email address used for the purchase",
+      "properties": [
+        {
+          "name": "email",
+          "description": "Email address used for the purchase",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTicketsQrCodeParams",
+      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nemail: Email address used for the purchase\nformat: QR code format",
+      "properties": [
+        {
+          "name": "email",
+          "description": "Email address used for the purchase",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "format",
+          "description": "QR code format",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": "png",
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsQrCodeParams"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Operations",
+      "description": "Museum operational information",
+      "externalDocs": null
+    },
+    {
+      "name": "Events",
+      "description": "Special events hosted by the museum",
+      "externalDocs": null
+    },
+    {
+      "name": "Tickets",
+      "description": "Museum ticket purchasing",
+      "externalDocs": null
+    }
+  ],
+  "endpoints": [
+    {
+      "operationId": "getMuseumHours",
+      "method": "get",
+      "path": "/museum-hours",
+      "summary": "Get museum operating hours",
+      "description": "Returns the operating hours for the museum for the next seven days.",
+      "tags": [
+        "Operations"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Museum hours retrieved successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::museum-hours/get/responses/responses/200/content/application::json/schema/GetMuseumHours200Response"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "listSpecialEvents",
+      "method": "get",
+      "path": "/special-events",
+      "summary": "List special events",
+      "description": "Get a list of upcoming special events at the museum",
+      "tags": [
+        "Events"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "List of special events",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::special-events/get/responses/responses/200/content/application::json/schema/GetSpecialEvents200Response"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "createSpecialEvent",
+      "method": "post",
+      "path": "/special-events",
+      "summary": "Create a new special event",
+      "description": "Create a new special event (requires admin privileges)",
+      "tags": [
+        "Events"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventRequest"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Event created successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/SpecialEvent"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getSpecialEvent",
+      "method": "get",
+      "path": "/special-events/{eventId}",
+      "summary": "Get special event details",
+      "description": "Get details about a specific special event",
+      "tags": [
+        "Events"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Event details retrieved successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/SpecialEvent"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "updateSpecialEvent",
+      "method": "patch",
+      "path": "/special-events/{eventId}",
+      "summary": "Update special event",
+      "description": "Update a special event (requires admin privileges)",
+      "tags": [
+        "Events"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventUpdate"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Event updated successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/SpecialEvent"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "deleteSpecialEvent",
+      "method": "delete",
+      "path": "/special-events/{eventId}",
+      "summary": "Delete special event",
+      "description": "Delete a special event (requires admin privileges)",
+      "tags": [
+        "Events"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "204",
+          "description": "Event deleted successfully",
+          "content": null,
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "purchaseTickets",
+      "method": "post",
+      "path": "/tickets",
+      "summary": "Purchase museum tickets",
+      "description": "Purchase tickets for museum admission",
+      "tags": [
+        "Tickets"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/TicketPurchaseRequest"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Tickets purchased successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/TicketPurchaseConfirmation"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "402",
+          "description": "Payment Required",
+          "content": [
+            {
+              "mimeType": "application/problem+json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Problem"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "409",
+          "description": "Conflict - Tickets not available for selected date/time",
+          "content": [
+            {
+              "mimeType": "application/problem+json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Problem"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getTicket",
+      "method": "get",
+      "path": "/tickets/{confirmationId}",
+      "summary": "Retrieve ticket details",
+      "description": "Get details of a ticket purchase",
+      "tags": [
+        "Tickets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Ticket details retrieved successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/TicketPurchaseConfirmation"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getTicketQRCode",
+      "method": "get",
+      "path": "/tickets/{confirmationId}/qr-code",
+      "summary": "Generate QR code for tickets",
+      "description": "Generate a QR code for ticket validation at the museum entrance",
+      "tags": [
+        "Tickets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsQrCodeParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "QR code generated successfully",
+          "content": [
+            {
+              "mimeType": "image/png",
+              "schema": "binary"
+            },
+            {
+              "mimeType": "image/svg+xml",
+              "schema": "string"
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    }
+  ],
+  "servers": [],
+  "security": []
+}

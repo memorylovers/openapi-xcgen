@@ -1,0 +1,1704 @@
+{
+  "metadata": {
+    "title": "Train Travel API",
+    "version": "1.2.1",
+    "description": "API for finding and booking train trips across Europe.\n\n## Run in Postman\n\nExperiment with this API in Postman, using our Postman Collection.\n\n[![Run In Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9265903-7a75a0d0-b108-4436-ba54-c6139698dc08?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D9265903-7a75a0d0-b108-4436-ba54-c6139698dc08%26entityType%3Dcollection%26workspaceId%3Df507f69d-9564-419c-89a2-cb8e4c8c7b8f)\n",
+    "termsOfService": null,
+    "contact": {
+      "name": "Train Support",
+      "email": "support@example.com",
+      "url": "https://example.com/support"
+    },
+    "license": {
+      "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+      "url": null
+    }
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Station",
+      "referencePath": "#/components/schemas/Station",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "address",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "country_code",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[A-Z]{2}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "timezone",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "coordinates",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/StationCoordinates"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "StationCoordinates",
+      "referencePath": "#/components/schemas/StationCoordinates",
+      "description": null,
+      "properties": [
+        {
+          "name": "latitude",
+          "description": null,
+          "type": "double",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": -90,
+            "maximum": 90,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "longitude",
+          "description": null,
+          "type": "double",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": -180,
+            "maximum": 180,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Trip",
+      "referencePath": "#/components/schemas/Trip",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "origin",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Station"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "destination",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Station"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "departure_time",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "arrival_time",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "operator",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "price",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Price"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "bicycles_allowed",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "dogs_allowed",
+          "description": null,
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BookingRequest",
+      "referencePath": "#/components/schemas/BookingRequest",
+      "description": null,
+      "properties": [
+        {
+          "name": "trip_id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "passengers",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/Passenger"
+            }
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": 1,
+            "maxItems": 10,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "seat_preferences",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingRequestSeatPreferences"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BookingRequestSeatPreferences",
+      "referencePath": "#/components/schemas/BookingRequestSeatPreferences",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "window",
+          "name": "WINDOW",
+          "description": null
+        },
+        {
+          "value": "aisle",
+          "name": "AISLE",
+          "description": null
+        },
+        {
+          "value": "table",
+          "name": "TABLE",
+          "description": null
+        },
+        {
+          "value": "quiet",
+          "name": "QUIET",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Booking",
+      "referencePath": "#/components/schemas/Booking",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "trip",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Trip"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "passengers",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/Passenger"
+            }
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "status",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingStatus"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "payment_status",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingPaymentStatus"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "created_at",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "total_price",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Price"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BookingStatus",
+      "referencePath": "#/components/schemas/BookingStatus",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "pending",
+          "name": "PENDING",
+          "description": null
+        },
+        {
+          "value": "confirmed",
+          "name": "CONFIRMED",
+          "description": null
+        },
+        {
+          "value": "cancelled",
+          "name": "CANCELLED",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BookingPaymentStatus",
+      "referencePath": "#/components/schemas/BookingPaymentStatus",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "unpaid",
+          "name": "UNPAID",
+          "description": null
+        },
+        {
+          "value": "paid",
+          "name": "PAID",
+          "description": null
+        },
+        {
+          "value": "refunded",
+          "name": "REFUNDED",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Passenger",
+      "referencePath": "#/components/schemas/Passenger",
+      "description": null,
+      "properties": [
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "email",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "email"
+          }
+        },
+        {
+          "name": "date_of_birth",
+          "description": null,
+          "type": "date",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "passport_number",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[A-Z0-9]+$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Price",
+      "referencePath": "#/components/schemas/Price",
+      "description": null,
+      "properties": [
+        {
+          "name": "amount",
+          "description": null,
+          "type": "double",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 0,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "currency",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[A-Z]{3}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "CardPayment",
+      "referencePath": "#/components/schemas/CardPayment",
+      "description": null,
+      "properties": [
+        {
+          "name": "method",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "card_number",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[0-9]{13,19}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "card_holder",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "expiry_month",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 1,
+            "maximum": 12,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "expiry_year",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 2024,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "cvv",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": "^[0-9]{3,4}$",
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BankTransferPayment",
+      "referencePath": "#/components/schemas/BankTransferPayment",
+      "description": null,
+      "properties": [
+        {
+          "name": "method",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "account_number",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "routing_number",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "account_holder",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PaymentConfirmation",
+      "referencePath": "#/components/schemas/PaymentConfirmation",
+      "description": null,
+      "properties": [
+        {
+          "name": "payment_id",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "status",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaymentConfirmationStatus"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "amount",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Price"
+          },
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "timestamp",
+          "description": null,
+          "type": "datetime",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "receipt_url",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "PaymentConfirmationStatus",
+      "referencePath": "#/components/schemas/PaymentConfirmationStatus",
+      "description": null,
+      "type": "string",
+      "values": [
+        {
+          "value": "success",
+          "name": "SUCCESS",
+          "description": null
+        },
+        {
+          "value": "pending",
+          "name": "PENDING",
+          "description": null
+        },
+        {
+          "value": "failed",
+          "name": "FAILED",
+          "description": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PaginationLinks",
+      "referencePath": "#/components/schemas/PaginationLinks",
+      "description": null,
+      "properties": [
+        {
+          "name": "self",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "next",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "prev",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "first",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "last",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Problem",
+      "referencePath": "#/components/schemas/Problem",
+      "description": null,
+      "properties": [
+        {
+          "name": "type",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": "about:blank",
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        },
+        {
+          "name": "title",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "status",
+          "description": null,
+          "type": "int",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": 100,
+            "maximum": 599,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": null
+          }
+        },
+        {
+          "name": "detail",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "instance",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "response",
+      "name": "GetStations200Response",
+      "referencePath": "#/paths/::stations/get/responses/responses/200/content/application::json/schema/GetStations200Response",
+      "description": null,
+      "properties": [
+        {
+          "name": "data",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/Station"
+            }
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "links",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ],
+      "statusCode": "200",
+      "headers": null
+    },
+    {
+      "kind": "parameter",
+      "name": "GetStationsParams",
+      "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results",
+      "properties": [
+        {
+          "name": "coordinates",
+          "description": "Find stations close to a location.",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "search",
+          "description": "Search for stations by name or code",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "country",
+          "description": "Filter by country code (ISO 3166-1 alpha-2)",
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "limit",
+          "description": "Maximum number of results",
+          "type": "int",
+          "required": false,
+          "nullable": null,
+          "defaultValue": 10,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::stations/get/parameters/GetStationsParams"
+    },
+    {
+      "kind": "response",
+      "name": "GetTrips200Response",
+      "referencePath": "#/paths/::trips/get/responses/responses/200/content/application::json/schema/GetTrips200Response",
+      "description": null,
+      "properties": [
+        {
+          "name": "data",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/Trip"
+            }
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "links",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ],
+      "statusCode": "200",
+      "headers": null
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTripsParams",
+      "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs",
+      "properties": [
+        {
+          "name": "origin",
+          "description": "The ID of the origin station",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "destination",
+          "description": "The ID of the destination station",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "date",
+          "description": "Date of travel (ISO 8601)",
+          "type": "date",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "bicycles",
+          "description": "Only return trips that allow bicycles",
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        },
+        {
+          "name": "dogs",
+          "description": "Only return trips that allow dogs",
+          "type": "boolean",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "query"
+        }
+      ],
+      "referencePath": "#/paths/::trips/get/parameters/GetTripsParams"
+    },
+    {
+      "kind": "response",
+      "name": "GetBookings200Response",
+      "referencePath": "#/paths/::bookings/get/responses/responses/200/content/application::json/schema/GetBookings200Response",
+      "description": null,
+      "properties": [
+        {
+          "name": "data",
+          "description": null,
+          "type": {
+            "kind": "array",
+            "itemType": {
+              "kind": "ref",
+              "name": "#/components/schemas/Booking"
+            }
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "links",
+          "description": null,
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ],
+      "statusCode": "200",
+      "headers": null
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "operationId": "getStations",
+      "method": "get",
+      "path": "/stations",
+      "summary": "Get a list of train stations",
+      "description": "Returns a list of all train stations in the system.",
+      "tags": [
+        "Stations"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::stations/get/parameters/GetStationsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::stations/get/responses/responses/200/content/application::json/schema/GetStations200Response"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getTrips",
+      "method": "get",
+      "path": "/trips",
+      "summary": "Get available train trips",
+      "description": "Returns a list of available trips between stations",
+      "tags": [
+        "Trips"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::trips/get/parameters/GetTripsParams"
+      },
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::trips/get/responses/responses/200/content/application::json/schema/GetTrips200Response"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getBookings",
+      "method": "get",
+      "path": "/bookings",
+      "summary": "List bookings for the authenticated user",
+      "description": "Returns a list of bookings for the authenticated user",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::bookings/get/responses/responses/200/content/application::json/schema/GetBookings200Response"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "createBooking",
+      "method": "post",
+      "path": "/bookings",
+      "summary": "Create a new booking",
+      "description": "Book a trip for one or more passengers",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": [],
+      "requestBody": {
+        "description": null,
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/BookingRequest"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Booking created successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Booking"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "getBooking",
+      "method": "get",
+      "path": "/bookings/{bookingId}",
+      "summary": "Get booking details",
+      "description": "Returns details of a specific booking",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Booking"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "cancelBooking",
+      "method": "delete",
+      "path": "/bookings/{bookingId}",
+      "summary": "Cancel a booking",
+      "description": "Cancel an existing booking",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "204",
+          "description": "Booking cancelled successfully",
+          "content": null,
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    },
+    {
+      "operationId": "payForBooking",
+      "method": "post",
+      "path": "/bookings/{bookingId}/payment",
+      "summary": "Pay for a booking",
+      "description": "Process payment for a booking",
+      "tags": [
+        "Payments"
+      ],
+      "parameters": [],
+      "requestBody": null,
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Payment processed successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/PaymentConfirmation"
+              }
+            }
+          ],
+          "headers": null
+        },
+        {
+          "statusCode": "402",
+          "description": "Payment Required - Payment failed",
+          "content": [
+            {
+              "mimeType": "application/problem+json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Problem"
+              }
+            }
+          ],
+          "headers": null
+        }
+      ],
+      "deprecated": null,
+      "security": null
+    }
+  ],
+  "servers": [],
+  "security": []
+}

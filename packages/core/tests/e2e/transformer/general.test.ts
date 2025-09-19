@@ -19,4 +19,14 @@ describe("E2E: Transformer - General", () => {
       await compareWithExpected("general/multi-service");
     });
   });
+
+  describe("Modern OpenAPI 3.1 Examples", () => {
+    it("should transform Train Travel API correctly", async () => {
+      await compareWithExpected("general/train-travel-api");
+    });
+
+    it("should transform Museum API correctly", async () => {
+      await compareWithExpected("general/museum-api");
+    });
+  });
 });

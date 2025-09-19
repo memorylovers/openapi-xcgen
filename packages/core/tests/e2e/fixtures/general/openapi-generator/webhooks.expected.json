@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "title": "Webhook Example",
+    "version": "1.0.0",
+    "description": null,
+    "termsOfService": null,
+    "contact": null,
+    "license": null
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "description": null,
+      "properties": [
+        {
+          "name": "id",
+          "description": null,
+          "type": "long",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": {
+            "minimum": null,
+            "maximum": null,
+            "exclusiveMinimum": null,
+            "exclusiveMaximum": null,
+            "minLength": null,
+            "maxLength": null,
+            "pattern": null,
+            "minItems": null,
+            "maxItems": null,
+            "uniqueItems": null,
+            "minProperties": null,
+            "maxProperties": null,
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
+          "name": "tag",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [],
+  "webhooks": [
+    {
+      "name": "newPet",
+      "method": "post",
+      "description": null,
+      "requestBody": {
+        "description": "Information about a new pet in the system",
+        "required": false,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Pet"
+            }
+          }
+        ]
+      },
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "Return a 200 status to indicate that the data was received successfully",
+          "content": null,
+          "headers": null
+        }
+      ]
+    }
+  ],
+  "servers": [],
+  "security": []
+}
