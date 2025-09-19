@@ -107,8 +107,9 @@ export function visitObject(
     return result;
   }
 
-  // object型でない場合
-  if (schema.type !== "object") {
+  // object型でない場合（暗黙的object型は許可）
+  // OpenAPI 3.1では、typeがなくてもpropertiesがあれば暗黙的にobject型
+  if (schema.type !== undefined && schema.type !== "object") {
     consola.warn(`Invalid type for object visitor: ${schema.type}`);
     return result;
   }

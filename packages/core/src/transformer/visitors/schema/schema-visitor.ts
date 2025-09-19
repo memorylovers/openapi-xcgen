@@ -81,8 +81,9 @@ export function visitSchema(
     };
     return result;
   }
-  // object型の処理
-  else if (schema.type === "object") {
+  // object型の処理（明示的または暗黙的）
+  // OpenAPI 3.1では、typeがなくてもpropertiesがあれば暗黙的にobject型
+  else if (schema.type === "object" || (!schema.type && schema.properties)) {
     // visitObjectでobject処理（ネスト構造の抽出含む）を完結
     const objectResult = visitObject(schema, context);
 
@@ -772,6 +773,77 @@ if (import.meta.vitest) {
               { value: "product", name: "PRODUCT", description: null },
               { value: "service", name: "SERVICE", description: null },
               { value: "other", name: "OTHER", description: null },
+            ],
+          },
+        ],
+      });
+    });
+
+    /**
+     * 仕様確認:
+     * - OpenAPI 3.1では、typeプロパティがなくてもpropertiesがあれば暗黙的にobject型として扱われる
+     * - この場合、通常のobject型と同様に処理され、独立したモデルとして抽出される
+     * - webhooks.yamlのPetスキーマのようなケースに対応
+     */
+    it("should handle implicit object type when properties exist without type", () => {
+      const schema: SchemaObjectWithNullable = {
+        // type: "object" がない
+        properties: {
+          id: { type: "integer", format: "int64" },
+          name: { type: "string" },
+        },
+        required: ["id", "name"],
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Pet"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({
+        type: { kind: "ref", name: "#/components/schemas/Pet" },
+        models: [
+          {
+            kind: "object",
+            name: "Pet",
+            referencePath: "#/components/schemas/Pet",
+            description: null,
+            properties: [
+              {
+                name: "id",
+                description: null,
+                type: "long",
+                required: true,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: {
+                  minimum: null,
+                  maximum: null,
+                  exclusiveMinimum: null,
+                  exclusiveMaximum: null,
+                  minLength: null,
+                  maxLength: null,
+                  pattern: null,
+                  minItems: null,
+                  maxItems: null,
+                  uniqueItems: null,
+                  minProperties: null,
+                  maxProperties: null,
+                  format: "int64",
+                },
+              },
+              {
+                name: "name",
+                description: null,
+                type: "string",
+                required: true,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
+              },
             ],
           },
         ],

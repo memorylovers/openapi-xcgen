@@ -63,34 +63,6 @@
   ],
   "tags": [],
   "endpoints": [],
-  "webhooks": [
-    {
-      "name": "newPet",
-      "method": "post",
-      "description": null,
-      "requestBody": {
-        "description": "Information about a new pet in the system",
-        "required": false,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/Pet"
-            }
-          }
-        ]
-      },
-      "responses": [
-        {
-          "statusCode": "200",
-          "description": "Return a 200 status to indicate that the data was received successfully",
-          "content": null,
-          "headers": null
-        }
-      ]
-    }
-  ],
   "servers": [],
   "security": []
 }
