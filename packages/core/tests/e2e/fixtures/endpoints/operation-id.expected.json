@@ -10,7 +10,7 @@
   "models": [
     {
       "kind": "parameter",
-      "name": "GetUsersParams",
+      "name": "GetUsersIdParams",
       "description": "Parameters for GET /users/{id}",
       "properties": [
         {
@@ -25,7 +25,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
     }
   ],
   "tags": [],
@@ -64,7 +64,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
       },
       "requestBody": null,
       "responses": [

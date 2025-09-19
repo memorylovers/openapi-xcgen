@@ -85,19 +85,22 @@ export function createParameterModel(
 
 /**
  * パラメータ統合モデル用のコンポーネント名を生成
- * パスパラメータ（{id}など）を除外して名前を生成する
+ * パスパラメータ（{id}など）も名前に含めて一意性を確保する
  *
  * @param pathTemplate - パステンプレート（例: "/users/{id}/posts"）
  * @param method - HTTPメソッド（例: "get"）
- * @returns パラメータモデル名（例: "GetUsersPostsParams"）
+ * @returns パラメータモデル名（例: "GetUsersIdPostsParams"）
  *
  * @example
  * ```typescript
- * generateParameterModelName("/users/{id}", "get")
- * // => "GetUsersParams"
+ * generateParameterModelName("/pets", "get")
+ * // => "GetPetsParams"
+ *
+ * generateParameterModelName("/pets/{petId}", "get")
+ * // => "GetPetsPetIdParams"
  *
  * generateParameterModelName("/users/{id}/posts", "get")
- * // => "GetUsersPostsParams"
+ * // => "GetUsersIdPostsParams"
  * ```
  */
 function generateParameterModelName(
@@ -106,12 +109,19 @@ function generateParameterModelName(
 ): string {
   const methodPascal = pascalCase(method);
 
-  // パステンプレートからパスパラメータを除外してセグメントを抽出
+  // パステンプレートからセグメントを抽出（パスパラメータも含める）
   const segments = pathTemplate
     .replace(/^\//g, "") // 先頭のスラッシュを除去
     .split("/")
-    .filter((segment) => segment.length > 0 && !segment.startsWith("{")) // パスパラメータ（{xxx}）を除外
-    .map((segment) => pascalCase(segment));
+    .filter((segment) => segment.length > 0)
+    .map((segment) => {
+      // パスパラメータの場合は中身を抽出してPascalCaseに
+      if (segment.startsWith("{") && segment.endsWith("}")) {
+        const paramName = segment.slice(1, -1); // {} を除去
+        return pascalCase(paramName);
+      }
+      return pascalCase(segment);
+    });
 
   const pathBase = segments.join("");
   return `${methodPascal}${pathBase}Params`;
@@ -188,7 +198,7 @@ if (import.meta.vitest) {
 
       expect(result).not.toBeNull();
       expect(result!.kind).toBe("parameter");
-      expect(result!.name).toBe("GetUsersParams");
+      expect(result!.name).toBe("GetUsersIdParams");
       expect(result!.properties).toHaveLength(1);
       expect(result!.properties[0]).toEqual({
         name: "id",
@@ -248,7 +258,7 @@ if (import.meta.vitest) {
 
       expect(result).not.toBeNull();
       expect(result!.kind).toBe("parameter");
-      expect(result!.name).toBe("GetUsersPostsParams");
+      expect(result!.name).toBe("GetUsersIdPostsParams");
       expect(result!.properties).toHaveLength(3);
 
       // Path parameter
@@ -418,19 +428,29 @@ if (import.meta.vitest) {
   });
 
   describe("generateParameterModelName", () => {
-    it("should generate parameter model name excluding path parameters", () => {
+    // 重要: このテストは期待値に合わせて修正
+    // パスパラメータを含めて一意の名前を生成する
+    it("should generate unique parameter model names including path parameters", () => {
+      // /pets と /pets/{petId} で異なる名前になることを確認
+      expect(generateParameterModelName("/pets", "get")).toBe("GetPetsParams");
+      expect(generateParameterModelName("/pets/{petId}", "get")).toBe(
+        "GetPetsPetIdParams",
+      );
+    });
+
+    it("should generate parameter model name including path parameters", () => {
       expect(generateParameterModelName("/users/{id}", "get")).toBe(
-        "GetUsersParams",
+        "GetUsersIdParams",
       );
       expect(generateParameterModelName("/users/{id}/posts", "get")).toBe(
-        "GetUsersPostsParams",
+        "GetUsersIdPostsParams",
       );
       expect(
         generateParameterModelName(
           "/api/v1/users/{userId}/posts/{postId}",
           "patch",
         ),
-      ).toBe("PatchApiV1UsersPostsParams");
+      ).toBe("PatchApiV1UsersUserIdPostsPostIdParams");
     });
 
     it("should handle paths without parameters", () => {
@@ -447,9 +467,9 @@ if (import.meta.vitest) {
     });
 
     it("should handle paths with only parameters", () => {
-      expect(generateParameterModelName("/{id}", "get")).toBe("GetParams");
+      expect(generateParameterModelName("/{id}", "get")).toBe("GetIdParams");
       expect(generateParameterModelName("/{category}/{id}", "delete")).toBe(
-        "DeleteParams",
+        "DeleteCategoryIdParams",
       );
     });
   });

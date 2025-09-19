@@ -358,7 +358,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: {
             kind: "ref",
-            name: "#/paths/::with::{id}/get/parameters/GetWithParams",
+            name: "#/paths/::with::{id}/get/parameters/GetWithIdParams",
           },
           requestBody: null,
           responses: [],
@@ -368,7 +368,7 @@ if (import.meta.vitest) {
         models: [
           {
             kind: "parameter",
-            name: "GetWithParams",
+            name: "GetWithIdParams",
             description: "Parameters for GET /with/{id}",
             properties: [
               {
@@ -394,7 +394,8 @@ if (import.meta.vitest) {
                 in: "query",
               },
             ],
-            referencePath: "#/paths/::with::{id}/get/parameters/GetWithParams",
+            referencePath:
+              "#/paths/::with::{id}/get/parameters/GetWithIdParams",
           },
         ],
       });
@@ -632,7 +633,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: {
             kind: "ref",
-            name: "#/paths/::ref::{id}/get/parameters/GetRefParams",
+            name: "#/paths/::ref::{id}/get/parameters/GetRefIdParams",
           },
           requestBody: null,
           responses: [],
@@ -642,7 +643,7 @@ if (import.meta.vitest) {
         models: [
           {
             kind: "parameter",
-            name: "GetRefParams",
+            name: "GetRefIdParams",
             description: "Parameters for GET /ref/{id}",
             properties: [
               {
@@ -657,7 +658,7 @@ if (import.meta.vitest) {
                 in: "query",
               },
             ],
-            referencePath: "#/paths/::ref::{id}/get/parameters/GetRefParams",
+            referencePath: "#/paths/::ref::{id}/get/parameters/GetRefIdParams",
           },
         ],
       });

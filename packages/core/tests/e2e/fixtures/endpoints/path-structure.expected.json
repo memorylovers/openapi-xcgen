@@ -10,7 +10,7 @@
   "models": [
     {
       "kind": "parameter",
-      "name": "GetUsersParams",
+      "name": "GetUsersIdParams",
       "description": "Parameters for GET /users/{id}",
       "properties": [
         {
@@ -25,11 +25,11 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
     },
     {
       "kind": "parameter",
-      "name": "GetOrgProjectsParams",
+      "name": "GetOrgOrgIdProjectsProjectIdParams",
       "description": "Parameters for GET /org/{orgId}/projects/{projectId}",
       "properties": [
         {
@@ -55,7 +55,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
+      "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgOrgIdProjectsProjectIdParams"
     }
   ],
   "tags": [],
@@ -119,7 +119,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/parameters/GetUsersParams"
+        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
       },
       "requestBody": null,
       "responses": [
@@ -147,7 +147,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgProjectsParams"
+        "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgOrgIdProjectsProjectIdParams"
       },
       "requestBody": null,
       "responses": [

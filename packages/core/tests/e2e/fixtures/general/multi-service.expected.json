@@ -137,7 +137,7 @@
     },
     {
       "kind": "parameter",
-      "name": "GetUsersParams",
+      "name": "GetUsersUserIdParams",
       "description": "Parameters for GET /users/{userId}",
       "properties": [
         {
@@ -152,7 +152,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
+      "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
     }
   ],
   "tags": [],
@@ -201,7 +201,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/get/parameters/GetUsersParams"
+        "name": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
       },
       "requestBody": null,
       "responses": [

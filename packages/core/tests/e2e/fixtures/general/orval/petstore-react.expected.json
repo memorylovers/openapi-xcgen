@@ -107,7 +107,7 @@
     },
     {
       "kind": "parameter",
-      "name": "ListPetsParams",
+      "name": "GetPetsParams",
       "description": "Parameters for GET /pets\nlimit: How many items to return at one time (max 100)",
       "properties": [
         {
@@ -122,7 +122,7 @@
           "in": "query"
         }
       ],
-      "referencePath": "#/paths/::pets/get/parameters/ListPetsParams"
+      "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
     },
     {
       "kind": "requestBody",
@@ -155,8 +155,8 @@
     },
     {
       "kind": "parameter",
-      "name": "GetPetByIdParams",
-      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
+      "name": "GetPetsPetIdParams",
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve\ntestId: The id of the pet to retrieve",
       "properties": [
         {
           "name": "petId",
@@ -168,9 +168,20 @@
           "deprecated": null,
           "validation": null,
           "in": "path"
+        },
+        {
+          "name": "testId",
+          "description": "The id of the pet to retrieve",
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null,
+          "in": "path"
         }
       ],
-      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetByIdParams"
+      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
     }
   ],
   "tags": [],
@@ -186,7 +197,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets/get/parameters/ListPetsParams"
+        "name": "#/paths/::pets/get/parameters/GetPetsParams"
       },
       "requestBody": null,
       "responses": [
@@ -281,7 +292,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets::{petId}/get/parameters/GetPetByIdParams"
+        "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
       },
       "requestBody": null,
       "responses": [

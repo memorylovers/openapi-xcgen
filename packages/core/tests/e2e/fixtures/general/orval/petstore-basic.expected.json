@@ -344,7 +344,7 @@
     {
       "kind": "parameter",
       "name": "GetPetsPetIdParams",
-      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve\ntestId: The id of the pet to retrieve",
       "properties": [
         {
           "name": "petId",

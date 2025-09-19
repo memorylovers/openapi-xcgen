@@ -137,7 +137,7 @@
     },
     {
       "kind": "parameter",
-      "name": "GetTest1ParametersParams",
+      "name": "GetTest1ParametersIdParams",
       "description": "Parameters for GET /test-1-parameters/{id}\nid: Path parameter - always required\ncategory: Optional enum query parameter\nstatus: Required enum query parameter\nlimit: Optional integer parameter with default value\nincludeDetails: Optional boolean parameter with default value\nAuthorization: Optional header parameter\nsessionId: Optional cookie parameter",
       "properties": [
         {
@@ -218,7 +218,7 @@
           "in": "cookie"
         }
       ],
-      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersParams"
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParams"
     },
     {
       "kind": "requestBody",
@@ -493,7 +493,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersParams"
+        "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParams"
       },
       "requestBody": null,
       "responses": [

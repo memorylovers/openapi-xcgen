@@ -552,8 +552,9 @@ if (import.meta.vitest) {
           },
           {
             kind: "parameter",
-            name: "GetPetsParams",
-            referencePath: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+            name: "GetPetsIdParams",
+            referencePath:
+              "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
             description: "Parameters for GET /pets/{id}",
             properties: [
               {
@@ -581,7 +582,7 @@ if (import.meta.vitest) {
             tags: ["pets"],
             parameters: {
               kind: "ref",
-              name: "#/paths/::pets::{id}/get/parameters/GetPetsParams",
+              name: "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
             },
             requestBody: null,
             responses: [

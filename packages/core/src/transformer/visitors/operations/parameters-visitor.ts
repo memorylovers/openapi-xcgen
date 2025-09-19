@@ -181,7 +181,7 @@ if (import.meta.vitest) {
         ],
         unifiedModel: {
           kind: "parameter",
-          name: "GetUsersParams",
+          name: "GetUsersIdParams",
           description: "Parameters for GET /users/{id}\nid: User ID",
           properties: [
             {
@@ -196,7 +196,7 @@ if (import.meta.vitest) {
               in: "path",
             },
           ],
-          referencePath: "#/paths/::users::{id}/get/GetUsersParams",
+          referencePath: "#/paths/::users::{id}/get/GetUsersIdParams",
         },
         models: [],
       });
@@ -266,7 +266,7 @@ if (import.meta.vitest) {
         ],
         unifiedModel: {
           kind: "parameter",
-          name: "GetUsersPostsParams",
+          name: "GetUsersIdPostsParams",
           description: "Parameters for GET /users/{id}/posts",
           properties: [
             {
@@ -303,7 +303,8 @@ if (import.meta.vitest) {
               in: "query",
             },
           ],
-          referencePath: "#/paths/::users::{id}::posts/get/GetUsersPostsParams",
+          referencePath:
+            "#/paths/::users::{id}::posts/get/GetUsersIdPostsParams",
         },
         models: [],
       });
@@ -345,7 +346,7 @@ if (import.meta.vitest) {
         ],
         unifiedModel: {
           kind: "parameter",
-          name: "GetRefParams",
+          name: "GetRefIdParams",
           description: "Parameters for GET /ref/{id}",
           properties: [
             {
@@ -360,7 +361,7 @@ if (import.meta.vitest) {
               in: "query",
             },
           ],
-          referencePath: "#/paths/::ref::{id}/get/GetRefParams",
+          referencePath: "#/paths/::ref::{id}/get/GetRefIdParams",
         },
         models: [],
       });
