@@ -13,132 +13,6 @@
   "models": [
     {
       "kind": "object",
-      "name": "Person",
-      "referencePath": "#/components/schemas/Person",
-      "description": null,
-      "properties": [
-        {
-          "name": "$_type",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "lastName",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "firstName",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "address",
-          "description": null,
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/PersonAddress"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "secondHomeAddress",
-          "description": null,
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/Nullable.Address"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "skills",
-          "description": null,
-          "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/PersonSkills"
-            }
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "PersonAddress",
-      "referencePath": "#/components/schemas/PersonAddress",
-      "description": null,
-      "properties": [
-        {
-          "name": "street",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "city",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "PersonSkills",
-      "referencePath": "#/components/schemas/PersonSkills",
-      "description": null,
-      "properties": [
-        {
-          "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
       "name": "Nullable.Address",
       "referencePath": "#/components/schemas/Nullable.Address",
       "description": "A representation of an address whose value can be null.",
@@ -167,7 +41,7 @@
     },
     {
       "kind": "parameter",
-      "name": "GetPersonDisplayParams",
+      "name": "GetPersonDisplayPersonIdParams",
       "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve",
       "properties": [
         {
@@ -182,7 +56,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayParams"
+      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
     }
   ],
   "tags": [],
@@ -196,7 +70,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayParams"
+        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
       },
       "requestBody": null,
       "responses": [

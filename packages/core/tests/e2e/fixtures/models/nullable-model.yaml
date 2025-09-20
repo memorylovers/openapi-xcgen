@@ -10,12 +10,12 @@ paths:
     get:
       summary: Get profiles
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile'
+                $ref: "#/components/schemas/Profile"
 
 components:
   schemas:
@@ -35,11 +35,10 @@ components:
           type: string
           nullable: true
         # OpenAPI 3.1形式のtype配列
-        # TODO: 未対応 - type配列形式はスキップされる
         nickname:
-          type: 
+          type:
             - string
-            - 'null'
+            - "null"
         # nullable + format
         lastLoginDate:
           type: string

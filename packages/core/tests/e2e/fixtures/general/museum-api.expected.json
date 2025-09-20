@@ -2096,7 +2096,7 @@
     },
     {
       "kind": "parameter",
-      "name": "GetTicketsParams",
+      "name": "GetTicketsConfirmationIdParams",
       "description": "Parameters for GET /tickets/{confirmationId}\nemail: Email address used for the purchase",
       "properties": [
         {
@@ -2111,11 +2111,11 @@
           "in": "query"
         }
       ],
-      "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsParams"
+      "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
     },
     {
       "kind": "parameter",
-      "name": "GetTicketsQrCodeParams",
+      "name": "GetTicketsConfirmationIdQrCodeParams",
       "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nemail: Email address used for the purchase\nformat: QR code format",
       "properties": [
         {
@@ -2141,7 +2141,7 @@
           "in": "query"
         }
       ],
-      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsQrCodeParams"
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
     }
   ],
   "tags": [
@@ -2445,7 +2445,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsParams"
+        "name": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
       },
       "requestBody": null,
       "responses": [
@@ -2478,7 +2478,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsQrCodeParams"
+        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
       },
       "requestBody": null,
       "responses": [

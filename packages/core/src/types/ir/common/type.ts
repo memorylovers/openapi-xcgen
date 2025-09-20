@@ -16,6 +16,7 @@ export type IRScalarType =
   // 基本型
   | "string" // string
   | "boolean" // boolean
+  | "null" // null (OpenAPI 3.1)
   // 日時型（特別扱い）
   | "date" // string/date → 日付のみ
   | "datetime" // string/date-time → 日時

@@ -13,6 +13,7 @@
  * 他のVisitorは各自の専門処理に専念できます。
  */
 
+import { consola } from "consola";
 import type { IRModel, IRType, SchemaObjectWithNullable } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
@@ -68,6 +69,38 @@ export function visitSchema(
     type: null,
     models: [],
   };
+
+  // 未対応機能の検出と警告
+  if ("allOf" in schema && schema.allOf) {
+    consola.warn(
+      `allOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
+    );
+    return result;
+  }
+  if ("oneOf" in schema && schema.oneOf) {
+    consola.warn(
+      `oneOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
+    );
+    return result;
+  }
+  if ("anyOf" in schema && schema.anyOf) {
+    consola.warn(
+      `anyOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
+    );
+    return result;
+  }
+  if ("discriminator" in schema && schema.discriminator) {
+    consola.warn(
+      `discriminator is not supported yet: ${buildReferencePath(context.documentPath)}`,
+    );
+    return result;
+  }
+  if ("not" in schema && schema.not) {
+    consola.warn(
+      `not schema is not supported yet: ${buildReferencePath(context.documentPath)}`,
+    );
+    return result;
+  }
 
   // enum型の処理
   if (schema.enum !== undefined) {
@@ -140,7 +173,7 @@ export function visitSchema(
 
 // === in-source testing ===
 if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
+  const { describe, it, expect, vi } = import.meta.vitest;
 
   describe("visitSchema", () => {
     // ===================================
@@ -848,6 +881,114 @@ if (import.meta.vitest) {
           },
         ],
       });
+    });
+
+    // ===================================
+    // カテゴリ4: 未対応機能の警告
+    // ===================================
+    it("should warn for allOf and return empty result", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema = {
+        allOf: [
+          { $ref: "#/components/schemas/Base" },
+          { type: "object", properties: { extra: { type: "string" } } },
+        ],
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Composed"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({ type: null, models: [] });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "allOf is not supported yet: #/components/schemas/Composed",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should warn for oneOf and return empty result", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema = {
+        oneOf: [{ type: "string" }, { type: "number" }],
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "StringOrNumber"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({ type: null, models: [] });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "oneOf is not supported yet: #/components/schemas/StringOrNumber",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should warn for anyOf and return empty result", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema = {
+        anyOf: [{ type: "string" }, { type: "null" }],
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "NullableString"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({ type: null, models: [] });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "anyOf is not supported yet: #/components/schemas/NullableString",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should warn for discriminator and return empty result", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema = {
+        oneOf: [
+          { $ref: "#/components/schemas/Cat" },
+          { $ref: "#/components/schemas/Dog" },
+        ],
+        discriminator: {
+          propertyName: "petType",
+        },
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Pet"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({ type: null, models: [] });
+      // oneOfが先にチェックされるため、oneOfの警告のみが出る
+      expect(warnSpy).toHaveBeenCalledWith(
+        "oneOf is not supported yet: #/components/schemas/Pet",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should warn for not schema and return empty result", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema = {
+        not: { type: "string" },
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "NotString"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({ type: null, models: [] });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "not schema is not supported yet: #/components/schemas/NotString",
+      );
+      warnSpy.mockRestore();
     });
   });
 }

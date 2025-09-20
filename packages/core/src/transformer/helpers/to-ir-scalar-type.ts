@@ -72,6 +72,9 @@ export function toIRScalarType(
   // 真偽値型
   if (type === "boolean") return "boolean";
 
+  // null型（OpenAPI 3.1）
+  if (type === "null") return "null";
+
   return null;
 }
 
@@ -168,12 +171,22 @@ if (import.meta.vitest) {
       });
     });
 
+    // null型のテスト（OpenAPI 3.1）
+    describe("null types", () => {
+      it("should return null for null type", () => {
+        expect(toIRScalarType("null")).toBe("null");
+      });
+
+      it("should return null for null with any format", () => {
+        expect(toIRScalarType("null", "any")).toBe("null");
+      });
+    });
+
     // 無効な型のテスト
     describe("invalid types", () => {
       it("should return null for non-scalar types", () => {
         expect(toIRScalarType("array")).toBe(null);
         expect(toIRScalarType("object")).toBe(null);
-        expect(toIRScalarType("null")).toBe(null);
       });
 
       it("should return null for empty string", () => {

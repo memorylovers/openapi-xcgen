@@ -33,10 +33,10 @@
  * ```
  */
 
+import { consola } from "consola";
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { consola } from "consola";
 import { expect } from "vitest";
 import { parse } from "../../../src/parser/index";
 import { transform } from "../../../src/transformer/index";

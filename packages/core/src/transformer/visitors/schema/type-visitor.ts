@@ -79,6 +79,23 @@ export function visitType(
     if (scalarType) return scalarType;
   }
 
+  // OpenAPI 3.1: typeが配列の場合（例: ["string", "null"]）
+  // nullableはプロパティレベルで処理するため、ここでは最初の非null型を返す
+  if (Array.isArray(schema.type)) {
+    // null以外の最初の型を探す
+    const nonNullType = schema.type.find((t) => t !== "null");
+    if (nonNullType) {
+      const formatValue =
+        typeof schema.format === "string" ? schema.format : null;
+      const scalarType = toIRScalarType(nonNullType, formatValue);
+      if (scalarType) return scalarType;
+    }
+    // 配列に"null"のみの場合
+    if (schema.type.length === 1 && schema.type[0] === "null") {
+      return "null";
+    }
+  }
+
   // 配列型
   if (schema.type === "array" && schema.items) {
     const itemType = visitType(schema.items as SchemaObjectWithNullable, {
@@ -321,6 +338,42 @@ if (import.meta.vitest) {
       });
       // date-time formatは特別な型として扱われる
       expect(result).toEqual("datetime");
+    });
+
+    it("should handle null type (OpenAPI 3.1)", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "null",
+      };
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "NullValue"],
+        rootSegment: "components",
+      });
+      // OpenAPI 3.1のnull型は特別なスカラー型として扱う
+      expect(result).toEqual("null");
+    });
+
+    it("should handle array type with null (OpenAPI 3.1)", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: ["string", "null"] as any,
+      };
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "StringOrNull"],
+        rootSegment: "components",
+      });
+      // 型配列の最初の非null型を返す（nullableはプロパティレベルで処理）
+      expect(result).toEqual("string");
+    });
+
+    it("should handle array type with only null (OpenAPI 3.1)", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: ["null"] as any,
+      };
+      const result = visitType(schema, {
+        documentPath: ["components", "schemas", "OnlyNull"],
+        rootSegment: "components",
+      });
+      // null型のみの配列はnull型として扱う
+      expect(result).toEqual("null");
     });
   });
 

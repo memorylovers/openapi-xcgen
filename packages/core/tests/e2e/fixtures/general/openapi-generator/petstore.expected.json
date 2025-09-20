@@ -581,7 +581,7 @@
     },
     {
       "kind": "parameter",
-      "name": "GetPetParams",
+      "name": "GetPetPetIdParams",
       "description": "Parameters for GET /pet/{petId}\npetId: ID of pet to return",
       "properties": [
         {
@@ -596,7 +596,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::pet::{petId}/get/parameters/GetPetParams"
+      "referencePath": "#/paths/::pet::{petId}/get/parameters/GetPetPetIdParams"
     },
     {
       "kind": "requestBody",
@@ -629,7 +629,7 @@
     },
     {
       "kind": "parameter",
-      "name": "PostPetParams",
+      "name": "PostPetPetIdParams",
       "description": "Parameters for POST /pet/{petId}\npetId: ID of pet that needs to be updated",
       "properties": [
         {
@@ -644,11 +644,11 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::pet::{petId}/post/parameters/PostPetParams"
+      "referencePath": "#/paths/::pet::{petId}/post/parameters/PostPetPetIdParams"
     },
     {
       "kind": "parameter",
-      "name": "DeletePetParams",
+      "name": "DeletePetPetIdParams",
       "description": "Parameters for DELETE /pet/{petId}\npetId: Pet id to delete",
       "properties": [
         {
@@ -674,7 +674,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::pet::{petId}/delete/parameters/DeletePetParams"
+      "referencePath": "#/paths/::pet::{petId}/delete/parameters/DeletePetPetIdParams"
     },
     {
       "kind": "requestBody",
@@ -707,7 +707,7 @@
     },
     {
       "kind": "parameter",
-      "name": "PostPetUploadImageParams",
+      "name": "PostPetPetIdUploadImageParams",
       "description": "Parameters for POST /pet/{petId}/uploadImage\npetId: ID of pet to update",
       "properties": [
         {
@@ -722,11 +722,11 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetUploadImageParams"
+      "referencePath": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
     },
     {
       "kind": "parameter",
-      "name": "GetStoreOrderParams",
+      "name": "GetStoreOrderOrderIdParams",
       "description": "Parameters for GET /store/order/{orderId}\norderId: ID of pet that needs to be fetched",
       "properties": [
         {
@@ -741,11 +741,11 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderParams"
+      "referencePath": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderOrderIdParams"
     },
     {
       "kind": "parameter",
-      "name": "DeleteStoreOrderParams",
+      "name": "DeleteStoreOrderOrderIdParams",
       "description": "Parameters for DELETE /store/order/{orderId}\norderId: ID of the order that needs to be deleted",
       "properties": [
         {
@@ -760,7 +760,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderParams"
+      "referencePath": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderOrderIdParams"
     },
     {
       "kind": "parameter",
@@ -794,7 +794,7 @@
     },
     {
       "kind": "parameter",
-      "name": "GetUserParams",
+      "name": "GetUserUsernameParams",
       "description": "Parameters for GET /user/{username}\nusername: The name that needs to be fetched. Use user1 for testing.",
       "properties": [
         {
@@ -809,11 +809,11 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::user::{username}/get/parameters/GetUserParams"
+      "referencePath": "#/paths/::user::{username}/get/parameters/GetUserUsernameParams"
     },
     {
       "kind": "parameter",
-      "name": "PutUserParams",
+      "name": "PutUserUsernameParams",
       "description": "Parameters for PUT /user/{username}\nusername: name that need to be deleted",
       "properties": [
         {
@@ -828,11 +828,11 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::user::{username}/put/parameters/PutUserParams"
+      "referencePath": "#/paths/::user::{username}/put/parameters/PutUserUsernameParams"
     },
     {
       "kind": "parameter",
-      "name": "DeleteUserParams",
+      "name": "DeleteUserUsernameParams",
       "description": "Parameters for DELETE /user/{username}\nusername: The name that needs to be deleted",
       "properties": [
         {
@@ -847,7 +847,7 @@
           "in": "path"
         }
       ],
-      "referencePath": "#/paths/::user::{username}/delete/parameters/DeleteUserParams"
+      "referencePath": "#/paths/::user::{username}/delete/parameters/DeleteUserUsernameParams"
     }
   ],
   "tags": [
@@ -1081,7 +1081,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}/get/parameters/GetPetParams"
+        "name": "#/paths/::pet::{petId}/get/parameters/GetPetPetIdParams"
       },
       "requestBody": null,
       "responses": [
@@ -1133,7 +1133,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}/post/parameters/PostPetParams"
+        "name": "#/paths/::pet::{petId}/post/parameters/PostPetPetIdParams"
       },
       "requestBody": {
         "description": null,
@@ -1170,7 +1170,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}/delete/parameters/DeletePetParams"
+        "name": "#/paths/::pet::{petId}/delete/parameters/DeletePetPetIdParams"
       },
       "requestBody": null,
       "responses": [
@@ -1195,7 +1195,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetUploadImageParams"
+        "name": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
       },
       "requestBody": {
         "description": null,
@@ -1317,7 +1317,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderParams"
+        "name": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderOrderIdParams"
       },
       "requestBody": null,
       "responses": [
@@ -1369,7 +1369,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderParams"
+        "name": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderOrderIdParams"
       },
       "requestBody": null,
       "responses": [
@@ -1540,7 +1540,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::{username}/get/parameters/GetUserParams"
+        "name": "#/paths/::user::{username}/get/parameters/GetUserUsernameParams"
       },
       "requestBody": null,
       "responses": [
@@ -1592,7 +1592,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::{username}/put/parameters/PutUserParams"
+        "name": "#/paths/::user::{username}/put/parameters/PutUserUsernameParams"
       },
       "requestBody": {
         "description": "Updated user object",
@@ -1635,7 +1635,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::{username}/delete/parameters/DeleteUserParams"
+        "name": "#/paths/::user::{username}/delete/parameters/DeleteUserUsernameParams"
       },
       "requestBody": null,
       "responses": [

@@ -45,6 +45,16 @@
           "validation": null
         },
         {
+          "name": "nickname",
+          "description": null,
+          "type": "string",
+          "required": false,
+          "nullable": true,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
           "name": "lastLoginDate",
           "description": null,
           "type": "datetime",

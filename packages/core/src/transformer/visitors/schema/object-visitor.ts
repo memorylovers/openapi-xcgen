@@ -114,12 +114,6 @@ export function visitObject(
     return result;
   }
 
-  // propertiesがない場合
-  if (!schema.properties) {
-    consola.warn(`Object schema ${name} has no properties`);
-    return result;
-  }
-
   // requiredプロパティの配列を取得（未定義の場合は空配列）
   const required = schema.required || [];
 
@@ -129,49 +123,46 @@ export function visitObject(
   // ネストしたモデルを収集
   const nestedModels: IRModel[] = [];
 
-  for (const [propName, propSchema] of Object.entries(schema.properties)) {
-    const schemaObj = propSchema as SchemaObjectWithNullable;
+  // propertiesがある場合のみ処理
+  if (schema.properties) {
+    for (const [propName, propSchema] of Object.entries(schema.properties)) {
+      const schemaObj = propSchema as SchemaObjectWithNullable;
 
-    // プロパティ名を含む適切な名前を生成
-    const propTypeName = `${name}${pascalCase(propName)}`;
+      // プロパティ名を含む適切な名前を生成
+      const propTypeName = `${name}${pascalCase(propName)}`;
 
-    // visitSchemaを使って型を判定・処理
-    // ネストされたモデルは独立したコンポーネントとして扱う
-    // 親のコンテキストのパスを継承し、最後の要素を新しい名前に置き換える
-    const propResult = visitSchema(schemaObj, {
-      documentPath: [...context.documentPath.slice(0, -1), propTypeName],
-      rootSegment: context.rootSegment,
-    });
+      // visitSchemaを使って型を判定・処理
+      // ネストされたモデルは独立したコンポーネントとして扱う
+      // 親のコンテキストのパスを継承し、最後の要素を新しい名前に置き換える
+      const propResult = visitSchema(schemaObj, {
+        documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+        rootSegment: context.rootSegment,
+      });
 
-    // 抽出されたモデルを収集
-    nestedModels.push(...propResult.models);
+      // 抽出されたモデルを収集
+      nestedModels.push(...propResult.models);
 
-    // プロパティの型が取得できた場合のみ追加
-    if (propResult.type) {
-      const property: IRProperty = {
-        name: propName,
-        description: schemaObj.description || null,
-        type: propResult.type,
-        required: required.includes(propName),
-        nullable: isNullable(schemaObj) ? true : null,
-        defaultValue:
-          schemaObj.default !== undefined ? schemaObj.default : null,
-        deprecated: schemaObj.deprecated === true ? true : null,
-        validation: extractValidation(schemaObj),
-      };
+      // プロパティの型が取得できた場合のみ追加
+      if (propResult.type) {
+        const property: IRProperty = {
+          name: propName,
+          description: schemaObj.description || null,
+          type: propResult.type,
+          required: required.includes(propName),
+          nullable: isNullable(schemaObj) ? true : null,
+          defaultValue:
+            schemaObj.default !== undefined ? schemaObj.default : null,
+          deprecated: schemaObj.deprecated === true ? true : null,
+          validation: extractValidation(schemaObj),
+        };
 
-      properties.push(property);
-    } else {
-      // 型が無効な場合はスキップ
-      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+        properties.push(property);
+      } else {
+        // 型が無効な場合はスキップ
+        consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+      }
     }
-  }
-
-  // プロパティが1つも変換できなかった場合
-  if (properties.length === 0) {
-    consola.warn(`No valid properties found for model ${name}`);
-    return result;
-  }
+  } // if (schema.properties)
 
   const mainModel: IRModel = {
     kind: "object",
@@ -232,12 +223,6 @@ export function visitResponseObject(
     return result;
   }
 
-  // propertiesがない場合
-  if (!schema.properties) {
-    consola.warn(`Response object schema ${name} has no properties`);
-    return result;
-  }
-
   // requiredプロパティの配列を取得（未定義の場合は空配列）
   const required = schema.required || [];
 
@@ -245,47 +230,44 @@ export function visitResponseObject(
   const properties: IRProperty[] = [];
   const nestedModels: IRModel[] = [];
 
-  for (const [propName, propSchema] of Object.entries(schema.properties)) {
-    const schemaObj = propSchema as SchemaObjectWithNullable;
+  // propertiesがある場合のみ処理
+  if (schema.properties) {
+    for (const [propName, propSchema] of Object.entries(schema.properties)) {
+      const schemaObj = propSchema as SchemaObjectWithNullable;
 
-    // プロパティ名を含む適切な名前を生成
-    const propTypeName = `${name}${pascalCase(propName)}`;
+      // プロパティ名を含む適切な名前を生成
+      const propTypeName = `${name}${pascalCase(propName)}`;
 
-    // visitSchemaを使って型を判定・処理
-    const propResult = visitSchema(schemaObj, {
-      documentPath: [...context.documentPath.slice(0, -1), propTypeName],
-      rootSegment: context.rootSegment,
-    });
+      // visitSchemaを使って型を判定・処理
+      const propResult = visitSchema(schemaObj, {
+        documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+        rootSegment: context.rootSegment,
+      });
 
-    // 抽出されたモデルを収集
-    nestedModels.push(...propResult.models);
+      // 抽出されたモデルを収集
+      nestedModels.push(...propResult.models);
 
-    // プロパティの型が取得できた場合のみ追加
-    if (propResult.type) {
-      const property: IRProperty = {
-        name: propName,
-        description: schemaObj.description || null,
-        type: propResult.type,
-        required: required.includes(propName),
-        nullable: isNullable(schemaObj) ? true : null,
-        defaultValue:
-          schemaObj.default !== undefined ? schemaObj.default : null,
-        deprecated: schemaObj.deprecated === true ? true : null,
-        validation: extractValidation(schemaObj),
-      };
+      // プロパティの型が取得できた場合のみ追加
+      if (propResult.type) {
+        const property: IRProperty = {
+          name: propName,
+          description: schemaObj.description || null,
+          type: propResult.type,
+          required: required.includes(propName),
+          nullable: isNullable(schemaObj) ? true : null,
+          defaultValue:
+            schemaObj.default !== undefined ? schemaObj.default : null,
+          deprecated: schemaObj.deprecated === true ? true : null,
+          validation: extractValidation(schemaObj),
+        };
 
-      properties.push(property);
-    } else {
-      // 型が無効な場合はスキップ
-      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+        properties.push(property);
+      } else {
+        // 型が無効な場合はスキップ
+        consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+      }
     }
-  }
-
-  // プロパティが1つも変換できなかった場合
-  if (properties.length === 0) {
-    consola.warn(`No valid properties found for response model ${name}`);
-    return result;
-  }
+  } // if (schema.properties)
 
   const responseModel: IRResponseModel = {
     kind: "response",
@@ -353,12 +335,6 @@ export function visitRequestBodyObject(
     return result;
   }
 
-  // propertiesがない場合
-  if (!schema.properties) {
-    consola.warn(`Request body object schema ${name} has no properties`);
-    return result;
-  }
-
   // requiredプロパティの配列を取得（未定義の場合は空配列）
   const requiredProps = schema.required || [];
 
@@ -366,47 +342,44 @@ export function visitRequestBodyObject(
   const properties: IRProperty[] = [];
   const nestedModels: IRModel[] = [];
 
-  for (const [propName, propSchema] of Object.entries(schema.properties)) {
-    const schemaObj = propSchema as SchemaObjectWithNullable;
+  // propertiesがある場合のみ処理
+  if (schema.properties) {
+    for (const [propName, propSchema] of Object.entries(schema.properties)) {
+      const schemaObj = propSchema as SchemaObjectWithNullable;
 
-    // プロパティ名を含む適切な名前を生成
-    const propTypeName = `${name}${pascalCase(propName)}`;
+      // プロパティ名を含む適切な名前を生成
+      const propTypeName = `${name}${pascalCase(propName)}`;
 
-    // visitSchemaを使って型を判定・処理
-    const propResult = visitSchema(schemaObj, {
-      documentPath: [...context.documentPath.slice(0, -1), propTypeName],
-      rootSegment: context.rootSegment,
-    });
+      // visitSchemaを使って型を判定・処理
+      const propResult = visitSchema(schemaObj, {
+        documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+        rootSegment: context.rootSegment,
+      });
 
-    // 抽出されたモデルを収集
-    nestedModels.push(...propResult.models);
+      // 抽出されたモデルを収集
+      nestedModels.push(...propResult.models);
 
-    // プロパティの型が取得できた場合のみ追加
-    if (propResult.type) {
-      const property: IRProperty = {
-        name: propName,
-        description: schemaObj.description || null,
-        type: propResult.type,
-        required: requiredProps.includes(propName),
-        nullable: isNullable(schemaObj) ? true : null,
-        defaultValue:
-          schemaObj.default !== undefined ? schemaObj.default : null,
-        deprecated: schemaObj.deprecated === true ? true : null,
-        validation: extractValidation(schemaObj),
-      };
+      // プロパティの型が取得できた場合のみ追加
+      if (propResult.type) {
+        const property: IRProperty = {
+          name: propName,
+          description: schemaObj.description || null,
+          type: propResult.type,
+          required: requiredProps.includes(propName),
+          nullable: isNullable(schemaObj) ? true : null,
+          defaultValue:
+            schemaObj.default !== undefined ? schemaObj.default : null,
+          deprecated: schemaObj.deprecated === true ? true : null,
+          validation: extractValidation(schemaObj),
+        };
 
-      properties.push(property);
-    } else {
-      // 型が無効な場合はスキップ
-      consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+        properties.push(property);
+      } else {
+        // 型が無効な場合はスキップ
+        consola.warn(`Skipping property ${propName} in ${name}: invalid type`);
+      }
     }
-  }
-
-  // プロパティが1つも変換できなかった場合
-  if (properties.length === 0) {
-    consola.warn(`No valid properties found for request body model ${name}`);
-    return result;
-  }
+  } // if (schema.properties)
 
   const requestBodyModel: IRRequestBodyModel = {
     kind: "requestBody",
@@ -1050,9 +1023,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return empty result for object without properties", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should create model with empty properties for object without properties field", () => {
       const schema: SchemaObject = {
         type: "object",
         // propertiesが未定義
@@ -1063,19 +1034,17 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result).toEqual({
-        models: [],
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
+        kind: "object",
+        name: "Empty",
+        referencePath: "#/components/schemas/Empty",
+        description: null,
+        properties: [],
       });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Object schema Empty has no properties",
-      );
-
-      warnSpy.mockRestore();
     });
 
-    it("should return empty result for object with null properties", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should create model with empty properties for object with null properties", () => {
       const schema = {
         type: "object",
         properties: null,
@@ -1086,19 +1055,17 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result).toEqual({
-        models: [],
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
+        kind: "object",
+        name: "NullProps",
+        referencePath: "#/components/schemas/NullProps",
+        description: null,
+        properties: [],
       });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Object schema NullProps has no properties",
-      );
-
-      warnSpy.mockRestore();
     });
 
-    it("should return empty result for object with empty properties", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should create model with empty properties for object with empty properties object", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {},
@@ -1109,14 +1076,14 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result).toEqual({
-        models: [],
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
+        kind: "object",
+        name: "EmptyProps",
+        referencePath: "#/components/schemas/EmptyProps",
+        description: null,
+        properties: [],
       });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "No valid properties found for model EmptyProps",
-      );
-
-      warnSpy.mockRestore();
     });
 
     it("should return empty result for empty name", () => {
@@ -1214,7 +1181,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return empty result if all properties are invalid", () => {
+    it("should create model with empty properties if all properties are invalid", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const schema: SchemaObject = {
@@ -1230,12 +1197,15 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result).toEqual({
-        models: [],
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
+        kind: "object",
+        name: "AllInvalid",
+        referencePath: "#/components/schemas/AllInvalid",
+        description: null,
+        properties: [],
       });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "No valid properties found for model AllInvalid",
-      );
+      expect(warnSpy).toHaveBeenCalledTimes(4); // Warnings from type-visitor and object-visitor
 
       warnSpy.mockRestore();
     });
