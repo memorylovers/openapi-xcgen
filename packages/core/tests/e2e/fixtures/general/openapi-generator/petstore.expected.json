@@ -725,6 +725,15 @@
       "referencePath": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
     },
     {
+      "kind": "response",
+      "name": "GetStoreInventory200Response",
+      "referencePath": "#/paths/::store::inventory/get/responses/responses/200/content/application::json/schema/GetStoreInventory200Response",
+      "description": null,
+      "properties": [],
+      "statusCode": "200",
+      "headers": null
+    },
+    {
       "kind": "parameter",
       "name": "GetStoreOrderOrderIdParams",
       "description": "Parameters for GET /store/order/{orderId}\norderId: ID of pet that needs to be fetched",
@@ -1244,7 +1253,15 @@
         {
           "statusCode": "200",
           "description": "successful operation",
-          "content": null,
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::store::inventory/get/responses/responses/200/content/application::json/schema/GetStoreInventory200Response"
+              }
+            }
+          ],
           "headers": null
         }
       ],

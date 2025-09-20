@@ -102,6 +102,18 @@ export function visitSchema(
     return result;
   }
 
+  // additionalPropertiesのみの場合の検出（プロパティがない場合）
+  if (
+    "additionalProperties" in schema &&
+    schema.additionalProperties &&
+    (!schema.properties || Object.keys(schema.properties).length === 0)
+  ) {
+    consola.warn(
+      `additionalProperties-only schema detected (Map/Dictionary pattern), skipping model generation: ${buildReferencePath(context.documentPath)}`,
+    );
+    return result;
+  }
+
   // enum型の処理
   if (schema.enum !== undefined) {
     const enumResult = visitEnum(schema, context);
@@ -117,6 +129,18 @@ export function visitSchema(
   // object型の処理（明示的または暗黙的）
   // OpenAPI 3.1では、typeがなくてもpropertiesがあれば暗黙的にobject型
   else if (schema.type === "object" || (!schema.type && schema.properties)) {
+    // additionalPropertiesが通常のプロパティと一緒に存在する場合の警告
+    if (
+      "additionalProperties" in schema &&
+      schema.additionalProperties &&
+      schema.properties &&
+      Object.keys(schema.properties).length > 0
+    ) {
+      consola.warn(
+        `additionalProperties is not supported yet and will be ignored: ${buildReferencePath(context.documentPath)}`,
+      );
+    }
+
     // visitObjectでobject処理（ネスト構造の抽出含む）を完結
     const objectResult = visitObject(schema, context);
 
@@ -989,6 +1013,86 @@ if (import.meta.vitest) {
         "not schema is not supported yet: #/components/schemas/NotString",
       );
       warnSpy.mockRestore();
+    });
+
+    it("should warn and skip model generation for additionalProperties-only schemas", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema: SchemaObjectWithNullable = {
+        type: "object",
+        additionalProperties: { type: "string" },
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "StringMap"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({ type: null, models: [] });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "additionalProperties-only schema detected (Map/Dictionary pattern), skipping model generation: #/components/schemas/StringMap",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should warn when additionalProperties is present with regular properties", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const schema: SchemaObjectWithNullable = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: { type: "string" },
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Mixed"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      // Should still generate the model but warn about additionalProperties
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toMatchObject({
+        kind: "object",
+        name: "Mixed",
+        properties: [
+          {
+            name: "id",
+            type: "string",
+          },
+        ],
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        "additionalProperties is not supported yet and will be ignored: #/components/schemas/Mixed",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should generate model for empty object without additionalProperties", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "object",
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "EmptyObject"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      // Empty objects without additionalProperties should still generate a model
+      expect(result).toEqual({
+        type: { kind: "ref", name: "#/components/schemas/EmptyObject" },
+        models: [
+          {
+            kind: "object",
+            name: "EmptyObject",
+            referencePath: "#/components/schemas/EmptyObject",
+            description: null,
+            properties: [],
+          },
+        ],
+      });
     });
   });
 }

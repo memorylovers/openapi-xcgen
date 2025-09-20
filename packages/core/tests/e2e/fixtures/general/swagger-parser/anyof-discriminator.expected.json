@@ -10,6 +10,24 @@
   "models": [
     {
       "kind": "object",
+      "name": "FruitType",
+      "referencePath": "#/components/schemas/FruitType",
+      "description": null,
+      "properties": [
+        {
+          "name": "fruitType",
+          "description": null,
+          "type": "string",
+          "required": true,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        }
+      ]
+    },
+    {
+      "kind": "object",
       "name": "AppleReqDisc",
       "referencePath": "#/components/schemas/AppleReqDisc",
       "description": null,
@@ -66,111 +84,10 @@
     },
     {
       "kind": "object",
-      "name": "AppleAllOfDisc",
-      "referencePath": "#/components/schemas/AppleAllOfDisc",
+      "name": "DiscMissingNoProperties",
+      "referencePath": "#/components/schemas/DiscMissingNoProperties",
       "description": null,
-      "properties": [
-        {
-          "name": "seeds",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "BananaAllOfDisc",
-      "referencePath": "#/components/schemas/BananaAllOfDisc",
-      "description": null,
-      "properties": [
-        {
-          "name": "length",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "AppleAnyOfDisc",
-      "referencePath": "#/components/schemas/AppleAnyOfDisc",
-      "description": null,
-      "properties": [
-        {
-          "name": "seeds",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "BananaAnyOfDisc",
-      "referencePath": "#/components/schemas/BananaAnyOfDisc",
-      "description": null,
-      "properties": [
-        {
-          "name": "length",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "AppleGrandparentDisc",
-      "referencePath": "#/components/schemas/AppleGrandparentDisc",
-      "description": null,
-      "properties": [
-        {
-          "name": "seeds",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
-      "name": "BananaGrandparentDisc",
-      "referencePath": "#/components/schemas/BananaGrandparentDisc",
-      "description": null,
-      "properties": [
-        {
-          "name": "length",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
+      "properties": []
     },
     {
       "kind": "object",

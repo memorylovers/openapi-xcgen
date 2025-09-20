@@ -76,68 +76,6 @@
           "description": null
         }
       ]
-    },
-    {
-      "kind": "object",
-      "name": "Qux",
-      "referencePath": "#/components/schemas/Qux",
-      "description": null,
-      "properties": [
-        {
-          "name": "foo",
-          "description": null,
-          "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": "int32"
-          }
-        },
-        {
-          "name": "bar",
-          "description": null,
-          "type": "double",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "baz",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "id",
-          "description": null,
-          "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
     }
   ],
   "tags": [],
