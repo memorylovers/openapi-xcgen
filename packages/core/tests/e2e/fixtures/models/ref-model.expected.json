@@ -2,46 +2,30 @@
   "metadata": {
     "title": "Ref Model Test",
     "version": "1.0.0",
-    "description": "Test $ref references to components",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test $ref references to components"
   },
   "models": [
     {
       "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
-      "description": null,
       "properties": [
         {
           "name": "customer",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Customer"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "items",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
               "kind": "ref",
               "name": "#/components/schemas/OrderItem"
             }
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -49,17 +33,10 @@
       "kind": "object",
       "name": "Customer",
       "referencePath": "#/components/schemas/Customer",
-      "description": null,
       "properties": [
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     },
@@ -67,17 +44,10 @@
       "kind": "object",
       "name": "OrderItem",
       "referencePath": "#/components/schemas/OrderItem",
-      "description": null,
       "properties": [
         {
           "name": "productId",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     }
@@ -85,14 +55,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": null,
       "method": "get",
       "path": "/orders",
-      "summary": "Get orders",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -105,22 +71,16 @@
                 "name": "#/components/schemas/Order"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "summary": "Get orders"
     },
     {
-      "operationId": null,
       "method": "get",
       "path": "/customers",
-      "summary": "Get customers",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -136,12 +96,10 @@
                 }
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "summary": "Get customers"
     }
   ],
   "servers": [],

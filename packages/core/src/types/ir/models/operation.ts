@@ -40,7 +40,7 @@ export interface IRParameterModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description: string | null;
+  description?: string;
   /** パラメータプロパティの配列（in情報を含む） */
   properties: IRParameterProperty[];
 }
@@ -74,11 +74,11 @@ export interface IRRequestBodyModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description: string | null;
+  description?: string;
   /** プロパティ配列（IRObjectModelから継承） */
   properties: IRProperty[];
   /** 必須フラグ（リクエストボディ固有） */
-  required: boolean;
+  required?: true;
   /** 追加プロパティの型（additionalProperties） */
   additionalProperties?: IRType;
 }
@@ -113,13 +113,13 @@ export interface IRResponseModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description: string | null;
+  description?: string;
   /** プロパティ配列（IRObjectModelから継承） */
   properties: IRProperty[];
   /** HTTPステータスコード（レスポンス固有） */
   statusCode: string;
   /** ヘッダー配列（レスポンス固有） */
-  headers: IRResponseHeader[] | null;
+  headers?: IRResponseHeader[];
   /** 追加プロパティの型（additionalProperties） */
   additionalProperties?: IRType;
 }

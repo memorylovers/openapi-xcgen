@@ -2,12 +2,8 @@
   "metadata": {
     "title": "Swagger Petstore",
     "version": "1.0.0",
-    "description": null,
-    "termsOfService": null,
-    "contact": null,
     "license": {
-      "name": "MIT",
-      "url": null
+      "name": "MIT"
     }
   },
   "models": [
@@ -15,153 +11,64 @@
       "kind": "object",
       "name": "Pet",
       "referencePath": "#/components/schemas/Pet",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "name",
-          "description": "Name of pet",
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
+          "description": "Name of pet",
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 0,
-            "maxLength": 40,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 40
           }
         },
         {
           "name": "age",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 0,
             "maximum": 30,
             "exclusiveMinimum": true,
             "exclusiveMaximum": true,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int32"
           }
         },
         {
           "name": "tag",
-          "description": null,
           "type": "string",
-          "required": false,
           "nullable": true,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^\\\\d{3}-\\\\d{2}-\\\\d{4}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^\\\\d{3}-\\\\d{2}-\\\\d{4}$"
           }
         },
         {
           "name": "email",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "callingCode",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/PetCallingCode"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "country",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/PetCountry"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -169,23 +76,19 @@
       "kind": "enum",
       "name": "PetCallingCode",
       "referencePath": "#/components/schemas/PetCallingCode",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "+33",
-          "name": "33",
-          "description": null
+          "name": "33"
         },
         {
           "value": "+420",
-          "name": "420",
-          "description": null
+          "name": "420"
         },
         {
           "value": "+33",
-          "name": "33",
-          "description": null
+          "name": "33"
         }
       ]
     },
@@ -193,18 +96,15 @@
       "kind": "enum",
       "name": "PetCountry",
       "referencePath": "#/components/schemas/PetCountry",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "People's Republic of China",
-          "name": "PEOPLE_S_REPUBLIC_OF_CHINA",
-          "description": null
+          "name": "PEOPLE_S_REPUBLIC_OF_CHINA"
         },
         {
           "value": "Uruguay",
-          "name": "URUGUAY",
-          "description": null
+          "name": "URUGUAY"
         }
       ]
     },
@@ -212,23 +112,16 @@
       "kind": "object",
       "name": "PetsNestedArray",
       "referencePath": "#/components/schemas/PetsNestedArray",
-      "description": null,
       "properties": [
         {
           "name": "data",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
               "kind": "ref",
               "name": "#/components/schemas/Pet"
             }
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -236,41 +129,19 @@
       "kind": "object",
       "name": "Error",
       "referencePath": "#/components/schemas/Error",
-      "description": null,
       "properties": [
         {
           "name": "code",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int32"
           }
         },
         {
           "name": "message",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         }
       ]
     },
@@ -281,14 +152,9 @@
       "properties": [
         {
           "name": "limit",
-          "description": "How many items to return at one time (max 100)",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "How many items to return at one time (max 100)"
         }
       ],
       "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
@@ -300,27 +166,16 @@
       "properties": [
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "tag",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         }
       ],
-      "required": true,
-      "description": null
+      "required": true
     },
     {
       "kind": "parameter",
@@ -329,14 +184,9 @@
       "properties": [
         {
           "name": "limit",
-          "description": "How many items to return at one time (max 100)",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "How many items to return at one time (max 100)"
         }
       ],
       "referencePath": "#/paths/::pets-nested-array/get/parameters/GetPetsNestedArrayParams"
@@ -348,25 +198,17 @@
       "properties": [
         {
           "name": "petId",
-          "description": "The id of the pet to retrieve",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "The id of the pet to retrieve"
         },
         {
           "name": "testId",
-          "description": "The id of the pet to retrieve",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "The id of the pet to retrieve"
         }
       ],
       "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
@@ -375,17 +217,15 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "listPets",
       "method": "get",
       "path": "/pets",
-      "summary": "List all pets",
-      "description": null,
-      "tags": ["pets"],
+      "tags": [
+        "pets"
+      ],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::pets/get/parameters/GetPetsParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -398,8 +238,7 @@
                 "name": "#/components/schemas/PetsArray"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "default",
@@ -412,24 +251,41 @@
                 "name": "#/components/schemas/Error"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listPets",
+      "summary": "List all pets"
     },
     {
-      "operationId": "createPets",
       "method": "post",
       "path": "/pets",
-      "summary": "Create a pet",
-      "description": null,
-      "tags": ["pets"],
+      "tags": [
+        "pets"
+      ],
       "parameters": [],
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Null response"
+        },
+        {
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "createPets",
+      "summary": "Create a pet",
       "requestBody": {
-        "description": null,
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -438,45 +294,20 @@
               "name": "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody"
             }
           }
-        ]
-      },
-      "responses": [
-        {
-          "statusCode": "201",
-          "description": "Null response",
-          "content": null,
-          "headers": null
-        },
-        {
-          "statusCode": "default",
-          "description": "unexpected error",
-          "content": [
-            {
-              "mimeType": "application/json",
-              "schema": {
-                "kind": "ref",
-                "name": "#/components/schemas/Error"
-              }
-            }
-          ],
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
+        ],
+        "required": true
+      }
     },
     {
-      "operationId": "listPetsNestedArray",
       "method": "get",
       "path": "/pets-nested-array",
-      "summary": "List all pets as nested array",
-      "description": null,
-      "tags": ["pets, pets-nested-array"],
+      "tags": [
+        "pets, pets-nested-array"
+      ],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::pets-nested-array/get/parameters/GetPetsNestedArrayParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -489,8 +320,7 @@
                 "name": "#/components/schemas/PetsNestedArray"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "default",
@@ -503,25 +333,22 @@
                 "name": "#/components/schemas/Error"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listPetsNestedArray",
+      "summary": "List all pets as nested array"
     },
     {
-      "operationId": "showPetById",
       "method": "get",
       "path": "/pets/{petId}",
-      "summary": "Info for a specific pet",
-      "description": null,
-      "tags": ["pets"],
+      "tags": [
+        "pets"
+      ],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -534,8 +361,7 @@
                 "name": "#/components/schemas/Pet"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "default",
@@ -548,12 +374,11 @@
                 "name": "#/components/schemas/Error"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "showPetById",
+      "summary": "Info for a specific pet"
     }
   ],
   "servers": [],

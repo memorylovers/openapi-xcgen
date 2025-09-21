@@ -28,13 +28,13 @@ export interface IRApiKeyConfig {
  */
 export interface IROAuth2Flow {
   /** 認可URL */
-  authorizationUrl: string | null;
+  authorizationUrl?: string;
   /** トークンURL */
-  tokenUrl: string | null;
+  tokenUrl?: string;
   /** リフレッシュURL */
-  refreshUrl: string | null;
+  refreshUrl?: string;
   /** スコープ定義 */
-  scopes: IROAuth2ScopeMap | null;
+  scopes?: IROAuth2ScopeMap;
 }
 
 /**
@@ -57,13 +57,13 @@ export interface IROAuth2Flow {
  */
 export interface IROAuth2Flows {
   /** Implicit フロー */
-  implicit: IROAuth2Flow | null;
+  implicit?: IROAuth2Flow;
   /** Password フロー */
-  password: IROAuth2Flow | null;
+  password?: IROAuth2Flow;
   /** Client Credentials フロー */
-  clientCredentials: IROAuth2Flow | null;
+  clientCredentials?: IROAuth2Flow;
   /** Authorization Code フロー */
-  authorizationCode: IROAuth2Flow | null;
+  authorizationCode?: IROAuth2Flow;
 }
 
 /**
@@ -99,15 +99,15 @@ export interface IRSecurityScheme {
   /** タイプ */
   type: "apiKey" | "http" | "oauth2" | "openIdConnect";
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** APIキーの場合の設定 */
-  apiKey: IRApiKeyConfig | null;
+  apiKey?: IRApiKeyConfig;
   /** HTTPの場合のスキーム */
-  scheme: string | null;
+  scheme?: string;
   /** Bearer形式の場合のフォーマット */
-  bearerFormat: string | null;
+  bearerFormat?: string;
   /** OAuth2フロー */
-  flows: IROAuth2Flows | null;
+  flows?: IROAuth2Flows;
   /** OpenID Connect URL */
-  openIdConnectUrl: string | null;
+  openIdConnectUrl?: string;
 }

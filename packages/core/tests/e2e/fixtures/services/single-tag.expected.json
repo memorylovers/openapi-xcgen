@@ -2,25 +2,18 @@
   "metadata": {
     "title": "Single Tag Service Classification Test",
     "version": "1.0.0",
-    "description": "Test single tag service classification",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test single tag service classification"
   },
   "models": [],
   "tags": [],
   "endpoints": [
     {
-      "operationId": "getUsers",
       "method": "get",
       "path": "/users",
-      "summary": null,
-      "description": null,
       "tags": [
         "users"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -30,24 +23,18 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getUsers"
     },
     {
-      "operationId": "getProducts",
       "method": "get",
       "path": "/products",
-      "summary": null,
-      "description": null,
       "tags": [
         "products"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -57,12 +44,10 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getProducts"
     }
   ],
   "servers": [],

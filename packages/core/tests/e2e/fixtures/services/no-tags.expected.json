@@ -2,23 +2,16 @@
   "metadata": {
     "title": "No Tags Service Classification Test",
     "version": "1.0.0",
-    "description": "Test no-tags default service classification",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test no-tags default service classification"
   },
   "models": [],
   "tags": [],
   "endpoints": [
     {
-      "operationId": "health",
       "method": "get",
       "path": "/health",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -28,22 +21,16 @@
               "mimeType": "text/plain",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "health"
     },
     {
-      "operationId": "version",
       "method": "get",
       "path": "/version",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -53,22 +40,16 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "version"
     },
     {
-      "operationId": "ping",
       "method": "get",
       "path": "/ping",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -78,12 +59,10 @@
               "mimeType": "text/plain",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "ping"
     }
   ],
   "servers": [],

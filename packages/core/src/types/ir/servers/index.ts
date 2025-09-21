@@ -9,9 +9,9 @@ export interface IRServerVariable {
   /** デフォルト値 */
   default: string;
   /** 選択可能な値 */
-  enum: string[] | null;
+  enum?: string[];
   /** 説明 */
-  description: string | null;
+  description?: string;
 }
 
 /**
@@ -40,7 +40,7 @@ export interface IRServer {
   /** URL */
   url: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 変数 */
-  variables: IRServerVariableMap | null;
+  variables?: IRServerVariableMap;
 }

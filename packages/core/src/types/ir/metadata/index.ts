@@ -15,11 +15,11 @@
  */
 export interface IRContact {
   /** 連絡先名 */
-  name: string | null;
+  name?: string;
   /** メールアドレス */
-  email: string | null;
+  email?: string;
   /** URL */
-  url: string | null;
+  url?: string;
 }
 
 /**
@@ -36,7 +36,7 @@ export interface IRLicense {
   /** ライセンス名 */
   name: string;
   /** ライセンスURL */
-  url: string | null;
+  url?: string;
 }
 
 /**
@@ -65,11 +65,11 @@ export interface IRMetadata {
   /** APIバージョン */
   version: string;
   /** API説明 */
-  description: string | null;
+  description?: string;
   /** 利用規約URL */
-  termsOfService: string | null;
+  termsOfService?: string;
   /** 連絡先情報 */
-  contact: IRContact | null;
+  contact?: IRContact;
   /** ライセンス情報 */
-  license: IRLicense | null;
+  license?: IRLicense;
 }

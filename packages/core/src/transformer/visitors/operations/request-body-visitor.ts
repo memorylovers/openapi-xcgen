@@ -118,7 +118,7 @@ export function visitRequestBody(
             ],
             rootSegment: "paths",
           },
-          requestBody.required || false,
+          requestBody.required === true,
         );
 
         if (requestBodyResult && requestBodyResult.models.length > 0) {
@@ -171,9 +171,9 @@ export function visitRequestBody(
   }
 
   const irRequestBody: IRRequestBody = {
-    description: requestBody.description || null,
-    required: requestBody.required || false,
     content,
+    ...(requestBody.required && { required: true }),
+    ...(requestBody.description && { description: requestBody.description }),
   };
 
   return {
@@ -236,27 +236,14 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "name",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "email",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
             required: true,
-            description: null,
           },
         ],
       });
@@ -304,8 +291,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
-          description: null,
-          required: false,
           content: [
             {
               mimeType: "application/json",
@@ -339,17 +324,9 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "data",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            required: false,
-            description: null,
           },
           {
             kind: "requestBody",
@@ -359,17 +336,9 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "data",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            required: false,
-            description: null,
           },
           {
             kind: "requestBody",
@@ -379,17 +348,9 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "file",
-                description: null,
                 type: "binary",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            required: false,
-            description: null,
           },
         ],
       });
@@ -494,8 +455,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
-          description: null,
-          required: false,
           content: [
             {
               mimeType: "text/plain",
@@ -534,8 +493,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
-          description: null,
-          required: false,
           content: [
             {
               mimeType: "application/json",
@@ -555,17 +512,9 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "data",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            required: false,
-            description: null,
           },
         ],
       });

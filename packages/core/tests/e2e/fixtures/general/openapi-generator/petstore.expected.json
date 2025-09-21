@@ -3,8 +3,6 @@
     "title": "OpenAPI Petstore",
     "version": "1.0.0",
     "description": "This is a sample server Petstore server. For this sample, you can use the api key `special-key` to test the authorization filters.",
-    "termsOfService": null,
-    "contact": null,
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -15,525 +13,254 @@
       "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
-      "description": "An order for a pets from the pet store",
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "petId",
-          "description": null,
           "type": "long",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "quantity",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int32"
           }
         },
         {
           "name": "shipDate",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "status",
-          "description": "Order Status",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderStatus"
           },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "Order Status"
         },
         {
           "name": "complete",
-          "description": null,
           "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": false,
-          "deprecated": null,
-          "validation": null
+          "defaultValue": false
         }
-      ]
+      ],
+      "description": "An order for a pets from the pet store"
     },
     {
       "kind": "enum",
       "name": "OrderStatus",
       "referencePath": "#/components/schemas/OrderStatus",
-      "description": "Order Status",
       "type": "string",
       "values": [
         {
           "value": "placed",
-          "name": "PLACED",
-          "description": null
+          "name": "PLACED"
         },
         {
           "value": "approved",
-          "name": "APPROVED",
-          "description": null
+          "name": "APPROVED"
         },
         {
           "value": "delivered",
-          "name": "DELIVERED",
-          "description": null
+          "name": "DELIVERED"
         }
-      ]
+      ],
+      "description": "Order Status"
     },
     {
       "kind": "object",
       "name": "Category",
       "referencePath": "#/components/schemas/Category",
-      "description": "A category for a pet",
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^[a-zA-Z0-9]+[a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]+$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^[a-zA-Z0-9]+[a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]+$"
           }
         }
-      ]
+      ],
+      "description": "A category for a pet"
     },
     {
       "kind": "object",
       "name": "User",
       "referencePath": "#/components/schemas/User",
-      "description": "A User who is purchasing from the pet store",
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "username",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "firstName",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "lastName",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "email",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "password",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "phone",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "userStatus",
-          "description": "User Status",
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
+          "description": "User Status",
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int32"
           }
         }
-      ]
+      ],
+      "description": "A User who is purchasing from the pet store"
     },
     {
       "kind": "object",
       "name": "Tag",
       "referencePath": "#/components/schemas/Tag",
-      "description": "A tag for a pet",
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
-      ]
+      ],
+      "description": "A tag for a pet"
     },
     {
       "kind": "object",
       "name": "Pet",
       "referencePath": "#/components/schemas/Pet",
-      "description": "A pet for sale in the pet store",
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "category",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Category"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "photoUrls",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "tags",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
               "kind": "ref",
               "name": "#/components/schemas/Tag"
             }
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "status",
-          "description": "pet status in the store",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/PetStatus"
           },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": true,
-          "validation": null
+          "description": "pet status in the store",
+          "deprecated": true
         }
-      ]
+      ],
+      "description": "A pet for sale in the pet store"
     },
     {
       "kind": "enum",
       "name": "PetStatus",
       "referencePath": "#/components/schemas/PetStatus",
-      "description": "pet status in the store",
       "type": "string",
       "values": [
         {
           "value": "available",
-          "name": "AVAILABLE",
-          "description": null
+          "name": "AVAILABLE"
         },
         {
           "value": "pending",
-          "name": "PENDING",
-          "description": null
+          "name": "PENDING"
         },
         {
           "value": "sold",
-          "name": "SOLD",
-          "description": null
+          "name": "SOLD"
         }
-      ]
+      ],
+      "description": "pet status in the store"
     },
     {
       "kind": "object",
       "name": "ApiResponse",
       "referencePath": "#/components/schemas/ApiResponse",
-      "description": "Describes the result of uploading an image resource",
       "properties": [
         {
           "name": "code",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int32"
           }
         },
         {
           "name": "type",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "message",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
-      ]
+      ],
+      "description": "Describes the result of uploading an image resource"
     },
     {
       "kind": "parameter",
@@ -542,17 +269,14 @@
       "properties": [
         {
           "name": "status",
-          "description": "Status values that need to be considered for filter",
           "type": {
             "kind": "array",
             "itemType": "string"
           },
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": true,
-          "validation": null,
-          "in": "query"
+          "description": "Status values that need to be considered for filter",
+          "deprecated": true
         }
       ],
       "referencePath": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParams"
@@ -564,17 +288,13 @@
       "properties": [
         {
           "name": "tags",
-          "description": "Tags to filter by",
           "type": {
             "kind": "array",
             "itemType": "string"
           },
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "description": "Tags to filter by"
         }
       ],
       "referencePath": "#/paths/::pet::findByTags/get/parameters/GetPetFindByTagsParams"
@@ -586,14 +306,10 @@
       "properties": [
         {
           "name": "petId",
-          "description": "ID of pet to return",
           "type": "long",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "ID of pet to return"
         }
       ],
       "referencePath": "#/paths/::pet::{petId}/get/parameters/GetPetPetIdParams"
@@ -605,27 +321,15 @@
       "properties": [
         {
           "name": "name",
-          "description": "Updated name of the pet",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "Updated name of the pet"
         },
         {
           "name": "status",
-          "description": "Updated status of the pet",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "Updated status of the pet"
         }
-      ],
-      "required": false,
-      "description": null
+      ]
     },
     {
       "kind": "parameter",
@@ -634,14 +338,10 @@
       "properties": [
         {
           "name": "petId",
-          "description": "ID of pet that needs to be updated",
           "type": "long",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "ID of pet that needs to be updated"
         }
       ],
       "referencePath": "#/paths/::pet::{petId}/post/parameters/PostPetPetIdParams"
@@ -653,25 +353,15 @@
       "properties": [
         {
           "name": "api_key",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
           "in": "header"
         },
         {
           "name": "petId",
-          "description": "Pet id to delete",
           "type": "long",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "Pet id to delete"
         }
       ],
       "referencePath": "#/paths/::pet::{petId}/delete/parameters/DeletePetPetIdParams"
@@ -683,27 +373,15 @@
       "properties": [
         {
           "name": "additionalMetadata",
-          "description": "Additional data to pass to server",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "Additional data to pass to server"
         },
         {
           "name": "file",
-          "description": "file to upload",
           "type": "binary",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "file to upload"
         }
-      ],
-      "required": false,
-      "description": null
+      ]
     },
     {
       "kind": "parameter",
@@ -712,14 +390,10 @@
       "properties": [
         {
           "name": "petId",
-          "description": "ID of pet to update",
           "type": "long",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "ID of pet to update"
         }
       ],
       "referencePath": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
@@ -728,10 +402,8 @@
       "kind": "response",
       "name": "GetStoreInventory200Response",
       "referencePath": "#/paths/::store::inventory/get/responses/responses/200/content/application::json/schema/GetStoreInventory200Response",
-      "description": null,
       "properties": [],
       "statusCode": "200",
-      "headers": null,
       "additionalProperties": "int"
     },
     {
@@ -741,14 +413,10 @@
       "properties": [
         {
           "name": "orderId",
-          "description": "ID of pet that needs to be fetched",
           "type": "long",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "ID of pet that needs to be fetched"
         }
       ],
       "referencePath": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderOrderIdParams"
@@ -760,14 +428,10 @@
       "properties": [
         {
           "name": "orderId",
-          "description": "ID of the order that needs to be deleted",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "ID of the order that needs to be deleted"
         }
       ],
       "referencePath": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderOrderIdParams"
@@ -779,25 +443,17 @@
       "properties": [
         {
           "name": "username",
-          "description": "The user name for login",
           "type": "string",
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "description": "The user name for login"
         },
         {
           "name": "password",
-          "description": "The password for login in clear text",
           "type": "string",
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "description": "The password for login in clear text"
         }
       ],
       "referencePath": "#/paths/::user::login/get/parameters/GetUserLoginParams"
@@ -809,14 +465,10 @@
       "properties": [
         {
           "name": "username",
-          "description": "The name that needs to be fetched. Use user1 for testing.",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "The name that needs to be fetched. Use user1 for testing."
         }
       ],
       "referencePath": "#/paths/::user::{username}/get/parameters/GetUserUsernameParams"
@@ -828,14 +480,10 @@
       "properties": [
         {
           "name": "username",
-          "description": "name that need to be deleted",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "name that need to be deleted"
         }
       ],
       "referencePath": "#/paths/::user::{username}/put/parameters/PutUserUsernameParams"
@@ -847,14 +495,10 @@
       "properties": [
         {
           "name": "username",
-          "description": "The name that needs to be deleted",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "The name that needs to be deleted"
         }
       ],
       "referencePath": "#/paths/::user::{username}/delete/parameters/DeleteUserUsernameParams"
@@ -863,32 +507,25 @@
   "tags": [
     {
       "name": "pet",
-      "description": "Everything about your Pets",
-      "externalDocs": null
+      "description": "Everything about your Pets"
     },
     {
       "name": "store",
-      "description": "Access to Petstore orders",
-      "externalDocs": null
+      "description": "Access to Petstore orders"
     },
     {
       "name": "user",
-      "description": "Operations about user",
-      "externalDocs": null
+      "description": "Operations about user"
     }
   ],
   "endpoints": [
     {
-      "operationId": "addPet",
       "method": "post",
       "path": "/pet",
-      "summary": "Add a new pet to the store",
-      "description": null,
       "tags": [
         "pet"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -908,30 +545,23 @@
                 "name": "#/components/schemas/Pet"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "405",
-          "description": "Invalid input",
-          "content": null,
-          "headers": null
+          "description": "Invalid input"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "addPet",
+      "summary": "Add a new pet to the store"
     },
     {
-      "operationId": "updatePet",
       "method": "put",
       "path": "/pet",
-      "summary": "Update an existing pet",
-      "description": null,
       "tags": [
         "pet"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -951,37 +581,27 @@
                 "name": "#/components/schemas/Pet"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid ID supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid ID supplied"
         },
         {
           "statusCode": "404",
-          "description": "Pet not found",
-          "content": null,
-          "headers": null
+          "description": "Pet not found"
         },
         {
           "statusCode": "405",
-          "description": "Validation exception",
-          "content": null,
-          "headers": null
+          "description": "Validation exception"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "updatePet",
+      "summary": "Update an existing pet"
     },
     {
-      "operationId": "findPetsByStatus",
       "method": "get",
       "path": "/pet/findByStatus",
-      "summary": "Finds Pets by status",
-      "description": "Multiple status values can be provided with comma separated strings",
       "tags": [
         "pet"
       ],
@@ -989,7 +609,6 @@
         "kind": "ref",
         "name": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1015,25 +634,20 @@
                 }
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid status value",
-          "content": null,
-          "headers": null
+          "description": "Invalid status value"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "findPetsByStatus",
+      "summary": "Finds Pets by status",
+      "description": "Multiple status values can be provided with comma separated strings"
     },
     {
-      "operationId": "findPetsByTags",
       "method": "get",
       "path": "/pet/findByTags",
-      "summary": "Finds Pets by tags",
-      "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
       "tags": [
         "pet"
       ],
@@ -1041,7 +655,6 @@
         "kind": "ref",
         "name": "#/paths/::pet::findByTags/get/parameters/GetPetFindByTagsParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1067,25 +680,21 @@
                 }
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid tag value",
-          "content": null,
-          "headers": null
+          "description": "Invalid tag value"
         }
       ],
-      "deprecated": true,
-      "security": null
+      "operationId": "findPetsByTags",
+      "summary": "Finds Pets by tags",
+      "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+      "deprecated": true
     },
     {
-      "operationId": "getPetById",
       "method": "get",
       "path": "/pet/{petId}",
-      "summary": "Find pet by ID",
-      "description": "Returns a single pet",
       "tags": [
         "pet"
       ],
@@ -1093,7 +702,6 @@
         "kind": "ref",
         "name": "#/paths/::pet::{petId}/get/parameters/GetPetPetIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1113,31 +721,24 @@
                 "name": "#/components/schemas/Pet"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid ID supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid ID supplied"
         },
         {
           "statusCode": "404",
-          "description": "Pet not found",
-          "content": null,
-          "headers": null
+          "description": "Pet not found"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getPetById",
+      "summary": "Find pet by ID",
+      "description": "Returns a single pet"
     },
     {
-      "operationId": "updatePetWithForm",
       "method": "post",
       "path": "/pet/{petId}",
-      "summary": "Updates a pet in the store with form data",
-      "description": null,
       "tags": [
         "pet"
       ],
@@ -1145,9 +746,15 @@
         "kind": "ref",
         "name": "#/paths/::pet::{petId}/post/parameters/PostPetPetIdParams"
       },
+      "responses": [
+        {
+          "statusCode": "405",
+          "description": "Invalid input"
+        }
+      ],
+      "operationId": "updatePetWithForm",
+      "summary": "Updates a pet in the store with form data",
       "requestBody": {
-        "description": null,
-        "required": false,
         "content": [
           {
             "mimeType": "application/x-www-form-urlencoded",
@@ -1157,24 +764,11 @@
             }
           }
         ]
-      },
-      "responses": [
-        {
-          "statusCode": "405",
-          "description": "Invalid input",
-          "content": null,
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
+      }
     },
     {
-      "operationId": "deletePet",
       "method": "delete",
       "path": "/pet/{petId}",
-      "summary": "Deletes a pet",
-      "description": null,
       "tags": [
         "pet"
       ],
@@ -1182,43 +776,24 @@
         "kind": "ref",
         "name": "#/paths/::pet::{petId}/delete/parameters/DeletePetPetIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "400",
-          "description": "Invalid pet value",
-          "content": null,
-          "headers": null
+          "description": "Invalid pet value"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "deletePet",
+      "summary": "Deletes a pet"
     },
     {
-      "operationId": "uploadFile",
       "method": "post",
       "path": "/pet/{petId}/uploadImage",
-      "summary": "uploads an image",
-      "description": null,
       "tags": [
         "pet"
       ],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
-      },
-      "requestBody": {
-        "description": null,
-        "required": false,
-        "content": [
-          {
-            "mimeType": "multipart/form-data",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema/PostPetPetIdUploadImageRequestBody"
-            }
-          }
-        ]
       },
       "responses": [
         {
@@ -1232,24 +807,30 @@
                 "name": "#/components/schemas/ApiResponse"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "uploadFile",
+      "summary": "uploads an image",
+      "requestBody": {
+        "content": [
+          {
+            "mimeType": "multipart/form-data",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema/PostPetPetIdUploadImageRequestBody"
+            }
+          }
+        ]
+      }
     },
     {
-      "operationId": "getInventory",
       "method": "get",
       "path": "/store/inventory",
-      "summary": "Returns pet inventories by status",
-      "description": "Returns a map of status codes to quantities",
       "tags": [
         "store"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1262,26 +843,49 @@
                 "name": "#/paths/::store::inventory/get/responses/responses/200/content/application::json/schema/GetStoreInventory200Response"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getInventory",
+      "summary": "Returns pet inventories by status",
+      "description": "Returns a map of status codes to quantities"
     },
     {
-      "operationId": "placeOrder",
       "method": "post",
       "path": "/store/order",
-      "summary": "Place an order for a pet",
-      "description": null,
       "tags": [
         "store"
       ],
       "parameters": [],
+      "responses": [
+        {
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            }
+          ]
+        },
+        {
+          "statusCode": "400",
+          "description": "Invalid Order"
+        }
+      ],
+      "operationId": "placeOrder",
+      "summary": "Place an order for a pet",
       "requestBody": {
-        "description": "order placed for purchasing the pet",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1290,46 +894,14 @@
               "name": "#/components/schemas/Order"
             }
           }
-        ]
-      },
-      "responses": [
-        {
-          "statusCode": "200",
-          "description": "successful operation",
-          "content": [
-            {
-              "mimeType": "application/xml",
-              "schema": {
-                "kind": "ref",
-                "name": "#/components/schemas/Order"
-              }
-            },
-            {
-              "mimeType": "application/json",
-              "schema": {
-                "kind": "ref",
-                "name": "#/components/schemas/Order"
-              }
-            }
-          ],
-          "headers": null
-        },
-        {
-          "statusCode": "400",
-          "description": "Invalid Order",
-          "content": null,
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
+        ],
+        "required": true,
+        "description": "order placed for purchasing the pet"
+      }
     },
     {
-      "operationId": "getOrderById",
       "method": "get",
       "path": "/store/order/{orderId}",
-      "summary": "Find purchase order by ID",
-      "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions",
       "tags": [
         "store"
       ],
@@ -1337,7 +909,6 @@
         "kind": "ref",
         "name": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderOrderIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1357,31 +928,24 @@
                 "name": "#/components/schemas/Order"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid ID supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid ID supplied"
         },
         {
           "statusCode": "404",
-          "description": "Order not found",
-          "content": null,
-          "headers": null
+          "description": "Order not found"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getOrderById",
+      "summary": "Find purchase order by ID",
+      "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions"
     },
     {
-      "operationId": "deleteOrder",
       "method": "delete",
       "path": "/store/order/{orderId}",
-      "summary": "Delete purchase order by ID",
-      "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
       "tags": [
         "store"
       ],
@@ -1389,37 +953,37 @@
         "kind": "ref",
         "name": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderOrderIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "400",
-          "description": "Invalid ID supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid ID supplied"
         },
         {
           "statusCode": "404",
-          "description": "Order not found",
-          "content": null,
-          "headers": null
+          "description": "Order not found"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "deleteOrder",
+      "summary": "Delete purchase order by ID",
+      "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors"
     },
     {
-      "operationId": "createUser",
       "method": "post",
       "path": "/user",
-      "summary": "Create user",
-      "description": "This can only be done by the logged in user.",
       "tags": [
         "user"
       ],
       "parameters": [],
+      "responses": [
+        {
+          "statusCode": "default",
+          "description": "successful operation"
+        }
+      ],
+      "operationId": "createUser",
+      "summary": "Create user",
+      "description": "This can only be done by the logged in user.",
       "requestBody": {
-        "description": "Created user object",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1428,69 +992,46 @@
               "name": "#/components/schemas/User"
             }
           }
-        ]
-      },
-      "responses": [
-        {
-          "statusCode": "default",
-          "description": "successful operation",
-          "content": null,
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
+        ],
+        "required": true,
+        "description": "Created user object"
+      }
     },
     {
-      "operationId": "createUsersWithArrayInput",
       "method": "post",
       "path": "/user/createWithArray",
-      "summary": "Creates list of users with given input array",
-      "description": null,
       "tags": [
         "user"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "default",
-          "description": "successful operation",
-          "content": null,
-          "headers": null
+          "description": "successful operation"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "createUsersWithArrayInput",
+      "summary": "Creates list of users with given input array"
     },
     {
-      "operationId": "createUsersWithListInput",
       "method": "post",
       "path": "/user/createWithList",
-      "summary": "Creates list of users with given input array",
-      "description": null,
       "tags": [
         "user"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "default",
-          "description": "successful operation",
-          "content": null,
-          "headers": null
+          "description": "successful operation"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "createUsersWithListInput",
+      "summary": "Creates list of users with given input array"
     },
     {
-      "operationId": "loginUser",
       "method": "get",
       "path": "/user/login",
-      "summary": "Logs user into the system",
-      "description": null,
       "tags": [
         "user"
       ],
@@ -1498,7 +1039,6 @@
         "kind": "ref",
         "name": "#/paths/::user::login/get/parameters/GetUserLoginParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1512,47 +1052,35 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid username/password supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid username/password supplied"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "loginUser",
+      "summary": "Logs user into the system"
     },
     {
-      "operationId": "logoutUser",
       "method": "get",
       "path": "/user/logout",
-      "summary": "Logs out current logged in user session",
-      "description": null,
       "tags": [
         "user"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "default",
-          "description": "successful operation",
-          "content": null,
-          "headers": null
+          "description": "successful operation"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "logoutUser",
+      "summary": "Logs out current logged in user session"
     },
     {
-      "operationId": "getUserByName",
       "method": "get",
       "path": "/user/{username}",
-      "summary": "Get user by user name",
-      "description": null,
       "tags": [
         "user"
       ],
@@ -1560,7 +1088,6 @@
         "kind": "ref",
         "name": "#/paths/::user::{username}/get/parameters/GetUserUsernameParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -1580,31 +1107,23 @@
                 "name": "#/components/schemas/User"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "400",
-          "description": "Invalid username supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid username supplied"
         },
         {
           "statusCode": "404",
-          "description": "User not found",
-          "content": null,
-          "headers": null
+          "description": "User not found"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getUserByName",
+      "summary": "Get user by user name"
     },
     {
-      "operationId": "updateUser",
       "method": "put",
       "path": "/user/{username}",
-      "summary": "Updated user",
-      "description": "This can only be done by the logged in user.",
       "tags": [
         "user"
       ],
@@ -1612,9 +1131,20 @@
         "kind": "ref",
         "name": "#/paths/::user::{username}/put/parameters/PutUserUsernameParams"
       },
+      "responses": [
+        {
+          "statusCode": "400",
+          "description": "Invalid user supplied"
+        },
+        {
+          "statusCode": "404",
+          "description": "User not found"
+        }
+      ],
+      "operationId": "updateUser",
+      "summary": "Updated user",
+      "description": "This can only be done by the logged in user.",
       "requestBody": {
-        "description": "Updated user object",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1623,31 +1153,14 @@
               "name": "#/components/schemas/User"
             }
           }
-        ]
-      },
-      "responses": [
-        {
-          "statusCode": "400",
-          "description": "Invalid user supplied",
-          "content": null,
-          "headers": null
-        },
-        {
-          "statusCode": "404",
-          "description": "User not found",
-          "content": null,
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
+        ],
+        "required": true,
+        "description": "Updated user object"
+      }
     },
     {
-      "operationId": "deleteUser",
       "method": "delete",
       "path": "/user/{username}",
-      "summary": "Delete user",
-      "description": "This can only be done by the logged in user.",
       "tags": [
         "user"
       ],
@@ -1655,23 +1168,19 @@
         "kind": "ref",
         "name": "#/paths/::user::{username}/delete/parameters/DeleteUserUsernameParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "400",
-          "description": "Invalid username supplied",
-          "content": null,
-          "headers": null
+          "description": "Invalid username supplied"
         },
         {
           "statusCode": "404",
-          "description": "User not found",
-          "content": null,
-          "headers": null
+          "description": "User not found"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "deleteUser",
+      "summary": "Delete user",
+      "description": "This can only be done by the logged in user."
     }
   ],
   "servers": [],

@@ -2,93 +2,53 @@
   "metadata": {
     "title": "Nullable Model Test",
     "version": "1.0.0",
-    "description": "Test nullable property handling",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test nullable property handling"
   },
   "models": [
     {
       "kind": "object",
       "name": "Profile",
       "referencePath": "#/components/schemas/Profile",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "bio",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": true,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "nullable": true
         },
         {
           "name": "nickname",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": true,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "nullable": true
         },
         {
           "name": "lastLoginDate",
-          "description": null,
           "type": "datetime",
-          "required": false,
-          "nullable": true,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "nullable": true
         },
         {
           "name": "settings",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/ProfileSettings"
           },
-          "required": false,
-          "nullable": true,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "nullable": true
         },
         {
           "name": "tags",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
           },
-          "required": false,
-          "nullable": true,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "nullable": true
         }
       ]
     },
@@ -96,17 +56,10 @@
       "kind": "object",
       "name": "ProfileSettings",
       "referencePath": "#/components/schemas/ProfileSettings",
-      "description": null,
       "properties": [
         {
           "name": "theme",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     }
@@ -114,14 +67,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": null,
       "method": "get",
       "path": "/profiles",
-      "summary": "Get profiles",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -134,12 +83,10 @@
                 "name": "#/components/schemas/Profile"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "summary": "Get profiles"
     }
   ],
   "servers": [],

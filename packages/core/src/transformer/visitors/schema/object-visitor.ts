@@ -147,14 +147,17 @@ export function visitObject(
       if (propResult.type) {
         const property: IRProperty = {
           name: propName,
-          description: schemaObj.description || null,
           type: propResult.type,
-          required: required.includes(propName),
-          nullable: isNullable(schemaObj) ? true : null,
-          defaultValue:
-            schemaObj.default !== undefined ? schemaObj.default : null,
-          deprecated: schemaObj.deprecated === true ? true : null,
-          validation: extractValidation(schemaObj),
+          ...(required.includes(propName) && { required: true }),
+          ...(schemaObj.description && { description: schemaObj.description }),
+          ...(isNullable(schemaObj) && { nullable: true }),
+          ...(schemaObj.default !== undefined && {
+            defaultValue: schemaObj.default,
+          }),
+          ...(schemaObj.deprecated === true && { deprecated: true }),
+          ...(extractValidation(schemaObj) && {
+            validation: extractValidation(schemaObj),
+          }),
         };
 
         properties.push(property);
@@ -181,8 +184,8 @@ export function visitObject(
     kind: "object",
     name,
     referencePath: buildReferencePath(context.documentPath),
-    description: schema.description || null,
     properties,
+    ...(schema.description && { description: schema.description }),
     ...(additionalPropertiesType && {
       additionalProperties: additionalPropertiesType,
     }),
@@ -267,14 +270,17 @@ export function visitResponseObject(
       if (propResult.type) {
         const property: IRProperty = {
           name: propName,
-          description: schemaObj.description || null,
           type: propResult.type,
-          required: required.includes(propName),
-          nullable: isNullable(schemaObj) ? true : null,
-          defaultValue:
-            schemaObj.default !== undefined ? schemaObj.default : null,
-          deprecated: schemaObj.deprecated === true ? true : null,
-          validation: extractValidation(schemaObj),
+          ...(required.includes(propName) && { required: true }),
+          ...(schemaObj.description && { description: schemaObj.description }),
+          ...(isNullable(schemaObj) && { nullable: true }),
+          ...(schemaObj.default !== undefined && {
+            defaultValue: schemaObj.default,
+          }),
+          ...(schemaObj.deprecated === true && { deprecated: true }),
+          ...(extractValidation(schemaObj) && {
+            validation: extractValidation(schemaObj),
+          }),
         };
 
         properties.push(property);
@@ -301,10 +307,10 @@ export function visitResponseObject(
     kind: "response",
     name,
     referencePath: buildReferencePath(context.documentPath),
-    description: schema.description || null,
     properties,
     statusCode,
-    headers: null, // TODO: Implement headers processing
+    ...(schema.description && { description: schema.description }),
+    // headers は省略（undefined として扱う）
     ...(additionalPropertiesType && {
       additionalProperties: additionalPropertiesType,
     }),
@@ -392,16 +398,18 @@ export function visitRequestBodyObject(
 
       // プロパティの型が取得できた場合のみ追加
       if (propResult.type) {
+        const validation = extractValidation(schemaObj);
         const property: IRProperty = {
           name: propName,
-          description: schemaObj.description || null,
           type: propResult.type,
-          required: requiredProps.includes(propName),
-          nullable: isNullable(schemaObj) ? true : null,
-          defaultValue:
-            schemaObj.default !== undefined ? schemaObj.default : null,
-          deprecated: schemaObj.deprecated === true ? true : null,
-          validation: extractValidation(schemaObj),
+          ...(requiredProps.includes(propName) && { required: true }),
+          ...(schemaObj.description && { description: schemaObj.description }),
+          ...(isNullable(schemaObj) && { nullable: true }),
+          ...(schemaObj.default !== undefined && {
+            defaultValue: schemaObj.default,
+          }),
+          ...(schemaObj.deprecated === true && { deprecated: true }),
+          ...(validation && { validation }),
         };
 
         properties.push(property);
@@ -429,8 +437,8 @@ export function visitRequestBodyObject(
     name,
     referencePath: buildReferencePath(context.documentPath),
     properties,
-    required,
-    description: schema.description || null,
+    ...(required && { required: true }),
+    ...(schema.description && { description: schema.description }),
     ...(additionalPropertiesType && {
       additionalProperties: additionalPropertiesType,
     }),
@@ -470,17 +478,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Simple",
             referencePath: "#/components/schemas/Simple",
-            description: null,
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -512,13 +513,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "int",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -551,17 +546,11 @@ if (import.meta.vitest) {
             kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
-            description: null,
             properties: [
               {
                 name: "name",
                 description: "User's full name",
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -591,17 +580,11 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Config",
             referencePath: "#/components/schemas/Config",
-            description: null,
             properties: [
               {
                 name: "status",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
                 defaultValue: "active",
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -631,17 +614,11 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Model",
             referencePath: "#/components/schemas/Model",
-            description: null,
             properties: [
               {
                 name: "oldField",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
                 deprecated: true,
-                validation: null,
               },
             ],
           },
@@ -673,30 +650,14 @@ if (import.meta.vitest) {
             kind: "object",
             name: "User",
             referencePath: "#/components/schemas/User",
-            description: null,
             properties: [
               {
                 name: "username",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
                 validation: {
-                  minimum: null,
-                  maximum: null,
-                  exclusiveMinimum: null,
-                  exclusiveMaximum: null,
                   minLength: 3,
                   maxLength: 20,
                   pattern: "^[a-zA-Z0-9]+$",
-                  minItems: null,
-                  maxItems: null,
-                  uniqueItems: null,
-                  minProperties: null,
-                  maxProperties: null,
-                  format: null,
                 },
               },
             ],
@@ -741,47 +702,26 @@ if (import.meta.vitest) {
             kind: "object",
             name: "NullableTest",
             referencePath: "#/components/schemas/NullableTest",
-            description: null,
             properties: [
               {
                 name: "requiredNullable",
-                description: null,
                 type: "string",
                 required: true,
                 nullable: true,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "requiredNotNullable",
-                description: null,
                 type: "string",
                 required: true,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "optionalNullable",
-                description: null,
                 type: "string",
-                required: false,
                 nullable: true,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "optionalNotNullable",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -810,27 +750,15 @@ if (import.meta.vitest) {
             kind: "object",
             name: "TestModel",
             referencePath: "#/components/schemas/TestModel",
-            description: null,
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "int",
-                required: true, // 存在するプロパティは正しくrequired
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
+                required: true,
               },
               {
                 name: "name",
-                description: null,
                 type: "string",
-                required: false, // required配列に含まれていないのでfalse
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -865,20 +793,13 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Person",
             referencePath: "#/components/schemas/Person",
-            description: null,
             properties: [
               {
                 name: "address",
-                description: null,
                 type: {
                   kind: "ref",
                   name: "#/components/schemas/PersonAddress",
                 },
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -886,17 +807,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "PersonAddress",
             referencePath: "#/components/schemas/PersonAddress",
-            description: null,
             properties: [
               {
                 name: "street",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -926,20 +840,13 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Data",
             referencePath: "#/components/schemas/Data",
-            description: null,
             properties: [
               {
                 name: "tags",
-                description: null,
                 type: {
                   kind: "array",
                   itemType: "string",
                 },
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -966,17 +873,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Membership",
             referencePath: "#/components/schemas/Membership",
-            description: null,
             properties: [
               {
                 name: "user",
-                description: null,
                 type: { kind: "ref", name: "#/components/schemas/User" },
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -1007,7 +907,6 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Document",
             referencePath: "#/components/schemas/Document",
-            description: null,
             properties: [
               {
                 name: "status",
@@ -1016,11 +915,6 @@ if (import.meta.vitest) {
                   kind: "ref",
                   name: "#/components/schemas/DocumentStatus",
                 },
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -1031,9 +925,9 @@ if (import.meta.vitest) {
             description: "Document status",
             type: "string",
             values: [
-              { value: "draft", name: "DRAFT", description: null },
-              { value: "published", name: "PUBLISHED", description: null },
-              { value: "archived", name: "ARCHIVED", description: null },
+              { value: "draft", name: "DRAFT" },
+              { value: "published", name: "PUBLISHED" },
+              { value: "archived", name: "ARCHIVED" },
             ],
           },
         ],
@@ -1086,7 +980,6 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Empty",
             referencePath: "#/components/schemas/Empty",
-            description: null,
             properties: [],
           },
         ],
@@ -1110,7 +1003,6 @@ if (import.meta.vitest) {
             kind: "object",
             name: "NullProps",
             referencePath: "#/components/schemas/NullProps",
-            description: null,
             properties: [],
           },
         ],
@@ -1134,7 +1026,6 @@ if (import.meta.vitest) {
             kind: "object",
             name: "EmptyProps",
             referencePath: "#/components/schemas/EmptyProps",
-            description: null,
             properties: [],
           },
         ],
@@ -1213,17 +1104,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Mixed",
             referencePath: "#/components/schemas/Mixed",
-            description: null,
             properties: [
               {
                 name: "valid",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -1258,7 +1142,6 @@ if (import.meta.vitest) {
             kind: "object",
             name: "AllInvalid",
             referencePath: "#/components/schemas/AllInvalid",
-            description: null,
             properties: [],
           },
         ],
@@ -1291,17 +1174,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "ConfigObject",
             referencePath: "#/components/schemas/ConfigObject",
-            description: null,
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
             additionalProperties: "string",
@@ -1333,17 +1209,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "MetricsData",
             referencePath: "#/components/schemas/MetricsData",
-            description: null,
             properties: [
               {
                 name: "name",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
             additionalProperties: {
@@ -1375,17 +1244,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "StrictObject",
             referencePath: "#/components/schemas/StrictObject",
-            description: null,
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
             // additionalPropertiesフィールドは存在しない

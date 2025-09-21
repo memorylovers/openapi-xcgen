@@ -35,13 +35,13 @@ export interface IRResponseHeader {
   /** ヘッダー名 */
   name: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 型情報 */
   type: IRType;
   /** デフォルト値 */
-  defaultValue: unknown | null;
+  defaultValue?: unknown;
   /** 非推奨フラグ */
-  deprecated: boolean | null;
+  deprecated?: true;
 }
 
 /**
@@ -100,9 +100,9 @@ export interface IRResponse {
   /** HTTPステータスコード（"200", "404", "default"など） */
   statusCode: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
-  content: IRResponseContent[] | null;
+  content?: IRResponseContent[];
   /** レスポンスヘッダー */
-  headers: IRResponseHeader[] | null;
+  headers?: IRResponseHeader[];
 }

@@ -2,235 +2,81 @@
   "metadata": {
     "title": "Validation Model Test",
     "version": "1.0.0",
-    "description": "Test validation constraints",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test validation constraints"
   },
   "models": [
     {
       "kind": "object",
       "name": "Product",
       "referencePath": "#/components/schemas/Product",
-      "description": null,
       "properties": [
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 100,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 100
           }
         },
         {
           "name": "code",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^[A-Z]{3}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^[A-Z]{3}$"
           }
         },
         {
           "name": "userId",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uuid"
           }
         },
         {
           "name": "email",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "website",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "ipAddress",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "ipv4"
           }
         },
         {
           "name": "price",
-          "description": null,
           "type": "double",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 0,
-            "maximum": 1000,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maximum": 1000
           }
         },
         {
           "name": "quantity",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": 1,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minimum": 1
           }
         },
         {
           "name": "tags",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
           },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
             "minItems": 1,
-            "maxItems": 5,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxItems": 5
           }
         }
       ]
@@ -239,14 +85,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": null,
       "method": "get",
       "path": "/products",
-      "summary": "Get products",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -259,12 +101,10 @@
                 "name": "#/components/schemas/Product"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "summary": "Get products"
     }
   ],
   "servers": [],

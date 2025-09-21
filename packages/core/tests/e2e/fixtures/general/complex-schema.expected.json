@@ -2,45 +2,24 @@
   "metadata": {
     "title": "Complex Schema API",
     "version": "1.0.0",
-    "description": "API with complex nested schemas",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "API with complex nested schemas"
   },
   "models": [
     {
       "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uuid"
           }
         },
         {
           "name": "items",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
@@ -49,109 +28,53 @@
             }
           },
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": 1,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minItems": 1
           }
         },
         {
           "name": "customer",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderCustomer"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "status",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderStatus"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "priority",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderPriority"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "tags",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "metadata",
-          "description": null,
           "type": {
             "kind": "map",
             "valueType": "string"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "createdAt",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "updatedAt",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         }
       ]
     },
@@ -159,87 +82,33 @@
       "kind": "object",
       "name": "OrderItems",
       "referencePath": "#/components/schemas/OrderItems",
-      "description": null,
       "properties": [
         {
           "name": "productId",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "quantity",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": 1,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minimum": 1
           }
         },
         {
           "name": "price",
-          "description": null,
           "type": "float",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "float"
           }
         },
         {
           "name": "discount",
-          "description": null,
           "type": "float",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 0,
             "maximum": 100,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "float"
           }
         }
@@ -249,64 +118,30 @@
       "kind": "object",
       "name": "OrderCustomer",
       "referencePath": "#/components/schemas/OrderCustomer",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "email",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "address",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/OrderCustomerAddress"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -314,60 +149,24 @@
       "kind": "object",
       "name": "OrderCustomerAddress",
       "referencePath": "#/components/schemas/OrderCustomerAddress",
-      "description": null,
       "properties": [
         {
           "name": "street",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "city",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "country",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "zipCode",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^\\d{5}(-\\d{4})?$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^\\d{5}(-\\d{4})?$"
           }
         }
       ]
@@ -376,33 +175,27 @@
       "kind": "enum",
       "name": "OrderStatus",
       "referencePath": "#/components/schemas/OrderStatus",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "pending",
-          "name": "PENDING",
-          "description": null
+          "name": "PENDING"
         },
         {
           "value": "processing",
-          "name": "PROCESSING",
-          "description": null
+          "name": "PROCESSING"
         },
         {
           "value": "shipped",
-          "name": "SHIPPED",
-          "description": null
+          "name": "SHIPPED"
         },
         {
           "value": "delivered",
-          "name": "DELIVERED",
-          "description": null
+          "name": "DELIVERED"
         },
         {
           "value": "cancelled",
-          "name": "CANCELLED",
-          "description": null
+          "name": "CANCELLED"
         }
       ]
     },
@@ -410,28 +203,23 @@
       "kind": "enum",
       "name": "OrderPriority",
       "referencePath": "#/components/schemas/OrderPriority",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "low",
-          "name": "LOW",
-          "description": null
+          "name": "LOW"
         },
         {
           "value": "normal",
-          "name": "NORMAL",
-          "description": null
+          "name": "NORMAL"
         },
         {
           "value": "high",
-          "name": "HIGH",
-          "description": null
+          "name": "HIGH"
         },
         {
           "value": "urgent",
-          "name": "URGENT",
-          "description": null
+          "name": "URGENT"
         }
       ]
     }
@@ -439,28 +227,12 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "createOrder",
       "method": "post",
       "path": "/orders",
-      "summary": "Create a new order",
-      "description": null,
       "tags": [
         "orders"
       ],
       "parameters": [],
-      "requestBody": {
-        "description": null,
-        "required": true,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/Order"
-            }
-          }
-        ]
-      },
       "responses": [
         {
           "statusCode": "201",
@@ -473,12 +245,23 @@
                 "name": "#/components/schemas/Order"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "createOrder",
+      "summary": "Create a new order",
+      "requestBody": {
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Order"
+            }
+          }
+        ],
+        "required": true
+      }
     }
   ],
   "servers": [],

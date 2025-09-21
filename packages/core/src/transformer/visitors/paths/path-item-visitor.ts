@@ -10,7 +10,7 @@
  * - パラメータの継承（PathItem共通パラメータ）の処理
  */
 
-import type { PathItemObject, IREndpoint, IRModel } from "../../../types";
+import type { IREndpoint, IRModel, PathItemObject } from "../../../types";
 import type { OperationContext, PathItemContext } from "../../types";
 import { visitOperation } from "../operations/operation-visitor";
 
@@ -127,21 +127,14 @@ if (import.meta.vitest) {
             operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
-            summary: null,
-            description: null,
             tags: ["pets"],
             parameters: [],
-            requestBody: null,
             responses: [
               {
                 statusCode: "200",
                 description: "Success",
-                content: null,
-                headers: null,
               },
             ],
-            deprecated: null,
-            security: null,
           },
           models: [],
         },
@@ -172,21 +165,15 @@ if (import.meta.vitest) {
 
       const result = visitPathItem(pathItem, context);
 
-      // Red Phase: このテストは失敗する
       expect(result).toEqual([
         {
           endpoint: {
             operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
-            summary: null,
-            description: null,
             tags: [],
             parameters: [],
-            requestBody: null,
             responses: [],
-            deprecated: null,
-            security: null,
           },
           models: [],
         },
@@ -195,14 +182,9 @@ if (import.meta.vitest) {
             operationId: "updatePet",
             method: "put",
             path: "/pets/{id}",
-            summary: null,
-            description: null,
             tags: [],
             parameters: [],
-            requestBody: null,
             responses: [],
-            deprecated: null,
-            security: null,
           },
           models: [],
         },
@@ -211,14 +193,9 @@ if (import.meta.vitest) {
             operationId: "deletePet",
             method: "delete",
             path: "/pets/{id}",
-            summary: null,
-            description: null,
             tags: [],
             parameters: [],
-            requestBody: null,
             responses: [],
-            deprecated: null,
-            security: null,
           },
           models: [],
         },
@@ -244,21 +221,15 @@ if (import.meta.vitest) {
 
       const result = visitPathItem(pathItem, context);
 
-      // Red Phase: このテストは失敗する
       expect(result).toEqual([
         {
           endpoint: {
             operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
-            summary: null,
-            description: null,
             tags: [],
             parameters: [],
-            requestBody: null,
             responses: [],
-            deprecated: null,
-            security: null,
           },
           models: [],
         },
@@ -289,26 +260,19 @@ if (import.meta.vitest) {
 
       const result = visitPathItem(pathItem, context);
 
-      // Red Phase: このテストは失敗する（パラメータはStep 12で実装）
       expect(result).toEqual([
         {
           endpoint: {
             operationId: "getPet",
             method: "get",
             path: "/pets/{id}",
-            summary: null,
-            description: null,
             tags: [],
             parameters: [],
-            requestBody: null,
             responses: [],
-            deprecated: null,
-            security: null,
           },
           models: [],
         },
       ]);
-      // パラメータの処理は今回のスコープ外
     });
   });
 }

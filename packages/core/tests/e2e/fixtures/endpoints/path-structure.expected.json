@@ -2,10 +2,7 @@
   "metadata": {
     "title": "Path Structure Test",
     "version": "1.0.0",
-    "description": "Test path parsing and normalization",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test path parsing and normalization"
   },
   "models": [
     {
@@ -15,14 +12,9 @@
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "in": "path",
+          "required": true
         }
       ],
       "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
@@ -34,25 +26,15 @@
       "properties": [
         {
           "name": "orgId",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "in": "path",
+          "required": true
         },
         {
           "name": "projectId",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "in": "path",
+          "required": true
         }
       ],
       "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgOrgIdProjectsProjectIdParams"
@@ -61,14 +43,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "root",
       "method": "get",
       "path": "/",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -78,22 +56,16 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "root"
     },
     {
-      "operationId": "users",
       "method": "get",
       "path": "/users",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -103,25 +75,19 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "users"
     },
     {
-      "operationId": "userById",
       "method": "get",
       "path": "/users/{id}",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -131,25 +97,19 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "userById"
     },
     {
-      "operationId": "projectInOrg",
       "method": "get",
       "path": "/org/{orgId}/projects/{projectId}",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgOrgIdProjectsProjectIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -159,22 +119,16 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "projectInOrg"
     },
     {
-      "operationId": "healthCheck",
       "method": "get",
       "path": "/api-gateway/health_check",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -184,12 +138,10 @@
               "mimeType": "text/plain",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "healthCheck"
     }
   ],
   "servers": [],

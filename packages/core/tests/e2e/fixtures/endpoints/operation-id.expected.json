@@ -2,10 +2,7 @@
   "metadata": {
     "title": "Operation ID Optional Field Test",
     "version": "1.0.0",
-    "description": "Test operationId as optional field per OpenAPI specification",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test operationId as optional field per OpenAPI specification"
   },
   "models": [
     {
@@ -15,14 +12,9 @@
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "in": "path",
+          "required": true
         }
       ],
       "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
@@ -31,14 +23,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "listUsers",
       "method": "get",
       "path": "/users",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -48,25 +36,19 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listUsers"
     },
     {
-      "operationId": null,
       "method": "get",
       "path": "/users/{id}",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -76,22 +58,15 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
-      ],
-      "deprecated": null,
-      "security": null
+      ]
     },
     {
-      "operationId": null,
       "method": "get",
       "path": "/products",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -101,22 +76,15 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
-      ],
-      "deprecated": null,
-      "security": null
+      ]
     },
     {
-      "operationId": null,
       "method": "post",
       "path": "/products",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "201",
@@ -126,12 +94,9 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
-      ],
-      "deprecated": null,
-      "security": null
+      ]
     }
   ],
   "servers": [],

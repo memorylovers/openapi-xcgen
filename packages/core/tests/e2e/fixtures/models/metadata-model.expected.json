@@ -2,92 +2,52 @@
   "metadata": {
     "title": "Metadata Model Test",
     "version": "1.0.0",
-    "description": "Test metadata attributes",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test metadata attributes"
   },
   "models": [
     {
       "kind": "object",
       "name": "Article",
       "referencePath": "#/components/schemas/Article",
-      "description": "Article model with metadata",
       "properties": [
         {
           "name": "name",
-          "description": "Name description",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "Name description"
         },
         {
           "name": "code",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "status",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": "active",
-          "deprecated": null,
-          "validation": null
+          "defaultValue": "active"
         },
         {
           "name": "createdAt",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "password",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "oldId",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": true,
-          "validation": null
+          "deprecated": true
         }
-      ]
+      ],
+      "description": "Article model with metadata"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "operationId": null,
       "method": "get",
       "path": "/articles",
-      "summary": "Get articles",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -100,12 +60,10 @@
                 "name": "#/components/schemas/Article"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "summary": "Get articles"
     }
   ],
   "servers": [],

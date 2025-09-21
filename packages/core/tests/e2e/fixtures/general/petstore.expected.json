@@ -3,11 +3,9 @@
     "title": "Petstore API",
     "version": "1.0.0",
     "description": "A simple petstore API",
-    "termsOfService": null,
     "contact": {
       "name": "API Support",
-      "email": "support@example.com",
-      "url": null
+      "email": "support@example.com"
     },
     "license": {
       "name": "MIT",
@@ -19,51 +17,23 @@
       "kind": "object",
       "name": "Pet",
       "referencePath": "#/components/schemas/Pet",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "long",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int64"
           }
         },
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "tag",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     },
@@ -71,27 +41,15 @@
       "kind": "object",
       "name": "NewPet",
       "referencePath": "#/components/schemas/NewPet",
-      "description": null,
       "properties": [
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "tag",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     },
@@ -99,41 +57,19 @@
       "kind": "object",
       "name": "Error",
       "referencePath": "#/components/schemas/Error",
-      "description": null,
       "properties": [
         {
           "name": "code",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "int32"
           }
         },
         {
           "name": "message",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         }
       ]
     },
@@ -144,14 +80,10 @@
       "properties": [
         {
           "name": "limit",
-          "description": "How many items to return at one time",
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": 20,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "How many items to return at one time",
+          "defaultValue": 20
         }
       ],
       "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
@@ -163,14 +95,10 @@
       "properties": [
         {
           "name": "petId",
-          "description": "The id of the pet to retrieve",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "The id of the pet to retrieve"
         }
       ],
       "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
@@ -179,11 +107,8 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "listPets",
       "method": "get",
       "path": "/pets",
-      "summary": "List all pets",
-      "description": null,
       "tags": [
         "pets"
       ],
@@ -191,7 +116,6 @@
         "kind": "ref",
         "name": "#/paths/::pets/get/parameters/GetPetsParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -207,8 +131,7 @@
                 }
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "500",
@@ -221,36 +144,19 @@
                 "name": "#/components/schemas/Error"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listPets",
+      "summary": "List all pets"
     },
     {
-      "operationId": "createPet",
       "method": "post",
       "path": "/pets",
-      "summary": "Create a pet",
-      "description": null,
       "tags": [
         "pets"
       ],
       "parameters": [],
-      "requestBody": {
-        "description": null,
-        "required": true,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/NewPet"
-            }
-          }
-        ]
-      },
       "responses": [
         {
           "statusCode": "201",
@@ -263,8 +169,7 @@
                 "name": "#/components/schemas/Pet"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "500",
@@ -277,19 +182,27 @@
                 "name": "#/components/schemas/Error"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "createPet",
+      "summary": "Create a pet",
+      "requestBody": {
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/NewPet"
+            }
+          }
+        ],
+        "required": true
+      }
     },
     {
-      "operationId": "getPetById",
       "method": "get",
       "path": "/pets/{petId}",
-      "summary": "Info for a specific pet",
-      "description": null,
       "tags": [
         "pets"
       ],
@@ -297,7 +210,6 @@
         "kind": "ref",
         "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -310,14 +222,11 @@
                 "name": "#/components/schemas/Pet"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "404",
-          "description": "Pet not found",
-          "content": null,
-          "headers": null
+          "description": "Pet not found"
         },
         {
           "statusCode": "500",
@@ -330,12 +239,11 @@
                 "name": "#/components/schemas/Error"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getPetById",
+      "summary": "Info for a specific pet"
     }
   ],
   "servers": [],

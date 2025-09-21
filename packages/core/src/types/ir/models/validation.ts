@@ -15,29 +15,29 @@
  */
 export interface IRValidation {
   /** 最小値 */
-  minimum: number | null;
+  minimum?: number;
   /** 最大値 */
-  maximum: number | null;
+  maximum?: number;
   /** 排他的最小値 */
-  exclusiveMinimum: boolean | null;
+  exclusiveMinimum?: true;
   /** 排他的最大値 */
-  exclusiveMaximum: boolean | null;
+  exclusiveMaximum?: true;
   /** 最小長 */
-  minLength: number | null;
+  minLength?: number;
   /** 最大長 */
-  maxLength: number | null;
+  maxLength?: number;
   /** パターン（正規表現） */
-  pattern: string | null;
+  pattern?: string;
   /** 最小アイテム数 */
-  minItems: number | null;
+  minItems?: number;
   /** 最大アイテム数 */
-  maxItems: number | null;
+  maxItems?: number;
   /** ユニークアイテム */
-  uniqueItems: boolean | null;
+  uniqueItems?: true;
   /** 最小プロパティ数 */
-  minProperties: number | null;
+  minProperties?: number;
   /** 最大プロパティ数 */
-  maxProperties: number | null;
+  maxProperties?: number;
   /** フォーマット（uuid、email、uri、ipv4等のバリデーション用） */
-  format: string | null;
+  format?: string;
 }

@@ -1,22 +1,16 @@
 {
   "metadata": {
     "title": "OpenAPI 3.1.1 transformers all of example",
-    "version": "1.0.0",
-    "description": null,
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "version": "1.0.0"
   },
   "models": [
     {
       "kind": "object",
       "name": "Foo",
       "referencePath": "#/components/schemas/Foo",
-      "description": null,
       "properties": [
         {
           "name": "foo",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
@@ -24,11 +18,7 @@
               "name": "#/components/schemas/Bar"
             }
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         }
       ]
     },
@@ -36,20 +26,14 @@
       "kind": "object",
       "name": "Bar",
       "referencePath": "#/components/schemas/Bar",
-      "description": null,
       "properties": [
         {
           "name": "bar",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/BarBar"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         }
       ]
     },
@@ -57,23 +41,19 @@
       "kind": "enum",
       "name": "BarBar",
       "referencePath": "#/components/schemas/BarBar",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "foo",
-          "name": "FOO",
-          "description": null
+          "name": "FOO"
         },
         {
           "value": "bar",
-          "name": "BAR",
-          "description": null
+          "name": "BAR"
         },
         {
           "value": "baz",
-          "name": "BAZ",
-          "description": null
+          "name": "BAZ"
         }
       ]
     }
@@ -81,14 +61,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": null,
       "method": "get",
       "path": "/foo",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -101,12 +77,9 @@
                 "name": "#/components/schemas/Foo"
               }
             }
-          ],
-          "headers": null
+          ]
         }
-      ],
-      "deprecated": null,
-      "security": null
+      ]
     }
   ],
   "servers": [],

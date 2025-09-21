@@ -2,74 +2,35 @@
   "metadata": {
     "title": "Multi-Service API",
     "version": "2.0.0",
-    "description": "API with multiple services/tags",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "API with multiple services/tags"
   },
   "models": [
     {
       "kind": "object",
       "name": "User",
       "referencePath": "#/components/schemas/User",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "email",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "role",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/UserRole"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -77,23 +38,19 @@
       "kind": "enum",
       "name": "UserRole",
       "referencePath": "#/components/schemas/UserRole",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "admin",
-          "name": "ADMIN",
-          "description": null
+          "name": "ADMIN"
         },
         {
           "value": "user",
-          "name": "USER",
-          "description": null
+          "name": "USER"
         },
         {
           "value": "guest",
-          "name": "GUEST",
-          "description": null
+          "name": "GUEST"
         }
       ]
     },
@@ -101,37 +58,20 @@
       "kind": "object",
       "name": "NewPost",
       "referencePath": "#/components/schemas/NewPost",
-      "description": null,
       "properties": [
         {
           "name": "title",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "content",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "authorId",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     },
@@ -142,14 +82,9 @@
       "properties": [
         {
           "name": "userId",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "in": "path",
+          "required": true
         }
       ],
       "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
@@ -158,16 +93,12 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "listUsers",
       "method": "get",
       "path": "/users",
-      "summary": "List all users",
-      "description": null,
       "tags": [
         "users"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -183,19 +114,15 @@
                 }
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listUsers",
+      "summary": "List all users"
     },
     {
-      "operationId": "getUser",
       "method": "get",
       "path": "/users/{userId}",
-      "summary": "Get user by ID",
-      "description": null,
       "tags": [
         "users"
       ],
@@ -203,7 +130,6 @@
         "kind": "ref",
         "name": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -216,48 +142,44 @@
                 "name": "#/components/schemas/User"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getUser",
+      "summary": "Get user by ID"
     },
     {
-      "operationId": "listPosts",
       "method": "get",
       "path": "/posts",
-      "summary": "List all posts",
-      "description": null,
       "tags": [
         "posts"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
-          "description": "List of posts",
-          "content": null,
-          "headers": null
+          "description": "List of posts"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listPosts",
+      "summary": "List all posts"
     },
     {
-      "operationId": "createPost",
       "method": "post",
       "path": "/posts",
-      "summary": "Create a new post",
-      "description": null,
       "tags": [
         "posts"
       ],
       "parameters": [],
+      "responses": [
+        {
+          "statusCode": "201",
+          "description": "Post created"
+        }
+      ],
+      "operationId": "createPost",
+      "summary": "Create a new post",
       "requestBody": {
-        "description": null,
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -266,60 +188,39 @@
               "name": "#/components/schemas/NewPost"
             }
           }
-        ]
-      },
-      "responses": [
-        {
-          "statusCode": "201",
-          "description": "Post created",
-          "content": null,
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
+        ],
+        "required": true
+      }
     },
     {
-      "operationId": "getSettings",
       "method": "get",
       "path": "/admin/settings",
-      "summary": "Get admin settings",
-      "description": null,
       "tags": [
         "admin"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
-          "description": "Settings retrieved",
-          "content": null,
-          "headers": null
+          "description": "Settings retrieved"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getSettings",
+      "summary": "Get admin settings"
     },
     {
-      "operationId": "healthCheck",
       "method": "get",
       "path": "/health",
-      "summary": "Health check endpoint",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
-          "description": "Service is healthy",
-          "content": null,
-          "headers": null
+          "description": "Service is healthy"
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "healthCheck",
+      "summary": "Health check endpoint"
     }
   ],
   "servers": [],

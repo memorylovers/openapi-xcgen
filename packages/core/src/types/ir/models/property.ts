@@ -2,8 +2,8 @@
  * プロパティ関連のIR型定義
  */
 
-import type { IRParameterInType } from "../endpoints/parameter";
 import type { IRType } from "../common/type";
+import type { IRParameterInType } from "../endpoints/parameter";
 import type { IRValidation } from "./validation";
 
 /**
@@ -33,19 +33,19 @@ export interface IRProperty {
   /** プロパティ名 */
   name: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 型情報 */
   type: IRType;
   /** 必須フラグ（requiredArrayから導出） */
-  required: boolean;
+  required?: true;
   /** null許容フラグ（OpenAPI 3.0のnullable、OpenAPI 3.1のtype配列） */
-  nullable: boolean | null;
+  nullable?: true;
   /** デフォルト値 */
-  defaultValue: unknown | null;
+  defaultValue?: unknown;
   /** 非推奨フラグ */
-  deprecated: boolean | null;
+  deprecated?: true;
   /** バリデーション制約 */
-  validation: IRValidation | null;
+  validation?: IRValidation;
 }
 
 /**

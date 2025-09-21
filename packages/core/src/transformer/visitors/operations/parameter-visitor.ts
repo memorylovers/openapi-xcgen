@@ -93,12 +93,12 @@ export function visitParameter(
   const irParameter: IRParameter = {
     name: parameter.name,
     in: parameterIn,
-    description: parameter.description || null,
-    required: parameter.required || false,
     type,
-    nullable: isNullable(schema) ? true : null,
-    defaultValue: schema.default || null,
-    deprecated: parameter.deprecated || null,
+    ...(parameter.required && { required: true }),
+    ...(parameter.description && { description: parameter.description }),
+    ...(isNullable(schema) && { nullable: true }),
+    ...(schema.default !== undefined && { defaultValue: schema.default }),
+    ...(parameter.deprecated && { deprecated: parameter.deprecated }),
   };
 
   return irParameter;
@@ -133,9 +133,6 @@ if (import.meta.vitest) {
         description: "User ID",
         required: true,
         type: "string",
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
       });
     });
 
@@ -163,12 +160,8 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "limit",
         in: "query",
-        description: null,
-        required: false,
         type: "int",
-        nullable: null,
         defaultValue: 10,
-        deprecated: null,
       });
     });
 
@@ -192,11 +185,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "X-API-Version",
         in: "header",
-        description: null,
-        required: false,
         type: "string",
-        nullable: null,
-        defaultValue: null,
         deprecated: true,
       });
     });
@@ -221,12 +210,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "session",
         in: "cookie",
-        description: null,
-        required: false,
         type: "string",
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
       });
     });
 
@@ -332,15 +316,10 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "tags",
         in: "query",
-        description: null,
-        required: false,
         type: {
           kind: "array",
           itemType: "string",
         },
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
       });
     });
 
@@ -366,20 +345,12 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "filter",
         in: "query",
-        description: null,
-        required: false,
         type: "string",
         nullable: true,
-        defaultValue: null,
-        deprecated: null,
       });
     });
 
-    // TODO: OpenAPI 3.1形式のtype配列はtype-visitorでまだサポートされていない
-    // type配列形式（["string", "null"]）はtype-visitorがnullを返すため、
-    // parameter全体もnullになってしまう。
-    // type-visitorの改修が必要。
-    it.skip("should handle nullable parameter with OpenAPI 3.1 format", () => {
+    it("should handle nullable parameter with OpenAPI 3.1 format", () => {
       const param = {
         name: "category",
         in: "query",
@@ -400,12 +371,8 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         name: "category",
         in: "query",
-        description: null,
-        required: false,
-        type: "string", // 本来はstringを返すべき
+        type: "string",
         nullable: true,
-        defaultValue: null,
-        deprecated: null,
       });
     });
   });

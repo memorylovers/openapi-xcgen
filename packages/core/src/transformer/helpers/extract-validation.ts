@@ -1,9 +1,9 @@
-import type { SchemaObject, IRValidation } from "../../types";
+import type { IRValidation, SchemaObject } from "../../types";
 
 /**
  * SchemaObjectからバリデーション情報を抽出
  * @param schema - OpenAPI SchemaObject
- * @returns バリデーション情報、バリデーションがない場合はnull
+ * @returns バリデーション情報、バリデーションがない場合はundefined
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -35,23 +35,11 @@ import type { SchemaObject, IRValidation } from "../../types";
  *   maxProperties: 50
  * ```
  */
-export function extractValidation(schema: SchemaObject): IRValidation | null {
-  // すべてのフィールドを明示的にnullで初期化
-  const validation: IRValidation = {
-    minimum: null,
-    maximum: null,
-    exclusiveMinimum: null,
-    exclusiveMaximum: null,
-    minLength: null,
-    maxLength: null,
-    pattern: null,
-    minItems: null,
-    maxItems: null,
-    uniqueItems: null,
-    minProperties: null,
-    maxProperties: null,
-    format: null,
-  };
+export function extractValidation(
+  schema: SchemaObject,
+): IRValidation | undefined {
+  // 空のオブジェクトから始める
+  const validation: IRValidation = {};
 
   // 文字列バリデーション
   if (schema.minLength !== undefined) {
@@ -71,11 +59,11 @@ export function extractValidation(schema: SchemaObject): IRValidation | null {
   if (schema.maximum !== undefined) {
     validation.maximum = schema.maximum;
   }
-  if (schema.exclusiveMinimum !== undefined) {
-    validation.exclusiveMinimum = schema.exclusiveMinimum as boolean;
+  if (schema.exclusiveMinimum === true) {
+    validation.exclusiveMinimum = true;
   }
-  if (schema.exclusiveMaximum !== undefined) {
-    validation.exclusiveMaximum = schema.exclusiveMaximum as boolean;
+  if (schema.exclusiveMaximum === true) {
+    validation.exclusiveMaximum = true;
   }
 
   // 配列バリデーション
@@ -85,8 +73,8 @@ export function extractValidation(schema: SchemaObject): IRValidation | null {
   if (schema.maxItems !== undefined) {
     validation.maxItems = schema.maxItems;
   }
-  if (schema.uniqueItems !== undefined) {
-    validation.uniqueItems = schema.uniqueItems;
+  if (schema.uniqueItems === true) {
+    validation.uniqueItems = true;
   }
 
   // オブジェクトバリデーション
@@ -106,10 +94,10 @@ export function extractValidation(schema: SchemaObject): IRValidation | null {
     validation.format = schema.format;
   }
 
-  // バリデーションが空の場合はnullを返す
-  // すべてのフィールドがnullの場合
-  const hasValidation = Object.values(validation).some((v) => v !== null);
-  return hasValidation ? validation : null;
+  // バリデーションが空の場合はundefinedを返す
+  // プロパティが1つもない場合
+  const hasValidation = Object.keys(validation).length > 0;
+  return hasValidation ? validation : undefined;
 }
 
 // === in-source testing ===
@@ -128,19 +116,9 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
         minLength: 3,
         maxLength: 50,
         pattern: "^[a-zA-Z]+$",
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -159,16 +137,6 @@ if (import.meta.vitest) {
         minimum: 0,
         maximum: 100,
         exclusiveMinimum: true,
-        exclusiveMaximum: false,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -184,17 +152,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         minimum: 1,
         maximum: 10,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -210,19 +167,9 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
         minItems: 1,
         maxItems: 10,
         uniqueItems: true,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -236,19 +183,8 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
         minProperties: 2,
         maxProperties: 10,
-        format: null,
       });
     });
 
@@ -264,38 +200,28 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
         minLength: 1,
         maxLength: 100,
         pattern: "^[a-zA-Z0-9]+$",
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
-    it("should return null for schema without validation", () => {
+    it("should return undefined for schema without validation", () => {
       const schema: SchemaObject = {
         type: "string",
       };
 
       const result = extractValidation(schema);
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
-    it("should return null for empty schema", () => {
+    it("should return undefined for empty schema", () => {
       const schema: SchemaObject = {};
 
       const result = extractValidation(schema);
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
     it("should handle partial validation", () => {
@@ -308,19 +234,7 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
         minLength: 5,
-        maxLength: null,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -336,18 +250,8 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         minimum: 0,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
         minItems: 0,
-        maxItems: null,
-        uniqueItems: null,
         minProperties: 0,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -364,19 +268,8 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
         minLength: 3,
         maxLength: 20,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -396,15 +289,6 @@ if (import.meta.vitest) {
         maximum: 100,
         exclusiveMinimum: true,
         exclusiveMaximum: true,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
-        format: null,
       });
     });
 
@@ -417,18 +301,6 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
-        minLength: null,
-        maxLength: null,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
         format: "uuid",
       });
     });
@@ -451,10 +323,10 @@ if (import.meta.vitest) {
         format: "byte",
       };
 
-      expect(extractValidation(dateSchema)).toBeNull();
-      expect(extractValidation(dateTimeSchema)).toBeNull();
-      expect(extractValidation(binarySchema)).toBeNull();
-      expect(extractValidation(byteSchema)).toBeNull();
+      expect(extractValidation(dateSchema)).toBeUndefined();
+      expect(extractValidation(dateTimeSchema)).toBeUndefined();
+      expect(extractValidation(binarySchema)).toBeUndefined();
+      expect(extractValidation(byteSchema)).toBeUndefined();
     });
 
     it("should extract format with other validations", () => {
@@ -468,18 +340,8 @@ if (import.meta.vitest) {
       const result = extractValidation(schema);
 
       expect(result).toEqual({
-        minimum: null,
-        maximum: null,
-        exclusiveMinimum: null,
-        exclusiveMaximum: null,
         minLength: 5,
         maxLength: 100,
-        pattern: null,
-        minItems: null,
-        maxItems: null,
-        uniqueItems: null,
-        minProperties: null,
-        maxProperties: null,
         format: "email",
       });
     });

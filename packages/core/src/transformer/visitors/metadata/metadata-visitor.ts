@@ -6,10 +6,10 @@
 import type {
   ContactObject,
   InfoObject,
-  LicenseObject,
   IRContact,
   IRLicense,
   IRMetadata,
+  LicenseObject,
 } from "../../../types";
 
 /**
@@ -37,10 +37,10 @@ export function visitMetadata(info: InfoObject): IRMetadata {
   return {
     title: info.title,
     version: info.version,
-    description: info.description || null,
-    termsOfService: info.termsOfService || null,
-    contact: info.contact ? visitContact(info.contact) : null,
-    license: info.license ? visitLicense(info.license) : null,
+    ...(info.description && { description: info.description }),
+    ...(info.termsOfService && { termsOfService: info.termsOfService }),
+    ...(info.contact && { contact: visitContact(info.contact) }),
+    ...(info.license && { license: visitLicense(info.license) }),
   };
 }
 
@@ -51,9 +51,9 @@ export function visitMetadata(info: InfoObject): IRMetadata {
  */
 function visitContact(contact: ContactObject): IRContact {
   return {
-    name: contact.name || null,
-    email: contact.email || null,
-    url: contact.url || null,
+    ...(contact.name && { name: contact.name }),
+    ...(contact.email && { email: contact.email }),
+    ...(contact.url && { url: contact.url }),
   };
 }
 
@@ -65,7 +65,7 @@ function visitContact(contact: ContactObject): IRContact {
 function visitLicense(license: LicenseObject): IRLicense {
   return {
     name: license.name,
-    url: license.url || null,
+    ...(license.url && { url: license.url }),
   };
 }
 
@@ -85,10 +85,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         title: "My API",
         version: "1.0.0",
-        description: null,
-        termsOfService: null,
-        contact: null,
-        license: null,
       });
     });
 
@@ -140,9 +136,7 @@ if (import.meta.vitest) {
       const result = visitMetadata(info);
 
       expect(result.contact).toEqual({
-        name: null,
         email: "support@example.com",
-        url: null,
       });
     });
 
@@ -159,7 +153,6 @@ if (import.meta.vitest) {
 
       expect(result.license).toEqual({
         name: "MIT",
-        url: null,
       });
     });
 
@@ -167,10 +160,6 @@ if (import.meta.vitest) {
       const info: InfoObject = {
         title: "My API",
         version: "1.0.0",
-        description: undefined,
-        termsOfService: undefined,
-        contact: undefined,
-        license: undefined,
       };
 
       const result = visitMetadata(info);
@@ -178,10 +167,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         title: "My API",
         version: "1.0.0",
-        description: null,
-        termsOfService: null,
-        contact: null,
-        license: null,
       });
     });
   });
@@ -208,11 +193,7 @@ if (import.meta.vitest) {
 
       const result = visitContact(contact);
 
-      expect(result).toEqual({
-        name: null,
-        email: null,
-        url: null,
-      });
+      expect(result).toEqual({});
     });
   });
 
@@ -240,7 +221,6 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         name: "MIT",
-        url: null,
       });
     });
   });

@@ -3,15 +3,13 @@
     "title": "Museum API",
     "version": "2.3.0",
     "description": "An imaginary, but delightful Museum API for interacting with museum services and information.\nBuilt with love by Redocly.\n",
-    "termsOfService": null,
     "contact": {
       "name": "Museum API Support",
       "email": "support@museum-api.com",
       "url": "https://museum-api.com/support"
     },
     "license": {
-      "name": "MIT",
-      "url": null
+      "name": "MIT"
     }
   },
   "models": [
@@ -19,109 +17,46 @@
       "kind": "object",
       "name": "DailyHours",
       "referencePath": "#/components/schemas/DailyHours",
-      "description": null,
       "properties": [
         {
           "name": "date",
-          "description": null,
           "type": "date",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "open",
-          "description": "Opening time in 24-hour format",
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
+          "description": "Opening time in 24-hour format",
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
           }
         },
         {
           "name": "close",
-          "description": "Closing time in 24-hour format",
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
+          "description": "Closing time in 24-hour format",
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
           }
         },
         {
           "name": "special_hours",
-          "description": null,
           "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": false,
-          "deprecated": null,
-          "validation": null
+          "defaultValue": false
         },
         {
           "name": "note",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": 500,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 500
           }
         },
         {
           "name": "closed",
-          "description": null,
           "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": false,
-          "deprecated": null,
-          "validation": null
+          "defaultValue": false
         }
       ]
     },
@@ -129,240 +64,100 @@
       "kind": "object",
       "name": "SpecialEvent",
       "referencePath": "#/components/schemas/SpecialEvent",
-      "description": null,
       "properties": [
         {
           "name": "event_id",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uuid"
           }
         },
         {
           "name": "name",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 200,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 200
           }
         },
         {
           "name": "description",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 2000,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 2000
           }
         },
         {
           "name": "start_date",
-          "description": null,
           "type": "datetime",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "end_date",
-          "description": null,
           "type": "datetime",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "category",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/SpecialEventCategory"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "location",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/SpecialEventLocation"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "price",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Money"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "capacity",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 1,
-            "maximum": 1000,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maximum": 1000
           }
         },
         {
           "name": "registration_required",
-          "description": null,
           "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": false,
-          "deprecated": null,
-          "validation": null
+          "defaultValue": false
         },
         {
           "name": "registration_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "image_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "created_at",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "updated_at",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         }
       ]
     },
@@ -370,38 +165,31 @@
       "kind": "enum",
       "name": "SpecialEventCategory",
       "referencePath": "#/components/schemas/SpecialEventCategory",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "exhibition",
-          "name": "EXHIBITION",
-          "description": null
+          "name": "EXHIBITION"
         },
         {
           "value": "workshop",
-          "name": "WORKSHOP",
-          "description": null
+          "name": "WORKSHOP"
         },
         {
           "value": "tour",
-          "name": "TOUR",
-          "description": null
+          "name": "TOUR"
         },
         {
           "value": "lecture",
-          "name": "LECTURE",
-          "description": null
+          "name": "LECTURE"
         },
         {
           "value": "family",
-          "name": "FAMILY",
-          "description": null
+          "name": "FAMILY"
         },
         {
           "value": "members-only",
-          "name": "MEMBERS_ONLY",
-          "description": null
+          "name": "MEMBERS_ONLY"
         }
       ]
     },
@@ -409,48 +197,39 @@
       "kind": "enum",
       "name": "SpecialEventLocation",
       "referencePath": "#/components/schemas/SpecialEventLocation",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "main-hall",
-          "name": "MAIN_HALL",
-          "description": null
+          "name": "MAIN_HALL"
         },
         {
           "value": "gallery-a",
-          "name": "GALLERY_A",
-          "description": null
+          "name": "GALLERY_A"
         },
         {
           "value": "gallery-b",
-          "name": "GALLERY_B",
-          "description": null
+          "name": "GALLERY_B"
         },
         {
           "value": "gallery-c",
-          "name": "GALLERY_C",
-          "description": null
+          "name": "GALLERY_C"
         },
         {
           "value": "auditorium",
-          "name": "AUDITORIUM",
-          "description": null
+          "name": "AUDITORIUM"
         },
         {
           "value": "classroom-1",
-          "name": "CLASSROOM_1",
-          "description": null
+          "name": "CLASSROOM_1"
         },
         {
           "value": "classroom-2",
-          "name": "CLASSROOM_2",
-          "description": null
+          "name": "CLASSROOM_2"
         },
         {
           "value": "outdoor",
-          "name": "OUTDOOR",
-          "description": null
+          "name": "OUTDOOR"
         }
       ]
     },
@@ -458,194 +237,82 @@
       "kind": "object",
       "name": "SpecialEventRequest",
       "referencePath": "#/components/schemas/SpecialEventRequest",
-      "description": null,
       "properties": [
         {
           "name": "name",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 200,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 200
           }
         },
         {
           "name": "description",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 2000,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 2000
           }
         },
         {
           "name": "start_date",
-          "description": null,
           "type": "datetime",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "end_date",
-          "description": null,
           "type": "datetime",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "category",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/SpecialEventRequestCategory"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "location",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/SpecialEventRequestLocation"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "price",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Money"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "capacity",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 1,
-            "maximum": 1000,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maximum": 1000
           }
         },
         {
           "name": "registration_required",
-          "description": null,
           "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": false,
-          "deprecated": null,
-          "validation": null
+          "defaultValue": false
         },
         {
           "name": "registration_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "image_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         }
@@ -655,38 +322,31 @@
       "kind": "enum",
       "name": "SpecialEventRequestCategory",
       "referencePath": "#/components/schemas/SpecialEventRequestCategory",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "exhibition",
-          "name": "EXHIBITION",
-          "description": null
+          "name": "EXHIBITION"
         },
         {
           "value": "workshop",
-          "name": "WORKSHOP",
-          "description": null
+          "name": "WORKSHOP"
         },
         {
           "value": "tour",
-          "name": "TOUR",
-          "description": null
+          "name": "TOUR"
         },
         {
           "value": "lecture",
-          "name": "LECTURE",
-          "description": null
+          "name": "LECTURE"
         },
         {
           "value": "family",
-          "name": "FAMILY",
-          "description": null
+          "name": "FAMILY"
         },
         {
           "value": "members-only",
-          "name": "MEMBERS_ONLY",
-          "description": null
+          "name": "MEMBERS_ONLY"
         }
       ]
     },
@@ -694,48 +354,39 @@
       "kind": "enum",
       "name": "SpecialEventRequestLocation",
       "referencePath": "#/components/schemas/SpecialEventRequestLocation",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "main-hall",
-          "name": "MAIN_HALL",
-          "description": null
+          "name": "MAIN_HALL"
         },
         {
           "value": "gallery-a",
-          "name": "GALLERY_A",
-          "description": null
+          "name": "GALLERY_A"
         },
         {
           "value": "gallery-b",
-          "name": "GALLERY_B",
-          "description": null
+          "name": "GALLERY_B"
         },
         {
           "value": "gallery-c",
-          "name": "GALLERY_C",
-          "description": null
+          "name": "GALLERY_C"
         },
         {
           "value": "auditorium",
-          "name": "AUDITORIUM",
-          "description": null
+          "name": "AUDITORIUM"
         },
         {
           "value": "classroom-1",
-          "name": "CLASSROOM_1",
-          "description": null
+          "name": "CLASSROOM_1"
         },
         {
           "value": "classroom-2",
-          "name": "CLASSROOM_2",
-          "description": null
+          "name": "CLASSROOM_2"
         },
         {
           "value": "outdoor",
-          "name": "OUTDOOR",
-          "description": null
+          "name": "OUTDOOR"
         }
       ]
     },
@@ -743,194 +394,75 @@
       "kind": "object",
       "name": "SpecialEventUpdate",
       "referencePath": "#/components/schemas/SpecialEventUpdate",
-      "description": null,
       "properties": [
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 200,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 200
           }
         },
         {
           "name": "description",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 2000,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 2000
           }
         },
         {
           "name": "start_date",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "end_date",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "category",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/SpecialEventUpdateCategory"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "location",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/SpecialEventUpdateLocation"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "price",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Money"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "capacity",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 1,
-            "maximum": 1000,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maximum": 1000
           }
         },
         {
           "name": "registration_required",
-          "description": null,
-          "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "boolean"
         },
         {
           "name": "registration_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "image_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         }
@@ -940,38 +472,31 @@
       "kind": "enum",
       "name": "SpecialEventUpdateCategory",
       "referencePath": "#/components/schemas/SpecialEventUpdateCategory",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "exhibition",
-          "name": "EXHIBITION",
-          "description": null
+          "name": "EXHIBITION"
         },
         {
           "value": "workshop",
-          "name": "WORKSHOP",
-          "description": null
+          "name": "WORKSHOP"
         },
         {
           "value": "tour",
-          "name": "TOUR",
-          "description": null
+          "name": "TOUR"
         },
         {
           "value": "lecture",
-          "name": "LECTURE",
-          "description": null
+          "name": "LECTURE"
         },
         {
           "value": "family",
-          "name": "FAMILY",
-          "description": null
+          "name": "FAMILY"
         },
         {
           "value": "members-only",
-          "name": "MEMBERS_ONLY",
-          "description": null
+          "name": "MEMBERS_ONLY"
         }
       ]
     },
@@ -979,48 +504,39 @@
       "kind": "enum",
       "name": "SpecialEventUpdateLocation",
       "referencePath": "#/components/schemas/SpecialEventUpdateLocation",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "main-hall",
-          "name": "MAIN_HALL",
-          "description": null
+          "name": "MAIN_HALL"
         },
         {
           "value": "gallery-a",
-          "name": "GALLERY_A",
-          "description": null
+          "name": "GALLERY_A"
         },
         {
           "value": "gallery-b",
-          "name": "GALLERY_B",
-          "description": null
+          "name": "GALLERY_B"
         },
         {
           "value": "gallery-c",
-          "name": "GALLERY_C",
-          "description": null
+          "name": "GALLERY_C"
         },
         {
           "value": "auditorium",
-          "name": "AUDITORIUM",
-          "description": null
+          "name": "AUDITORIUM"
         },
         {
           "value": "classroom-1",
-          "name": "CLASSROOM_1",
-          "description": null
+          "name": "CLASSROOM_1"
         },
         {
           "value": "classroom-2",
-          "name": "CLASSROOM_2",
-          "description": null
+          "name": "CLASSROOM_2"
         },
         {
           "value": "outdoor",
-          "name": "OUTDOOR",
-          "description": null
+          "name": "OUTDOOR"
         }
       ]
     },
@@ -1028,149 +544,58 @@
       "kind": "object",
       "name": "TicketPurchaseRequest",
       "referencePath": "#/components/schemas/TicketPurchaseRequest",
-      "description": null,
       "properties": [
         {
           "name": "visitor_email",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "visitor_name",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 200,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 200
           }
         },
         {
           "name": "visit_date",
-          "description": null,
           "type": "date",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "visit_time",
-          "description": "Preferred entry time in 24-hour format",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
+          "description": "Preferred entry time in 24-hour format",
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
           }
         },
         {
           "name": "ticket_type",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/TicketPurchaseRequestTicketType"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "quantity",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 1,
-            "maximum": 20,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maximum": 20
           }
         },
         {
           "name": "special_requests",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": 500,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 500
           }
         }
       ]
@@ -1179,38 +604,31 @@
       "kind": "enum",
       "name": "TicketPurchaseRequestTicketType",
       "referencePath": "#/components/schemas/TicketPurchaseRequestTicketType",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "adult",
-          "name": "ADULT",
-          "description": null
+          "name": "ADULT"
         },
         {
           "value": "senior",
-          "name": "SENIOR",
-          "description": null
+          "name": "SENIOR"
         },
         {
           "value": "student",
-          "name": "STUDENT",
-          "description": null
+          "name": "STUDENT"
         },
         {
           "value": "child",
-          "name": "CHILD",
-          "description": null
+          "name": "CHILD"
         },
         {
           "value": "family",
-          "name": "FAMILY",
-          "description": null
+          "name": "FAMILY"
         },
         {
           "value": "group",
-          "name": "GROUP",
-          "description": null
+          "name": "GROUP"
         }
       ]
     },
@@ -1218,192 +636,82 @@
       "kind": "object",
       "name": "TicketPurchaseConfirmation",
       "referencePath": "#/components/schemas/TicketPurchaseConfirmation",
-      "description": null,
       "properties": [
         {
           "name": "confirmation_id",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^[A-Z0-9]{8}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^[A-Z0-9]{8}$"
           }
         },
         {
           "name": "purchase_date",
-          "description": null,
           "type": "datetime",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "visitor_email",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "visitor_name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "visit_date",
-          "description": null,
           "type": "date",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "visit_time",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
           }
         },
         {
           "name": "ticket_type",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/TicketPurchaseConfirmationTicketType"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "quantity",
-          "description": null,
           "type": "int",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "total_amount",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Money"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "status",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/TicketPurchaseConfirmationStatus"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "qr_code_url",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "special_requests",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     },
@@ -1411,38 +719,31 @@
       "kind": "enum",
       "name": "TicketPurchaseConfirmationTicketType",
       "referencePath": "#/components/schemas/TicketPurchaseConfirmationTicketType",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "adult",
-          "name": "ADULT",
-          "description": null
+          "name": "ADULT"
         },
         {
           "value": "senior",
-          "name": "SENIOR",
-          "description": null
+          "name": "SENIOR"
         },
         {
           "value": "student",
-          "name": "STUDENT",
-          "description": null
+          "name": "STUDENT"
         },
         {
           "value": "child",
-          "name": "CHILD",
-          "description": null
+          "name": "CHILD"
         },
         {
           "value": "family",
-          "name": "FAMILY",
-          "description": null
+          "name": "FAMILY"
         },
         {
           "value": "group",
-          "name": "GROUP",
-          "description": null
+          "name": "GROUP"
         }
       ]
     },
@@ -1450,33 +751,27 @@
       "kind": "enum",
       "name": "TicketPurchaseConfirmationStatus",
       "referencePath": "#/components/schemas/TicketPurchaseConfirmationStatus",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "pending",
-          "name": "PENDING",
-          "description": null
+          "name": "PENDING"
         },
         {
           "value": "confirmed",
-          "name": "CONFIRMED",
-          "description": null
+          "name": "CONFIRMED"
         },
         {
           "value": "used",
-          "name": "USED",
-          "description": null
+          "name": "USED"
         },
         {
           "value": "cancelled",
-          "name": "CANCELLED",
-          "description": null
+          "name": "CANCELLED"
         },
         {
           "value": "refunded",
-          "name": "REFUNDED",
-          "description": null
+          "name": "REFUNDED"
         }
       ]
     },
@@ -1484,112 +779,44 @@
       "kind": "object",
       "name": "CreditCardPayment",
       "referencePath": "#/components/schemas/CreditCardPayment",
-      "description": null,
       "properties": [
         {
           "name": "type",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "card_number",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^[0-9]{13,19}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^[0-9]{13,19}$"
           }
         },
         {
           "name": "card_holder_name",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
             "minLength": 1,
-            "maxLength": 100,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maxLength": 100
           }
         },
         {
           "name": "expiry_date",
-          "description": "MM/YY format",
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
+          "description": "MM/YY format",
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^(0[1-9]|1[0-2])\\/[0-9]{2}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^(0[1-9]|1[0-2])\\/[0-9]{2}$"
           }
         },
         {
           "name": "cvv",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^[0-9]{3,4}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^[0-9]{3,4}$"
           }
         }
       ]
@@ -1598,51 +825,23 @@
       "kind": "object",
       "name": "PayPalPayment",
       "referencePath": "#/components/schemas/PayPalPayment",
-      "description": null,
       "properties": [
         {
           "name": "type",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "paypal_email",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "paypal_auth_code",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     },
@@ -1650,54 +849,22 @@
       "kind": "object",
       "name": "Money",
       "referencePath": "#/components/schemas/Money",
-      "description": null,
       "properties": [
         {
           "name": "amount",
-          "description": null,
           "type": "double",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": 0,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minimum": 0
           }
         },
         {
           "name": "currency",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
           "defaultValue": "USD",
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": "^[A-Z]{3}$",
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "pattern": "^[A-Z]{3}$"
           }
         }
       ]
@@ -1706,89 +873,34 @@
       "kind": "object",
       "name": "Pagination",
       "referencePath": "#/components/schemas/Pagination",
-      "description": null,
       "properties": [
         {
           "name": "total",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": 0,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minimum": 0
           }
         },
         {
           "name": "limit",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": 1,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minimum": 1
           }
         },
         {
           "name": "offset",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": 0,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "minimum": 0
           }
         },
         {
           "name": "has_more",
-          "description": null,
-          "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "boolean"
         }
       ]
     },
@@ -1796,131 +908,49 @@
       "kind": "object",
       "name": "Problem",
       "referencePath": "#/components/schemas/Problem",
-      "description": null,
       "properties": [
         {
           "name": "type",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
           "defaultValue": "about:blank",
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "title",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "status",
-          "description": null,
           "type": "int",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
             "minimum": 100,
-            "maximum": 599,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
-            "format": null
+            "maximum": 599
           }
         },
         {
           "name": "detail",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "instance",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uri"
           }
         },
         {
           "name": "timestamp",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "correlation_id",
-          "description": null,
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "uuid"
           }
         }
@@ -1930,37 +960,24 @@
       "kind": "response",
       "name": "GetMuseumHours200Response",
       "referencePath": "#/paths/::museum-hours/get/responses/responses/200/content/application::json/schema/GetMuseumHours200Response",
-      "description": null,
       "properties": [
         {
           "name": "timezone",
-          "description": "Timezone used for the hours",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "description": "Timezone used for the hours"
         },
         {
           "name": "daily_hours",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
               "kind": "ref",
               "name": "#/components/schemas/DailyHours"
             }
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ],
-      "statusCode": "200",
-      "headers": null
+      "statusCode": "200"
     },
     {
       "kind": "parameter",
@@ -1969,25 +986,16 @@
       "properties": [
         {
           "name": "date",
-          "description": "Specific date to retrieve hours for (ISO 8601 format)",
           "type": "date",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Specific date to retrieve hours for (ISO 8601 format)"
         },
         {
           "name": "timezone",
-          "description": "Timezone for displaying hours (IANA timezone format)",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": "America/New_York",
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Timezone for displaying hours (IANA timezone format)",
+          "defaultValue": "America/New_York"
         }
       ],
       "referencePath": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
@@ -1996,40 +1004,26 @@
       "kind": "response",
       "name": "GetSpecialEvents200Response",
       "referencePath": "#/paths/::special-events/get/responses/responses/200/content/application::json/schema/GetSpecialEvents200Response",
-      "description": null,
       "properties": [
         {
           "name": "events",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": {
               "kind": "ref",
               "name": "#/components/schemas/SpecialEvent"
             }
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "pagination",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Pagination"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ],
-      "statusCode": "200",
-      "headers": null
+      "statusCode": "200"
     },
     {
       "kind": "parameter",
@@ -2038,58 +1032,35 @@
       "properties": [
         {
           "name": "start_date",
-          "description": "Filter events starting from this date",
           "type": "date",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Filter events starting from this date"
         },
         {
           "name": "end_date",
-          "description": "Filter events until this date",
           "type": "date",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Filter events until this date"
         },
         {
           "name": "category",
-          "description": "Filter by event category",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Filter by event category"
         },
         {
           "name": "limit",
-          "description": "Maximum number of events to return",
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": 20,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Maximum number of events to return",
+          "defaultValue": 20
         },
         {
           "name": "offset",
-          "description": "Number of events to skip (for pagination)",
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Number of events to skip (for pagination)",
+          "defaultValue": 0
         }
       ],
       "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
@@ -2101,14 +1072,10 @@
       "properties": [
         {
           "name": "email",
-          "description": "Email address used for the purchase",
           "type": "string",
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "description": "Email address used for the purchase"
         }
       ],
       "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
@@ -2120,25 +1087,17 @@
       "properties": [
         {
           "name": "email",
-          "description": "Email address used for the purchase",
           "type": "string",
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "description": "Email address used for the purchase"
         },
         {
           "name": "format",
-          "description": "QR code format",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": "png",
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "QR code format",
+          "defaultValue": "png"
         }
       ],
       "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
@@ -2147,27 +1106,21 @@
   "tags": [
     {
       "name": "Operations",
-      "description": "Museum operational information",
-      "externalDocs": null
+      "description": "Museum operational information"
     },
     {
       "name": "Events",
-      "description": "Special events hosted by the museum",
-      "externalDocs": null
+      "description": "Special events hosted by the museum"
     },
     {
       "name": "Tickets",
-      "description": "Museum ticket purchasing",
-      "externalDocs": null
+      "description": "Museum ticket purchasing"
     }
   ],
   "endpoints": [
     {
-      "operationId": "getMuseumHours",
       "method": "get",
       "path": "/museum-hours",
-      "summary": "Get museum operating hours",
-      "description": "Returns the operating hours for the museum for the next seven days.",
       "tags": [
         "Operations"
       ],
@@ -2175,7 +1128,6 @@
         "kind": "ref",
         "name": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -2188,19 +1140,16 @@
                 "name": "#/paths/::museum-hours/get/responses/responses/200/content/application::json/schema/GetMuseumHours200Response"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getMuseumHours",
+      "summary": "Get museum operating hours",
+      "description": "Returns the operating hours for the museum for the next seven days."
     },
     {
-      "operationId": "listSpecialEvents",
       "method": "get",
       "path": "/special-events",
-      "summary": "List special events",
-      "description": "Get a list of upcoming special events at the museum",
       "tags": [
         "Events"
       ],
@@ -2208,7 +1157,6 @@
         "kind": "ref",
         "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -2221,36 +1169,20 @@
                 "name": "#/paths/::special-events/get/responses/responses/200/content/application::json/schema/GetSpecialEvents200Response"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "listSpecialEvents",
+      "summary": "List special events",
+      "description": "Get a list of upcoming special events at the museum"
     },
     {
-      "operationId": "createSpecialEvent",
       "method": "post",
       "path": "/special-events",
-      "summary": "Create a new special event",
-      "description": "Create a new special event (requires admin privileges)",
       "tags": [
         "Events"
       ],
       "parameters": [],
-      "requestBody": {
-        "description": null,
-        "required": true,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/SpecialEventRequest"
-            }
-          }
-        ]
-      },
       "responses": [
         {
           "statusCode": "201",
@@ -2263,24 +1195,32 @@
                 "name": "#/components/schemas/SpecialEvent"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "createSpecialEvent",
+      "summary": "Create a new special event",
+      "description": "Create a new special event (requires admin privileges)",
+      "requestBody": {
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventRequest"
+            }
+          }
+        ],
+        "required": true
+      }
     },
     {
-      "operationId": "getSpecialEvent",
       "method": "get",
       "path": "/special-events/{eventId}",
-      "summary": "Get special event details",
-      "description": "Get details about a specific special event",
       "tags": [
         "Events"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -2293,36 +1233,20 @@
                 "name": "#/components/schemas/SpecialEvent"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getSpecialEvent",
+      "summary": "Get special event details",
+      "description": "Get details about a specific special event"
     },
     {
-      "operationId": "updateSpecialEvent",
       "method": "patch",
       "path": "/special-events/{eventId}",
-      "summary": "Update special event",
-      "description": "Update a special event (requires admin privileges)",
       "tags": [
         "Events"
       ],
       "parameters": [],
-      "requestBody": {
-        "description": null,
-        "required": true,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/SpecialEventUpdate"
-            }
-          }
-        ]
-      },
       "responses": [
         {
           "statusCode": "200",
@@ -2335,58 +1259,49 @@
                 "name": "#/components/schemas/SpecialEvent"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
-    },
-    {
-      "operationId": "deleteSpecialEvent",
-      "method": "delete",
-      "path": "/special-events/{eventId}",
-      "summary": "Delete special event",
-      "description": "Delete a special event (requires admin privileges)",
-      "tags": [
-        "Events"
-      ],
-      "parameters": [],
-      "requestBody": null,
-      "responses": [
-        {
-          "statusCode": "204",
-          "description": "Event deleted successfully",
-          "content": null,
-          "headers": null
-        }
-      ],
-      "deprecated": null,
-      "security": null
-    },
-    {
-      "operationId": "purchaseTickets",
-      "method": "post",
-      "path": "/tickets",
-      "summary": "Purchase museum tickets",
-      "description": "Purchase tickets for museum admission",
-      "tags": [
-        "Tickets"
-      ],
-      "parameters": [],
+      "operationId": "updateSpecialEvent",
+      "summary": "Update special event",
+      "description": "Update a special event (requires admin privileges)",
       "requestBody": {
-        "description": null,
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/TicketPurchaseRequest"
+              "name": "#/components/schemas/SpecialEventUpdate"
             }
           }
-        ]
-      },
+        ],
+        "required": true
+      }
+    },
+    {
+      "method": "delete",
+      "path": "/special-events/{eventId}",
+      "tags": [
+        "Events"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "statusCode": "204",
+          "description": "Event deleted successfully"
+        }
+      ],
+      "operationId": "deleteSpecialEvent",
+      "summary": "Delete special event",
+      "description": "Delete a special event (requires admin privileges)"
+    },
+    {
+      "method": "post",
+      "path": "/tickets",
+      "tags": [
+        "Tickets"
+      ],
+      "parameters": [],
       "responses": [
         {
           "statusCode": "201",
@@ -2399,8 +1314,7 @@
                 "name": "#/components/schemas/TicketPurchaseConfirmation"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "402",
@@ -2413,8 +1327,7 @@
                 "name": "#/components/schemas/Problem"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "409",
@@ -2427,19 +1340,28 @@
                 "name": "#/components/schemas/Problem"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "purchaseTickets",
+      "summary": "Purchase museum tickets",
+      "description": "Purchase tickets for museum admission",
+      "requestBody": {
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/TicketPurchaseRequest"
+            }
+          }
+        ],
+        "required": true
+      }
     },
     {
-      "operationId": "getTicket",
       "method": "get",
       "path": "/tickets/{confirmationId}",
-      "summary": "Retrieve ticket details",
-      "description": "Get details of a ticket purchase",
       "tags": [
         "Tickets"
       ],
@@ -2447,7 +1369,6 @@
         "kind": "ref",
         "name": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -2460,19 +1381,16 @@
                 "name": "#/components/schemas/TicketPurchaseConfirmation"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getTicket",
+      "summary": "Retrieve ticket details",
+      "description": "Get details of a ticket purchase"
     },
     {
-      "operationId": "getTicketQRCode",
       "method": "get",
       "path": "/tickets/{confirmationId}/qr-code",
-      "summary": "Generate QR code for tickets",
-      "description": "Generate a QR code for ticket validation at the museum entrance",
       "tags": [
         "Tickets"
       ],
@@ -2480,7 +1398,6 @@
         "kind": "ref",
         "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -2494,12 +1411,12 @@
               "mimeType": "image/svg+xml",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "getTicketQRCode",
+      "summary": "Generate QR code for tickets",
+      "description": "Generate a QR code for ticket validation at the museum entrance"
     }
   ],
   "servers": [],

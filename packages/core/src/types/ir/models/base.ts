@@ -50,7 +50,7 @@ export interface IRObjectModel {
    */
   referencePath: string;
   /** モデルの説明 */
-  description: string | null;
+  description?: string;
   /** プロパティの配列 */
   properties: IRProperty[];
   /** 追加プロパティの型（additionalProperties） */
@@ -76,7 +76,7 @@ export interface IREnumValue {
   /** 名前（コード生成用） */
   name: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
 }
 
 /**
@@ -112,7 +112,7 @@ export interface IREnumModel {
    */
   referencePath: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 値の型（OpenAPIの型をそのまま保持） */
   type: IRScalarType;
   /** Enum値の配列 */
@@ -131,7 +131,7 @@ export interface IRArrayModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description: string | null;
+  description?: string;
   /** 配列アイテムの型 */
   itemType: IRType;
 }
@@ -148,7 +148,7 @@ export interface IRMapModel {
   /** 参照パス */
   referencePath: string;
   /** モデルの説明 */
-  description: string | null;
+  description?: string;
   /** 値の型 */
   valueType: IRType;
 }

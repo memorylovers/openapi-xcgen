@@ -13,11 +13,11 @@
 
 import { consola } from "consola";
 import type {
-  OperationObject,
-  ReferenceObject,
   IREndpoint,
   IRHttpMethod,
   IRModel,
+  OperationObject,
+  ReferenceObject,
 } from "../../../types";
 import type {
   OperationContext,
@@ -148,17 +148,17 @@ export function visitOperation(
     : parametersResult.parameters;
 
   const endpoint: IREndpoint = {
-    operationId: operation.operationId || null,
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
-    summary: operation.summary || null,
-    description: operation.description || null,
     tags: operation.tags || [],
     parameters,
-    requestBody: requestBody || null,
     responses: responsesResult.responses,
-    deprecated: operation.deprecated || null,
-    security: null, // TODO: implement security handling
+    ...(operation.operationId && { operationId: operation.operationId }),
+    ...(operation.summary && { summary: operation.summary }),
+    ...(operation.description && { description: operation.description }),
+    ...(requestBody && { requestBody }),
+    ...(operation.deprecated && { deprecated: operation.deprecated }),
+    // security は省略（undefined として扱う） TODO: implement security handling
   };
 
   return {
@@ -201,17 +201,12 @@ if (import.meta.vitest) {
           description: "Returns a single pet",
           tags: ["pets"],
           parameters: [],
-          requestBody: null,
           responses: [
             {
               statusCode: "200",
               description: "Success",
-              content: null,
-              headers: null,
             },
           ],
-          deprecated: null,
-          security: null,
         },
         models: [],
       });
@@ -238,14 +233,10 @@ if (import.meta.vitest) {
           operationId: "oldEndpoint",
           method: "post",
           path: "/old/endpoint",
-          summary: null,
-          description: null,
           tags: [],
           parameters: [],
-          requestBody: null,
           responses: [],
           deprecated: true,
-          security: null,
         },
         models: [],
       });
@@ -270,17 +261,12 @@ if (import.meta.vitest) {
       // operationIdが任意項目なので、処理は継続される
       expect(result).toEqual({
         endpoint: {
-          operationId: null,
           method: "get",
           path: "/missing",
           summary: "Missing ID",
-          description: null,
           tags: [],
           parameters: [],
-          requestBody: null,
           responses: [],
-          deprecated: null,
-          security: null,
         },
         models: [],
       });
@@ -307,14 +293,9 @@ if (import.meta.vitest) {
           operationId: "noTags",
           method: "get",
           path: "/no-tags",
-          summary: null,
-          description: null,
           tags: [],
           parameters: [],
-          requestBody: null,
           responses: [],
-          deprecated: null,
-          security: null,
         },
         models: [],
       });
@@ -353,17 +334,12 @@ if (import.meta.vitest) {
           operationId: "withParams",
           method: "get",
           path: "/with/{id}",
-          summary: null,
-          description: null,
           tags: [],
           parameters: {
             kind: "ref",
             name: "#/paths/::with::{id}/get/parameters/GetWithIdParams",
           },
-          requestBody: null,
           responses: [],
-          deprecated: null,
-          security: null,
         },
         models: [
           {
@@ -373,24 +349,14 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "string",
                 required: true,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
                 in: "path",
               },
               {
                 name: "limit",
-                description: null,
                 type: "int",
-                required: false,
-                nullable: null,
                 defaultValue: 10,
-                deprecated: null,
-                validation: null,
                 in: "query",
               },
             ],
@@ -436,8 +402,6 @@ if (import.meta.vitest) {
           operationId: "createPet",
           method: "post",
           path: "/pets",
-          summary: null,
-          description: null,
           tags: [],
           parameters: [],
           requestBody: {
@@ -454,8 +418,6 @@ if (import.meta.vitest) {
             ],
           },
           responses: [],
-          deprecated: null,
-          security: null,
         },
         models: [
           {
@@ -466,27 +428,14 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "name",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "age",
-                description: null,
                 type: "int",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
             required: true,
-            description: null,
           },
         ],
       });
@@ -530,11 +479,8 @@ if (import.meta.vitest) {
           operationId: "getPet",
           method: "get",
           path: "/pets/{id}",
-          summary: null,
-          description: null,
           tags: [],
           parameters: [],
-          requestBody: null,
           responses: [
             {
               statusCode: "200",
@@ -548,17 +494,12 @@ if (import.meta.vitest) {
                   },
                 },
               ],
-              headers: null,
             },
             {
               statusCode: "404",
               description: "Not found",
-              content: null,
-              headers: null,
             },
           ],
-          deprecated: null,
-          security: null,
         },
         models: [
           {
@@ -566,31 +507,17 @@ if (import.meta.vitest) {
             name: "GetPetsId200Response",
             referencePath:
               "#/paths/::pets::{id}/get/responses/responses/200/content/application::json/schema/GetPetsId200Response",
-            description: null,
             statusCode: "200",
             properties: [
               {
                 name: "id",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "name",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            headers: null,
           },
         ],
       });
@@ -628,17 +555,12 @@ if (import.meta.vitest) {
           operationId: "withRefParam",
           method: "get",
           path: "/ref/{id}",
-          summary: null,
-          description: null,
           tags: [],
           parameters: {
             kind: "ref",
             name: "#/paths/::ref::{id}/get/parameters/GetRefIdParams",
           },
-          requestBody: null,
           responses: [],
-          deprecated: null,
-          security: null,
         },
         models: [
           {
@@ -648,13 +570,7 @@ if (import.meta.vitest) {
             properties: [
               {
                 name: "limit",
-                description: null,
                 type: "int",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
                 in: "query",
               },
             ],

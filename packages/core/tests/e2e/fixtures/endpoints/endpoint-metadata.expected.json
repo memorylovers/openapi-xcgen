@@ -2,23 +2,16 @@
   "metadata": {
     "title": "Endpoint Metadata Test",
     "version": "1.0.0",
-    "description": "Test summary and description preservation",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test summary and description preservation"
   },
   "models": [],
   "tags": [],
   "endpoints": [
     {
-      "operationId": "endpoint1",
       "method": "get",
       "path": "/endpoint1",
-      "summary": "Test summary",
-      "description": "Test description",
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -28,22 +21,18 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint1",
+      "summary": "Test summary",
+      "description": "Test description"
     },
     {
-      "operationId": "endpoint2",
       "method": "get",
       "path": "/endpoint2",
-      "summary": "Test summary only",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -53,22 +42,17 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint2",
+      "summary": "Test summary only"
     },
     {
-      "operationId": "endpoint3",
       "method": "get",
       "path": "/endpoint3",
-      "summary": null,
-      "description": "Test description only",
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -78,22 +62,17 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint3",
+      "description": "Test description only"
     },
     {
-      "operationId": "endpoint4",
       "method": "get",
       "path": "/endpoint4",
-      "summary": null,
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -103,12 +82,10 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint4"
     }
   ],
   "servers": [],

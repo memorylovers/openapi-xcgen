@@ -2,28 +2,22 @@
   "metadata": {
     "title": "Inline Schemas Test API",
     "version": "1.0.0",
-    "description": "Test cases for inline schema extraction - validates conversion from inline schemas to independent models",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test cases for inline schema extraction - validates conversion from inline schemas to independent models"
   },
   "models": [
     {
       "kind": "enum",
       "name": "RoleEnum",
       "referencePath": "#/components/schemas/RoleEnum",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "admin",
-          "name": "ADMIN",
-          "description": null
+          "name": "ADMIN"
         },
         {
           "value": "user",
-          "name": "USER",
-          "description": null
+          "name": "USER"
         }
       ]
     },
@@ -31,18 +25,15 @@
       "kind": "enum",
       "name": "StatusEnum",
       "referencePath": "#/components/schemas/StatusEnum",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "active",
-          "name": "ACTIVE",
-          "description": null
+          "name": "ACTIVE"
         },
         {
           "value": "inactive",
-          "name": "INACTIVE",
-          "description": null
+          "name": "INACTIVE"
         }
       ]
     },
@@ -50,40 +41,21 @@
       "kind": "object",
       "name": "UserResponse",
       "referencePath": "#/components/schemas/UserResponse",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "profile",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/UserProfile"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -91,27 +63,14 @@
       "kind": "object",
       "name": "UserProfile",
       "referencePath": "#/components/schemas/UserProfile",
-      "description": null,
       "properties": [
         {
           "name": "bio",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "active",
-          "description": null,
-          "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "boolean"
         }
       ]
     },
@@ -119,21 +78,13 @@
       "kind": "response",
       "name": "GetTest1ParametersId200Response",
       "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response",
-      "description": null,
       "properties": [
         {
           "name": "result",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ],
-      "statusCode": "200",
-      "headers": null
+      "statusCode": "200"
     },
     {
       "kind": "parameter",
@@ -142,80 +93,49 @@
       "properties": [
         {
           "name": "id",
-          "description": "Path parameter - always required",
           "type": "string",
+          "in": "path",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "path"
+          "description": "Path parameter - always required"
         },
         {
           "name": "category",
-          "description": "Optional enum query parameter",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Optional enum query parameter"
         },
         {
           "name": "status",
-          "description": "Required enum query parameter",
           "type": "string",
+          "in": "query",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "description": "Required enum query parameter"
         },
         {
           "name": "limit",
-          "description": "Optional integer parameter with default value",
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": 20,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Optional integer parameter with default value",
+          "defaultValue": 20
         },
         {
           "name": "includeDetails",
-          "description": "Optional boolean parameter with default value",
           "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "description": "Optional boolean parameter with default value",
+          "defaultValue": false
         },
         {
           "name": "Authorization",
-          "description": "Optional header parameter",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "header"
+          "in": "header",
+          "description": "Optional header parameter"
         },
         {
           "name": "sessionId",
-          "description": "Optional cookie parameter",
           "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null,
-          "in": "cookie"
+          "in": "cookie",
+          "description": "Optional cookie parameter"
         }
       ],
       "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParams"
@@ -227,93 +147,46 @@
       "properties": [
         {
           "name": "name",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "email",
-          "description": null,
           "type": "string",
           "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
           "validation": {
-            "minimum": null,
-            "maximum": null,
-            "exclusiveMinimum": null,
-            "exclusiveMaximum": null,
-            "minLength": null,
-            "maxLength": null,
-            "pattern": null,
-            "minItems": null,
-            "maxItems": null,
-            "uniqueItems": null,
-            "minProperties": null,
-            "maxProperties": null,
             "format": "email"
           }
         },
         {
           "name": "nested",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ],
-      "required": true,
-      "description": null
+      "required": true
     },
     {
       "kind": "object",
       "name": "PostTest2RequestRequestBodyNested",
       "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested",
-      "description": null,
       "properties": [
         {
           "name": "value",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "count",
-          "description": null,
-          "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "int"
         },
         {
           "name": "role",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/RoleEnum"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -321,60 +194,33 @@
       "kind": "response",
       "name": "PostTest2Request201Response",
       "referencePath": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response",
-      "description": null,
       "properties": [
         {
           "name": "result",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ],
-      "statusCode": "201",
-      "headers": null
+      "statusCode": "201"
     },
     {
       "kind": "object",
       "name": "schema",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/201/content/application::json/schema",
-      "description": null,
       "properties": [
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "testStatus",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/StatusEnum"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "isActive",
-          "description": null,
-          "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "boolean"
         }
       ]
     },
@@ -382,53 +228,32 @@
       "kind": "response",
       "name": "GetTest3Response202Response",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response",
-      "description": null,
       "properties": [
         {
           "name": "count",
-          "description": null,
-          "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "int"
         },
         {
           "name": "result",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResult"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ],
-      "statusCode": "202",
-      "headers": null
+      "statusCode": "202"
     },
     {
       "kind": "object",
       "name": "GetTest3Response202ResponseResult",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
-      "description": null,
       "properties": [
         {
           "name": "status",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -436,18 +261,15 @@
       "kind": "enum",
       "name": "GetTest3Response202ResponseResultStatus",
       "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "success",
-          "name": "SUCCESS",
-          "description": null
+          "name": "SUCCESS"
         },
         {
           "value": "failed",
-          "name": "FAILED",
-          "description": null
+          "name": "FAILED"
         }
       ]
     },
@@ -458,25 +280,15 @@
       "properties": [
         {
           "name": "page",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": 1,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "defaultValue": 1
         },
         {
           "name": "limit",
-          "description": null,
           "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": 10,
-          "deprecated": null,
-          "validation": null,
-          "in": "query"
+          "in": "query",
+          "defaultValue": 10
         }
       ],
       "referencePath": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
@@ -485,17 +297,13 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": "testParametersModelGeneration",
       "method": "get",
       "path": "/test-1-parameters/{id}",
-      "summary": "Test 1: Parameters model generation (Basic)",
-      "description": "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion.",
       "tags": [],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -508,34 +316,18 @@
                 "name": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "testParametersModelGeneration",
+      "summary": "Test 1: Parameters model generation (Basic)",
+      "description": "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion."
     },
     {
-      "operationId": "testRequestInlineExtraction",
       "method": "post",
       "path": "/test-2-request",
-      "summary": "Test 2: Request body inline schema extraction (Basic)",
-      "description": "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.",
       "tags": [],
       "parameters": [],
-      "requestBody": {
-        "description": null,
-        "required": true,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody"
-            }
-          }
-        ]
-      },
       "responses": [
         {
           "statusCode": "201",
@@ -548,25 +340,33 @@
                 "name": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "testRequestInlineExtraction",
+      "summary": "Test 2: Request body inline schema extraction (Basic)",
+      "description": "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.",
+      "requestBody": {
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody"
+            }
+          }
+        ],
+        "required": true
+      }
     },
     {
-      "operationId": "testResponseInlineExtraction",
       "method": "get",
       "path": "/test-3-response",
-      "summary": "Test 3: Response inline schema extraction (Intermediate)",
-      "description": "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation.",
       "tags": [],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
       },
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -576,8 +376,7 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "201",
@@ -593,8 +392,7 @@
                 }
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "202",
@@ -607,8 +405,7 @@
                 "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response"
               }
             }
-          ],
-          "headers": null
+          ]
         },
         {
           "statusCode": "203",
@@ -621,12 +418,12 @@
                 "name": "#/components/schemas/UserResponse"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "testResponseInlineExtraction",
+      "summary": "Test 3: Response inline schema extraction (Intermediate)",
+      "description": "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation."
     }
   ],
   "servers": [],

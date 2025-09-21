@@ -146,14 +146,16 @@ function parameterToParameterProperty(
 ): IRParameterProperty {
   const property: IRParameterProperty = {
     name: parameter.name,
-    description: parameter.description,
     type: parameter.type,
-    required: parameter.required,
-    nullable: parameter.nullable,
-    defaultValue: parameter.defaultValue,
-    deprecated: parameter.deprecated,
-    validation: null, // TODO: implement validation handling
     in: parameter.in, // 重要: in情報を保持
+    ...(parameter.required && { required: parameter.required }),
+    ...(parameter.description && { description: parameter.description }),
+    ...(parameter.nullable && { nullable: parameter.nullable }),
+    ...(parameter.defaultValue !== undefined && {
+      defaultValue: parameter.defaultValue,
+    }),
+    ...(parameter.deprecated && { deprecated: parameter.deprecated }),
+    // validation は省略（undefined として扱う） TODO: implement validation handling
   };
 
   return property;
@@ -181,11 +183,8 @@ if (import.meta.vitest) {
           name: "id",
           in: "path" as const,
           description: "User ID",
-          required: true,
+          required: true as const,
           type: "string" as const,
-          nullable: null,
-          defaultValue: null,
-          deprecated: null,
         },
       ];
 
@@ -204,12 +203,8 @@ if (import.meta.vitest) {
         name: "id",
         description: "User ID",
         type: "string",
-        required: true,
+        required: true as const,
         in: "path",
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
-        validation: null,
       });
       expect(result!.description).toContain("Parameters for GET /users/{id}");
       expect(result!.description).toContain("id: User ID");
@@ -221,31 +216,21 @@ if (import.meta.vitest) {
           name: "id",
           in: "path" as const,
           description: "User ID",
-          required: true,
+          required: true as const,
           type: "string" as const,
-          nullable: null,
-          defaultValue: null,
-          deprecated: null,
         },
         {
           name: "limit",
           in: "query" as const,
           description: "Maximum number of results",
-          required: false,
           type: "int" as const,
-          nullable: null,
           defaultValue: 10,
-          deprecated: null,
         },
         {
           name: "offset",
           in: "query" as const,
-          description: null,
-          required: false,
           type: "int" as const,
-          nullable: null,
           defaultValue: 0,
-          deprecated: null,
         },
       ];
 
@@ -266,12 +251,8 @@ if (import.meta.vitest) {
         name: "id",
         description: "User ID",
         type: "string",
-        required: true,
+        required: true as const,
         in: "path",
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
-        validation: null,
       });
 
       // Query parameters
@@ -279,24 +260,15 @@ if (import.meta.vitest) {
         name: "limit",
         description: "Maximum number of results",
         type: "int",
-        required: false,
         in: "query",
-        nullable: null,
         defaultValue: 10,
-        deprecated: null,
-        validation: null,
       });
 
       expect(result!.properties[2]).toEqual({
         name: "offset",
-        description: null,
         type: "int",
-        required: false,
         in: "query",
-        nullable: null,
         defaultValue: 0,
-        deprecated: null,
-        validation: null,
       });
 
       // Description should include parameter descriptions
@@ -312,22 +284,13 @@ if (import.meta.vitest) {
         {
           name: "id",
           in: "path" as const,
-          description: null,
-          required: true,
+          required: true as const,
           type: "string" as const,
-          nullable: null,
-          defaultValue: null,
-          deprecated: null,
         },
         {
           name: "format",
           in: "query" as const,
-          description: null,
-          required: false,
           type: "string" as const,
-          nullable: null,
-          defaultValue: null,
-          deprecated: null,
         },
       ];
 
@@ -349,11 +312,8 @@ if (import.meta.vitest) {
           name: "oldParam",
           in: "query" as const,
           description: "This parameter is deprecated",
-          required: false,
           type: "string" as const,
-          nullable: null,
-          defaultValue: null,
-          deprecated: true,
+          deprecated: true as const,
         },
       ];
 
@@ -377,25 +337,24 @@ if (import.meta.vitest) {
         name: "testParam",
         in: "query" as const,
         description: "A test parameter",
-        required: true,
+        required: true as const,
         type: "string" as const,
-        nullable: true,
+        nullable: true as const,
         defaultValue: "default",
-        deprecated: false,
-      };
+        // deprecatedを省略（falseの場合はプロパティ自体を省略）
+      } satisfies IRParameter;
 
       const result = parameterToParameterProperty(parameter);
 
       expect(result).toEqual({
         name: "testParam",
-        description: "A test parameter",
         type: "string",
-        required: true,
+        required: true as const,
+        in: "query",
+        description: "A test parameter",
         nullable: true,
         defaultValue: "default",
-        deprecated: false,
-        validation: null,
-        in: "query",
+        // deprecatedとvalidationは省略（undefined）
       });
     });
 
@@ -403,25 +362,16 @@ if (import.meta.vitest) {
       const parameter = {
         name: "minimal",
         in: "path" as const,
-        description: null,
-        required: true,
+        required: true as const,
         type: "string" as const,
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
       };
 
       const result = parameterToParameterProperty(parameter);
 
       expect(result).toEqual({
         name: "minimal",
-        description: null,
         type: "string",
-        required: true,
-        nullable: null,
-        defaultValue: null,
-        deprecated: null,
-        validation: null,
+        required: true as const,
         in: "path",
       });
     });

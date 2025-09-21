@@ -36,15 +36,15 @@ export interface IRParameter {
   /** パラメータの配置場所 */
   in: IRParameterInType;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 必須フラグ */
-  required: boolean;
+  required?: true;
   /** 型情報 */
   type: IRType;
   /** null許容フラグ（OpenAPI 3.0のnullable、OpenAPI 3.1のtype配列） */
-  nullable: boolean | null;
+  nullable?: true;
   /** デフォルト値 */
-  defaultValue: unknown | null;
+  defaultValue?: unknown;
   /** 非推奨フラグ */
-  deprecated: boolean | null;
+  deprecated?: true;
 }

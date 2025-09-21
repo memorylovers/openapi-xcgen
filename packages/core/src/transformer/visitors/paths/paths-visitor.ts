@@ -11,10 +11,10 @@
  */
 
 import type {
-  PathsObject,
-  PathItemObject,
   IREndpoint,
   IRModel,
+  PathItemObject,
+  PathsObject,
 } from "../../../types";
 import type { PathItemContext, VisitorContext } from "../../types";
 import { visitPathItem } from "./path-item-visitor";
@@ -121,21 +121,14 @@ if (import.meta.vitest) {
             operationId: "listPets",
             method: "get",
             path: "/pets",
-            summary: null,
-            description: null,
             tags: ["pets"],
             parameters: [],
-            requestBody: null,
             responses: [
               {
                 statusCode: "200",
                 description: "Success",
-                content: null,
-                headers: null,
               },
             ],
-            deprecated: null,
-            security: null,
           },
         ],
         models: [],

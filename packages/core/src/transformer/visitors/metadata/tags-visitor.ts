@@ -10,7 +10,7 @@
  * - externalDocsの処理
  */
 
-import type { TagObject, IRTag } from "../../../types";
+import type { IRTag, TagObject } from "../../../types";
 
 /**
  * TagObject[]を処理してIRTag[]に変換
@@ -37,13 +37,15 @@ export function visitTags(tags: TagObject[] | undefined): IRTag[] {
 
   return tags.map((tag) => ({
     name: tag.name,
-    description: tag.description || null,
-    externalDocs: tag.externalDocs
-      ? {
-          url: tag.externalDocs.url,
-          description: tag.externalDocs.description || null,
-        }
-      : null,
+    ...(tag.description && { description: tag.description }),
+    ...(tag.externalDocs && {
+      externalDocs: {
+        url: tag.externalDocs.url,
+        ...(tag.externalDocs.description && {
+          description: tag.externalDocs.description,
+        }),
+      },
+    }),
   }));
 }
 
@@ -80,12 +82,10 @@ if (import.meta.vitest) {
         {
           name: "users",
           description: "User management operations",
-          externalDocs: null,
         },
         {
           name: "pets",
           description: "Pet management operations",
-          externalDocs: null,
         },
       ]);
     });
@@ -128,8 +128,6 @@ if (import.meta.vitest) {
       expect(result).toEqual([
         {
           name: "minimal",
-          description: null,
-          externalDocs: null,
         },
       ]);
     });
@@ -149,10 +147,8 @@ if (import.meta.vitest) {
       expect(result).toEqual([
         {
           name: "api",
-          description: null,
           externalDocs: {
             url: "https://example.com/api",
-            description: null,
           },
         },
       ]);

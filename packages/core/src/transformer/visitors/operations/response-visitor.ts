@@ -167,9 +167,9 @@ export function visitResponse(
 
   const irResponse: IRResponse = {
     statusCode: context.statusCode,
-    description: response.description || null,
-    content: content || null,
-    headers: null, // TODO: implement headers processing
+    ...(response.description && { description: response.description }),
+    ...(content && { content }),
+    // headers は省略（undefined として扱う） TODO: implement headers processing
   };
 
   return { response: irResponse, models };
@@ -199,8 +199,6 @@ if (import.meta.vitest) {
         response: {
           statusCode: "200",
           description: "Success",
-          content: null,
-          headers: null,
         },
         models: [],
       });
@@ -247,7 +245,6 @@ if (import.meta.vitest) {
               },
             },
           ],
-          headers: null,
         },
         models: [
           {
@@ -255,24 +252,16 @@ if (import.meta.vitest) {
             name: "GetUsers200Response",
             referencePath:
               "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
-            description: null,
             statusCode: "200",
             properties: [
               {
                 name: "users",
-                description: null,
                 type: {
                   kind: "array",
                   itemType: "string",
                 },
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            headers: null,
           },
         ],
       });
@@ -338,7 +327,6 @@ if (import.meta.vitest) {
               schema: "string",
             },
           ],
-          headers: null,
         },
         models: [
           {
@@ -346,42 +334,26 @@ if (import.meta.vitest) {
             name: "GetData200Response",
             referencePath:
               "#/paths/::data/get/responses/200/content/application::json/schema/GetData200Response",
-            description: null,
             statusCode: "200",
             properties: [
               {
                 name: "data",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            headers: null,
           },
           {
             kind: "response",
             name: "GetData200Response",
             referencePath:
               "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200Response",
-            description: null,
             statusCode: "200",
             properties: [
               {
                 name: "data",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            headers: null,
           },
         ],
       });
@@ -415,8 +387,6 @@ if (import.meta.vitest) {
         response: {
           statusCode: "200",
           description: "Success with headers",
-          content: null,
-          headers: null,
         },
         models: [],
       });
@@ -488,7 +458,6 @@ if (import.meta.vitest) {
               },
             },
           ],
-          headers: null,
         },
         models: [
           {
@@ -496,31 +465,17 @@ if (import.meta.vitest) {
             name: "PostUsers400Response",
             referencePath:
               "#/paths/::users/post/responses/400/content/application::json/schema/PostUsers400Response",
-            description: null,
             statusCode: "400",
             properties: [
               {
                 name: "error",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
               {
                 name: "message",
-                description: null,
                 type: "string",
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
-            headers: null,
           },
         ],
       });

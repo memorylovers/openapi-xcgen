@@ -75,9 +75,9 @@ export interface IRRequestContent {
  */
 export interface IRRequestBody {
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 必須フラグ */
-  required: boolean;
+  required?: true;
   /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
   content: IRRequestContent[];
 }

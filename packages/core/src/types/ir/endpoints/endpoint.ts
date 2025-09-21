@@ -49,25 +49,25 @@ export type IRHttpMethod =
  */
 export interface IREndpoint {
   /** OpenAPIのoperationId - エンドポイント識別子（任意項目） */
-  operationId: string | null;
+  operationId?: string;
   /** HTTPメソッド（GET/POST等） */
   method: IRHttpMethod;
   /** エンドポイントパス（例: "/users/{id}"） */
   path: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** サマリー */
-  summary: string | null;
+  summary?: string;
   /** タグ（OpenAPIのtags配列） */
   tags: string[];
   /** パラメータ（統合モデルがある場合は参照、ない場合は個別配列） */
   parameters: IRType | IRParameter[];
   /** リクエストボディ */
-  requestBody: IRRequestBody | null;
+  requestBody?: IRRequestBody;
   /** レスポンス */
   responses: IRResponse[];
   /** 非推奨フラグ */
-  deprecated: boolean | null;
+  deprecated?: true;
   /** セキュリティ要件 */
-  security: string[] | null;
+  security?: string[];
 }

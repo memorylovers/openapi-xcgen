@@ -8,8 +8,8 @@
 import { consola } from "consola";
 import type {
   ComponentsObject,
-  SchemaObjectWithNullable,
   IRModel,
+  SchemaObjectWithNullable,
 } from "../../../types";
 import type { SchemaContext, VisitorContext } from "../../types";
 import { visitSchema } from "../schema/schema-visitor";
@@ -122,17 +122,10 @@ if (import.meta.vitest) {
             kind: "object",
             name: "Item",
             referencePath: "#/components/schemas/Item",
-            description: null,
             properties: [
               {
                 name: "status",
-                description: null,
                 type: { kind: "ref", name: "#/components/schemas/ItemStatus" },
-                required: false,
-                nullable: null,
-                defaultValue: null,
-                deprecated: null,
-                validation: null,
               },
             ],
           },
@@ -140,22 +133,20 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "ItemStatus",
             referencePath: "#/components/schemas/ItemStatus",
-            description: null,
             type: "string",
             values: [
-              { value: "a", name: "A", description: null },
-              { value: "b", name: "B", description: null },
+              { value: "a", name: "A" },
+              { value: "b", name: "B" },
             ],
           },
           {
             kind: "enum",
             name: "Type",
             referencePath: "#/components/schemas/Type",
-            description: null,
             type: "string",
             values: [
-              { value: "x", name: "X", description: null },
-              { value: "y", name: "Y", description: null },
+              { value: "x", name: "X" },
+              { value: "y", name: "Y" },
             ],
           },
         ],
@@ -246,11 +237,10 @@ if (import.meta.vitest) {
             kind: "enum",
             name: "GoodSchema",
             referencePath: "#/components/schemas/GoodSchema",
-            description: null,
             type: "string",
             values: [
-              { value: "a", name: "A", description: null },
-              { value: "b", name: "B", description: null },
+              { value: "a", name: "A" },
+              { value: "b", name: "B" },
             ],
           },
         ],

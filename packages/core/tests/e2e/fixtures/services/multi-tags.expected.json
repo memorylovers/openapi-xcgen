@@ -2,26 +2,19 @@
   "metadata": {
     "title": "Multi Tags Service Classification Test",
     "version": "1.0.0",
-    "description": "Test multi-tag service classification",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test multi-tag service classification"
   },
   "models": [],
   "tags": [],
   "endpoints": [
     {
-      "operationId": "endpoint1",
       "method": "get",
       "path": "/endpoint1",
-      "summary": null,
-      "description": null,
       "tags": [
         "users",
         "admin"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -31,25 +24,19 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint1"
     },
     {
-      "operationId": "endpoint2",
       "method": "get",
       "path": "/endpoint2",
-      "summary": null,
-      "description": null,
       "tags": [
         "admin",
         "users"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -59,26 +46,20 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint2"
     },
     {
-      "operationId": "endpoint3",
       "method": "get",
       "path": "/endpoint3",
-      "summary": null,
-      "description": null,
       "tags": [
         "products",
         "admin",
         "moderation"
       ],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -88,12 +69,10 @@
               "mimeType": "application/json",
               "schema": "string"
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "operationId": "endpoint3"
     }
   ],
   "servers": [],

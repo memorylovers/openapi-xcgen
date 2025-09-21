@@ -9,7 +9,7 @@ export interface IRTagExternalDocs {
   /** ドキュメントURL */
   url: string;
   /** ドキュメントの説明 */
-  description: string | null;
+  description?: string;
 }
 
 /**
@@ -31,7 +31,7 @@ export interface IRTag {
   /** タグ名 */
   name: string;
   /** 説明 */
-  description: string | null;
+  description?: string;
   /** 外部ドキュメント */
-  externalDocs: IRTagExternalDocs | null;
+  externalDocs?: IRTagExternalDocs;
 }

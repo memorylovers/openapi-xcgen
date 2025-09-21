@@ -110,7 +110,7 @@ export function visitEnum(
   // enum値をIREnumValueに変換
   const values: IREnumValue[] = schema.enum.map((value) => {
     const enumName = generateEnumName(value);
-    return { value, name: enumName, description: null };
+    return { value, name: enumName };
   });
 
   // IREnumModelを作成
@@ -118,9 +118,9 @@ export function visitEnum(
     kind: "enum",
     name,
     referencePath: buildReferencePath(context.documentPath),
-    description: schema.description || null,
     type,
     values,
+    ...(schema.description && { description: schema.description }),
   };
 
   return { models: [enumModel] };
@@ -152,9 +152,9 @@ if (import.meta.vitest) {
             type: "string",
             description: "Status of the item",
             values: [
-              { value: "pending", name: "PENDING", description: null },
-              { value: "approved", name: "APPROVED", description: null },
-              { value: "rejected", name: "REJECTED", description: null },
+              { value: "pending", name: "PENDING" },
+              { value: "approved", name: "APPROVED" },
+              { value: "rejected", name: "REJECTED" },
             ],
           },
         ],
@@ -182,9 +182,9 @@ if (import.meta.vitest) {
             type: "int", // integerはIRScalarTypeのintに変換される
             description: "Priority level",
             values: [
-              { value: 1, name: "VALUE_1", description: null },
-              { value: 2, name: "VALUE_2", description: null },
-              { value: 3, name: "VALUE_3", description: null },
+              { value: 1, name: "VALUE_1" },
+              { value: 2, name: "VALUE_2" },
+              { value: 3, name: "VALUE_3" },
             ],
           },
         ],
@@ -207,14 +207,13 @@ if (import.meta.vitest) {
           {
             kind: "enum",
             name: "TaskStatus",
-            description: null,
             referencePath: "#/components/schemas/TaskStatus",
             type: "string",
             values: [
-              { value: "in-progress", name: "IN_PROGRESS", description: null },
-              { value: "on_hold", name: "ON_HOLD", description: null },
-              { value: "completed!", name: "COMPLETED_", description: null },
-              { value: "new/pending", name: "NEW_PENDING", description: null },
+              { value: "in-progress", name: "IN_PROGRESS" },
+              { value: "on_hold", name: "ON_HOLD" },
+              { value: "completed!", name: "COMPLETED_" },
+              { value: "new/pending", name: "NEW_PENDING" },
             ],
           },
         ],

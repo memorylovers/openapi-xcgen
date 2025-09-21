@@ -2,142 +2,72 @@
   "metadata": {
     "title": "Data Types Test",
     "version": "1.0.0",
-    "description": "Test all supported data types",
-    "termsOfService": null,
-    "contact": null,
-    "license": null
+    "description": "Test all supported data types"
   },
   "models": [
     {
       "kind": "object",
       "name": "DataTypes",
       "referencePath": "#/components/schemas/DataTypes",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
-          "type": "int",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "int"
         },
         {
           "name": "name",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         },
         {
           "name": "score",
-          "description": null,
-          "type": "double",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "double"
         },
         {
           "name": "isActive",
-          "description": null,
-          "type": "boolean",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "boolean"
         },
         {
           "name": "birthDate",
-          "description": null,
-          "type": "date",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "date"
         },
         {
           "name": "createdAt",
-          "description": null,
-          "type": "datetime",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "datetime"
         },
         {
           "name": "profile",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/DataTypesProfile"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "tags",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "string"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "numbers",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "int"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "scores",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "double"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         },
         {
           "name": "flags",
-          "description": null,
           "type": {
             "kind": "array",
             "itemType": "boolean"
-          },
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          }
         }
       ]
     },
@@ -145,17 +75,10 @@
       "kind": "object",
       "name": "DataTypesProfile",
       "referencePath": "#/components/schemas/DataTypesProfile",
-      "description": null,
       "properties": [
         {
           "name": "bio",
-          "description": null,
-          "type": "string",
-          "required": false,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "type": "string"
         }
       ]
     }
@@ -163,14 +86,10 @@
   "tags": [],
   "endpoints": [
     {
-      "operationId": null,
       "method": "get",
       "path": "/data",
-      "summary": "Get data",
-      "description": null,
       "tags": [],
       "parameters": [],
-      "requestBody": null,
       "responses": [
         {
           "statusCode": "200",
@@ -183,12 +102,10 @@
                 "name": "#/components/schemas/DataTypes"
               }
             }
-          ],
-          "headers": null
+          ]
         }
       ],
-      "deprecated": null,
-      "security": null
+      "summary": "Get data"
     }
   ],
   "servers": [],
