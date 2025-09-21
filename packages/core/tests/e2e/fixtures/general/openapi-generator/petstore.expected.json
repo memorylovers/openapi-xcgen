@@ -731,7 +731,8 @@
       "description": null,
       "properties": [],
       "statusCode": "200",
-      "headers": null
+      "headers": null,
+      "additionalProperties": "int"
     },
     {
       "kind": "parameter",

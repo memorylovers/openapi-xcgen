@@ -6,10 +6,10 @@
  */
 
 import { consola } from "consola";
+import type { IRArray, IRType, SchemaObjectWithNullable } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import type { SchemaObjectWithNullable, IRArray, IRType } from "../../../types";
-import type { VisitorContext } from "../../types";
 import { extractRefName, toIRScalarType } from "../../helpers";
+import type { VisitorContext } from "../../types";
 
 /**
  * SchemaObjectをIRTypeに解決
@@ -353,9 +353,9 @@ if (import.meta.vitest) {
     });
 
     it("should handle array type with null (OpenAPI 3.1)", () => {
-      const schema: SchemaObjectWithNullable = {
-        type: ["string", "null"] as any,
-      };
+      const schema = {
+        type: ["string", "null"],
+      } as SchemaObjectWithNullable;
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "StringOrNull"],
         rootSegment: "components",
@@ -365,9 +365,9 @@ if (import.meta.vitest) {
     });
 
     it("should handle array type with only null (OpenAPI 3.1)", () => {
-      const schema: SchemaObjectWithNullable = {
-        type: ["null"] as any,
-      };
+      const schema = {
+        type: ["null"],
+      } as SchemaObjectWithNullable;
       const result = visitType(schema, {
         documentPath: ["components", "schemas", "OnlyNull"],
         rootSegment: "components",

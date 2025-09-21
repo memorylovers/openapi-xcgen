@@ -2,8 +2,8 @@
  * コアモデル定義のIR型定義
  */
 
-import type { IRProperty } from "./property";
 import type { IRScalarType, IRType } from "../common/type";
+import type { IRProperty } from "./property";
 
 /**
  * IRObjectModel - オブジェクト型モデル定義
@@ -53,6 +53,8 @@ export interface IRObjectModel {
   description: string | null;
   /** プロパティの配列 */
   properties: IRProperty[];
+  /** 追加プロパティの型（additionalProperties） */
+  additionalProperties?: IRType;
 }
 
 /**

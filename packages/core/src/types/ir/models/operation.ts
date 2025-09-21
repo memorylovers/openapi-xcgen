@@ -2,6 +2,8 @@
  * 操作固有モデル定義のIR型定義
  */
 
+import type { IRType } from "../common/type";
+import type { IRResponseHeader } from "../endpoints/response";
 import type {
   IRArrayModel,
   IREnumModel,
@@ -9,7 +11,6 @@ import type {
   IRObjectModel,
 } from "./base";
 import type { IRParameterProperty, IRProperty } from "./property";
-import type { IRResponseHeader } from "../endpoints/response";
 
 /**
  * IRParameterModel - パラメータ統合モデル定義
@@ -78,6 +79,8 @@ export interface IRRequestBodyModel {
   properties: IRProperty[];
   /** 必須フラグ（リクエストボディ固有） */
   required: boolean;
+  /** 追加プロパティの型（additionalProperties） */
+  additionalProperties?: IRType;
 }
 
 /**
@@ -117,6 +120,8 @@ export interface IRResponseModel {
   statusCode: string;
   /** ヘッダー配列（レスポンス固有） */
   headers: IRResponseHeader[] | null;
+  /** 追加プロパティの型（additionalProperties） */
+  additionalProperties?: IRType;
 }
 
 /**

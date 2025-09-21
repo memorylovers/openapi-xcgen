@@ -121,6 +121,19 @@
           "validation": null
         },
         {
+          "name": "metadata",
+          "description": null,
+          "type": {
+            "kind": "map",
+            "valueType": "string"
+          },
+          "required": false,
+          "nullable": null,
+          "defaultValue": null,
+          "deprecated": null,
+          "validation": null
+        },
+        {
           "name": "createdAt",
           "description": null,
           "type": "datetime",

@@ -17,6 +17,7 @@ import { consola } from "consola";
 import type { IRModel, IRType, SchemaObjectWithNullable } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { visitAdditionalProperties } from "./additional-properties-visitor";
 import { visitEnum } from "./enum-visitor";
 import { visitObject } from "./object-visitor";
 import { visitType } from "./type-visitor";
@@ -108,9 +109,22 @@ export function visitSchema(
     schema.additionalProperties &&
     (!schema.properties || Object.keys(schema.properties).length === 0)
   ) {
-    consola.warn(
-      `additionalProperties-only schema detected (Map/Dictionary pattern), skipping model generation: ${buildReferencePath(context.documentPath)}`,
+    // IRMap型として処理
+    const valueType = visitAdditionalProperties(
+      schema.additionalProperties,
+      context,
     );
+
+    if (valueType) {
+      result.type = {
+        kind: "map",
+        valueType,
+      };
+    } else {
+      consola.warn(
+        `Failed to process additionalProperties-only schema: ${buildReferencePath(context.documentPath)}`,
+      );
+    }
     return result;
   }
 
@@ -129,19 +143,8 @@ export function visitSchema(
   // object型の処理（明示的または暗黙的）
   // OpenAPI 3.1では、typeがなくてもpropertiesがあれば暗黙的にobject型
   else if (schema.type === "object" || (!schema.type && schema.properties)) {
-    // additionalPropertiesが通常のプロパティと一緒に存在する場合の警告
-    if (
-      "additionalProperties" in schema &&
-      schema.additionalProperties &&
-      schema.properties &&
-      Object.keys(schema.properties).length > 0
-    ) {
-      consola.warn(
-        `additionalProperties is not supported yet and will be ignored: ${buildReferencePath(context.documentPath)}`,
-      );
-    }
-
     // visitObjectでobject処理（ネスト構造の抽出含む）を完結
+    // additionalPropertiesも含めて処理する
     const objectResult = visitObject(schema, context);
 
     // visitObjectの結果をマージ
@@ -917,7 +920,7 @@ if (import.meta.vitest) {
           { $ref: "#/components/schemas/Base" },
           { type: "object", properties: { extra: { type: "string" } } },
         ],
-      } as any;
+      } as SchemaObjectWithNullable;
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Composed"],
         rootSegment: "components",
@@ -936,7 +939,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema = {
         oneOf: [{ type: "string" }, { type: "number" }],
-      } as any;
+      } as SchemaObjectWithNullable;
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "StringOrNumber"],
         rootSegment: "components",
@@ -955,7 +958,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema = {
         anyOf: [{ type: "string" }, { type: "null" }],
-      } as any;
+      } as SchemaObjectWithNullable;
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "NullableString"],
         rootSegment: "components",
@@ -980,7 +983,7 @@ if (import.meta.vitest) {
         discriminator: {
           propertyName: "petType",
         },
-      } as any;
+      } as SchemaObjectWithNullable;
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Pet"],
         rootSegment: "components",
@@ -1000,7 +1003,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema = {
         not: { type: "string" },
-      } as any;
+      } as SchemaObjectWithNullable;
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "NotString"],
         rootSegment: "components",
@@ -1015,8 +1018,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn and skip model generation for additionalProperties-only schemas", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should return IRMap type for additionalProperties-only schemas", () => {
       const schema: SchemaObjectWithNullable = {
         type: "object",
         additionalProperties: { type: "string" },
@@ -1028,15 +1030,16 @@ if (import.meta.vitest) {
 
       const result = visitSchema(schema, context);
 
-      expect(result).toEqual({ type: null, models: [] });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "additionalProperties-only schema detected (Map/Dictionary pattern), skipping model generation: #/components/schemas/StringMap",
-      );
-      warnSpy.mockRestore();
+      expect(result).toEqual({
+        type: {
+          kind: "map",
+          valueType: "string",
+        },
+        models: [],
+      });
     });
 
-    it("should warn when additionalProperties is present with regular properties", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should include additionalProperties in model when present with regular properties", () => {
       const schema: SchemaObjectWithNullable = {
         type: "object",
         properties: {
@@ -1051,22 +1054,31 @@ if (import.meta.vitest) {
 
       const result = visitSchema(schema, context);
 
-      // Should still generate the model but warn about additionalProperties
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toMatchObject({
-        kind: "object",
-        name: "Mixed",
-        properties: [
+      // Should generate the model with additionalProperties
+      expect(result).toEqual({
+        type: { kind: "ref", name: "#/components/schemas/Mixed" },
+        models: [
           {
-            name: "id",
-            type: "string",
+            kind: "object",
+            name: "Mixed",
+            referencePath: "#/components/schemas/Mixed",
+            description: null,
+            properties: [
+              {
+                name: "id",
+                description: null,
+                type: "string",
+                required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
+              },
+            ],
+            additionalProperties: "string",
           },
         ],
       });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "additionalProperties is not supported yet and will be ignored: #/components/schemas/Mixed",
-      );
-      warnSpy.mockRestore();
     });
 
     it("should generate model for empty object without additionalProperties", () => {
@@ -1092,6 +1104,59 @@ if (import.meta.vitest) {
             properties: [],
           },
         ],
+      });
+    });
+
+    it("should handle additionalProperties with array type", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "object",
+        additionalProperties: {
+          type: "array",
+          items: { type: "string" },
+        },
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "ArrayMap"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({
+        type: {
+          kind: "map",
+          valueType: {
+            kind: "array",
+            itemType: "string",
+          },
+        },
+        models: [],
+      });
+    });
+
+    it("should handle additionalProperties with reference type", () => {
+      const schema: SchemaObjectWithNullable = {
+        type: "object",
+        additionalProperties: {
+          $ref: "#/components/schemas/MetadataValue",
+        },
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "MetadataMap"],
+        rootSegment: "components",
+      };
+
+      const result = visitSchema(schema, context);
+
+      expect(result).toEqual({
+        type: {
+          kind: "map",
+          valueType: {
+            kind: "ref",
+            name: "#/components/schemas/MetadataValue",
+          },
+        },
+        models: [],
       });
     });
   });

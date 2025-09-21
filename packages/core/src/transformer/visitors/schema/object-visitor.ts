@@ -30,6 +30,7 @@ import {
   isNullable,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { visitAdditionalProperties } from "./additional-properties-visitor";
 import { visitSchema } from "./schema-visitor";
 
 /**
@@ -164,12 +165,27 @@ export function visitObject(
     }
   } // if (schema.properties)
 
+  // additionalPropertiesの処理
+  let additionalPropertiesType = undefined;
+  if ("additionalProperties" in schema && schema.additionalProperties) {
+    const additionalType = visitAdditionalProperties(
+      schema.additionalProperties,
+      context,
+    );
+    if (additionalType) {
+      additionalPropertiesType = additionalType;
+    }
+  }
+
   const mainModel: IRModel = {
     kind: "object",
     name,
     referencePath: buildReferencePath(context.documentPath),
     description: schema.description || null,
     properties,
+    ...(additionalPropertiesType && {
+      additionalProperties: additionalPropertiesType,
+    }),
   };
 
   // メインモデルを最初に、ネストしたモデルをその後に追加
@@ -269,6 +285,18 @@ export function visitResponseObject(
     }
   } // if (schema.properties)
 
+  // additionalPropertiesの処理
+  let additionalPropertiesType = undefined;
+  if ("additionalProperties" in schema && schema.additionalProperties) {
+    const additionalType = visitAdditionalProperties(
+      schema.additionalProperties,
+      context,
+    );
+    if (additionalType) {
+      additionalPropertiesType = additionalType;
+    }
+  }
+
   const responseModel: IRResponseModel = {
     kind: "response",
     name,
@@ -277,6 +305,9 @@ export function visitResponseObject(
     properties,
     statusCode,
     headers: null, // TODO: Implement headers processing
+    ...(additionalPropertiesType && {
+      additionalProperties: additionalPropertiesType,
+    }),
   };
 
   // headersがある場合のみ追加
@@ -381,6 +412,18 @@ export function visitRequestBodyObject(
     }
   } // if (schema.properties)
 
+  // additionalPropertiesの処理
+  let additionalPropertiesType = undefined;
+  if ("additionalProperties" in schema && schema.additionalProperties) {
+    const additionalType = visitAdditionalProperties(
+      schema.additionalProperties,
+      context,
+    );
+    if (additionalType) {
+      additionalPropertiesType = additionalType;
+    }
+  }
+
   const requestBodyModel: IRRequestBodyModel = {
     kind: "requestBody",
     name,
@@ -388,6 +431,9 @@ export function visitRequestBodyObject(
     properties,
     required,
     description: schema.description || null,
+    ...(additionalPropertiesType && {
+      additionalProperties: additionalPropertiesType,
+    }),
   };
 
   // メインモデルを最初に、ネストしたモデルをその後に追加
@@ -1034,13 +1080,16 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "Empty",
-        referencePath: "#/components/schemas/Empty",
-        description: null,
-        properties: [],
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "Empty",
+            referencePath: "#/components/schemas/Empty",
+            description: null,
+            properties: [],
+          },
+        ],
       });
     });
 
@@ -1055,13 +1104,16 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "NullProps",
-        referencePath: "#/components/schemas/NullProps",
-        description: null,
-        properties: [],
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "NullProps",
+            referencePath: "#/components/schemas/NullProps",
+            description: null,
+            properties: [],
+          },
+        ],
       });
     });
 
@@ -1076,13 +1128,16 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "EmptyProps",
-        referencePath: "#/components/schemas/EmptyProps",
-        description: null,
-        properties: [],
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "EmptyProps",
+            referencePath: "#/components/schemas/EmptyProps",
+            description: null,
+            properties: [],
+          },
+        ],
       });
     });
 
@@ -1197,17 +1252,146 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "AllInvalid",
-        referencePath: "#/components/schemas/AllInvalid",
-        description: null,
-        properties: [],
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "AllInvalid",
+            referencePath: "#/components/schemas/AllInvalid",
+            description: null,
+            properties: [],
+          },
+        ],
       });
       expect(warnSpy).toHaveBeenCalledTimes(4); // Warnings from type-visitor and object-visitor
 
       warnSpy.mockRestore();
+    });
+
+    // ===================================
+    // カテゴリ: additionalProperties処理
+    // ===================================
+    it("should include additionalProperties in object model", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: { type: "string" },
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "ConfigObject"],
+        rootSegment: "components",
+      });
+
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "ConfigObject",
+            referencePath: "#/components/schemas/ConfigObject",
+            description: null,
+            properties: [
+              {
+                name: "id",
+                description: null,
+                type: "string",
+                required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
+              },
+            ],
+            additionalProperties: "string",
+          },
+        ],
+      });
+    });
+
+    it("should handle additionalProperties with complex types", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+        },
+        additionalProperties: {
+          type: "array",
+          items: { type: "number" },
+        },
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "MetricsData"],
+        rootSegment: "components",
+      });
+
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "MetricsData",
+            referencePath: "#/components/schemas/MetricsData",
+            description: null,
+            properties: [
+              {
+                name: "name",
+                description: null,
+                type: "string",
+                required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
+              },
+            ],
+            additionalProperties: {
+              kind: "array",
+              itemType: "double",
+            },
+          },
+        ],
+      });
+    });
+
+    it("should not include additionalProperties when false", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: false,
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "StrictObject"],
+        rootSegment: "components",
+      });
+
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "StrictObject",
+            referencePath: "#/components/schemas/StrictObject",
+            description: null,
+            properties: [
+              {
+                name: "id",
+                description: null,
+                type: "string",
+                required: false,
+                nullable: null,
+                defaultValue: null,
+                deprecated: null,
+                validation: null,
+              },
+            ],
+            // additionalPropertiesフィールドは存在しない
+          },
+        ],
+      });
     });
   });
 }
