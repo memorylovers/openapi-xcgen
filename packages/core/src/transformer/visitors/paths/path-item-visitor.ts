@@ -90,8 +90,7 @@ export function visitPathItem(
     }
   }
 
-  // TODO: Step 12で共通パラメータの処理を実装
-  // if (pathItem.parameters) { ... }
+  // 共通パラメータは未対応
 
   return results;
 }

@@ -193,12 +193,21 @@ pnpm typecheck    # TypeScript check
 
 The following OpenAPI features are not yet supported:
 
+### Schema Features
+
 - `oneOf`, `anyOf`, `allOf` (union types and schema composition)
 - `discriminator` (polymorphism)
 - `not` (negation schema)
 - `additionalProperties` (dynamic properties)
 - `if`/`then`/`else` (conditional schemas)
 - Empty schemas `{}`
+
+### Operation Features
+
+- Response headers (Rate-Limit information, etc.)
+- Path-level common parameters
+- Security definitions (`security`/`securitySchemes`)
+- Parameter validation constraints (`minimum`, `maximum`, `pattern`, etc.)
 
 ## License
 

@@ -158,7 +158,7 @@ export function visitOperation(
     ...(operation.description && { description: operation.description }),
     ...(requestBody && { requestBody }),
     ...(operation.deprecated && { deprecated: operation.deprecated }),
-    // security は省略（undefined として扱う） TODO: implement security handling
+    // security は未対応
   };
 
   return {

@@ -318,7 +318,14 @@ Conventional Commitsに従う：
 - **空のスキーマ `{}`**: any型相当（すべての型を許可）
 - **typeプロパティなし**: 暗黙的なany型
 
-これらの機能は使用頻度が低く（全体の5-10%）、基本的な型処理（object、array、primitive、enum、$ref）で90%以上のAPIに対応可能です。
+#### Paths/Operations機能
+
+- **レスポンスヘッダー**: headers処理（Rate-Limit情報等）
+- **共通パラメータ**: PathItemレベルの共通parameters
+- **セキュリティ定義**: security/securitySchemes処理
+- **パラメータバリデーション**: minimum/maximum等の詳細なバリデーション情報
+
+これらの機能は使用頻度が低く（全体の5-10%）、基本的な型処理（object、array、primitive、enum、$ref）で90%以上のAPIに対応可能です。また、基本的なコード生成には不要であり、実装優先度を下げています。
 
 注: any型のサポートは意図的に除外しています。型安全性を重視し、明示的な型定義を推奨します。
 

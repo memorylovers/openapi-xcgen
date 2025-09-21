@@ -163,13 +163,13 @@ export function visitResponse(
     }
   }
 
-  // TODO: headersの処理（Step 12で実装予定）
+  // headers は未対応
 
   const irResponse: IRResponse = {
     statusCode: context.statusCode,
     ...(response.description && { description: response.description }),
     ...(content && { content }),
-    // headers は省略（undefined として扱う） TODO: implement headers processing
+    // headers は未対応
   };
 
   return { response: irResponse, models };
@@ -390,8 +390,7 @@ if (import.meta.vitest) {
         },
         models: [],
       });
-      // TODO: headersの処理はStep 12で実装
-      // Headers processing will be added in Step 12
+      // headers は未対応
     });
 
     it("should warn and return null for reference response", () => {
