@@ -62,11 +62,7 @@ export type {
 } from "./types";
 
 // Export guard functions
-export {
-  isOpenAPIV3_1Document,
-  isOpenAPIV3Document,
-  isReferenceObject,
-} from "./types";
+export { isReferenceObject } from "./types";
 
 // Export HTTP utilities
 export { isValidHTTPMethod, normalizeHTTPMethod } from "./utils/http";

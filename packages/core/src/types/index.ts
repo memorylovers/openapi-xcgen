@@ -24,11 +24,7 @@ export type LicenseObject = OpenAPIV3_1.LicenseObject;
 export type TagObject = OpenAPIV3_1.TagObject;
 
 // Re-export guard functions
-export {
-  isOpenAPIV3_1Document,
-  isOpenAPIV3Document,
-  isReferenceObject,
-} from "./guards";
+export { isReferenceObject } from "./guards";
 
 // Re-export IR types
 export type {
