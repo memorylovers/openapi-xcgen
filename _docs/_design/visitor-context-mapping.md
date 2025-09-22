@@ -51,6 +51,7 @@ OpenAPI Document → XcgenIR
 - `pathToComponentBase` が `/users/{id}` → `UsersId` のようにパスを PascalCase 化し、HTTP メソッドを付けて基礎名を構築します。
 - コンテキストごとにサフィックスやステータスコードを付加し、レスポンスやリクエストボディごとに一意の名前を作ります。
 - ネストしたオブジェクト／列挙型は親コンポーネント名をプレフィックスにした派生名で管理し、`buildReferencePath` と組み合わせて `#/paths/...` 系の参照を組み立てます。
+- 同じパス・メソッドで複数の media type が定義される場合でも、`application/json` は既定名のまま、その他の media type は `Xml` や `TextPlain` など MIME に応じたサフィックスを付与して重複を避けます。
 
 ### YAML Path → ComponentName → $ref 対応
 

@@ -11,6 +11,7 @@
  */
 
 import { pascalCase } from "es-toolkit/string";
+import { getMediaTypeSuffix } from "./media-type-suffix";
 
 /**
  * コンポーネント名生成のコンテキスト
@@ -86,20 +87,26 @@ export function generateComponentName(
   context: ComponentContext,
   statusCode?: string,
   propertyName?: string,
+  mediaType?: string,
 ): string {
   const methodPascal = pascalCase(method);
   const pathBase = pathToComponentBase(pathTemplate);
   const base = `${methodPascal}${pathBase}`;
 
   switch (context) {
-    case "requestBody":
-      return `${base}RequestBody`;
+    case "requestBody": {
+      const mediaSuffix = getMediaTypeSuffix(mediaType);
+      return `${base}${mediaSuffix}RequestBody`;
+    }
 
     case "response":
       if (!statusCode) {
         throw new Error("Status code is required for response context");
       }
-      return `${base}${statusCode}Response`;
+      {
+        const mediaSuffix = getMediaTypeSuffix(mediaType);
+        return `${base}${statusCode}${mediaSuffix}Response`;
+      }
 
     case "parameter":
       return `${base}Params`;
@@ -219,6 +226,39 @@ if (import.meta.vitest) {
       expect(generateComponentName("/users/{userId}", "get", "parameter")).toBe(
         "GetUsersUserIdParams",
       );
+    });
+
+    it("should append media suffix when provided", () => {
+      expect(
+        generateComponentName(
+          "/files",
+          "post",
+          "requestBody",
+          undefined,
+          undefined,
+          "application/json",
+        ),
+      ).toBe("PostFilesRequestBody");
+      expect(
+        generateComponentName(
+          "/files",
+          "post",
+          "requestBody",
+          undefined,
+          undefined,
+          "multipart/form-data",
+        ),
+      ).toBe("PostFilesMultipartFormDataRequestBody");
+      expect(
+        generateComponentName(
+          "/data",
+          "get",
+          "response",
+          "200",
+          undefined,
+          "text/plain",
+        ),
+      ).toBe("GetData200TextPlainResponse");
     });
 
     it("should generate property names", () => {

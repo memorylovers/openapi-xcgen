@@ -98,6 +98,8 @@ export function visitResponse(
             context.method,
             "response",
             context.statusCode,
+            undefined,
+            mimeType,
           );
 
           // レスポンスvisitorで処理して、IRResponseModelとして抽出
@@ -319,7 +321,7 @@ if (import.meta.vitest) {
               mimeType: "application/xml",
               schema: {
                 kind: "ref",
-                name: "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200Response",
+                name: "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200XmlResponse",
               },
             },
             {
@@ -344,9 +346,9 @@ if (import.meta.vitest) {
           },
           {
             kind: "response",
-            name: "GetData200Response",
+            name: "GetData200XmlResponse",
             referencePath:
-              "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200Response",
+              "#/paths/::data/get/responses/200/content/application::xml/schema/GetData200XmlResponse",
             statusCode: "200",
             properties: [
               {

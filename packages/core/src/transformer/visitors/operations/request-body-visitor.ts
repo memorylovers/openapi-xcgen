@@ -91,6 +91,7 @@ export function visitRequestBody(
 
   // contentの処理
   const content: IRRequestContent[] = [];
+
   for (const [mimeType, mediaType] of Object.entries(requestBody.content)) {
     if (mediaType.schema) {
       // インラインのobjectスキーマを検出
@@ -103,6 +104,9 @@ export function visitRequestBody(
           context.pathTemplate,
           context.method,
           "requestBody",
+          undefined,
+          undefined,
+          mimeType,
         );
 
         // リクエストボディvisitorで処理して、IRRequestBodyModelとして抽出
@@ -303,14 +307,14 @@ if (import.meta.vitest) {
               mimeType: "application/xml",
               schema: {
                 kind: "ref",
-                name: "#/paths/::files/post/requestBody/content/application::xml/schema/PostFilesRequestBody",
+                name: "#/paths/::files/post/requestBody/content/application::xml/schema/PostFilesXmlRequestBody",
               },
             },
             {
               mimeType: "multipart/form-data",
               schema: {
                 kind: "ref",
-                name: "#/paths/::files/post/requestBody/content/multipart::form-data/schema/PostFilesRequestBody",
+                name: "#/paths/::files/post/requestBody/content/multipart::form-data/schema/PostFilesMultipartFormDataRequestBody",
               },
             },
           ],
@@ -330,9 +334,9 @@ if (import.meta.vitest) {
           },
           {
             kind: "requestBody",
-            name: "PostFilesRequestBody",
+            name: "PostFilesXmlRequestBody",
             referencePath:
-              "#/paths/::files/post/requestBody/content/application::xml/schema/PostFilesRequestBody",
+              "#/paths/::files/post/requestBody/content/application::xml/schema/PostFilesXmlRequestBody",
             properties: [
               {
                 name: "data",
@@ -342,9 +346,9 @@ if (import.meta.vitest) {
           },
           {
             kind: "requestBody",
-            name: "PostFilesRequestBody",
+            name: "PostFilesMultipartFormDataRequestBody",
             referencePath:
-              "#/paths/::files/post/requestBody/content/multipart::form-data/schema/PostFilesRequestBody",
+              "#/paths/::files/post/requestBody/content/multipart::form-data/schema/PostFilesMultipartFormDataRequestBody",
             properties: [
               {
                 name: "file",
