@@ -3,7 +3,6 @@
  */
 
 export { buildReferencePath } from "./build-reference-path";
-export { convertPathToEndpoint } from "./convert-path-to-endpoint";
 export { createParameterModel } from "./create-parameter-model";
 export { extractRefName } from "./extract-ref-name";
 export { extractValidation } from "./extract-validation";

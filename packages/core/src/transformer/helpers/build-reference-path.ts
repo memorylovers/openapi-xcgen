@@ -60,27 +60,9 @@ export function buildReferencePath(documentPath: string[]): string {
  * // => "::api::v1::products"
  * ```
  */
-export function convertPathToEndpointNotation(path: string): string {
+function convertPathToEndpointNotation(path: string): string {
   // 先頭の/を削除し、残りの/を::に置換
   return "::" + path.slice(1).replace(/\//g, "::");
-}
-
-/**
- * components/schemasへの参照パスを生成
- * @param modelName - モデル名
- * @returns components/schemasへの参照パス
- *
- * @example
- * ```typescript
- * buildComponentsSchemaReferencePath("GetUsersParams")
- * // => "#/components/schemas/GetUsersParams"
- *
- * buildComponentsSchemaReferencePath("User")
- * // => "#/components/schemas/User"
- * ```
- */
-export function buildComponentsSchemaReferencePath(modelName: string): string {
-  return `#/components/schemas/${modelName}`;
 }
 
 // === in-source testing ===
@@ -200,23 +182,6 @@ if (import.meta.vitest) {
       expect(
         convertPathToEndpointNotation("/users/{userId}/posts/{postId}"),
       ).toBe("::users::{userId}::posts::{postId}");
-    });
-  });
-
-  describe("buildComponentsSchemaReferencePath", () => {
-    it("should generate components schema reference path", () => {
-      const result = buildComponentsSchemaReferencePath("GetUsersParams");
-      expect(result).toBe("#/components/schemas/GetUsersParams");
-    });
-
-    it("should handle simple model name", () => {
-      const result = buildComponentsSchemaReferencePath("User");
-      expect(result).toBe("#/components/schemas/User");
-    });
-
-    it("should handle complex model name", () => {
-      const result = buildComponentsSchemaReferencePath("PostUsers200Response");
-      expect(result).toBe("#/components/schemas/PostUsers200Response");
     });
   });
 }
