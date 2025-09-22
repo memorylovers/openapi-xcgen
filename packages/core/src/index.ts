@@ -72,7 +72,6 @@ export type { OpenAPIParserOptions } from "./parser";
 
 // Export transformer
 export {
-  extractRefName,
   extractValidation,
   generateEnumName,
   toIRScalarType,

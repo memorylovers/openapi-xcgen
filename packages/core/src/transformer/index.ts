@@ -7,26 +7,21 @@ export { transform } from "./transformer";
 
 // Types
 export type {
+  OperationContext,
+  ParameterContext,
+  ParametersContext,
+  PathItemContext,
+  RequestBodyContext,
+  ResponseContext,
+  ResponsesContext,
+  SchemaContext,
   SchemaVisitor,
   VisitorContext,
   VisitorResult,
-  SchemaContext,
-  ParameterContext,
-  PathItemContext,
-  OperationContext,
-  ParametersContext,
-  RequestBodyContext,
-  ResponsesContext,
-  ResponseContext,
 } from "./types";
 
 // Helper functions
-export {
-  extractRefName,
-  extractValidation,
-  generateEnumName,
-  toIRScalarType,
-} from "./helpers";
+export { extractValidation, generateEnumName, toIRScalarType } from "./helpers";
 
 // Visitor functions
 export {

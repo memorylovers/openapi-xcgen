@@ -8,7 +8,7 @@
 import { consola } from "consola";
 import type { IRArray, IRType, SchemaObjectWithNullable } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { extractRefName, toIRScalarType } from "../../helpers";
+import { toIRScalarType } from "../../helpers";
 import type { VisitorContext } from "../../types";
 
 /**
@@ -61,11 +61,6 @@ export function visitType(
 ): IRType | null {
   // $ref参照の場合
   if (isReferenceObject(schema)) {
-    const refName = extractRefName(schema.$ref);
-    if (refName === null) {
-      consola.warn(`Invalid $ref in schema: ${schema.$ref}`);
-      return null;
-    }
     // IRRef設計に従い完全パス形式を使用
     return { kind: "ref", name: schema.$ref };
   }
@@ -225,21 +220,6 @@ if (import.meta.vitest) {
         kind: "ref",
         name: "#/components/schemas/User",
       });
-    });
-
-    it("should return null for invalid $ref", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const schema = { $ref: "" } as any;
-      const result = visitType(schema, {
-        documentPath: ["components", "schemas", "Invalid"],
-        rootSegment: "components",
-      });
-
-      expect(result).toEqual(null);
-      expect(warnSpy).toHaveBeenCalledTimes(2); // extractRefNameとvisitTypeの両方で警告
-
-      warnSpy.mockRestore();
     });
 
     it("should return null for empty schemas", () => {
