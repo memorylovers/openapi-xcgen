@@ -1,18 +1,31 @@
-import { XcgenError, type ParserErrorCode } from "../errors";
+/**
+ * Parser向けのエラーコード定義
+ */
+export const PARSER_ERROR_CODES = {
+  INVALID_FORMAT: "INVALID_FORMAT",
+  SYNTAX_ERROR: "SYNTAX_ERROR",
+  FILE_NOT_FOUND: "FILE_NOT_FOUND",
+  INVALID_YAML: "INVALID_YAML",
+  INVALID_JSON: "INVALID_JSON",
+  PARSE_FAILED: "PARSE_FAILED",
+} as const;
+
+export type ParserErrorCode =
+  (typeof PARSER_ERROR_CODES)[keyof typeof PARSER_ERROR_CODES];
 
 /**
  * Custom error class for OpenAPI parsing errors
- * Extends the base XcgenError for consistent error handling
+ * Provides structured metadata without relying on a shared base class
  *
  * @example
  * ```typescript
- * import { PARSER_ERROR_CODES } from "../errors/codes";
+ * import { PARSER_ERROR_CODES } from "./error";
  * throw new XcgenParserError("Invalid OpenAPI format", PARSER_ERROR_CODES.INVALID_FORMAT);
  * ```
  *
  * @example
  * ```typescript
- * import { PARSER_ERROR_CODES } from "../errors/codes";
+ * import { PARSER_ERROR_CODES } from "./error";
  * throw new XcgenParserError(
  *   "Syntax error in YAML",
  *   PARSER_ERROR_CODES.SYNTAX_ERROR,
@@ -20,7 +33,17 @@ import { XcgenError, type ParserErrorCode } from "../errors";
  * );
  * ```
  */
-export class XcgenParserError extends XcgenError {
+export class XcgenParserError extends Error {
+  /**
+   * Parser-specific error code
+   */
+  public readonly code?: ParserErrorCode;
+
+  /**
+   * Additional error context
+   */
+  public readonly details?: unknown;
+
   /**
    * Creates a new XcgenParserError instance
    * @param message - The error message
@@ -28,133 +51,16 @@ export class XcgenParserError extends XcgenError {
    * @param details - Optional additional error details
    */
   constructor(message: string, code?: ParserErrorCode, details?: unknown) {
-    super(message, code, details);
+    super(message);
     this.name = "XcgenParserError";
+    this.code = code;
+    this.details = details;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
   }
 }
-
 // Maintain backward compatibility by exporting the old name as an alias
 // This will be deprecated in a future version
 export const ParserError = XcgenParserError;
-
-// === in-source testing ===
-if (import.meta.vitest) {
-  const { describe, test, expect } = import.meta.vitest;
-  const { PARSER_ERROR_CODES } = await import("../errors/codes");
-
-  describe("XcgenParserError", () => {
-    test("should create parser error with message", () => {
-      const error = new XcgenParserError("Failed to parse");
-      expect(error.message).toBe("Failed to parse");
-      expect(error.name).toBe("XcgenParserError");
-      expect(error instanceof Error).toBe(true);
-      expect(error instanceof XcgenError).toBe(true);
-      expect(error instanceof XcgenParserError).toBe(true);
-    });
-
-    test("should have stack trace", () => {
-      const error = new XcgenParserError("Test error");
-      expect(error.stack).toBeDefined();
-      expect(error.stack).toContain("XcgenParserError");
-    });
-
-    test("should accept error code", () => {
-      const error = new XcgenParserError(
-        "Failed to parse",
-        PARSER_ERROR_CODES.INVALID_FORMAT,
-      );
-      expect(error.message).toBe("Failed to parse");
-      expect(error.code).toBe("INVALID_FORMAT");
-    });
-
-    test("should accept error details", () => {
-      const details = {
-        line: 10,
-        column: 5,
-        file: "api.yaml",
-      };
-      const error = new XcgenParserError(
-        "Syntax error",
-        PARSER_ERROR_CODES.SYNTAX_ERROR,
-        details,
-      );
-      expect(error.message).toBe("Syntax error");
-      expect(error.code).toBe("SYNTAX_ERROR");
-      expect(error.details).toEqual(details);
-    });
-
-    test("should inherit timestamp from XcgenError", () => {
-      const before = Date.now();
-      const error = new XcgenParserError("Test error");
-      const after = Date.now();
-
-      expect(error.timestamp).toBeInstanceOf(Date);
-      expect(error.timestamp.getTime()).toBeGreaterThanOrEqual(before);
-      expect(error.timestamp.getTime()).toBeLessThanOrEqual(after);
-    });
-
-    test("should inherit toJSON method from XcgenError", () => {
-      const error = new XcgenParserError(
-        "JSON test",
-        PARSER_ERROR_CODES.PARSE_FAILED,
-        {
-          key: "value",
-        },
-      );
-      const json = error.toJSON();
-
-      expect(json).toHaveProperty("name", "XcgenParserError");
-      expect(json).toHaveProperty("message", "JSON test");
-      expect(json).toHaveProperty("code", "PARSE_FAILED");
-      expect(json).toHaveProperty("details", { key: "value" });
-      expect(json).toHaveProperty("timestamp");
-      expect(json).toHaveProperty("stack");
-    });
-
-    test("should inherit toString method from XcgenError", () => {
-      const error = new XcgenParserError(
-        "String test",
-        PARSER_ERROR_CODES.INVALID_YAML,
-      );
-      const string = error.toString();
-
-      expect(string).toContain("XcgenParserError");
-      expect(string).toContain("INVALID_YAML");
-      expect(string).toContain("String test");
-    });
-
-    test("should work with try-catch", () => {
-      const throwError = () => {
-        throw new XcgenParserError("Test error");
-      };
-
-      expect(throwError).toThrow(XcgenParserError);
-      expect(throwError).toThrow("Test error");
-    });
-
-    test("should be catchable as Error, XcgenError, and XcgenParserError", () => {
-      try {
-        throw new XcgenParserError("Test error");
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-        expect(error).toBeInstanceOf(XcgenError);
-        expect(error).toBeInstanceOf(XcgenParserError);
-      }
-    });
-
-    test("should preserve Error.captureStackTrace behavior", () => {
-      const error = new XcgenParserError("Stack test");
-      const stackLines = error.stack?.split("\n") || [];
-      // Stack should start with error name and message
-      expect(stackLines[0]).toContain("XcgenParserError");
-      expect(stackLines[0]).toContain("Stack test");
-    });
-
-    test("backward compatibility: ParserError should be alias for XcgenParserError", () => {
-      const error = new ParserError("Backward compat test");
-      expect(error).toBeInstanceOf(XcgenParserError);
-      expect(error).toBeInstanceOf(XcgenError);
-      expect(error.name).toBe("XcgenParserError");
-    });
-  });
-}

@@ -1,5 +1,8 @@
-import { PARSER_ERROR_CODES, type ParserErrorCode } from "../errors";
-import { XcgenParserError } from "./error";
+import {
+  PARSER_ERROR_CODES,
+  XcgenParserError,
+  type ParserErrorCode,
+} from "./error";
 
 /**
  * Create an error for invalid OpenAPI version

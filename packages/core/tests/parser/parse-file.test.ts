@@ -1,6 +1,6 @@
 import { dirname } from "pathe";
 import { describe, expect, test } from "vitest";
-import { PARSER_ERROR_CODES } from "../../src/errors/codes";
+import { PARSER_ERROR_CODES } from "../../src/parser/error";
 import { parse } from "../../src/parser";
 import { XcgenParserError } from "../../src/parser/error";
 import { FIXTURES } from "../utils/fixtures";
