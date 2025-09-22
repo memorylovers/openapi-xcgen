@@ -90,8 +90,6 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   // モデルのname + kindをチェック（オブジェクト、列挙型等を統一的に処理）
   models.forEach((item) => {
     const modelKey = `${item.kind}:${item.name}`;
-    // デバッグ用：モデルキー出力
-    // consola.debug(`Checking model: ${modelKey}`);
     if (modelKeys.has(modelKey)) {
       duplicates.add(item.name);
     }
@@ -100,15 +98,8 @@ export function transform(document: OpenAPIDocument): XcgenIR {
 
   // 重複があれば警告
   if (duplicates.size > 0) {
-    duplicates.forEach((name) => {
-      consola.warn(`Duplicate component name detected: "${name}"`);
-    });
-    consola.warn(
-      `Consider reviewing your OpenAPI design for naming conflicts.`,
-    );
-    consola.warn(
-      `Components with duplicate names may cause issues in code generation.`,
-    );
+    const duplicateNames = [...duplicates].sort().join(", ");
+    consola.warn(`Duplicate component names detected: ${duplicateNames}`);
   }
 
   // XcgenIR生成
@@ -122,21 +113,6 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     servers: [],
     security: [],
   };
-
-  // 統計情報をログ出力（種類別にカウント）
-  const objectCount = models.filter((m) => m.kind === "object").length;
-  const enumCount = models.filter((m) => m.kind === "enum").length;
-  const arrayCount = models.filter((m) => m.kind === "array").length;
-  const mapCount = models.filter((m) => m.kind === "map").length;
-  const parameterCount = models.filter((m) => m.kind === "parameter").length;
-  const requestBodyCount = models.filter(
-    (m) => m.kind === "requestBody",
-  ).length;
-  const responseCount = models.filter((m) => m.kind === "response").length;
-
-  consola.success(
-    `Transformed OpenAPI document: ${models.length} models (${objectCount} objects, ${enumCount} enums, ${arrayCount} arrays, ${mapCount} maps, ${parameterCount} parameters, ${requestBodyCount} requestBodies, ${responseCount} responses), ${tags.length} tags, ${endpoints.length} endpoints`,
-  );
 
   return xcgenIR;
 }
@@ -629,9 +605,7 @@ if (import.meta.vitest) {
 
       transform(doc);
 
-      expect(warnSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining("Duplicate component name detected"),
-      );
+      expect(warnSpy).not.toHaveBeenCalled();
 
       warnSpy.mockRestore();
     });
@@ -692,9 +666,7 @@ if (import.meta.vitest) {
       // - object kind (from inline schemas): PostUsersRequestBody, PostUsers200Response
       // - requestBody kind (unified model): PostUsersRequestBody
       // - response kind (unified model): PostUsers200Response
-      expect(warnSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining("Duplicate component name detected"),
-      );
+      expect(warnSpy).not.toHaveBeenCalled();
 
       warnSpy.mockRestore();
     });
@@ -741,9 +713,7 @@ if (import.meta.vitest) {
       transform(doc);
 
       // Should NOT warn because using $ref properly avoids naming conflicts
-      expect(warnSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining("Duplicate component name detected"),
-      );
+      expect(warnSpy).not.toHaveBeenCalled();
 
       warnSpy.mockRestore();
     });
@@ -795,14 +765,9 @@ if (import.meta.vitest) {
 
       transform(doc);
 
+      expect(warnSpy).toHaveBeenCalledTimes(1);
       expect(warnSpy).toHaveBeenCalledWith(
-        'Duplicate component name detected: "PostUsersRequestBodyStatus"',
-      );
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Consider reviewing your OpenAPI design for naming conflicts.",
-      );
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Components with duplicate names may cause issues in code generation.",
+        "Duplicate component names detected: PostUsersRequestBodyStatus",
       );
 
       warnSpy.mockRestore();
@@ -864,9 +829,7 @@ if (import.meta.vitest) {
       // Should NOT warn because components and inline schemas have different names
       // - UserProfile (from components)
       // - PostUsersRequestBody (generated from inline)
-      expect(warnSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining("Duplicate component name detected"),
-      );
+      expect(warnSpy).not.toHaveBeenCalled();
 
       warnSpy.mockRestore();
     });
