@@ -140,9 +140,10 @@ export function visitSchema(
     };
     return result;
   }
+
   // object型の処理（明示的または暗黙的）
   // OpenAPI 3.1では、typeがなくてもpropertiesがあれば暗黙的にobject型
-  else if (schema.type === "object" || (!schema.type && schema.properties)) {
+  if (schema.type === "object" || (!schema.type && schema.properties)) {
     // visitObjectでobject処理（ネスト構造の抽出含む）を完結
     // additionalPropertiesも含めて処理する
     const objectResult = visitObject(schema, context);
@@ -159,8 +160,9 @@ export function visitSchema(
     }
     return result;
   }
+
   // 配列型の特別処理（配列の要素がobjectの場合）
-  else if (schema.type === "array" && schema.items) {
+  if (schema.type === "array" && schema.items) {
     const itemSchema = schema.items as SchemaObjectWithNullable;
 
     // 配列の要素がobject型の場合、モデルとして抽出
