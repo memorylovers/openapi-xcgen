@@ -65,16 +65,6 @@ export type {
 export { isReferenceObject } from "./types";
 
 // Export HTTP utilities
-export { isValidHTTPMethod, normalizeHTTPMethod } from "./utils/http";
-export type { HTTPMethod } from "./utils/http";
-
-// Export path utilities
-export {
-  buildPath,
-  extractPathParams,
-  isParameterizedPath,
-  normalizePath,
-} from "./utils/path";
 
 // Export parser
 export { parse, ParserError, XcgenParserError } from "./parser";
