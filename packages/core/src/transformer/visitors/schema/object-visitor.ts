@@ -145,6 +145,7 @@ export function visitObject(
 
       // プロパティの型が取得できた場合のみ追加
       if (propResult.type) {
+        const validation = extractValidation(schemaObj);
         const property: IRProperty = {
           name: propName,
           type: propResult.type,
@@ -155,8 +156,8 @@ export function visitObject(
             defaultValue: schemaObj.default,
           }),
           ...(schemaObj.deprecated === true && { deprecated: true }),
-          ...(extractValidation(schemaObj) && {
-            validation: extractValidation(schemaObj),
+          ...(validation && {
+            validation,
           }),
         };
 
