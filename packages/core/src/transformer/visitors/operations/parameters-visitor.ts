@@ -13,7 +13,6 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
   IRParameter,
   IRParameterModel,
   ParameterObject,
@@ -32,8 +31,6 @@ export interface ParametersResult {
   parameters: IRParameter[];
   /** パラメータ統合モデル（パラメータがない場合はnull） */
   unifiedModel: IRParameterModel | null;
-  /** インラインスキーマから抽出されたモデル（オブジェクト、列挙型、配列、マップを統一） */
-  models: IRModel[];
 }
 
 /**
@@ -63,14 +60,12 @@ export function visitParameters(
   context: ParametersContext,
 ): ParametersResult {
   const irParameters: IRParameter[] = [];
-  const models: IRModel[] = [];
 
   // パラメータ配列が存在しない場合
   if (!parameters || parameters.length === 0) {
     return {
       parameters: [],
       unifiedModel: null,
-      models: [],
     };
   }
 
@@ -109,7 +104,6 @@ export function visitParameters(
   return {
     parameters: irParameters,
     unifiedModel,
-    models,
   };
 }
 
@@ -129,7 +123,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         parameters: [],
         unifiedModel: null,
-        models: [],
       });
     });
 
@@ -144,7 +137,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         parameters: [],
         unifiedModel: null,
-        models: [],
       });
     });
 
@@ -191,7 +183,6 @@ if (import.meta.vitest) {
           ],
           referencePath: "#/paths/::users::{id}/get/GetUsersIdParams",
         },
-        models: [],
       });
     });
 
@@ -270,7 +261,6 @@ if (import.meta.vitest) {
           referencePath:
             "#/paths/::users::{id}::posts/get/GetUsersIdPostsParams",
         },
-        models: [],
       });
     });
 
@@ -316,7 +306,6 @@ if (import.meta.vitest) {
           ],
           referencePath: "#/paths/::ref::{id}/get/GetRefIdParams",
         },
-        models: [],
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Reference parameter not supported yet: #/components/parameters/IdParam",
@@ -368,7 +357,6 @@ if (import.meta.vitest) {
           ],
           referencePath: "#/paths/::test/get/GetTestParams",
         },
-        models: [],
       });
     });
 
@@ -397,7 +385,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         parameters: [],
         unifiedModel: null,
-        models: [],
       });
     });
 
@@ -453,7 +440,6 @@ if (import.meta.vitest) {
           ],
           referencePath: "#/paths/::api::test/post/PostApiTestParams",
         },
-        models: [],
       });
     });
   });

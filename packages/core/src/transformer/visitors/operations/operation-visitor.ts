@@ -130,8 +130,6 @@ export function visitOperation(
   );
 
   // 全てのモデルを収集（オブジェクト、列挙型、配列、マップを統一）
-  models.push(...parametersResult.models);
-
   models.push(...responsesResult.models);
 
   // パラメータ統合モデルを追加
