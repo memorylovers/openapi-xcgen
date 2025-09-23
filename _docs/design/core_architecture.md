@@ -118,16 +118,16 @@ import type { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 export type OpenAPIDocument = OpenAPIV3.Document | OpenAPIV3_1.Document;
 
 // よく使う型のエイリアス（開発効率のため）
-export type OpenAPIV3Document = OpenAPIV3_1.Document;
-export type PathsObject = OpenAPIV3_1.PathsObject;
-export type PathItemObject = OpenAPIV3_1.PathItemObject;
-export type OperationObject = OpenAPIV3_1.OperationObject;
-export type SchemaObject = OpenAPIV3_1.SchemaObject;
-export type ReferenceObject = OpenAPIV3_1.ReferenceObject;
-export type ParameterObject = OpenAPIV3_1.ParameterObject;
-export type RequestBodyObject = OpenAPIV3_1.RequestBodyObject;
-export type ResponseObject = OpenAPIV3_1.ResponseObject;
-export type ComponentsObject = OpenAPIV3_1.ComponentsObject;
+export type OpenAPIV3Document = OpenAPIV3.Document;
+export type PathsObject = OpenAPIV3.PathsObject | OpenAPIV3_1.PathsObject;
+export type PathItemObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject;
+export type OperationObject = OpenAPIV3.OperationObject | OpenAPIV3_1.OperationObject;
+export type SchemaObject = OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject;
+export type ReferenceObject = OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject;
+export type ParameterObject = OpenAPIV3.ParameterObject | OpenAPIV3_1.ParameterObject;
+export type RequestBodyObject = OpenAPIV3.RequestBodyObject | OpenAPIV3_1.RequestBodyObject;
+export type ResponseObject = OpenAPIV3.ResponseObject | OpenAPIV3_1.ResponseObject;
+export type ComponentsObject = OpenAPIV3.ComponentsObject | OpenAPIV3_1.ComponentsObject;
 export type SecuritySchemeObject = OpenAPIV3_1.SecuritySchemeObject;
 export type ServerObject = OpenAPIV3_1.ServerObject;
 export type InfoObject = OpenAPIV3_1.InfoObject;

@@ -43,9 +43,6 @@ export type {
   MimeType,
   OpenAPIDocument,
   // OpenAPI types
-  OpenAPIV3,
-  OpenAPIV3_1,
-  OpenAPIV3Document,
   OperationObject,
   ParameterObject,
   PathItemObject,
@@ -60,6 +57,8 @@ export type {
   TagObject,
   XcgenIR,
 } from "./types";
+
+export type { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 
 // Export guard functions
 export { isReferenceObject } from "./types";

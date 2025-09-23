@@ -1,6 +1,4 @@
-import type { OpenAPIV3_1 } from "openapi-types";
-
-export type ReferenceObject = OpenAPIV3_1.ReferenceObject;
+import type { ReferenceObject } from "./index";
 
 /**
  * オブジェクトが$ref参照オブジェクトかどうかを判定
