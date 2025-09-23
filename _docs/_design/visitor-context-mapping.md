@@ -48,6 +48,9 @@ OpenAPI Document → XcgenIR
 | property（ネスト） | `<ParentName> + <Property>` | `PostUsersRequestBody` 内 `profile` → `PostUsersRequestBodyProfile` | `object-visitor.ts`（`generateNestedComponentName`） |
 | enum（プロパティ由来） | `<ParentName><Property>Enum` | `GetPets200Response` 内 `status` → `GetPets200ResponseStatusEnum` | `enum-visitor.ts`（`generateEnumComponentName`） |
 
+- 配列のインライン要素は `array-visitor.ts` が `{配列モデル名}Item` を `documentPath` 末尾に設定して処理するため、`BlogPostsItemAuthor` のように必ず `Item` サフィックス付きで抽出されます。
+- マップ (additionalProperties) の値スキーマは `map-visitor.ts` が `{マップモデル名}Value` を採用するため、値オブジェクトは `SettingsValue` のように `Value` サフィックスで命名されます。
+
 - `pathToComponentBase` が `/users/{id}` → `UsersId` のようにパスを PascalCase 化し、HTTP メソッドを付けて基礎名を構築します。
 - コンテキストごとにサフィックスやステータスコードを付加し、レスポンスやリクエストボディごとに一意の名前を作ります。
 - ネストしたオブジェクト／列挙型は親コンポーネント名をプレフィックスにした派生名で管理し、`buildReferencePath` と組み合わせて `#/paths/...` 系の参照を組み立てます。
@@ -128,9 +131,10 @@ paths:
           content:
             application/json:
               schema:
-                # type-visitor.ts: VisitorContext -> IRType
+                # array-visitor.ts: VisitorContext -> IRArrayModel (モデル名に Item サフィックスを付与)
                 type: array
                 items:
+                  # type-visitor.ts: VisitorContext -> IRType（$ref はそのまま伝播）
                   $ref: '#/components/schemas/Pet'
         '400':
           description: Invalid request payload
@@ -143,7 +147,8 @@ paths:
                     type: string
                 # visitResponseObject: SchemaContext -> IRResponseModel "GetPets400Response"
                 additionalProperties:
-                  type: string  # additional-properties-visitor.ts: IRType（IRMapModel）
+                  type: string
+                # additional-properties-visitor.ts: VisitorContext -> IRType（IRObjectModel.additionalProperties に格納）
 
   # path-item-visitor.ts: PathItemContext -> IREndpoint[] + IRModel[]
   /pets/{id}:
@@ -211,6 +216,38 @@ paths:
                   status:
                     type: string
 
+  /catalogs:
+    # operation-visitor.ts: OperationContext -> IREndpoint + IRModel[]
+    get:
+      operationId: listCatalogs
+      summary: List catalogs
+      tags: [catalog]
+
+      # responses-visitor.ts: ResponsesContext -> IRResponse[] + IRResponseModel[]
+      responses:
+        '200':
+          description: Catalog list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogList'
+
+  /settings:
+    # operation-visitor.ts: OperationContext -> IREndpoint + IRModel[]
+    get:
+      operationId: listSettings
+      summary: List localized settings
+      tags: [config]
+
+      # responses-visitor.ts: ResponsesContext -> IRResponse[] + IRResponseModel[]
+      responses:
+        '200':
+          description: Map of localized strings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalizedSettings'
+
 # components-visitor.ts: VisitorContext -> IRModel[]
 components:
   # components-visitor.ts: VisitorContext -> IRModel[]
@@ -252,7 +289,7 @@ components:
           # type-visitor.ts: VisitorContext -> IRType
           $ref: '#/components/schemas/Owner'
 
-      # additional-properties-visitor.ts: VisitorContext -> IRType（IRMapModel）
+      # additional-properties-visitor.ts: SchemaContext -> IRType（IRObjectModel.additionalProperties に格納）
       additionalProperties:
         type: string
 
@@ -265,6 +302,27 @@ components:
         email:
           type: string
           format: email
+          
+    # array-visitor.ts: SchemaContext -> IRArrayModel（CatalogList / CatalogListItem）
+    CatalogList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Catalog'
+
+    # object-visitor.ts: SchemaContext -> IRObjectModel "Catalog"
+    Catalog:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    # map-visitor.ts: SchemaContext -> IRMapModel（LocalizedSettings / LocalizedSettingsValue）
+    LocalizedSettings:
+      type: object
+      additionalProperties:
+        type: string
 
     Status:
       type: string
@@ -338,8 +396,8 @@ IRModel =
   | IRParameterModel   // kind: "parameter"
   | IRRequestBodyModel // kind: "requestBody"
   | IRResponseModel    // kind: "response"
-  | IRArrayModel       // kind: "array" (将来用)
-  | IRMapModel        // kind: "map" (将来用)
+  | IRArrayModel       // kind: "array"
+  | IRMapModel        // kind: "map"
 
 // IRType - プロパティの型情報
 IRType =
