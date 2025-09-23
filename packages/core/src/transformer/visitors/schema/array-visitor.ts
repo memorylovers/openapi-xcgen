@@ -21,6 +21,9 @@ export interface ArrayVisitorResult {
 
 /**
  * 配列スキーマをIRArrayModelに変換し、参照可能な型として返却する。
+ *
+ * 子要素の命名は `{配列名}Item` を付与して `visitSchema` に委譲し、
+ * 配列モデル本体とネストしたモデルの識別を容易にしている。
  */
 export function visitArray(
   schema: ArraySchemaInput,

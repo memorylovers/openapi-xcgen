@@ -16,6 +16,9 @@ export interface MapVisitorResult {
 
 /**
  * additionalPropertiesのみを持つスキーマをIRMapModelに変換する。
+ *
+ * additionalPropertiesの値スキーマは `{マップ名}Value` という接尾辞で再帰処理し、
+ * マップ本体と値モデルを区別できるようにしている。
  */
 export function visitMap(
   schema: SchemaObjectWithNullable,
