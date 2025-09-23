@@ -8,11 +8,7 @@ import type {
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitSchema } from "./schema-visitor";
-
-export interface MapVisitorResult {
-  type: IRType | null;
-  models: IRModel[];
-}
+import type { SchemaTransformationResult } from "../../types";
 
 /**
  * additionalPropertiesのみを持つスキーマをIRMapModelに変換する。
@@ -23,8 +19,8 @@ export interface MapVisitorResult {
 export function visitMap(
   schema: SchemaObjectWithNullable,
   context: VisitorContext,
-): MapVisitorResult {
-  const result: MapVisitorResult = {
+): SchemaTransformationResult {
+  const result: SchemaTransformationResult = {
     type: null,
     models: [],
   };
@@ -47,12 +43,16 @@ export function visitMap(
 
   if (additional === true) {
     consola.warn(
-      "additionalProperties: true (any type) is not fully supported yet",
+      "additionalProperties: true (any type) is not supported; specify a schema for map values",
     );
-    valueType = "string";
-  } else if (additional === false) {
     return result;
-  } else {
+  }
+
+  if (additional === false) {
+    return result;
+  }
+
+  {
     const valueContext: VisitorContext = {
       documentPath: [...context.documentPath.slice(0, -1), `${name}Value`],
       rootSegment: context.rootSegment,
@@ -178,17 +178,12 @@ if (import.meta.vitest) {
       const result = visitMap(schema, context);
 
       expect(result).toEqual({
-        type: { kind: "ref", name: "#/components/schemas/AnyMap" },
-        models: [
-          {
-            kind: "map",
-            name: "AnyMap",
-            referencePath: "#/components/schemas/AnyMap",
-            valueType: "string",
-          },
-        ],
+        type: null,
+        models: [],
       });
-      expect(warnSpy).toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(
+        "additionalProperties: true (any type) is not supported; specify a schema for map values",
+      );
       warnSpy.mockRestore();
     });
   });

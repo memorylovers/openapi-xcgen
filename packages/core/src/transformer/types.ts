@@ -1,4 +1,10 @@
-import type { SchemaObject, MimeType, IRHttpMethod, IRType } from "../types";
+import type {
+  IRHttpMethod,
+  IRModel,
+  IRType,
+  MimeType,
+  SchemaObject,
+} from "../types";
 
 /**
  * Visitor実行コンテキスト
@@ -133,3 +139,8 @@ export type SchemaVisitor = (
   schema: SchemaObject,
   context: VisitorContext,
 ) => VisitorResult<IRType>;
+
+export interface SchemaTransformationResult {
+  type: IRType | null;
+  models: IRModel[];
+}

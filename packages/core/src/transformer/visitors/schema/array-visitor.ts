@@ -1,23 +1,17 @@
 import { consola } from "consola";
 import type {
   IRArrayModel,
-  IRModel,
-  IRType,
   ReferenceObject,
   SchemaObjectWithNullable,
 } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitSchema } from "./schema-visitor";
+import type { SchemaTransformationResult } from "../../types";
 
 type ArraySchemaInput = SchemaObjectWithNullable & {
   items?: SchemaObjectWithNullable | ReferenceObject;
 };
-
-export interface ArrayVisitorResult {
-  type: IRType | null;
-  models: IRModel[];
-}
 
 /**
  * 配列スキーマをIRArrayModelに変換し、参照可能な型として返却する。
@@ -28,8 +22,8 @@ export interface ArrayVisitorResult {
 export function visitArray(
   schema: ArraySchemaInput,
   context: VisitorContext,
-): ArrayVisitorResult {
-  const result: ArrayVisitorResult = {
+): SchemaTransformationResult {
+  const result: SchemaTransformationResult = {
     type: null,
     models: [],
   };
