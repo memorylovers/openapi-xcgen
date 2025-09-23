@@ -6,7 +6,12 @@
  */
 
 import { consola } from "consola";
-import type { IRArray, IRType, SchemaObjectWithNullable } from "../../../types";
+import type {
+  IRArray,
+  IRType,
+  ReferenceObject,
+  SchemaObjectWithNullable,
+} from "../../../types";
 import { isReferenceObject } from "../../../types";
 import { toIRScalarType } from "../../helpers";
 import type { VisitorContext } from "../../types";
@@ -56,7 +61,7 @@ import type { VisitorContext } from "../../types";
  * ```
  */
 export function visitType(
-  schema: SchemaObjectWithNullable,
+  schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
 ): IRType | null {
   // $ref参照の場合
@@ -93,7 +98,7 @@ export function visitType(
 
   // 配列型
   if (schema.type === "array" && schema.items) {
-    const itemType = visitType(schema.items as SchemaObjectWithNullable, {
+    const itemType = visitType(schema.items, {
       documentPath: [...context.documentPath, "items"],
       rootSegment: context.rootSegment,
     });

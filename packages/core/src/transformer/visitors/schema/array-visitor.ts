@@ -48,10 +48,7 @@ export function visitArray(
   };
 
   // 配列要素を再帰的にvisitし、必要に応じて追加モデルを収集する。
-  const itemResult = visitSchema(
-    schema.items as SchemaObjectWithNullable,
-    itemContext,
-  );
+  const itemResult = visitSchema(schema.items, itemContext);
 
   if (!itemResult.type) {
     consola.warn(`Failed to resolve array item type: ${referencePath}`);

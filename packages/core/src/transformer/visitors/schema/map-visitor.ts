@@ -57,10 +57,7 @@ export function visitMap(
       documentPath: [...context.documentPath.slice(0, -1), `${name}Value`],
       rootSegment: context.rootSegment,
     };
-    const valueResult = visitSchema(
-      additional as SchemaObjectWithNullable,
-      valueContext,
-    );
+    const valueResult = visitSchema(additional, valueContext);
 
     if (!valueResult.type) {
       consola.warn(

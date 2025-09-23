@@ -14,7 +14,13 @@
  */
 
 import { consola } from "consola";
-import type { IRModel, IRType, SchemaObjectWithNullable } from "../../../types";
+import type {
+  IRModel,
+  IRType,
+  ReferenceObject,
+  SchemaObjectWithNullable,
+} from "../../../types";
+import { isReferenceObject } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitArray } from "./array-visitor";
@@ -64,13 +70,21 @@ export interface SchemaVisitorResult {
  * ```
  */
 export function visitSchema(
-  schema: SchemaObjectWithNullable,
+  schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
 ): SchemaVisitorResult {
   const result: SchemaVisitorResult = {
     type: null,
     models: [],
   };
+
+  if (isReferenceObject(schema)) {
+    result.type = {
+      kind: "ref",
+      name: schema.$ref,
+    };
+    return result;
+  }
 
   // 未対応機能の検出と警告
   if ("allOf" in schema && schema.allOf) {
