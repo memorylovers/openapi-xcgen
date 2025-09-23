@@ -47,15 +47,11 @@ export function visitAdditionalProperties(
   // boolean値の処理
   if (typeof additionalProperties === "boolean") {
     if (additionalProperties === true) {
-      // true = any型相当（現時点では未サポート）
       consola.warn(
-        `additionalProperties: true (any type) is not fully supported yet`,
+        "additionalProperties: true (any type) is not supported; specify a schema for map values",
       );
-      return "string"; // 暫定的にstringとして扱う
-    } else {
-      // false = 追加プロパティ禁止
-      return null;
     }
+    return null;
   }
 
   // SchemaObject | ReferenceObjectの処理
@@ -121,21 +117,6 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should handle boolean true with warning", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-      const context: VisitorContext = {
-        documentPath: ["components", "schemas", "Test"],
-        rootSegment: "components",
-      };
-
-      const result = visitAdditionalProperties(true, context);
-      expect(result).toBe("string"); // 暫定的にstring
-      expect(warnSpy).toHaveBeenCalledWith(
-        "additionalProperties: true (any type) is not fully supported yet",
-      );
-      warnSpy.mockRestore();
-    });
-
     it("should handle boolean false", () => {
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "Test"],
@@ -144,6 +125,21 @@ if (import.meta.vitest) {
 
       const result = visitAdditionalProperties(false, context);
       expect(result).toBeNull();
+    });
+
+    it("should warn and return null for boolean true", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Test"],
+        rootSegment: "components",
+      };
+
+      const result = visitAdditionalProperties(true, context);
+      expect(result).toBeNull();
+      expect(warnSpy).toHaveBeenCalledWith(
+        "additionalProperties: true (any type) is not supported; specify a schema for map values",
+      );
+      warnSpy.mockRestore();
     });
   });
 }
