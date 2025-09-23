@@ -45,8 +45,8 @@
         {
           "name": "tags",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/components/schemas/ProfileTags"
           },
           "nullable": true
         }
@@ -62,6 +62,12 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "ProfileTags",
+      "referencePath": "#/components/schemas/ProfileTags",
+      "itemType": "string"
     }
   ],
   "tags": [],

@@ -44,29 +44,29 @@
         {
           "name": "tags",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesTags"
           }
         },
         {
           "name": "numbers",
           "type": {
-            "kind": "array",
-            "itemType": "int"
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesNumbers"
           }
         },
         {
           "name": "scores",
           "type": {
-            "kind": "array",
-            "itemType": "double"
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesScores"
           }
         },
         {
           "name": "flags",
           "type": {
-            "kind": "array",
-            "itemType": "boolean"
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesFlags"
           }
         }
       ]
@@ -81,6 +81,30 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesTags",
+      "referencePath": "#/components/schemas/DataTypesTags",
+      "itemType": "string"
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesNumbers",
+      "referencePath": "#/components/schemas/DataTypesNumbers",
+      "itemType": "int"
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesScores",
+      "referencePath": "#/components/schemas/DataTypesScores",
+      "itemType": "double"
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesFlags",
+      "referencePath": "#/components/schemas/DataTypesFlags",
+      "itemType": "boolean"
     }
   ],
   "tags": [],

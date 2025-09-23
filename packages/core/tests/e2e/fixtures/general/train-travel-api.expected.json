@@ -158,11 +158,8 @@
         {
           "name": "passengers",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Passenger"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/BookingRequestPassengers"
           },
           "required": true,
           "validation": {
@@ -178,6 +175,15 @@
           }
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "BookingRequestPassengers",
+      "referencePath": "#/components/schemas/BookingRequestPassengers",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Passenger"
+      }
     },
     {
       "kind": "enum",
@@ -227,11 +233,8 @@
         {
           "name": "passengers",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Passenger"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/BookingPassengers"
           },
           "required": true
         },
@@ -264,6 +267,15 @@
           "required": true
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "BookingPassengers",
+      "referencePath": "#/components/schemas/BookingPassengers",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Passenger"
+      }
     },
     {
       "kind": "enum",
@@ -594,16 +606,13 @@
     {
       "kind": "response",
       "name": "GetStations200Response",
-      "referencePath": "#/paths/::stations/get/responses/responses/200/content/application::json/schema/GetStations200Response",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response",
       "properties": [
         {
           "name": "data",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Station"
-            }
+            "kind": "ref",
+            "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData"
           }
         },
         {
@@ -615,6 +624,15 @@
         }
       ],
       "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetStations200ResponseData",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Station"
+      }
     },
     {
       "kind": "parameter",
@@ -652,16 +670,13 @@
     {
       "kind": "response",
       "name": "GetTrips200Response",
-      "referencePath": "#/paths/::trips/get/responses/responses/200/content/application::json/schema/GetTrips200Response",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response",
       "properties": [
         {
           "name": "data",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Trip"
-            }
+            "kind": "ref",
+            "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData"
           }
         },
         {
@@ -673,6 +688,15 @@
         }
       ],
       "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetTrips200ResponseData",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Trip"
+      }
     },
     {
       "kind": "parameter",
@@ -718,16 +742,13 @@
     {
       "kind": "response",
       "name": "GetBookings200Response",
-      "referencePath": "#/paths/::bookings/get/responses/responses/200/content/application::json/schema/GetBookings200Response",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response",
       "properties": [
         {
           "name": "data",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Booking"
-            }
+            "kind": "ref",
+            "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData"
           }
         },
         {
@@ -739,6 +760,15 @@
         }
       ],
       "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetBookings200ResponseData",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Booking"
+      }
     }
   ],
   "tags": [],
@@ -762,7 +792,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::stations/get/responses/responses/200/content/application::json/schema/GetStations200Response"
+                "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response"
               }
             }
           ]
@@ -791,7 +821,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::trips/get/responses/responses/200/content/application::json/schema/GetTrips200Response"
+                "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response"
               }
             }
           ]
@@ -817,7 +847,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::bookings/get/responses/responses/200/content/application::json/schema/GetBookings200Response"
+                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response"
               }
             }
           ]

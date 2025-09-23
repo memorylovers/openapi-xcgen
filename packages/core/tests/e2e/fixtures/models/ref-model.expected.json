@@ -20,14 +20,20 @@
         {
           "name": "items",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/OrderItem"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/OrderItems"
           }
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "OrderItems",
+      "referencePath": "#/components/schemas/OrderItems",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/OrderItem"
+      }
     },
     {
       "kind": "object",
@@ -50,6 +56,15 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "GetCustomers200Response",
+      "referencePath": "#/paths/::customers/get/responses/200/content/application::json/schema/GetCustomers200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Customer"
+      }
     }
   ],
   "tags": [],
@@ -89,11 +104,8 @@
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Customer"
-                }
+                "kind": "ref",
+                "name": "#/paths/::customers/get/responses/200/content/application::json/schema/GetCustomers200Response"
               }
             }
           ]

@@ -32,6 +32,15 @@
       ]
     },
     {
+      "kind": "array",
+      "name": "Pets",
+      "referencePath": "#/components/schemas/Pets",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
       "kind": "object",
       "name": "Error",
       "referencePath": "#/components/schemas/Error",

@@ -191,19 +191,16 @@
         {
           "name": "photoUrls",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/components/schemas/PetPhotoUrls"
           },
           "required": true
         },
         {
           "name": "tags",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Tag"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/PetTags"
           }
         },
         {
@@ -217,6 +214,21 @@
         }
       ],
       "description": "A pet for sale in the pet store"
+    },
+    {
+      "kind": "array",
+      "name": "PetPhotoUrls",
+      "referencePath": "#/components/schemas/PetPhotoUrls",
+      "itemType": "string"
+    },
+    {
+      "kind": "array",
+      "name": "PetTags",
+      "referencePath": "#/components/schemas/PetTags",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Tag"
+      }
     },
     {
       "kind": "enum",
@@ -263,6 +275,24 @@
       "description": "Describes the result of uploading an image resource"
     },
     {
+      "kind": "array",
+      "name": "GetPetFindByStatus200XmlResponse",
+      "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema/GetPetFindByStatus200XmlResponse",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByStatus200Response",
+      "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema/GetPetFindByStatus200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
       "kind": "parameter",
       "name": "GetPetFindByStatusParams",
       "description": "Parameters for GET /pet/findByStatus\nstatus: Status values that need to be considered for filter",
@@ -280,6 +310,24 @@
         }
       ],
       "referencePath": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParams"
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByTags200XmlResponse",
+      "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema/GetPetFindByTags200XmlResponse",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByTags200Response",
+      "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema/GetPetFindByTags200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
     },
     {
       "kind": "parameter",
@@ -401,7 +449,7 @@
     {
       "kind": "response",
       "name": "GetStoreInventory200Response",
-      "referencePath": "#/paths/::store::inventory/get/responses/responses/200/content/application::json/schema/GetStoreInventory200Response",
+      "referencePath": "#/paths/::store::inventory/get/responses/200/content/application::json/schema/GetStoreInventory200Response",
       "properties": [],
       "statusCode": "200",
       "additionalProperties": "int"
@@ -617,21 +665,15 @@
             {
               "mimeType": "application/xml",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Pet"
-                }
+                "kind": "ref",
+                "name": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema/GetPetFindByStatus200XmlResponse"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Pet"
-                }
+                "kind": "ref",
+                "name": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema/GetPetFindByStatus200Response"
               }
             }
           ]
@@ -663,21 +705,15 @@
             {
               "mimeType": "application/xml",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Pet"
-                }
+                "kind": "ref",
+                "name": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema/GetPetFindByTags200XmlResponse"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Pet"
-                }
+                "kind": "ref",
+                "name": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema/GetPetFindByTags200Response"
               }
             }
           ]
@@ -840,7 +876,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::store::inventory/get/responses/responses/200/content/application::json/schema/GetStoreInventory200Response"
+                "name": "#/paths/::store::inventory/get/responses/200/content/application::json/schema/GetStoreInventory200Response"
               }
             }
           ]

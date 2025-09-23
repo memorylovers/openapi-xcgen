@@ -140,7 +140,7 @@ export function visitObject(
         rootSegment: context.rootSegment,
       });
 
-      // 抽出されたモデルを収集
+      // 抽出されたモデルを収集（配列・マップの補助モデルもここで追加される）
       nestedModels.push(...propResult.models);
 
       // プロパティの型が取得できた場合のみ追加
@@ -844,11 +844,17 @@ if (import.meta.vitest) {
               {
                 name: "tags",
                 type: {
-                  kind: "array",
-                  itemType: "string",
+                  kind: "ref",
+                  name: "#/components/schemas/DataTags",
                 },
               },
             ],
+          },
+          {
+            kind: "array",
+            name: "DataTags",
+            referencePath: "#/components/schemas/DataTags",
+            itemType: "string",
           },
         ],
       });

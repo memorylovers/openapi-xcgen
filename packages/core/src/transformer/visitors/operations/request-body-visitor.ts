@@ -146,12 +146,21 @@ export function visitRequestBody(
         }
       } else {
         // それ以外のスキーマは通常通り処理
+        const componentName = generateComponentName(
+          context.pathTemplate,
+          context.method,
+          "requestBody",
+          undefined,
+          undefined,
+          mimeType,
+        );
         const schemaResult = visitSchema(mediaType.schema, {
           documentPath: [
             ...context.documentPath,
             "content",
             mimeType,
             "schema",
+            componentName,
           ],
           rootSegment: "paths",
         });

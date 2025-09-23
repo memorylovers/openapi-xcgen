@@ -76,6 +76,15 @@
       ]
     },
     {
+      "kind": "array",
+      "name": "GetUsers200Response",
+      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/User"
+      }
+    },
+    {
       "kind": "parameter",
       "name": "GetUsersUserIdParams",
       "description": "Parameters for GET /users/{userId}",
@@ -107,11 +116,8 @@
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/User"
-                }
+                "kind": "ref",
+                "name": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response"
               }
             }
           ]

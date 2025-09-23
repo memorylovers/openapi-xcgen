@@ -74,6 +74,15 @@
       ]
     },
     {
+      "kind": "array",
+      "name": "GetPets200Response",
+      "referencePath": "#/paths/::pets/get/responses/200/content/application::json/schema/GetPets200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
       "kind": "parameter",
       "name": "GetPetsParams",
       "description": "Parameters for GET /pets\nlimit: How many items to return at one time",
@@ -124,11 +133,8 @@
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/Pet"
-                }
+                "kind": "ref",
+                "name": "#/paths/::pets/get/responses/200/content/application::json/schema/GetPets200Response"
               }
             }
           ]

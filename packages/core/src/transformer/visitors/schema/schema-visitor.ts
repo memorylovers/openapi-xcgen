@@ -17,8 +17,9 @@ import { consola } from "consola";
 import type { IRModel, IRType, SchemaObjectWithNullable } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
-import { visitAdditionalProperties } from "./additional-properties-visitor";
+import { visitArray } from "./array-visitor";
 import { visitEnum } from "./enum-visitor";
+import { visitMap } from "./map-visitor";
 import { visitObject } from "./object-visitor";
 import { visitType } from "./type-visitor";
 
@@ -106,25 +107,12 @@ export function visitSchema(
   // additionalPropertiesのみの場合の検出（プロパティがない場合）
   if (
     "additionalProperties" in schema &&
-    schema.additionalProperties &&
+    schema.additionalProperties !== undefined &&
     (!schema.properties || Object.keys(schema.properties).length === 0)
   ) {
-    // IRMap型として処理
-    const valueType = visitAdditionalProperties(
-      schema.additionalProperties,
-      context,
-    );
-
-    if (valueType) {
-      result.type = {
-        kind: "map",
-        valueType,
-      };
-    } else {
-      consola.warn(
-        `Failed to process additionalProperties-only schema: ${buildReferencePath(context.documentPath)}`,
-      );
-    }
+    const mapResult = visitMap(schema, context);
+    result.models.push(...mapResult.models);
+    result.type = mapResult.type;
     return result;
   }
 
@@ -161,43 +149,16 @@ export function visitSchema(
     return result;
   }
 
-  // 配列型の特別処理（配列の要素がobjectの場合）
-  if (schema.type === "array" && schema.items) {
-    const itemSchema = schema.items as SchemaObjectWithNullable;
-
-    // 配列の要素がobject型の場合、モデルとして抽出
-    if (itemSchema.type === "object") {
-      const itemResult = visitSchema(itemSchema, context);
-
-      // 抽出されたモデルを集約
-      result.models.push(...itemResult.models);
-
-      // 配列型を構築（要素は参照型）
-      if (itemResult.models.length > 0) {
-        result.type = {
-          kind: "array",
-          itemType: {
-            kind: "ref",
-            name: buildReferencePath(context.documentPath),
-          },
-        };
-      } else {
-        // モデルが生成されなかった場合は通常の配列処理
-        result.type = visitType(schema, context);
-      }
-      return result;
-    }
-    // 配列の要素がobject以外の場合は通常処理
-    else {
-      result.type = visitType(schema, context);
-      return result;
-    }
-  }
-  // その他の型（プリミティブなど）
-  else {
-    result.type = visitType(schema, context);
+  if (schema.type === "array") {
+    const arrayResult = visitArray(schema, context);
+    result.models.push(...arrayResult.models);
+    result.type = arrayResult.type;
     return result;
   }
+
+  // その他の型（プリミティブなど）
+  result.type = visitType(schema, context);
+  return result;
 }
 
 // === in-source testing ===
@@ -426,14 +387,20 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: {
-          kind: "array",
-          itemType: { kind: "ref", name: "#/components/schemas/Item" },
+          kind: "ref",
+          name: "#/components/schemas/Item",
         },
         models: [
           {
-            kind: "object",
+            kind: "array",
             name: "Item",
             referencePath: "#/components/schemas/Item",
+            itemType: { kind: "ref", name: "#/components/schemas/ItemItem" },
+          },
+          {
+            kind: "object",
+            name: "ItemItem",
+            referencePath: "#/components/schemas/ItemItem",
             properties: [
               {
                 name: "id",
@@ -575,19 +542,25 @@ if (import.meta.vitest) {
               {
                 name: "posts",
                 type: {
-                  kind: "array",
-                  itemType: {
-                    kind: "ref",
-                    name: "#/components/schemas/BlogPosts",
-                  },
+                  kind: "ref",
+                  name: "#/components/schemas/BlogPosts",
                 },
               },
             ],
           },
           {
-            kind: "object",
+            kind: "array",
             name: "BlogPosts",
             referencePath: "#/components/schemas/BlogPosts",
+            itemType: {
+              kind: "ref",
+              name: "#/components/schemas/BlogPostsItem",
+            },
+          },
+          {
+            kind: "object",
+            name: "BlogPostsItem",
+            referencePath: "#/components/schemas/BlogPostsItem",
             properties: [
               {
                 name: "title",
@@ -597,15 +570,15 @@ if (import.meta.vitest) {
                 name: "author",
                 type: {
                   kind: "ref",
-                  name: "#/components/schemas/BlogPostsAuthor",
+                  name: "#/components/schemas/BlogPostsItemAuthor",
                 },
               },
             ],
           },
           {
             kind: "object",
-            name: "BlogPostsAuthor",
-            referencePath: "#/components/schemas/BlogPostsAuthor",
+            name: "BlogPostsItemAuthor",
+            referencePath: "#/components/schemas/BlogPostsItemAuthor",
             properties: [
               {
                 name: "name",
@@ -615,15 +588,15 @@ if (import.meta.vitest) {
                 name: "role",
                 type: {
                   kind: "ref",
-                  name: "#/components/schemas/BlogPostsAuthorRole",
+                  name: "#/components/schemas/BlogPostsItemAuthorRole",
                 },
               },
             ],
           },
           {
             kind: "enum",
-            name: "BlogPostsAuthorRole",
-            referencePath: "#/components/schemas/BlogPostsAuthorRole",
+            name: "BlogPostsItemAuthorRole",
+            referencePath: "#/components/schemas/BlogPostsItemAuthorRole",
             type: "string",
             values: [
               { value: "admin", name: "ADMIN" },
@@ -671,14 +644,20 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: {
-          kind: "array",
-          itemType: { kind: "ref", name: "#/components/schemas/Items" },
+          kind: "ref",
+          name: "#/components/schemas/Items",
         },
         models: [
           {
-            kind: "object",
+            kind: "array",
             name: "Items",
             referencePath: "#/components/schemas/Items",
+            itemType: { kind: "ref", name: "#/components/schemas/ItemsItem" },
+          },
+          {
+            kind: "object",
+            name: "ItemsItem",
+            referencePath: "#/components/schemas/ItemsItem",
             properties: [
               {
                 name: "id",
@@ -692,15 +671,15 @@ if (import.meta.vitest) {
                 name: "metadata",
                 type: {
                   kind: "ref",
-                  name: "#/components/schemas/ItemsMetadata",
+                  name: "#/components/schemas/ItemsItemMetadata",
                 },
               },
             ],
           },
           {
             kind: "object",
-            name: "ItemsMetadata",
-            referencePath: "#/components/schemas/ItemsMetadata",
+            name: "ItemsItemMetadata",
+            referencePath: "#/components/schemas/ItemsItemMetadata",
             properties: [
               {
                 name: "created",
@@ -710,15 +689,15 @@ if (import.meta.vitest) {
                 name: "category",
                 type: {
                   kind: "ref",
-                  name: "#/components/schemas/ItemsMetadataCategory",
+                  name: "#/components/schemas/ItemsItemMetadataCategory",
                 },
               },
             ],
           },
           {
             kind: "enum",
-            name: "ItemsMetadataCategory",
-            referencePath: "#/components/schemas/ItemsMetadataCategory",
+            name: "ItemsItemMetadataCategory",
+            referencePath: "#/components/schemas/ItemsItemMetadataCategory",
             type: "string",
             values: [
               { value: "product", name: "PRODUCT" },
@@ -901,10 +880,17 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: {
-          kind: "map",
-          valueType: "string",
+          kind: "ref",
+          name: "#/components/schemas/StringMap",
         },
-        models: [],
+        models: [
+          {
+            kind: "map",
+            name: "StringMap",
+            referencePath: "#/components/schemas/StringMap",
+            valueType: "string",
+          },
+        ],
       });
     });
 
@@ -985,13 +971,26 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: {
-          kind: "map",
-          valueType: {
+          kind: "ref",
+          name: "#/components/schemas/ArrayMap",
+        },
+        models: [
+          {
+            kind: "map",
+            name: "ArrayMap",
+            referencePath: "#/components/schemas/ArrayMap",
+            valueType: {
+              kind: "ref",
+              name: "#/components/schemas/ArrayMapValue",
+            },
+          },
+          {
             kind: "array",
+            name: "ArrayMapValue",
+            referencePath: "#/components/schemas/ArrayMapValue",
             itemType: "string",
           },
-        },
-        models: [],
+        ],
       });
     });
 
@@ -1011,13 +1010,20 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: {
-          kind: "map",
-          valueType: {
-            kind: "ref",
-            name: "#/components/schemas/MetadataValue",
-          },
+          kind: "ref",
+          name: "#/components/schemas/MetadataMap",
         },
-        models: [],
+        models: [
+          {
+            kind: "map",
+            name: "MetadataMap",
+            referencePath: "#/components/schemas/MetadataMap",
+            valueType: {
+              kind: "ref",
+              name: "#/components/schemas/MetadataValue",
+            },
+          },
+        ],
       });
     });
   });

@@ -139,12 +139,21 @@ export function visitResponse(
           }
         } else {
           // それ以外のスキーマは通常通り処理
+          const componentName = generateComponentName(
+            context.pathTemplate,
+            context.method,
+            "response",
+            context.statusCode,
+            undefined,
+            mimeType,
+          );
           const schemaContext: VisitorContext = {
             documentPath: [
               ...context.documentPath,
               "content",
               mimeType,
               "schema",
+              componentName,
             ],
             rootSegment: "paths",
           };
@@ -259,11 +268,18 @@ if (import.meta.vitest) {
               {
                 name: "users",
                 type: {
-                  kind: "array",
-                  itemType: "string",
+                  kind: "ref",
+                  name: "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200ResponseUsers",
                 },
               },
             ],
+          },
+          {
+            kind: "array",
+            name: "GetUsers200ResponseUsers",
+            referencePath:
+              "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200ResponseUsers",
+            itemType: "string",
           },
         ],
       });

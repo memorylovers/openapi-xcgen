@@ -959,7 +959,7 @@
     {
       "kind": "response",
       "name": "GetMuseumHours200Response",
-      "referencePath": "#/paths/::museum-hours/get/responses/responses/200/content/application::json/schema/GetMuseumHours200Response",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200Response",
       "properties": [
         {
           "name": "timezone",
@@ -969,15 +969,21 @@
         {
           "name": "daily_hours",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/DailyHours"
-            }
+            "kind": "ref",
+            "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours"
           }
         }
       ],
       "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetMuseumHours200ResponseDailyHours",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/DailyHours"
+      }
     },
     {
       "kind": "parameter",
@@ -1003,16 +1009,13 @@
     {
       "kind": "response",
       "name": "GetSpecialEvents200Response",
-      "referencePath": "#/paths/::special-events/get/responses/responses/200/content/application::json/schema/GetSpecialEvents200Response",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200Response",
       "properties": [
         {
           "name": "events",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/SpecialEvent"
-            }
+            "kind": "ref",
+            "name": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents"
           }
         },
         {
@@ -1024,6 +1027,15 @@
         }
       ],
       "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetSpecialEvents200ResponseEvents",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/SpecialEvent"
+      }
     },
     {
       "kind": "parameter",
@@ -1137,7 +1149,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::museum-hours/get/responses/responses/200/content/application::json/schema/GetMuseumHours200Response"
+                "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200Response"
               }
             }
           ]
@@ -1166,7 +1178,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::special-events/get/responses/responses/200/content/application::json/schema/GetSpecialEvents200Response"
+                "name": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200Response"
               }
             }
           ]

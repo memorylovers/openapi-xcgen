@@ -130,19 +130,25 @@
         {
           "name": "members",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/TeamMembers"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/TeamMembers"
           }
         }
       ]
     },
     {
-      "kind": "object",
+      "kind": "array",
       "name": "TeamMembers",
       "referencePath": "#/components/schemas/TeamMembers",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/TeamMembersItem"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "TeamMembersItem",
+      "referencePath": "#/components/schemas/TeamMembersItem",
       "properties": [
         {
           "name": "name",
@@ -160,6 +166,15 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "GetUsers200Response",
+      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/User"
+      }
     }
   ],
   "tags": [],
@@ -265,11 +280,8 @@
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/components/schemas/User"
-                }
+                "kind": "ref",
+                "name": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response"
               }
             }
           ]

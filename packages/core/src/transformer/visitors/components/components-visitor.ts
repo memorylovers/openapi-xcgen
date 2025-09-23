@@ -264,9 +264,15 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      // 配列型はモデル/enumとして扱われない
       expect(result).toEqual({
-        models: [],
+        models: [
+          {
+            kind: "array",
+            name: "List",
+            referencePath: "#/components/schemas/List",
+            itemType: "string",
+          },
+        ],
       });
     });
 

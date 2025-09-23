@@ -488,7 +488,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::pets::{id}/get/responses/responses/200/content/application::json/schema/GetPetsId200Response",
+                    name: "#/paths/::pets::{id}/get/responses/200/content/application::json/schema/GetPetsId200Response",
                   },
                 },
               ],
@@ -504,7 +504,7 @@ if (import.meta.vitest) {
             kind: "response",
             name: "GetPetsId200Response",
             referencePath:
-              "#/paths/::pets::{id}/get/responses/responses/200/content/application::json/schema/GetPetsId200Response",
+              "#/paths/::pets::{id}/get/responses/200/content/application::json/schema/GetPetsId200Response",
             statusCode: "200",
             properties: [
               {

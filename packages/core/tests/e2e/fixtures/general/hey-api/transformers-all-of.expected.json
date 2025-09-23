@@ -12,15 +12,21 @@
         {
           "name": "foo",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Bar"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/FooFoo"
           },
           "required": true
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "FooFoo",
+      "referencePath": "#/components/schemas/FooFoo",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Bar"
+      }
     },
     {
       "kind": "object",

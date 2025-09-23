@@ -116,14 +116,29 @@
         {
           "name": "data",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/Pet"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/PetsNestedArrayData"
           }
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "PetsNestedArrayData",
+      "referencePath": "#/components/schemas/PetsNestedArrayData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "array",
+      "name": "PetsArray",
+      "referencePath": "#/components/schemas/PetsArray",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
     },
     {
       "kind": "object",

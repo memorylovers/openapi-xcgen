@@ -30,6 +30,7 @@ export { isReferenceObject } from "./guards";
 export type {
   IRApiKeyConfig,
   IRArray,
+  IRArrayModel,
   IRContact,
   IREndpoint,
   IREnumModel,
@@ -37,6 +38,7 @@ export type {
   IRHttpMethod,
   IRLicense,
   IRMap,
+  IRMapModel,
   IRMetadata,
   IRModel,
   IROAuth2Flow,

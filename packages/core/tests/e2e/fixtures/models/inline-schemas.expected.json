@@ -77,7 +77,7 @@
     {
       "kind": "response",
       "name": "GetTest1ParametersId200Response",
-      "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response",
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema/GetTest1ParametersId200Response",
       "properties": [
         {
           "name": "result",
@@ -193,7 +193,7 @@
     {
       "kind": "response",
       "name": "PostTest2Request201Response",
-      "referencePath": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response",
+      "referencePath": "#/paths/::test-2-request/post/responses/201/content/application::json/schema/PostTest2Request201Response",
       "properties": [
         {
           "name": "result",
@@ -203,9 +203,18 @@
       "statusCode": "201"
     },
     {
+      "kind": "array",
+      "name": "GetTest3Response201Response",
+      "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201ResponseItem"
+      }
+    },
+    {
       "kind": "object",
-      "name": "schema",
-      "referencePath": "#/paths/::test-3-response/get/responses/responses/201/content/application::json/schema",
+      "name": "GetTest3Response201ResponseItem",
+      "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201ResponseItem",
       "properties": [
         {
           "name": "name",
@@ -227,7 +236,7 @@
     {
       "kind": "response",
       "name": "GetTest3Response202Response",
-      "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202Response",
       "properties": [
         {
           "name": "count",
@@ -237,7 +246,7 @@
           "name": "result",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResult"
+            "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult"
           }
         }
       ],
@@ -246,13 +255,13 @@
     {
       "kind": "object",
       "name": "GetTest3Response202ResponseResult",
-      "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
       "properties": [
         {
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus"
+            "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus"
           }
         }
       ]
@@ -260,7 +269,7 @@
     {
       "kind": "enum",
       "name": "GetTest3Response202ResponseResultStatus",
-      "referencePath": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus",
       "type": "string",
       "values": [
         {
@@ -313,7 +322,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-1-parameters::{id}/get/responses/responses/200/content/application::json/schema/GetTest1ParametersId200Response"
+                "name": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema/GetTest1ParametersId200Response"
               }
             }
           ]
@@ -337,7 +346,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-2-request/post/responses/responses/201/content/application::json/schema/PostTest2Request201Response"
+                "name": "#/paths/::test-2-request/post/responses/201/content/application::json/schema/PostTest2Request201Response"
               }
             }
           ]
@@ -385,11 +394,8 @@
             {
               "mimeType": "application/json",
               "schema": {
-                "kind": "array",
-                "itemType": {
-                  "kind": "ref",
-                  "name": "#/paths/::test-3-response/get/responses/responses/201/content/application::json/schema"
-                }
+                "kind": "ref",
+                "name": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201Response"
               }
             }
           ]
@@ -402,7 +408,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-3-response/get/responses/responses/202/content/application::json/schema/GetTest3Response202Response"
+                "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202Response"
               }
             }
           ]

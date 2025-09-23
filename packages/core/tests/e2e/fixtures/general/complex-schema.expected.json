@@ -21,11 +21,8 @@
         {
           "name": "items",
           "type": {
-            "kind": "array",
-            "itemType": {
-              "kind": "ref",
-              "name": "#/components/schemas/OrderItems"
-            }
+            "kind": "ref",
+            "name": "#/components/schemas/OrderItems"
           },
           "required": true,
           "validation": {
@@ -57,15 +54,15 @@
         {
           "name": "tags",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/components/schemas/OrderTags"
           }
         },
         {
           "name": "metadata",
           "type": {
-            "kind": "map",
-            "valueType": "string"
+            "kind": "ref",
+            "name": "#/components/schemas/OrderMetadata"
           }
         },
         {
@@ -79,9 +76,18 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "array",
       "name": "OrderItems",
       "referencePath": "#/components/schemas/OrderItems",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/OrderItemsItem"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "OrderItemsItem",
+      "referencePath": "#/components/schemas/OrderItemsItem",
       "properties": [
         {
           "name": "productId",
@@ -222,6 +228,18 @@
           "name": "URGENT"
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "OrderTags",
+      "referencePath": "#/components/schemas/OrderTags",
+      "itemType": "string"
+    },
+    {
+      "kind": "map",
+      "name": "OrderMetadata",
+      "referencePath": "#/components/schemas/OrderMetadata",
+      "valueType": "string"
     }
   ],
   "tags": [],

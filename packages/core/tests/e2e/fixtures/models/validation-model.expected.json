@@ -71,8 +71,8 @@
         {
           "name": "tags",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/components/schemas/ProductTags"
           },
           "validation": {
             "minItems": 1,
@@ -80,6 +80,12 @@
           }
         }
       ]
+    },
+    {
+      "kind": "array",
+      "name": "ProductTags",
+      "referencePath": "#/components/schemas/ProductTags",
+      "itemType": "string"
     }
   ],
   "tags": [],
