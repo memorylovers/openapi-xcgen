@@ -94,7 +94,5 @@
       ],
       "summary": "Get profiles"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

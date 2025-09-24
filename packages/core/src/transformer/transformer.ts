@@ -110,8 +110,6 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     models,
     tags,
     endpoints,
-    servers: [],
-    security: [],
   };
 
   return xcgenIR;
@@ -142,8 +140,6 @@ if (import.meta.vitest) {
         models: [],
         tags: [],
         endpoints: [],
-        servers: [],
-        security: [],
       });
     });
 
@@ -215,8 +211,6 @@ if (import.meta.vitest) {
         ],
         tags: [],
         endpoints: [],
-        servers: [],
-        security: [],
       });
     });
 
@@ -348,8 +342,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        servers: [],
-        security: [],
       });
     });
 
@@ -499,8 +491,6 @@ if (import.meta.vitest) {
             ],
           },
         ],
-        servers: [],
-        security: [],
       });
     });
 
@@ -555,8 +545,6 @@ if (import.meta.vitest) {
         models: [],
         tags: [],
         endpoints: [],
-        servers: [],
-        security: [],
       });
     });
   });

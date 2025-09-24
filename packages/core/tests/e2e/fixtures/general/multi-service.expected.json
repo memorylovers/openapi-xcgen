@@ -228,7 +228,5 @@
       "operationId": "healthCheck",
       "summary": "Health check endpoint"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

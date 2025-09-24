@@ -200,7 +200,5 @@
     }
   ],
   "tags": [],
-  "endpoints": [],
-  "servers": [],
-  "security": []
+  "endpoints": []
 }

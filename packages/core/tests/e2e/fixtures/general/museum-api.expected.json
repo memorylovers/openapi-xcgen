@@ -1430,7 +1430,5 @@
       "summary": "Generate QR code for tickets",
       "description": "Generate a QR code for ticket validation at the museum entrance"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

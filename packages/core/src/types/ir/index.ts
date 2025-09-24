@@ -8,8 +8,6 @@
 import type { IREndpoint } from "./endpoints/endpoint";
 import type { IRMetadata } from "./metadata";
 import type { IRModel } from "./models/operation";
-import type { IRSecurityScheme } from "./security";
-import type { IRServer } from "./servers";
 import type { IRTag } from "./tags";
 
 /**
@@ -25,10 +23,6 @@ export interface XcgenIR {
   tags: IRTag[];
   /** APIエンドポイントの配列 */
   endpoints: IREndpoint[];
-  /** サーバー情報の配列 */
-  servers: IRServer[];
-  /** セキュリティ定義 */
-  security: IRSecurityScheme[];
 }
 
 // Re-export all types from sub-modules
@@ -72,17 +66,3 @@ export type {
   IRResponseContent,
   IRResponseHeader,
 } from "./endpoints";
-// servers
-export type {
-  IRServer,
-  IRServerVariable,
-  IRServerVariableMap,
-} from "./servers";
-// security
-export type {
-  IRApiKeyConfig,
-  IROAuth2Flow,
-  IROAuth2Flows,
-  IROAuth2ScopeMap,
-  IRSecurityScheme,
-} from "./security";

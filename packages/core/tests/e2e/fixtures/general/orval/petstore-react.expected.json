@@ -240,7 +240,5 @@
       "operationId": "showPetById",
       "summary": "Info for a specific pet"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

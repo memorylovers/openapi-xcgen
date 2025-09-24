@@ -40,7 +40,6 @@ export { isReferenceObject } from "./guards";
 
 // Re-export IR types
 export type {
-  IRApiKeyConfig,
   IRArray,
   IRArrayModel,
   IRContact,
@@ -53,9 +52,6 @@ export type {
   IRMapModel,
   IRMetadata,
   IRModel,
-  IROAuth2Flow,
-  IROAuth2Flows,
-  IROAuth2ScopeMap,
   IRParameter,
   IRParameterInType,
   IRParameterModel,
@@ -70,10 +66,6 @@ export type {
   IRResponseHeader,
   IRResponseModel,
   IRScalarType,
-  IRSecurityScheme,
-  IRServer,
-  IRServerVariable,
-  IRServerVariableMap,
   IRTag,
   IRType,
   IRValidation,

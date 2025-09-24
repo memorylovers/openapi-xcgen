@@ -74,7 +74,5 @@
       ],
       "operationId": "endpoint3"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

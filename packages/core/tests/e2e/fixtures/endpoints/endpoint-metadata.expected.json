@@ -87,7 +87,5 @@
       ],
       "operationId": "endpoint4"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

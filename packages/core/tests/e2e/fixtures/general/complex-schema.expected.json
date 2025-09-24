@@ -281,7 +281,5 @@
         "required": true
       }
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

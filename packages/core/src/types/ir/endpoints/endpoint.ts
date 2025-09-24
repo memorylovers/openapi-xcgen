@@ -68,6 +68,4 @@ export interface IREndpoint {
   responses: IRResponse[];
   /** 非推奨フラグ */
   deprecated?: true;
-  /** セキュリティ要件 */
-  security?: string[];
 }

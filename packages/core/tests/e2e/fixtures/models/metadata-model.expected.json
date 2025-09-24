@@ -65,7 +65,5 @@
       ],
       "summary": "Get articles"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

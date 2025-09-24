@@ -431,7 +431,5 @@
       "summary": "Test 3: Response inline schema extraction (Intermediate)",
       "description": "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation."
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

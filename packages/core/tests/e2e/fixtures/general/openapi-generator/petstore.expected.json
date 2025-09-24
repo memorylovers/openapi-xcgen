@@ -1218,7 +1218,5 @@
       "summary": "Delete user",
       "description": "This can only be done by the logged in user."
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

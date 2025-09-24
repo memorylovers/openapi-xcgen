@@ -112,7 +112,5 @@
       ],
       "summary": "Get products"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

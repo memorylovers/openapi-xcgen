@@ -113,7 +113,5 @@
       ],
       "summary": "Get customers"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

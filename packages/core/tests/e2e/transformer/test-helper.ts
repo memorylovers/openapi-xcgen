@@ -152,8 +152,6 @@ export async function compareWithExpected(testCase: string): Promise<void> {
         models: [],
         tags: [],
         endpoints: [],
-        servers: [],
-        security: [],
       };
     } else {
       // 予期しないエラーの場合は再スロー

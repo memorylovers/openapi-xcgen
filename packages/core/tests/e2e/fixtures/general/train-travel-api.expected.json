@@ -977,7 +977,5 @@
       "summary": "Pay for a booking",
       "description": "Process payment for a booking"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }

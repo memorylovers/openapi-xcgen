@@ -64,7 +64,5 @@
       ],
       "operationId": "ping"
     }
-  ],
-  "servers": [],
-  "security": []
+  ]
 }
