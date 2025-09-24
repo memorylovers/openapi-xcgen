@@ -2,15 +2,7 @@
   "metadata": {
     "title": "Petstore API",
     "version": "1.0.0",
-    "description": "A simple petstore API",
-    "contact": {
-      "name": "API Support",
-      "email": "support@example.com"
-    },
-    "license": {
-      "name": "MIT",
-      "url": "https://opensource.org/licenses/MIT"
-    }
+    "description": "A simple petstore API"
   },
   "models": [
     {

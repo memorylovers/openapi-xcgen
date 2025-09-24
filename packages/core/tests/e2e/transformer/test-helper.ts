@@ -144,10 +144,6 @@ export async function compareWithExpected(testCase: string): Promise<void> {
         metadata: {
           title,
           version,
-          description: null,
-          termsOfService: null,
-          contact: null,
-          license: null,
         },
         models: [],
         tags: [],

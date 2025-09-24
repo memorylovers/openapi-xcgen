@@ -42,12 +42,10 @@ export { isReferenceObject } from "./guards";
 export type {
   IRArray,
   IRArrayModel,
-  IRContact,
   IREndpoint,
   IREnumModel,
   IREnumValue,
   IRHttpMethod,
-  IRLicense,
   IRMap,
   IRMapModel,
   IRMetadata,

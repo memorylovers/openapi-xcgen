@@ -2,15 +2,7 @@
   "metadata": {
     "title": "Museum API",
     "version": "2.3.0",
-    "description": "An imaginary, but delightful Museum API for interacting with museum services and information.\nBuilt with love by Redocly.\n",
-    "contact": {
-      "name": "Museum API Support",
-      "email": "support@museum-api.com",
-      "url": "https://museum-api.com/support"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "description": "An imaginary, but delightful Museum API for interacting with museum services and information.\nBuilt with love by Redocly.\n"
   },
   "models": [
     {

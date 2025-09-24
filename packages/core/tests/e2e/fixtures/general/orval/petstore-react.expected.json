@@ -1,10 +1,7 @@
 {
   "metadata": {
     "title": "Swagger Petstore",
-    "version": "1.0.0",
-    "license": {
-      "name": "MIT"
-    }
+    "version": "1.0.0"
   },
   "models": [
     {

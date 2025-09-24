@@ -3,14 +3,7 @@
  * @description OpenAPI InfoObject から IRMetadata への変換を担当
  */
 
-import type {
-  ContactObject,
-  InfoObject,
-  IRContact,
-  IRLicense,
-  IRMetadata,
-  LicenseObject,
-} from "../../../types";
+import type { InfoObject, IRMetadata } from "../../../types";
 
 /**
  * InfoObjectをIRMetadataに変換
@@ -23,14 +16,6 @@ import type {
  *   title: "Pet Store API"
  *   version: "1.0.0"
  *   description: "This is a sample Pet Store Server"
- *   termsOfService: "http://example.com/terms/"
- *   contact:
- *     name: "API Support"
- *     email: "support@example.com"
- *     url: "http://www.example.com/support"
- *   license:
- *     name: "Apache 2.0"
- *     url: "https://www.apache.org/licenses/LICENSE-2.0.html"
  * ```
  */
 export function visitMetadata(info: InfoObject): IRMetadata {
@@ -38,34 +23,6 @@ export function visitMetadata(info: InfoObject): IRMetadata {
     title: info.title,
     version: info.version,
     ...(info.description && { description: info.description }),
-    ...(info.termsOfService && { termsOfService: info.termsOfService }),
-    ...(info.contact && { contact: visitContact(info.contact) }),
-    ...(info.license && { license: visitLicense(info.license) }),
-  };
-}
-
-/**
- * ContactObjectをIRContactに変換
- * @param contact - OpenAPI ContactObject
- * @returns IRContact
- */
-function visitContact(contact: ContactObject): IRContact {
-  return {
-    ...(contact.name && { name: contact.name }),
-    ...(contact.email && { email: contact.email }),
-    ...(contact.url && { url: contact.url }),
-  };
-}
-
-/**
- * LicenseObjectをIRLicenseに変換
- * @param license - OpenAPI LicenseObject
- * @returns IRLicense
- */
-function visitLicense(license: LicenseObject): IRLicense {
-  return {
-    name: license.name,
-    ...(license.url && { url: license.url }),
   };
 }
 
@@ -93,16 +50,6 @@ if (import.meta.vitest) {
         title: "Pet Store API",
         version: "1.0.0",
         description: "This is a sample Pet Store Server",
-        termsOfService: "http://example.com/terms/",
-        contact: {
-          name: "API Support",
-          email: "support@example.com",
-          url: "http://www.example.com/support",
-        },
-        license: {
-          name: "Apache 2.0",
-          url: "https://www.apache.org/licenses/LICENSE-2.0.html",
-        },
       };
 
       const result = visitMetadata(info);
@@ -111,48 +58,6 @@ if (import.meta.vitest) {
         title: "Pet Store API",
         version: "1.0.0",
         description: "This is a sample Pet Store Server",
-        termsOfService: "http://example.com/terms/",
-        contact: {
-          name: "API Support",
-          email: "support@example.com",
-          url: "http://www.example.com/support",
-        },
-        license: {
-          name: "Apache 2.0",
-          url: "https://www.apache.org/licenses/LICENSE-2.0.html",
-        },
-      });
-    });
-
-    it("should handle partial contact info", () => {
-      const info: InfoObject = {
-        title: "My API",
-        version: "1.0.0",
-        contact: {
-          email: "support@example.com",
-        },
-      };
-
-      const result = visitMetadata(info);
-
-      expect(result.contact).toEqual({
-        email: "support@example.com",
-      });
-    });
-
-    it("should handle license without url", () => {
-      const info: InfoObject = {
-        title: "My API",
-        version: "1.0.0",
-        license: {
-          name: "MIT",
-        },
-      };
-
-      const result = visitMetadata(info);
-
-      expect(result.license).toEqual({
-        name: "MIT",
       });
     });
 
@@ -167,60 +72,6 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         title: "My API",
         version: "1.0.0",
-      });
-    });
-  });
-
-  describe("visitContact", () => {
-    it("should convert full contact to IRContact", () => {
-      const contact: ContactObject = {
-        name: "API Support",
-        email: "support@example.com",
-        url: "http://www.example.com/support",
-      };
-
-      const result = visitContact(contact);
-
-      expect(result).toEqual({
-        name: "API Support",
-        email: "support@example.com",
-        url: "http://www.example.com/support",
-      });
-    });
-
-    it("should handle empty contact object", () => {
-      const contact: ContactObject = {};
-
-      const result = visitContact(contact);
-
-      expect(result).toEqual({});
-    });
-  });
-
-  describe("visitLicense", () => {
-    it("should convert full license to IRLicense", () => {
-      const license: LicenseObject = {
-        name: "Apache 2.0",
-        url: "https://www.apache.org/licenses/LICENSE-2.0.html",
-      };
-
-      const result = visitLicense(license);
-
-      expect(result).toEqual({
-        name: "Apache 2.0",
-        url: "https://www.apache.org/licenses/LICENSE-2.0.html",
-      });
-    });
-
-    it("should handle license without url", () => {
-      const license: LicenseObject = {
-        name: "MIT",
-      };
-
-      const result = visitLicense(license);
-
-      expect(result).toEqual({
-        name: "MIT",
       });
     });
   });

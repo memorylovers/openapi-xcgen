@@ -5,12 +5,10 @@ export type {
   InfoObject,
   // IR types
   IRArray,
-  IRContact,
   IREndpoint,
   IREnumModel,
   IREnumValue,
   IRHttpMethod,
-  IRLicense,
   IRMap,
   IRMetadata,
   IRModel,

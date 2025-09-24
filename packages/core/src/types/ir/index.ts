@@ -36,7 +36,7 @@ export type {
   MimeType,
 } from "./common";
 // metadata
-export type { IRContact, IRLicense, IRMetadata } from "./metadata";
+export type { IRMetadata } from "./metadata";
 // models
 export type {
   IRArrayModel,
