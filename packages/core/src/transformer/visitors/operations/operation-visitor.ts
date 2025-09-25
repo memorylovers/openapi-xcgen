@@ -79,6 +79,7 @@ export function visitOperation(
     method: context.method,
     pathTemplate: context.pathTemplate,
     rootSegment: "paths",
+    commonParameters: context.commonParameters, // 共通パラメータを渡す
   };
 
   const parametersResult = visitParameters(

@@ -3,6 +3,8 @@ import type {
   IRModel,
   IRType,
   MimeType,
+  ParameterObject,
+  ReferenceObject,
   SchemaObject,
 } from "../types";
 
@@ -62,6 +64,8 @@ export interface OperationContext extends VisitorContext {
   method: IRHttpMethod;
   /** パステンプレート（例: "/pets/{id}"） */
   pathTemplate: string;
+  /** PathItemレベルの共通パラメータ（継承用） */
+  commonParameters?: Array<ParameterObject | ReferenceObject>;
 }
 
 /**
@@ -74,6 +78,8 @@ export interface ParametersContext extends VisitorContext {
   method: IRHttpMethod;
   /** パステンプレート */
   pathTemplate: string;
+  /** PathItemレベルの共通パラメータ（継承用） */
+  commonParameters?: Array<ParameterObject | ReferenceObject>;
 }
 
 /**

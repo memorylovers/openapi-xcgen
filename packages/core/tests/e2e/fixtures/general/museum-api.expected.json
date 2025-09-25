@@ -1071,9 +1071,61 @@
     },
     {
       "kind": "parameter",
-      "name": "GetTicketsConfirmationIdParams",
-      "description": "Parameters for GET /tickets/{confirmationId}\nemail: Email address used for the purchase",
+      "name": "GetSpecialEventsEventIdParams",
+      "description": "Parameters for GET /special-events/{eventId}\neventId: Unique identifier of the special event",
       "properties": [
+        {
+          "name": "eventId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Unique identifier of the special event"
+        }
+      ],
+      "referencePath": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "PatchSpecialEventsEventIdParams",
+      "description": "Parameters for PATCH /special-events/{eventId}\neventId: Unique identifier of the special event",
+      "properties": [
+        {
+          "name": "eventId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Unique identifier of the special event"
+        }
+      ],
+      "referencePath": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "DeleteSpecialEventsEventIdParams",
+      "description": "Parameters for DELETE /special-events/{eventId}\neventId: Unique identifier of the special event",
+      "properties": [
+        {
+          "name": "eventId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Unique identifier of the special event"
+        }
+      ],
+      "referencePath": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTicketsConfirmationIdParams",
+      "description": "Parameters for GET /tickets/{confirmationId}\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase",
+      "properties": [
+        {
+          "name": "confirmationId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Ticket purchase confirmation ID"
+        },
         {
           "name": "email",
           "type": "string",
@@ -1087,8 +1139,15 @@
     {
       "kind": "parameter",
       "name": "GetTicketsConfirmationIdQrCodeParams",
-      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nemail: Email address used for the purchase\nformat: QR code format",
+      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase\nformat: QR code format",
       "properties": [
+        {
+          "name": "confirmationId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Ticket purchase confirmation ID"
+        },
         {
           "name": "email",
           "type": "string",
@@ -1224,7 +1283,10 @@
       "tags": [
         "Events"
       ],
-      "parameters": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
+      },
       "responses": [
         {
           "statusCode": "200",
@@ -1250,7 +1312,10 @@
       "tags": [
         "Events"
       ],
-      "parameters": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
+      },
       "responses": [
         {
           "statusCode": "200",
@@ -1288,7 +1353,10 @@
       "tags": [
         "Events"
       ],
-      "parameters": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
+      },
       "responses": [
         {
           "statusCode": "204",

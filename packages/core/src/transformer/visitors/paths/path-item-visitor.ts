@@ -69,6 +69,9 @@ export function visitPathItem(
 ): PathItemResult[] {
   const results: PathItemResult[] = [];
 
+  // PathItemレベルの共通パラメータを取得
+  const commonParameters = pathItem.parameters || undefined;
+
   // 各HTTPメソッドを処理
   for (const method of HTTP_METHODS) {
     const operation = pathItem[method];
@@ -78,6 +81,7 @@ export function visitPathItem(
         method,
         pathTemplate: context.pathTemplate,
         rootSegment: "paths",
+        commonParameters, // 共通パラメータを渡す
       };
 
       const operationResult = visitOperation(operation, operationContext);
@@ -89,8 +93,6 @@ export function visitPathItem(
       }
     }
   }
-
-  // 共通パラメータは未対応
 
   return results;
 }
@@ -259,6 +261,8 @@ if (import.meta.vitest) {
 
       const result = visitPathItem(pathItem, context);
 
+      // 共通パラメータが継承されているはず
+      // パラメータが存在する場合は、統合モデルへの参照になる
       expect(result).toEqual([
         {
           endpoint: {
@@ -266,10 +270,193 @@ if (import.meta.vitest) {
             method: "get",
             path: "/pets/{id}",
             tags: [],
-            parameters: [],
+            parameters: {
+              kind: "ref",
+              name: "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+            },
             responses: [],
           },
-          models: [],
+          models: [
+            {
+              kind: "parameter",
+              name: "GetPetsIdParams",
+              description: "Parameters for GET /pets/{id}",
+              referencePath:
+                "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+              properties: [
+                {
+                  name: "id",
+                  type: "string",
+                  in: "path",
+                  required: true,
+                },
+              ],
+            },
+          ],
+        },
+      ]);
+    });
+
+    it("should inherit common parameters to multiple operations", () => {
+      const pathItem: PathItemObject = {
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        get: {
+          operationId: "getPet",
+          responses: {},
+        },
+        put: {
+          operationId: "updatePet",
+          responses: {},
+        },
+      };
+
+      const context: PathItemContext = {
+        documentPath: ["paths", "/pets/{id}"],
+        rootSegment: "paths",
+        pathTemplate: "/pets/{id}",
+      };
+
+      const result = visitPathItem(pathItem, context);
+
+      // 両方のOperationに共通パラメータが継承されているはず
+      expect(result).toEqual([
+        {
+          endpoint: {
+            operationId: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              name: "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+            },
+            responses: [],
+          },
+          models: [
+            {
+              kind: "parameter",
+              name: "GetPetsIdParams",
+              description: "Parameters for GET /pets/{id}",
+              referencePath:
+                "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+              properties: [
+                {
+                  name: "id",
+                  type: "string",
+                  in: "path",
+                  required: true,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          endpoint: {
+            operationId: "updatePet",
+            method: "put",
+            path: "/pets/{id}",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              name: "#/paths/::pets::{id}/put/parameters/PutPetsIdParams",
+            },
+            responses: [],
+          },
+          models: [
+            {
+              kind: "parameter",
+              name: "PutPetsIdParams",
+              description: "Parameters for PUT /pets/{id}",
+              referencePath:
+                "#/paths/::pets::{id}/put/parameters/PutPetsIdParams",
+              properties: [
+                {
+                  name: "id",
+                  type: "string",
+                  in: "path",
+                  required: true,
+                },
+              ],
+            },
+          ],
+        },
+      ]);
+    });
+
+    it("should allow operation to override common parameters", () => {
+      const pathItem: PathItemObject = {
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "Common parameter",
+          },
+        ],
+        get: {
+          operationId: "getPet",
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Overridden parameter",
+            },
+          ],
+          responses: {},
+        },
+      };
+
+      const context: PathItemContext = {
+        documentPath: ["paths", "/pets/{id}"],
+        rootSegment: "paths",
+        pathTemplate: "/pets/{id}",
+      };
+
+      const result = visitPathItem(pathItem, context);
+
+      // Operationレベルのパラメータが優先されるはず
+      expect(result).toEqual([
+        {
+          endpoint: {
+            operationId: "getPet",
+            method: "get",
+            path: "/pets/{id}",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              name: "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+            },
+            responses: [],
+          },
+          models: [
+            {
+              kind: "parameter",
+              name: "GetPetsIdParams",
+              description:
+                "Parameters for GET /pets/{id}\nid: Overridden parameter",
+              referencePath:
+                "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+              properties: [
+                {
+                  name: "id",
+                  type: "string",
+                  in: "path",
+                  required: true,
+                  description: "Overridden parameter",
+                },
+              ],
+            },
+          ],
         },
       ]);
     });

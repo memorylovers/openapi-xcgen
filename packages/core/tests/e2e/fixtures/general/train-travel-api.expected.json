@@ -761,6 +761,48 @@
         "kind": "ref",
         "name": "#/components/schemas/Booking"
       }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetBookingsBookingIdParams",
+      "description": "Parameters for GET /bookings/{bookingId}",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "referencePath": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "DeleteBookingsBookingIdParams",
+      "description": "Parameters for DELETE /bookings/{bookingId}",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "referencePath": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "PostBookingsBookingIdPaymentParams",
+      "description": "Parameters for POST /bookings/{bookingId}/payment",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
     }
   ],
   "tags": [],
@@ -893,7 +935,10 @@
       "tags": [
         "Bookings"
       ],
-      "parameters": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+      },
       "responses": [
         {
           "statusCode": "200",
@@ -919,7 +964,10 @@
       "tags": [
         "Bookings"
       ],
-      "parameters": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+      },
       "responses": [
         {
           "statusCode": "204",
@@ -936,7 +984,10 @@
       "tags": [
         "Payments"
       ],
-      "parameters": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+      },
       "responses": [
         {
           "statusCode": "200",
