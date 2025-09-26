@@ -1204,6 +1204,20 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "500",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/InternalServerError"
+          }
         }
       ],
       "operationId": "getMuseumHours",
@@ -1233,6 +1247,13 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
         }
       ],
       "operationId": "listSpecialEvents",
@@ -1259,6 +1280,27 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "403",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Forbidden"
+          }
         }
       ],
       "operationId": "createSpecialEvent",
@@ -1300,6 +1342,13 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "getSpecialEvent",
@@ -1329,6 +1378,34 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "403",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Forbidden"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "updateSpecialEvent",
@@ -1361,6 +1438,27 @@
         {
           "statusCode": "204",
           "description": "Event deleted successfully"
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "403",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Forbidden"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "deleteSpecialEvent",
@@ -1387,6 +1485,13 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
         },
         {
           "statusCode": "402",
@@ -1454,6 +1559,20 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "getTicket",
@@ -1484,6 +1603,20 @@
               "schema": "string"
             }
           ]
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "getTicketQRCode",

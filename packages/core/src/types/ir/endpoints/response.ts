@@ -3,7 +3,7 @@
  */
 
 import type { MimeType } from "../common/mime-type";
-import type { IRType } from "../common/type";
+import type { IRRef, IRType } from "../common/type";
 
 /**
  * IRResponseContent - レスポンスコンテンツ（MIMEタイプとスキーマの組み合わせ）
@@ -105,4 +105,6 @@ export interface IRResponse {
   content?: IRResponseContent[];
   /** レスポンスヘッダー */
   headers?: IRResponseHeader[];
+  /** $ref参照情報（components/responsesへの参照など） */
+  ref?: IRRef;
 }

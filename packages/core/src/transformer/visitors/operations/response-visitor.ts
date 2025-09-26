@@ -14,6 +14,7 @@
 import { consola } from "consola";
 import type {
   IRModel,
+  IRRef,
   IRResponse,
   IRResponseContent,
   ReferenceObject,
@@ -75,17 +76,29 @@ export function visitResponse(
 ): ResponseResult | null {
   const models: IRModel[] = [];
 
-  // $ref参照の場合は現時点でスキップ
+  // ReferenceObjectの場合は$ref情報を保持
   if (isReferenceObject(response)) {
-    consola.warn(`Reference response not supported yet: ${response.$ref}`);
-    return null;
+    const ref: IRRef = {
+      kind: "ref",
+      name: response.$ref,
+    };
+
+    const irResponse: IRResponse = {
+      statusCode: context.statusCode,
+      ref,
+    };
+
+    return { response: irResponse, models: [] };
   }
+
+  // ResponseObject として扱う
+  const responseObj = response as ResponseObject;
 
   // contentの処理
   let content: IRResponseContent[] | null = null;
-  if (response.content) {
+  if (responseObj.content) {
     content = [];
-    for (const [mimeType, mediaType] of Object.entries(response.content)) {
+    for (const [mimeType, mediaType] of Object.entries(responseObj.content)) {
       if (mediaType.schema) {
         // インラインのobjectスキーマを検出
         if (
@@ -178,7 +191,7 @@ export function visitResponse(
 
   const irResponse: IRResponse = {
     statusCode: context.statusCode,
-    ...(response.description && { description: response.description }),
+    ...(responseObj.description && { description: responseObj.description }),
     ...(content && { content }),
     // headers は未対応
   };
@@ -188,7 +201,7 @@ export function visitResponse(
 
 // === in-source testing ===
 if (import.meta.vitest) {
-  const { describe, it, expect, vi } = import.meta.vitest;
+  const { describe, it, expect } = import.meta.vitest;
 
   describe("visitResponse", () => {
     it("should handle basic response without content", () => {
@@ -411,9 +424,7 @@ if (import.meta.vitest) {
       // headers は未対応
     });
 
-    it("should warn and return null for reference response", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should handle reference response by preserving $ref information", () => {
       const response: ReferenceObject = {
         $ref: "#/components/responses/NotFound",
       };
@@ -428,12 +439,71 @@ if (import.meta.vitest) {
         schemaPath: null,
       });
 
-      expect(result).toEqual(null);
-      expect(warnSpy).toHaveBeenCalledWith(
-        "Reference response not supported yet: #/components/responses/NotFound",
-      );
+      // $ref情報がIRRefとして保持される
+      expect(result).toEqual({
+        response: {
+          statusCode: "404",
+          ref: {
+            kind: "ref",
+            name: "#/components/responses/NotFound",
+          },
+        },
+        models: [],
+      });
+    });
 
-      warnSpy.mockRestore();
+    it("should handle different component reference patterns", () => {
+      // BadRequestの参照
+      const badRequest: ReferenceObject = {
+        $ref: "#/components/responses/BadRequest",
+      };
+
+      const result400 = visitResponse(badRequest, {
+        documentPath: ["paths", "/api/users", "post", "responses", "400"],
+        rootSegment: "paths",
+        method: "post",
+        pathTemplate: "/api/users",
+        statusCode: "400",
+        contentType: null,
+        schemaPath: null,
+      });
+
+      expect(result400).toEqual({
+        response: {
+          statusCode: "400",
+          ref: {
+            kind: "ref",
+            name: "#/components/responses/BadRequest",
+          },
+        },
+        models: [],
+      });
+
+      // InternalServerErrorの参照
+      const serverError: ReferenceObject = {
+        $ref: "#/components/responses/InternalServerError",
+      };
+
+      const result500 = visitResponse(serverError, {
+        documentPath: ["paths", "/api/users", "post", "responses", "500"],
+        rootSegment: "paths",
+        method: "post",
+        pathTemplate: "/api/users",
+        statusCode: "500",
+        contentType: null,
+        schemaPath: null,
+      });
+
+      expect(result500).toEqual({
+        response: {
+          statusCode: "500",
+          ref: {
+            kind: "ref",
+            name: "#/components/responses/InternalServerError",
+          },
+        },
+        models: [],
+      });
     });
 
     it("should handle 4xx and 5xx error responses", () => {

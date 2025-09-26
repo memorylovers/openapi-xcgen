@@ -73,16 +73,14 @@ export function visitRequestBody(
 ): RequestBodyResult | null {
   const models: IRModel[] = [];
 
-  // $ref参照の場合は現時点でスキップ
-  if (isReferenceObject(requestBody)) {
-    consola.warn(
-      `Reference requestBody not supported yet: ${requestBody.$ref}`,
-    );
-    return null;
-  }
+  // RequestBodyObject として扱う（$refは後でschemaレベルで処理）
+  const requestBodyObj = requestBody as RequestBodyObject;
 
   // contentが必須
-  if (!requestBody.content || Object.keys(requestBody.content).length === 0) {
+  if (
+    !requestBodyObj.content ||
+    Object.keys(requestBodyObj.content).length === 0
+  ) {
     consola.warn(
       `RequestBody without content for operation: ${operationId || "unknown"}`,
     );
@@ -92,7 +90,7 @@ export function visitRequestBody(
   // contentの処理
   const content: IRRequestContent[] = [];
 
-  for (const [mimeType, mediaType] of Object.entries(requestBody.content)) {
+  for (const [mimeType, mediaType] of Object.entries(requestBodyObj.content)) {
     if (mediaType.schema) {
       // インラインのobjectスキーマを検出
       if (
@@ -122,7 +120,7 @@ export function visitRequestBody(
             ],
             rootSegment: "paths",
           },
-          requestBody.required === true,
+          requestBodyObj.required === true,
         );
 
         if (requestBodyResult && requestBodyResult.models.length > 0) {
@@ -185,8 +183,10 @@ export function visitRequestBody(
 
   const irRequestBody: IRRequestBody = {
     content,
-    ...(requestBody.required && { required: true }),
-    ...(requestBody.description && { description: requestBody.description }),
+    ...(requestBodyObj.required && { required: true }),
+    ...(requestBodyObj.description && {
+      description: requestBodyObj.description,
+    }),
   };
 
   return {
@@ -419,7 +419,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn and return null for reference requestBody", () => {
+    it("should warn and return null for reference requestBody (no content)", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
       const requestBody: ReferenceObject = {
@@ -435,9 +435,10 @@ if (import.meta.vitest) {
         schemaPath: null,
       });
 
+      // $refはRequestBodyObjectとして処理され、contentがundefinedなのでnullが返る
       expect(result).toEqual(null);
       expect(warnSpy).toHaveBeenCalledWith(
-        "Reference requestBody not supported yet: #/components/requestBodies/UserInput",
+        "RequestBody without content for operation: updateUser",
       );
 
       warnSpy.mockRestore();

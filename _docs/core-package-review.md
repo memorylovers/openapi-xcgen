@@ -3,8 +3,9 @@
 ## 未実装項目
 
 - Operation/Path レベルの `security` を解析する visitor がなく `visitOperation` でも未対応が明示されています（`packages/core/src/transformer/visitors/operations/operation-visitor.ts:159`）。
-- `$ref` を含む RequestBody/Response/Parameter をすべて警告してスキップしており、コンポーネント参照の再利用ができません（`packages/core/src/transformer/visitors/operations/request-body-visitor.ts:76`、`packages/core/src/transformer/visitors/operations/response-visitor.ts:79`、`packages/core/src/transformer/visitors/operations/parameters-visitor.ts:76`）。
+- Parameter の `$ref` 参照が警告されスキップされます（`packages/core/src/transformer/visitors/operations/parameters-visitor.ts:117-119`）。
 - `visitComponents` が `components.schemas` のみ処理し、`components.securitySchemes` や `components.responses` など他セクションが未対応です（`packages/core/src/transformer/visitors/components/components-visitor.ts:57`）。
+- discriminatorを使用したoneOf/allOf/anyOfパターンが未サポートで、3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗します。CLAUDE.mdの制限事項にも明記済み。
 
 ## 挙動上のリスク
 
@@ -13,7 +14,8 @@
 
 ## 改善余地
 
-- レスポンスヘッダーが IR へ取り込まれておらず、`visitResponse` で完全に無視されています（`packages/core/src/transformer/visitors/operations/response-visitor.ts:177`）。
+- レスポンスヘッダーが IR へ取り込まれておらず、`visitResponse` で完全に無視されています（`packages/core/src/transformer/visitors/operations/response-visitor.ts:174`）。`IRResponse`と`IRResponseHeader`インターフェースは定義済み（`packages/core/src/types/ir/endpoints/response.ts:99,34`）なので、実装のみが必要です。
+- パラメータのバリデーション情報が`IRParameter`に含まれていません。`IRParameter`インターフェースに`validation?: IRValidation`フィールドが未定義（`packages/core/src/types/ir/endpoints/parameter.ts:33-49`）。`extractValidation`ヘルパー関数は実装済み（`packages/core/src/transformer/helpers/extract-validation.ts:37`）だが、`parameter-visitor.ts`で未使用。
 - パラメータ統合モデルへバリデーション情報が渡らず `parameterToParameterProperty` で `validation` を無視しています（`packages/core/src/transformer/helpers/create-parameter-model.ts:147`）。
 - `extractValidation` が OpenAPI 3.1 の数値指定形式（`exclusiveMinimum` / `exclusiveMaximum` に数値を取るケース）をカバーしていません（`packages/core/src/transformer/helpers/extract-validation.ts:62`）。
 
@@ -29,32 +31,19 @@
 理由：エントリーポイントでの必須要件チェックは処理の前提条件であり、満たされない場合は異常終了すべき。
 「例外を投げない」原則は**Visitor関数内**での部分的な処理失敗に対する指針。
 
-### 1. $ref参照の処理（優先度: 高）
+### 1. Parameterの$ref参照の処理（優先度: 高）
 
 #### 1-1. 問題詳細
 
-コンポーネントへの参照が解決されず、再利用可能な定義が活用できない。
+Parameterレベルでの$ref参照が解決されず、再利用可能な定義が活用できない。
 
 #### 1-2. 修正箇所
 
-- `request-body-visitor.ts:76-81` - RequestBodyの$ref
-- `response-visitor.ts:79` - Responseの$ref
-- `parameters-visitor.ts:76` - Parameterの$ref
+- `parameters-visitor.ts:117-119` - Parameterの$ref警告とスキップ
 
 #### 1-3. 実装方法
 
-```typescript
-if (isReferenceObject(requestBody)) {
-  const refName = extractRefName(requestBody.$ref);
-  const resolved = context.document.components?.requestBodies?.[refName];
-  if (!resolved) {
-    consola.warn(`Cannot resolve reference: ${requestBody.$ref}`);
-    return null;
-  }
-  // 解決したオブジェクトで通常処理を継続
-  requestBody = resolved as RequestBodyObject;
-}
-```
+schema-level（`visitRef`）での処理に依存する現在の方式を継続、またはParameterレベルでの解決を実装。
 
 ### 2. パラメータバリデーション情報のIR反映（優先度: 中）
 
@@ -64,12 +53,29 @@ if (isReferenceObject(requestBody)) {
 
 #### 2-2. 修正箇所
 
-- `create-parameter-model.ts:158` - validation情報の無視
+- `packages/core/src/types/ir/endpoints/parameter.ts` - `IRParameter`インターフェースに`validation?: IRValidation`を追加
+- `parameter-visitor.ts` - `extractValidation`をインポートして使用
+- `create-parameter-model.ts:147` - validation情報の渡し忘れ修正
 - `extract-validation.ts:62-66` - OpenAPI 3.1形式の未対応
 
 #### 2-3. 実装方法
 
 ```typescript
+// IRParameterインターフェースに追加
+export interface IRParameter {
+  // 既存のフィールド
+  validation?: IRValidation;
+}
+
+// parameter-visitor.tsで
+import { extractValidation } from "../../helpers";
+
+const validation = extractValidation(schema);
+const irParameter: IRParameter = {
+  // 既存のフィールド
+  ...(validation && { validation }),
+};
+
 // OpenAPI 3.1形式対応
 if (typeof schema.exclusiveMinimum === 'number') {
   validation.minimum = schema.exclusiveMinimum;
@@ -85,13 +91,39 @@ Rate-Limit情報などの重要なヘッダー情報がIRに含まれない。
 
 #### 3-2. 実装箇所
 
-- `response-visitor.ts:177` - ヘッダー処理のスキップ箇所
+- `response-visitor.ts:174` - ヘッダー処理のスキップ箇所
 
 #### 3-3. 実装方法
 
-1. `IRResponse`型に`headers`フィールドを追加
-2. `HeadersObject`の各エントリーを処理
-3. ヘッダーごとにスキーマ情報を保持
+```typescript
+// response-visitor.tsで
+let headers: IRResponseHeader[] | undefined;
+if (responseObj.headers) {
+  headers = [];
+  for (const [headerName, headerDef] of Object.entries(responseObj.headers)) {
+    if (isReferenceObject(headerDef)) {
+      consola.warn(`Reference header not supported yet: ${headerDef.$ref}`);
+      continue;
+    }
+
+    if (headerDef.schema) {
+      const type = visitType(headerDef.schema, {
+        documentPath: [...context.documentPath, "headers", headerName, "schema"],
+        rootSegment: context.rootSegment,
+      });
+
+      if (type) {
+        headers.push({
+          name: headerName,
+          type,
+          ...(headerDef.description && { description: headerDef.description }),
+          ...(headerDef.deprecated && { deprecated: headerDef.deprecated }),
+        });
+      }
+    }
+  }
+}
+```
 
 ## テスト方針
 
@@ -105,6 +137,13 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 
 ## 実装順序
 
-1. $ref参照の処理（再利用性の向上）
+1. Parameterの$ref参照の処理（再利用性の向上）
 2. パラメータバリデーション情報（クライアント側検証）
 3. レスポンスヘッダー対応（追加情報の取り込み）
+
+## 完了済みタスク
+
+### 2024年実装
+
+- **PathItem共通parameters継承**: PathItemレベルのparametersをOperationに継承し、同一name+inの場合はOperationレベルが優先される仕組みを実装（`parameters-visitor.ts:44-69`）
+- **RequestBody/Responseの$ref簡略化**: $ref参照を解決せず、ResponseObject/RequestBodyObjectとして扱うように変更。schema-level（`visitRef`）での処理に委譲（`response-visitor.ts:79`、`request-body-visitor.ts:77`）

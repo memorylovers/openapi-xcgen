@@ -830,6 +830,27 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "429",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/TooManyRequests"
+          }
+        },
+        {
+          "statusCode": "500",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/InternalServerError"
+          }
         }
       ],
       "operationId": "getStations",
@@ -859,6 +880,20 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "getTrips",
@@ -885,6 +920,13 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
         }
       ],
       "operationId": "getBookings",
@@ -911,6 +953,27 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "409",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Conflict"
+          }
         }
       ],
       "operationId": "createBooking",
@@ -952,6 +1015,20 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "getBooking",
@@ -972,6 +1049,27 @@
         {
           "statusCode": "204",
           "description": "Booking cancelled successfully"
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        },
+        {
+          "statusCode": "409",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Conflict"
+          }
         }
       ],
       "operationId": "cancelBooking",
@@ -1003,6 +1101,20 @@
           ]
         },
         {
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
           "statusCode": "402",
           "description": "Payment Required - Payment failed",
           "content": [
@@ -1014,6 +1126,13 @@
               }
             }
           ]
+        },
+        {
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
         }
       ],
       "operationId": "payForBooking",

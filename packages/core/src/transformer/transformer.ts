@@ -56,6 +56,28 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     throw new Error("Missing required info field");
   }
 
+  // 未対応機能の検出と警告
+  if (document.components?.parameters) {
+    consola.warn(
+      `components.parameters is not supported yet and will be skipped`,
+    );
+  }
+  if (document.components?.requestBodies) {
+    consola.warn(
+      `components.requestBodies is not supported yet and will be skipped`,
+    );
+  }
+  if (document.components?.responses) {
+    consola.warn(
+      `components.responses is not supported yet and will be skipped`,
+    );
+  }
+  if (document.components?.securitySchemes) {
+    consola.warn(
+      `components.securitySchemes is not supported yet and will be skipped`,
+    );
+  }
+
   // Components処理（schemas）
   let models: IRModel[] = [];
   if (document.components?.schemas) {
@@ -818,6 +840,47 @@ if (import.meta.vitest) {
       // - UserProfile (from components)
       // - PostUsersRequestBody (generated from inline)
       expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
+
+    it("should warn for components.securitySchemes", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const doc: OpenAPIDocument = {
+        openapi: "3.0.0",
+        info: {
+          title: "API with Security",
+          version: "1.0.0",
+        },
+        paths: {
+          "/secure": {
+            get: {
+              responses: { "200": { description: "OK" } },
+            },
+          },
+        },
+        components: {
+          securitySchemes: {
+            BearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+            },
+            ApiKey: {
+              type: "apiKey",
+              in: "header",
+              name: "X-API-Key",
+            },
+          },
+        },
+      };
+
+      transform(doc);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        "components.securitySchemes is not supported yet and will be skipped",
+      );
 
       warnSpy.mockRestore();
     });
