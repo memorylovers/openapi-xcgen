@@ -1139,5 +1139,26 @@
       "summary": "Pay for a booking",
       "description": "Process payment for a booking"
     }
+  ],
+  "securitySchemes": {
+    "OAuth2": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://auth.example.com/oauth/authorize",
+          "tokenUrl": "https://auth.example.com/oauth/token",
+          "scopes": {
+            "read": "Read access",
+            "write": "Write access",
+            "admin": "Admin access"
+          }
+        }
+      }
+    }
+  },
+  "globalSecurity": [
+    {
+      "scheme": "OAuth2"
+    }
   ]
 }

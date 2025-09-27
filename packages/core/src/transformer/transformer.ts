@@ -16,6 +16,8 @@ import type {
   IREndpoint,
   IRMetadata,
   IRModel,
+  IRSecurityRequirement,
+  IRSecurityScheme,
   IRTag,
   OpenAPIDocument,
   PathsObject,
@@ -72,21 +74,18 @@ export function transform(document: OpenAPIDocument): XcgenIR {
       `components.responses is not supported yet and will be skipped`,
     );
   }
-  if (document.components?.securitySchemes) {
-    consola.warn(
-      `components.securitySchemes is not supported yet and will be skipped`,
-    );
-  }
 
-  // Components処理（schemas）
+  // Components処理（schemas, securitySchemes）
   let models: IRModel[] = [];
-  if (document.components?.schemas) {
+  let securitySchemes: Record<string, IRSecurityScheme> | undefined;
+  if (document.components) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const componentsResult = visitComponents(
       document.components as ComponentsObject,
-      { documentPath: ["components", "schemas"], rootSegment: "components" },
+      { documentPath: ["components"], rootSegment: "components" },
     );
     models = componentsResult.models;
+    securitySchemes = componentsResult.securitySchemes;
   }
 
   // Tags処理
@@ -124,6 +123,20 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     consola.warn(`Duplicate component names detected: ${duplicateNames}`);
   }
 
+  // グローバルセキュリティ処理（ルートレベルのsecurity）
+  let globalSecurity: IRSecurityRequirement[] | undefined;
+  if (document.security) {
+    globalSecurity = document.security.map((requirement) => {
+      // SecurityRequirementObjectは { schemeName: scopes[] } の形式
+      const schemeName = Object.keys(requirement)[0];
+      const scopes = requirement[schemeName];
+      return {
+        scheme: schemeName,
+        ...(scopes && scopes.length > 0 && { scopes }),
+      };
+    });
+  }
+
   // XcgenIR生成
   const metadata: IRMetadata = visitMetadata(document.info);
 
@@ -132,6 +145,8 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     models,
     tags,
     endpoints,
+    ...(securitySchemes && { securitySchemes }),
+    ...(globalSecurity && { globalSecurity }),
   };
 
   return xcgenIR;
@@ -844,9 +859,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn for components.securitySchemes", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should process components.securitySchemes", () => {
       const doc: OpenAPIDocument = {
         openapi: "3.0.0",
         info: {
@@ -876,13 +889,136 @@ if (import.meta.vitest) {
         },
       };
 
-      transform(doc);
+      const result = transform(doc);
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        "components.securitySchemes is not supported yet and will be skipped",
-      );
+      expect(result.securitySchemes).toEqual({
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+        ApiKey: {
+          type: "apiKey",
+          in: "header",
+          name: "X-API-Key",
+        },
+      });
+    });
 
-      warnSpy.mockRestore();
+    it("should process root-level security as globalSecurity", () => {
+      const doc: OpenAPIDocument = {
+        openapi: "3.0.0",
+        info: {
+          title: "API with Global Security",
+          version: "1.0.0",
+        },
+        paths: {
+          "/secure": {
+            get: {
+              responses: { "200": { description: "OK" } },
+            },
+          },
+        },
+        components: {
+          securitySchemes: {
+            OAuth2: {
+              type: "oauth2",
+              flows: {
+                authorizationCode: {
+                  authorizationUrl: "https://auth.example.com/oauth/authorize",
+                  tokenUrl: "https://auth.example.com/oauth/token",
+                  scopes: {
+                    read: "Read access",
+                    write: "Write access",
+                  },
+                },
+              },
+            },
+          },
+        },
+        security: [
+          {
+            OAuth2: [],
+          },
+        ],
+      };
+
+      const result = transform(doc);
+
+      expect(result.globalSecurity).toEqual([
+        {
+          scheme: "OAuth2",
+        },
+      ]);
+    });
+
+    it("should process root-level security with scopes", () => {
+      const doc: OpenAPIDocument = {
+        openapi: "3.0.0",
+        info: {
+          title: "API with Scoped Global Security",
+          version: "1.0.0",
+        },
+        paths: {
+          "/secure": {
+            get: {
+              responses: { "200": { description: "OK" } },
+            },
+          },
+        },
+        components: {
+          securitySchemes: {
+            OAuth2: {
+              type: "oauth2",
+              flows: {
+                authorizationCode: {
+                  authorizationUrl: "https://auth.example.com/oauth/authorize",
+                  tokenUrl: "https://auth.example.com/oauth/token",
+                  scopes: {
+                    read: "Read access",
+                    write: "Write access",
+                  },
+                },
+              },
+            },
+          },
+        },
+        security: [
+          {
+            OAuth2: ["read", "write"],
+          },
+        ],
+      };
+
+      const result = transform(doc);
+
+      expect(result.globalSecurity).toEqual([
+        {
+          scheme: "OAuth2",
+          scopes: ["read", "write"],
+        },
+      ]);
+    });
+
+    it("should not include globalSecurity when no root-level security exists", () => {
+      const doc: OpenAPIDocument = {
+        openapi: "3.0.0",
+        info: {
+          title: "API without Global Security",
+          version: "1.0.0",
+        },
+        paths: {
+          "/public": {
+            get: {
+              responses: { "200": { description: "OK" } },
+            },
+          },
+        },
+      };
+
+      const result = transform(doc);
+
+      expect(result.globalSecurity).toBeUndefined();
     });
   });
 }

@@ -2,9 +2,8 @@
 
 ## 未実装項目
 
-- Operation/Path レベルの `security` を解析する visitor がなく `visitOperation` でも未対応が明示されています（`packages/core/src/transformer/visitors/operations/operation-visitor.ts:159`）。
 - Parameter の `$ref` 参照が警告されスキップされます（`packages/core/src/transformer/visitors/operations/parameters-visitor.ts:117-119`）。
-- `visitComponents` が `components.schemas` のみ処理し、`components.securitySchemes` や `components.responses` など他セクションが未対応です（`packages/core/src/transformer/visitors/components/components-visitor.ts:57`）。
+- `components.responses` など一部のcomponentsセクションが未対応です。
 - discriminatorを使用したoneOf/allOf/anyOfパターンが未サポートで、3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗します。CLAUDE.mdの制限事項にも明記済み。
 
 ## 挙動上のリスク
@@ -147,3 +146,8 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 
 - **PathItem共通parameters継承**: PathItemレベルのparametersをOperationに継承し、同一name+inの場合はOperationレベルが優先される仕組みを実装（`parameters-visitor.ts:44-69`）
 - **RequestBody/Responseの$ref簡略化**: $ref参照を解決せず、ResponseObject/RequestBodyObjectとして扱うように変更。schema-level（`visitRef`）での処理に委譲（`response-visitor.ts:79`、`request-body-visitor.ts:77`）
+
+### 2025年実装
+
+- **Security対応**: Operation/PathレベルのsecurityとcomponentsのsecuritySchemesを完全対応。APIKey、HTTP(Basic/Bearer)、OAuth2、OpenID Connectの全認証タイプをサポート（`operation-visitor.ts:150-176`、`security-schemes-visitor.ts`、`components-visitor.ts:62-67`）
+- **グローバルセキュリティ対応**: OpenAPI仕様書のルートレベル`security`をIRの`globalSecurity`フィールドに変換する機能を実装。全エンドポイントのデフォルト認証要件をサポート（`transformer.ts:126-138`、`types/ir/index.ts:30`）

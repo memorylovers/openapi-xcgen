@@ -9,10 +9,12 @@ import { consola } from "consola";
 import type {
   ComponentsObject,
   IRModel,
+  IRSecurityScheme,
   SchemaObjectWithNullable,
 } from "../../../types";
 import type { SchemaContext, VisitorContext } from "../../types";
 import { visitSchema } from "../schema/schema-visitor";
+import { visitSecuritySchemes } from "./security-schemes-visitor";
 
 /**
  * Components処理の結果
@@ -20,6 +22,8 @@ import { visitSchema } from "../schema/schema-visitor";
 export interface ComponentsResult {
   /** 抽出されたモデル（オブジェクト、列挙型、配列、マップを統一的に管理） */
   models: IRModel[];
+  /** セキュリティスキーム定義 */
+  securitySchemes?: Record<string, IRSecurityScheme>;
 }
 
 /**
@@ -54,6 +58,14 @@ export function visitComponents(
     models: [],
   };
 
+  // securitySchemesを処理
+  if (components.securitySchemes) {
+    const securitySchemes = visitSecuritySchemes(components.securitySchemes);
+    if (Object.keys(securitySchemes).length > 0) {
+      result.securitySchemes = securitySchemes;
+    }
+  }
+
   // schemasが存在しない場合は早期リターン
   if (!components.schemas) {
     return result;
@@ -70,7 +82,7 @@ export function visitComponents(
     try {
       // visitSchemaを呼び出し（SchemaContextを作成）
       const schemaContext: SchemaContext = {
-        documentPath: [...context.documentPath, name],
+        documentPath: [...context.documentPath, "schemas", name],
         schemaName: name,
         rootSegment: "components",
       };
@@ -112,7 +124,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 
@@ -156,7 +168,7 @@ if (import.meta.vitest) {
     it("should handle empty components.schemas", () => {
       const components: ComponentsObject = { schemas: {} };
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 
@@ -200,7 +212,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 
@@ -226,7 +238,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 
@@ -260,7 +272,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 
@@ -284,7 +296,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 
@@ -304,7 +316,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitComponents(components, {
-        documentPath: ["components", "schemas"],
+        documentPath: ["components"],
         rootSegment: "components",
       });
 

@@ -8,6 +8,7 @@
 import type { IREndpoint } from "./endpoints/endpoint";
 import type { IRMetadata } from "./metadata";
 import type { IRModel } from "./models/operation";
+import type { IRSecurityRequirement, IRSecurityScheme } from "./security";
 import type { IRTag } from "./tags";
 
 /**
@@ -23,6 +24,10 @@ export interface XcgenIR {
   tags: IRTag[];
   /** APIエンドポイントの配列 */
   endpoints: IREndpoint[];
+  /** セキュリティスキーム定義（components.securitySchemesから変換） */
+  securitySchemes?: Record<string, IRSecurityScheme>;
+  /** グローバルセキュリティ要件（ルートレベルのsecurityから変換） */
+  globalSecurity?: IRSecurityRequirement[];
 }
 
 // Re-export all types from sub-modules
@@ -66,3 +71,14 @@ export type {
   IRResponseContent,
   IRResponseHeader,
 } from "./endpoints";
+// security
+export type {
+  IRApiKeySecurityScheme,
+  IRHttpSecurityScheme,
+  IROAuth2SecurityScheme,
+  IROAuthFlow,
+  IROAuthFlows,
+  IROpenIdConnectSecurityScheme,
+  IRSecurityRequirement,
+  IRSecurityScheme,
+} from "./security";

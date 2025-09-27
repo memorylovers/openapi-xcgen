@@ -16,6 +16,7 @@ import type {
   IREndpoint,
   IRHttpMethod,
   IRModel,
+  IRSecurityRequirement,
   OperationObject,
   ReferenceObject,
 } from "../../../types";
@@ -146,6 +147,20 @@ export function visitOperation(
       }
     : parametersResult.parameters;
 
+  // security処理
+  let security: IRSecurityRequirement[] | undefined;
+  if (operation.security) {
+    security = operation.security.map((requirement) => {
+      // SecurityRequirementObjectは { schemeName: scopes[] } の形式
+      const schemeName = Object.keys(requirement)[0];
+      const scopes = requirement[schemeName];
+      return {
+        scheme: schemeName,
+        ...(scopes && scopes.length > 0 && { scopes }),
+      };
+    });
+  }
+
   const endpoint: IREndpoint = {
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
@@ -157,7 +172,7 @@ export function visitOperation(
     ...(operation.description && { description: operation.description }),
     ...(requestBody && { requestBody }),
     ...(operation.deprecated && { deprecated: operation.deprecated }),
-    // security は未対応
+    ...(security && { security }),
   };
 
   return {

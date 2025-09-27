@@ -1317,7 +1317,12 @@
           }
         ],
         "required": true
-      }
+      },
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
+      ]
     },
     {
       "method": "get",
@@ -1422,7 +1427,12 @@
           }
         ],
         "required": true
-      }
+      },
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
+      ]
     },
     {
       "method": "delete",
@@ -1463,7 +1473,12 @@
       ],
       "operationId": "deleteSpecialEvent",
       "summary": "Delete special event",
-      "description": "Delete a special event (requires admin privileges)"
+      "description": "Delete a special event (requires admin privileges)",
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
+      ]
     },
     {
       "method": "post",
@@ -1623,5 +1638,13 @@
       "summary": "Generate QR code for tickets",
       "description": "Generate a QR code for ticket validation at the museum entrance"
     }
-  ]
+  ],
+  "securitySchemes": {
+    "ApiKey": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header",
+      "description": "API key for admin operations"
+    }
+  }
 }

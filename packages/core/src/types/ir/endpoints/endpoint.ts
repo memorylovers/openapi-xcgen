@@ -3,6 +3,7 @@
  */
 
 import type { IRType } from "../common/type";
+import type { IRSecurityRequirement } from "../security";
 import type { IRParameter } from "./parameter";
 import type { IRRequestBody } from "./request";
 import type { IRResponse } from "./response";
@@ -68,4 +69,6 @@ export interface IREndpoint {
   responses: IRResponse[];
   /** 非推奨フラグ */
   deprecated?: true;
+  /** エンドポイントで必要な認証 */
+  security?: IRSecurityRequirement[];
 }
