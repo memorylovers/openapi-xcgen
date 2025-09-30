@@ -126,6 +126,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "A paged array of pets",
           "content": [
@@ -139,6 +140,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "default",
           "description": "unexpected error",
           "content": [
@@ -164,10 +166,12 @@
       "parameters": [],
       "responses": [
         {
+          "kind": "content",
           "statusCode": "201",
           "description": "Null response"
         },
         {
+          "kind": "content",
           "statusCode": "default",
           "description": "unexpected error",
           "content": [
@@ -209,6 +213,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Expected response to a valid request",
           "content": [
@@ -222,6 +227,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "default",
           "description": "unexpected error",
           "content": [

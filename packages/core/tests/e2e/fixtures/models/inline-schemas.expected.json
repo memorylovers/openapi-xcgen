@@ -315,6 +315,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Success - validates parameter model generation",
           "content": [
@@ -339,6 +340,7 @@
       "parameters": [],
       "responses": [
         {
+          "kind": "content",
           "statusCode": "201",
           "description": "Created - validates simple response schema extraction",
           "content": [
@@ -379,6 +381,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Primitive response - validates direct string return",
           "content": [
@@ -389,6 +392,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "201",
           "description": "Array response - validates direct array with inline objects",
           "content": [
@@ -402,6 +406,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "202",
           "description": "Complex object response - validates nested object extraction",
           "content": [
@@ -415,6 +420,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "203",
           "description": "Direct schema reference - validates full schema $ref",
           "content": [

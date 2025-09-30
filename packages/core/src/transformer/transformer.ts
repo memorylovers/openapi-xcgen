@@ -334,6 +334,7 @@ if (import.meta.vitest) {
             parameters: [],
             responses: [
               {
+                kind: "content",
                 statusCode: "200",
                 description: "Success",
               },
@@ -359,6 +360,7 @@ if (import.meta.vitest) {
             },
             responses: [
               {
+                kind: "content",
                 statusCode: "201",
                 description: "Created",
               },
@@ -372,6 +374,7 @@ if (import.meta.vitest) {
             parameters: [],
             responses: [
               {
+                kind: "content",
                 statusCode: "200",
                 description: "Success",
               },
@@ -508,6 +511,7 @@ if (import.meta.vitest) {
             },
             responses: [
               {
+                kind: "content",
                 statusCode: "200",
                 description: "Success",
                 content: [
@@ -521,6 +525,7 @@ if (import.meta.vitest) {
                 ],
               },
               {
+                kind: "content",
                 statusCode: "404",
                 description: "Not found",
               },

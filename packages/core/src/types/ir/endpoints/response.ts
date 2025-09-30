@@ -45,18 +45,14 @@ export interface IRResponseHeader {
 }
 
 /**
- * IRResponse - レスポンス
+ * IRResponse - レスポンス (Discriminated Union型)
  * @example
  * ```yaml
  * # OpenAPI → IRResponse
  * # パターン1: components参照
  * responses:
  *   '200':
- *     description: Success
- *     content:
- *       application/json:
- *         schema:
- *           $ref: '#/components/schemas/User'
+ *     $ref: '#/components/responses/SuccessResponse'
  *
  * # パターン2: インラインスキーマ
  * responses:
@@ -96,7 +92,14 @@ export interface IRResponseHeader {
  *     description: Internal server error
  * ```
  */
-export interface IRResponse {
+export type IRResponse = IRResponseWithContent | IRResponseWithRef;
+
+/**
+ * IRResponseWithContent - コンテンツを持つレスポンス
+ */
+export interface IRResponseWithContent {
+  /** 判別子 */
+  kind: "content";
   /** HTTPステータスコード（"200", "404", "default"など） */
   statusCode: string;
   /** 説明 */
@@ -105,6 +108,34 @@ export interface IRResponse {
   content?: IRResponseContent[];
   /** レスポンスヘッダー */
   headers?: IRResponseHeader[];
+}
+
+/**
+ * IRResponseWithRef - $ref参照を持つレスポンス
+ */
+export interface IRResponseWithRef {
+  /** 判別子 */
+  kind: "ref";
+  /** HTTPステータスコード（"200", "404", "default"など） */
+  statusCode: string;
   /** $ref参照情報（components/responsesへの参照など） */
-  ref?: IRRef;
+  ref: IRRef;
+}
+
+/**
+ * IRResponseがIRResponseWithContentかどうかを判定する型ガード
+ */
+export function isIRResponseWithContent(
+  response: IRResponse,
+): response is IRResponseWithContent {
+  return response.kind === "content";
+}
+
+/**
+ * IRResponseがIRResponseWithRefかどうかを判定する型ガード
+ */
+export function isIRResponseWithRef(
+  response: IRResponse,
+): response is IRResponseWithRef {
+  return response.kind === "ref";
 }

@@ -84,6 +84,7 @@ export function visitResponse(
     };
 
     const irResponse: IRResponse = {
+      kind: "ref",
       statusCode: context.statusCode,
       ref,
     };
@@ -190,6 +191,7 @@ export function visitResponse(
   // headers は未対応
 
   const irResponse: IRResponse = {
+    kind: "content",
     statusCode: context.statusCode,
     ...(responseObj.description && { description: responseObj.description }),
     ...(content && { content }),
@@ -221,6 +223,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         response: {
+          kind: "content",
           statusCode: "200",
           description: "Success",
         },
@@ -258,6 +261,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         response: {
+          kind: "content",
           statusCode: "200",
           description: "User list",
           content: [
@@ -336,6 +340,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         response: {
+          kind: "content",
           statusCode: "200",
           description: "Multi-format response",
           content: [
@@ -416,6 +421,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         response: {
+          kind: "content",
           statusCode: "200",
           description: "Success with headers",
         },
@@ -442,6 +448,7 @@ if (import.meta.vitest) {
       // $ref情報がIRRefとして保持される
       expect(result).toEqual({
         response: {
+          kind: "ref",
           statusCode: "404",
           ref: {
             kind: "ref",
@@ -470,6 +477,7 @@ if (import.meta.vitest) {
 
       expect(result400).toEqual({
         response: {
+          kind: "ref",
           statusCode: "400",
           ref: {
             kind: "ref",
@@ -496,6 +504,7 @@ if (import.meta.vitest) {
 
       expect(result500).toEqual({
         response: {
+          kind: "ref",
           statusCode: "500",
           ref: {
             kind: "ref",
@@ -534,6 +543,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         response: {
+          kind: "content",
           statusCode: "400",
           description: "Bad Request",
           content: [

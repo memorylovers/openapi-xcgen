@@ -155,6 +155,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         responses: [
           {
+            kind: "content",
             statusCode: "200",
             description: "Success",
           },
@@ -186,14 +187,17 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         responses: [
           {
+            kind: "content",
             statusCode: "200",
             description: "Success",
           },
           {
+            kind: "content",
             statusCode: "404",
             description: "Not found",
           },
           {
+            kind: "content",
             statusCode: "500",
             description: "Internal server error",
           },
@@ -244,6 +248,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         responses: [
           {
+            kind: "content",
             statusCode: "200",
             description: "Success",
             content: [
@@ -257,6 +262,7 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "content",
             statusCode: "400",
             description: "Bad request",
             content: [
@@ -350,6 +356,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         responses: [
           {
+            kind: "content",
             statusCode: "200",
             description: "Success",
             content: [
@@ -363,10 +370,12 @@ if (import.meta.vitest) {
             ],
           },
           {
+            kind: "content",
             statusCode: "204",
             description: "No content",
           },
           {
+            kind: "content",
             statusCode: "404",
             description: "Not found",
             content: [
@@ -418,10 +427,12 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         responses: [
           {
+            kind: "content",
             statusCode: "200",
             description: "OK",
           },
           {
+            kind: "content",
             statusCode: "500",
             description: "Error",
           },
@@ -449,6 +460,7 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         responses: [
           {
+            kind: "content",
             statusCode: "200",
             description: "Success",
           },

@@ -253,6 +253,7 @@
       "parameters": [],
       "responses": [
         {
+          "kind": "content",
           "statusCode": "201",
           "description": "Order created",
           "content": [

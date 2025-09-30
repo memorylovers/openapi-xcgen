@@ -125,6 +125,7 @@ if (import.meta.vitest) {
             parameters: [],
             responses: [
               {
+                kind: "content",
                 statusCode: "200",
                 description: "Success",
               },

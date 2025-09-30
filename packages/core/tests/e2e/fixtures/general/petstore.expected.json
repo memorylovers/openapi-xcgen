@@ -119,6 +119,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "A paged array of pets",
           "content": [
@@ -132,6 +133,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "500",
           "description": "Unexpected error",
           "content": [
@@ -157,6 +159,7 @@
       "parameters": [],
       "responses": [
         {
+          "kind": "content",
           "statusCode": "201",
           "description": "Pet created",
           "content": [
@@ -170,6 +173,7 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "500",
           "description": "Unexpected error",
           "content": [
@@ -211,6 +215,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Expected response to a valid request",
           "content": [
@@ -224,10 +229,12 @@
           ]
         },
         {
+          "kind": "content",
           "statusCode": "404",
           "description": "Pet not found"
         },
         {
+          "kind": "content",
           "statusCode": "500",
           "description": "Unexpected error",
           "content": [

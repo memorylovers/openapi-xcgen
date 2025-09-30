@@ -819,6 +819,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Successful operation",
           "content": [
@@ -832,6 +833,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "400",
           "ref": {
             "kind": "ref",
@@ -839,6 +841,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "429",
           "ref": {
             "kind": "ref",
@@ -846,6 +849,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "500",
           "ref": {
             "kind": "ref",
@@ -869,6 +873,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Successful operation",
           "content": [
@@ -882,6 +887,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "400",
           "ref": {
             "kind": "ref",
@@ -889,6 +895,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "404",
           "ref": {
             "kind": "ref",
@@ -909,6 +916,7 @@
       "parameters": [],
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Successful operation",
           "content": [
@@ -922,6 +930,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "401",
           "ref": {
             "kind": "ref",
@@ -942,6 +951,7 @@
       "parameters": [],
       "responses": [
         {
+          "kind": "content",
           "statusCode": "201",
           "description": "Booking created successfully",
           "content": [
@@ -955,6 +965,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "400",
           "ref": {
             "kind": "ref",
@@ -962,6 +973,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "401",
           "ref": {
             "kind": "ref",
@@ -969,6 +981,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "409",
           "ref": {
             "kind": "ref",
@@ -1005,6 +1018,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Successful operation",
           "content": [
@@ -1018,6 +1032,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "401",
           "ref": {
             "kind": "ref",
@@ -1025,6 +1040,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "404",
           "ref": {
             "kind": "ref",
@@ -1048,10 +1064,12 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "204",
           "description": "Booking cancelled successfully"
         },
         {
+          "kind": "ref",
           "statusCode": "401",
           "ref": {
             "kind": "ref",
@@ -1059,6 +1077,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "404",
           "ref": {
             "kind": "ref",
@@ -1066,6 +1085,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "409",
           "ref": {
             "kind": "ref",
@@ -1089,6 +1109,7 @@
       },
       "responses": [
         {
+          "kind": "content",
           "statusCode": "200",
           "description": "Payment processed successfully",
           "content": [
@@ -1102,6 +1123,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "400",
           "ref": {
             "kind": "ref",
@@ -1109,6 +1131,7 @@
           }
         },
         {
+          "kind": "ref",
           "statusCode": "401",
           "ref": {
             "kind": "ref",
@@ -1116,6 +1139,7 @@
           }
         },
         {
+          "kind": "content",
           "statusCode": "402",
           "description": "Payment Required - Payment failed",
           "content": [
@@ -1129,6 +1153,7 @@
           ]
         },
         {
+          "kind": "ref",
           "statusCode": "404",
           "ref": {
             "kind": "ref",
@@ -1164,6 +1189,7 @@
   ],
   "commonResponses": {
     "BadRequest": {
+      "kind": "content",
       "statusCode": "200",
       "description": "Bad Request - Invalid input",
       "content": [
@@ -1177,6 +1203,7 @@
       ]
     },
     "Unauthorized": {
+      "kind": "content",
       "statusCode": "200",
       "description": "Unauthorized - Authentication required",
       "content": [
@@ -1190,6 +1217,7 @@
       ]
     },
     "NotFound": {
+      "kind": "content",
       "statusCode": "200",
       "description": "Not Found - Resource not found",
       "content": [
@@ -1203,6 +1231,7 @@
       ]
     },
     "Conflict": {
+      "kind": "content",
       "statusCode": "200",
       "description": "Conflict - Resource state conflict",
       "content": [
@@ -1216,6 +1245,7 @@
       ]
     },
     "TooManyRequests": {
+      "kind": "content",
       "statusCode": "200",
       "description": "Too Many Requests - Rate limit exceeded",
       "content": [
@@ -1229,6 +1259,7 @@
       ]
     },
     "InternalServerError": {
+      "kind": "content",
       "statusCode": "200",
       "description": "Internal Server Error",
       "content": [

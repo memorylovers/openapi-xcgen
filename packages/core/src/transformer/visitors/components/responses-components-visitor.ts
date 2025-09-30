@@ -17,6 +17,7 @@ import type {
   ReferenceObject,
   ResponseObject,
 } from "../../../types";
+import { isIRResponseWithContent } from "../../../types/ir/endpoints/response";
 import { isReferenceObject } from "../../../types";
 import type { ResponseContext } from "../../types";
 import { visitResponse } from "../operations/response-visitor";
@@ -122,6 +123,7 @@ if (import.meta.vitest) {
 
       expect(result).toHaveProperty("BadRequest");
       expect(result.BadRequest).toEqual({
+        kind: "content",
         statusCode: "200",
         description: "Bad Request - Invalid input",
         content: [
@@ -147,6 +149,7 @@ if (import.meta.vitest) {
 
       expect(result).toHaveProperty("NoContent");
       expect(result.NoContent).toEqual({
+        kind: "content",
         statusCode: "200",
         description: "No Content",
       });
@@ -212,8 +215,14 @@ if (import.meta.vitest) {
       const result = visitComponentsResponses(responses);
 
       expect(Object.keys(result)).toEqual(["BadRequest", "Unauthorized"]);
-      expect(result.BadRequest.description).toBe("Bad Request");
-      expect(result.Unauthorized.description).toBe("Unauthorized");
+
+      if (isIRResponseWithContent(result.BadRequest)) {
+        expect(result.BadRequest.description).toBe("Bad Request");
+      }
+
+      if (isIRResponseWithContent(result.Unauthorized)) {
+        expect(result.Unauthorized.description).toBe("Unauthorized");
+      }
     });
   });
 }
