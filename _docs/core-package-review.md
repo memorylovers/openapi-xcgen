@@ -2,7 +2,12 @@
 
 ## 未実装項目
 
-- `components.responses` など一部のcomponentsセクションが未対応です。
+- 一部のcomponentsセクションが未対応です：
+  - `components.parameters` - 再利用可能なパラメータ定義
+  - `components.examples` - 再利用可能なサンプル値
+  - `components.headers` - 再利用可能なヘッダー定義
+  - `components.links` - レスポンス間のリンク定義
+  - `components.callbacks` - Webhookコールバック定義
 - discriminatorを使用したoneOf/allOf/anyOfパターンが未サポートで、3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗します。CLAUDE.mdの制限事項にも明記済み。
 
 ## 挙動上のリスク
@@ -150,3 +155,17 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 
 - **Security対応**: Operation/PathレベルのsecurityとcomponentsのsecuritySchemesを完全対応。APIKey、HTTP(Basic/Bearer)、OAuth2、OpenID Connectの全認証タイプをサポート（`operation-visitor.ts:150-176`、`security-schemes-visitor.ts`、`components-visitor.ts:62-67`）
 - **グローバルセキュリティ対応**: OpenAPI仕様書のルートレベル`security`をIRの`globalSecurity`フィールドに変換する機能を実装。全エンドポイントのデフォルト認証要件をサポート（`transformer.ts:126-138`、`types/ir/index.ts:30`）
+- **components.responses対応**: components.responsesセクションの完全サポートを実装。$ref参照を保持し、IRResponseとして変換（`responses-components-visitor.ts`、`components-visitor.ts:78-82`）
+- **IRRequestBody/IRResponse Discriminated Union化**: content/refの相互排他性を型システムで表現。型安全性向上とメモリ効率化を実現（`request.ts`、`response.ts`）
+
+### 実装済みcomponentsセクション
+
+✅ `components.schemas` - スキーマ定義（完全対応）
+✅ `components.responses` - 再利用可能なレスポンス定義（完全対応）
+✅ `components.requestBodies` - 再利用可能なリクエストボディ定義（完全対応）
+✅ `components.securitySchemes` - 認証スキーム定義（完全対応）
+❌ `components.parameters` - 再利用可能なパラメータ定義（未実装）
+❌ `components.examples` - 再利用可能なサンプル値（未実装）
+❌ `components.headers` - 再利用可能なヘッダー定義（未実装）
+❌ `components.links` - レスポンス間のリンク定義（未実装）
+❌ `components.callbacks` - Webhookコールバック定義（未実装）
