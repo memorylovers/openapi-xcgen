@@ -298,6 +298,7 @@
       "operationId": "createPets",
       "summary": "Create a pet",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",

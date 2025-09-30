@@ -13,6 +13,7 @@
 import { consola } from "consola";
 import type {
   IRModel,
+  IRRef,
   IRRequestBody,
   IRRequestContent,
   ReferenceObject,
@@ -73,7 +74,22 @@ export function visitRequestBody(
 ): RequestBodyResult | null {
   const models: IRModel[] = [];
 
-  // RequestBodyObject として扱う（$refは後でschemaレベルで処理）
+  // ReferenceObjectの場合は$ref情報を保持
+  if (isReferenceObject(requestBody)) {
+    const ref: IRRef = {
+      kind: "ref",
+      name: requestBody.$ref,
+    };
+
+    const irRequestBody: IRRequestBody = {
+      kind: "ref",
+      ref,
+    };
+
+    return { requestBody: irRequestBody, models: [] };
+  }
+
+  // RequestBodyObject として扱う
   const requestBodyObj = requestBody as RequestBodyObject;
 
   // contentが必須
@@ -182,6 +198,7 @@ export function visitRequestBody(
   }
 
   const irRequestBody: IRRequestBody = {
+    kind: "content",
     content,
     ...(requestBodyObj.required && { required: true }),
     ...(requestBodyObj.description && {
@@ -228,6 +245,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
+          kind: "content",
           description: "User data",
           required: true,
           content: [
@@ -304,6 +322,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
+          kind: "content",
           content: [
             {
               mimeType: "application/json",
@@ -419,9 +438,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn and return null for reference requestBody (no content)", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-
+    it("should handle reference requestBody properly", () => {
       const requestBody: ReferenceObject = {
         $ref: "#/components/requestBodies/UserInput",
       };
@@ -435,13 +452,16 @@ if (import.meta.vitest) {
         schemaPath: null,
       });
 
-      // $refはRequestBodyObjectとして処理され、contentがundefinedなのでnullが返る
-      expect(result).toEqual(null);
-      expect(warnSpy).toHaveBeenCalledWith(
-        "RequestBody without content for operation: updateUser",
-      );
-
-      warnSpy.mockRestore();
+      expect(result).toEqual({
+        requestBody: {
+          kind: "ref",
+          ref: {
+            kind: "ref",
+            name: "#/components/requestBodies/UserInput",
+          },
+        },
+        models: [],
+      });
     });
 
     it("should handle content with media types that have no schema", () => {
@@ -469,6 +489,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
+          kind: "content",
           content: [
             {
               mimeType: "text/plain",
@@ -507,6 +528,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         requestBody: {
+          kind: "content",
           content: [
             {
               mimeType: "application/json",

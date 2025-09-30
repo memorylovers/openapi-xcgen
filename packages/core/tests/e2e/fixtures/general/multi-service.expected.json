@@ -186,6 +186,7 @@
       "operationId": "createPost",
       "summary": "Create a new post",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",

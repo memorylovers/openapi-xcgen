@@ -3,7 +3,7 @@
  */
 
 import type { MimeType } from "../common/mime-type";
-import type { IRType } from "../common/type";
+import type { IRRef, IRType } from "../common/type";
 
 /**
  * IRRequestContent - リクエストコンテンツ（MIMEタイプとスキーマの組み合わせ）
@@ -16,23 +16,40 @@ export interface IRRequestContent {
 }
 
 /**
- * IRRequestBody - リクエストボディ
+ * IRRequestBodyWithContent - 実際のコンテンツを持つリクエストボディ
+ */
+export interface IRRequestBodyWithContent {
+  /** 判別子 */
+  kind: "content";
+  /** 説明 */
+  description?: string;
+  /** 必須フラグ */
+  required?: true;
+  /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
+  content: IRRequestContent[];
+}
+
+/**
+ * IRRequestBodyWithRef - $ref参照を持つリクエストボディ
+ */
+export interface IRRequestBodyWithRef {
+  /** 判別子 */
+  kind: "ref";
+  /** $ref参照情報（components/requestBodiesへの参照など） */
+  ref: IRRef;
+}
+
+/**
+ * IRRequestBody - リクエストボディ（Discriminated Union）
+ *
+ * contentとrefのいずれかを持つが、両方を同時に持つことはない。
+ * TypeScriptの型システムでこの制約を強制し、型安全性を向上させる。
+ *
  * @example
  * ```yaml
- * # OpenAPI → IRRequestBody
+ * # OpenAPI → IRRequestBodyWithContent
  * requestBody:
  *   description: User to create
- *   required: true
- *   content:
- *     application/json:
- *       schema:
- *         $ref: '#/components/schemas/User'
- *     application/xml:
- *       schema:
- *         $ref: '#/components/schemas/User'
- *
- * # インラインスキーマ
- * requestBody:
  *   required: true
  *   content:
  *     application/json:
@@ -45,39 +62,27 @@ export interface IRRequestContent {
  *             type: string
  *             format: email
  *
- * # フォームデータ
+ * # OpenAPI → IRRequestBodyWithRef
  * requestBody:
- *   content:
- *     multipart/form-data:
- *       schema:
- *         type: object
- *         properties:
- *           file:
- *             type: string
- *             format: binary
- *           description:
- *             type: string
- *
- * # プレーンテキスト
- * requestBody:
- *   content:
- *     text/plain:
- *       schema:
- *         type: string
- *
- * # カスタムMIMEタイプ
- * requestBody:
- *   content:
- *     application/vnd.api+json:
- *       schema:
- *         type: object
+ *   $ref: '#/components/requestBodies/UserInput'
  * ```
  */
-export interface IRRequestBody {
-  /** 説明 */
-  description?: string;
-  /** 必須フラグ */
-  required?: true;
-  /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
-  content: IRRequestContent[];
+export type IRRequestBody = IRRequestBodyWithContent | IRRequestBodyWithRef;
+
+/**
+ * IRRequestBodyがコンテンツ型かどうかを判定する型ガード
+ */
+export function isIRRequestBodyWithContent(
+  requestBody: IRRequestBody,
+): requestBody is IRRequestBodyWithContent {
+  return requestBody.kind === "content";
+}
+
+/**
+ * IRRequestBodyが参照型かどうかを判定する型ガード
+ */
+export function isIRRequestBodyWithRef(
+  requestBody: IRRequestBody,
+): requestBody is IRRequestBodyWithRef {
+  return requestBody.kind === "ref";
 }

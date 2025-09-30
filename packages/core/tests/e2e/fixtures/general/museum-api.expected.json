@@ -1307,6 +1307,7 @@
       "summary": "Create a new special event",
       "description": "Create a new special event (requires admin privileges)",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",
@@ -1417,6 +1418,7 @@
       "summary": "Update special event",
       "description": "Update a special event (requires admin privileges)",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",
@@ -1539,6 +1541,7 @@
       "summary": "Purchase museum tickets",
       "description": "Purchase tickets for museum admission",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",
@@ -1645,6 +1648,73 @@
       "name": "X-API-Key",
       "in": "header",
       "description": "API key for admin operations"
+    }
+  },
+  "commonResponses": {
+    "BadRequest": {
+      "statusCode": "200",
+      "description": "Bad Request - Invalid input parameters",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Unauthorized": {
+      "statusCode": "200",
+      "description": "Unauthorized - Authentication required",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Forbidden": {
+      "statusCode": "200",
+      "description": "Forbidden - Insufficient privileges",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "NotFound": {
+      "statusCode": "200",
+      "description": "Not Found - Resource not found",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "InternalServerError": {
+      "statusCode": "200",
+      "description": "Internal Server Error",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
     }
   }
 }

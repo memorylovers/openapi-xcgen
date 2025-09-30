@@ -86,8 +86,8 @@ export interface ParametersContext extends VisitorContext {
  * RequestBody処理用のコンテキスト
  */
 export interface RequestBodyContext extends VisitorContext {
-  /** ルートセグメント（固定値: paths） */
-  rootSegment: "paths";
+  /** ルートセグメント（paths または components） */
+  rootSegment: "paths" | "components";
   /** HTTPメソッド */
   method: IRHttpMethod;
   /** パステンプレート */
@@ -114,8 +114,8 @@ export interface ResponsesContext extends VisitorContext {
  * Response処理用のコンテキスト
  */
 export interface ResponseContext extends VisitorContext {
-  /** ルートセグメント（固定値: paths） */
-  rootSegment: "paths";
+  /** ルートセグメント（paths または components） */
+  rootSegment: "paths" | "components";
   /** HTTPメソッド */
   method: IRHttpMethod;
   /** パステンプレート */

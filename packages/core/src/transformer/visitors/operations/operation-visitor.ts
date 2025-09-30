@@ -419,6 +419,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: [],
           requestBody: {
+            kind: "content",
             description: "Pet to add",
             required: true,
             content: [

@@ -6,6 +6,8 @@
  */
 
 import type { IREndpoint } from "./endpoints/endpoint";
+import type { IRRequestBody } from "./endpoints/request";
+import type { IRResponse } from "./endpoints/response";
 import type { IRMetadata } from "./metadata";
 import type { IRModel } from "./models/operation";
 import type { IRSecurityRequirement, IRSecurityScheme } from "./security";
@@ -28,6 +30,10 @@ export interface XcgenIR {
   securitySchemes?: Record<string, IRSecurityScheme>;
   /** グローバルセキュリティ要件（ルートレベルのsecurityから変換） */
   globalSecurity?: IRSecurityRequirement[];
+  /** 共通レスポンス定義（components.responsesから変換） */
+  commonResponses?: Record<string, IRResponse>;
+  /** 共通リクエストボディ定義（components.requestBodiesから変換） */
+  commonRequestBodies?: Record<string, IRRequestBody>;
 }
 
 // Re-export all types from sub-modules
@@ -66,10 +72,16 @@ export type {
   IRParameter,
   IRParameterInType,
   IRRequestBody,
+  IRRequestBodyWithContent,
+  IRRequestBodyWithRef,
   IRRequestContent,
   IRResponse,
   IRResponseContent,
   IRResponseHeader,
+} from "./endpoints";
+export {
+  isIRRequestBodyWithContent,
+  isIRRequestBodyWithRef,
 } from "./endpoints";
 // security
 export type {

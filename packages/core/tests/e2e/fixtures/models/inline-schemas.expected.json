@@ -356,6 +356,7 @@
       "summary": "Test 2: Request body inline schema extraction (Basic)",
       "description": "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",

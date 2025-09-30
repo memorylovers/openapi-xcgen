@@ -9,11 +9,15 @@ import { consola } from "consola";
 import type {
   ComponentsObject,
   IRModel,
+  IRRequestBody,
+  IRResponse,
   IRSecurityScheme,
   SchemaObjectWithNullable,
 } from "../../../types";
 import type { SchemaContext, VisitorContext } from "../../types";
 import { visitSchema } from "../schema/schema-visitor";
+import { visitComponentsRequestBodies } from "./requestBodies-components-visitor";
+import { visitComponentsResponses } from "./responses-components-visitor";
 import { visitSecuritySchemes } from "./security-schemes-visitor";
 
 /**
@@ -24,6 +28,10 @@ export interface ComponentsResult {
   models: IRModel[];
   /** セキュリティスキーム定義 */
   securitySchemes?: Record<string, IRSecurityScheme>;
+  /** 共通レスポンス定義 */
+  responses?: Record<string, IRResponse>;
+  /** 共通リクエストボディ定義 */
+  requestBodies?: Record<string, IRRequestBody>;
 }
 
 /**
@@ -63,6 +71,24 @@ export function visitComponents(
     const securitySchemes = visitSecuritySchemes(components.securitySchemes);
     if (Object.keys(securitySchemes).length > 0) {
       result.securitySchemes = securitySchemes;
+    }
+  }
+
+  // responsesを処理
+  if (components.responses) {
+    const responses = visitComponentsResponses(components.responses);
+    if (Object.keys(responses).length > 0) {
+      result.responses = responses;
+    }
+  }
+
+  // requestBodiesを処理
+  if (components.requestBodies) {
+    const requestBodies = visitComponentsRequestBodies(
+      components.requestBodies,
+    );
+    if (Object.keys(requestBodies).length > 0) {
+      result.requestBodies = requestBodies;
     }
   }
 

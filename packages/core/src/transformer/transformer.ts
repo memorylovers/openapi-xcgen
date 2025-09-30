@@ -16,6 +16,8 @@ import type {
   IREndpoint,
   IRMetadata,
   IRModel,
+  IRRequestBody,
+  IRResponse,
   IRSecurityRequirement,
   IRSecurityScheme,
   IRTag,
@@ -64,20 +66,12 @@ export function transform(document: OpenAPIDocument): XcgenIR {
       `components.parameters is not supported yet and will be skipped`,
     );
   }
-  if (document.components?.requestBodies) {
-    consola.warn(
-      `components.requestBodies is not supported yet and will be skipped`,
-    );
-  }
-  if (document.components?.responses) {
-    consola.warn(
-      `components.responses is not supported yet and will be skipped`,
-    );
-  }
 
-  // Components処理（schemas, securitySchemes）
+  // Components処理（schemas, securitySchemes, responses, requestBodies）
   let models: IRModel[] = [];
   let securitySchemes: Record<string, IRSecurityScheme> | undefined;
+  let commonResponses: Record<string, IRResponse> | undefined;
+  let commonRequestBodies: Record<string, IRRequestBody> | undefined;
   if (document.components) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
     const componentsResult = visitComponents(
@@ -86,6 +80,8 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     );
     models = componentsResult.models;
     securitySchemes = componentsResult.securitySchemes;
+    commonResponses = componentsResult.responses;
+    commonRequestBodies = componentsResult.requestBodies;
   }
 
   // Tags処理
@@ -147,6 +143,8 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     endpoints,
     ...(securitySchemes && { securitySchemes }),
     ...(globalSecurity && { globalSecurity }),
+    ...(commonResponses && { commonResponses }),
+    ...(commonRequestBodies && { commonRequestBodies }),
   };
 
   return xcgenIR;
@@ -348,6 +346,7 @@ if (import.meta.vitest) {
             tags: ["pets"],
             parameters: [],
             requestBody: {
+              kind: "content",
               content: [
                 {
                   mimeType: "application/json",

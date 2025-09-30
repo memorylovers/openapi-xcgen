@@ -598,6 +598,13 @@
       ],
       "operationId": "addPet",
       "summary": "Add a new pet to the store",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/Pet"
+        }
+      },
       "security": [
         {
           "scheme": "petstore_auth",
@@ -651,6 +658,13 @@
       ],
       "operationId": "updatePet",
       "summary": "Update an existing pet",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/Pet"
+        }
+      },
       "security": [
         {
           "scheme": "petstore_auth",
@@ -826,6 +840,7 @@
       "operationId": "updatePetWithForm",
       "summary": "Updates a pet in the store with form data",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/x-www-form-urlencoded",
@@ -902,6 +917,7 @@
       "operationId": "uploadFile",
       "summary": "uploads an image",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "multipart/form-data",
@@ -989,6 +1005,7 @@
       "operationId": "placeOrder",
       "summary": "Place an order for a pet",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",
@@ -1087,6 +1104,7 @@
       "summary": "Create user",
       "description": "This can only be done by the logged in user.",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",
@@ -1120,6 +1138,13 @@
       ],
       "operationId": "createUsersWithArrayInput",
       "summary": "Creates list of users with given input array",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/UserArray"
+        }
+      },
       "security": [
         {
           "scheme": "api_key"
@@ -1141,6 +1166,13 @@
       ],
       "operationId": "createUsersWithListInput",
       "summary": "Creates list of users with given input array",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/UserArray"
+        }
+      },
       "security": [
         {
           "scheme": "api_key"
@@ -1268,6 +1300,7 @@
       "summary": "Updated user",
       "description": "This can only be done by the logged in user.",
       "requestBody": {
+        "kind": "content",
         "content": [
           {
             "mimeType": "application/json",
@@ -1333,6 +1366,43 @@
       "type": "apiKey",
       "name": "api_key",
       "in": "header"
+    }
+  },
+  "commonRequestBodies": {
+    "UserArray": {
+      "kind": "content",
+      "content": [
+        {
+          "mimeType": "application/json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/requestBodies/UserArray/content/application/json/schema/PostRequestBody"
+          }
+        }
+      ],
+      "required": true,
+      "description": "List of user object"
+    },
+    "Pet": {
+      "kind": "content",
+      "content": [
+        {
+          "mimeType": "application/json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pet"
+          }
+        },
+        {
+          "mimeType": "application/xml",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pet"
+          }
+        }
+      ],
+      "required": true,
+      "description": "Pet object that needs to be added to the store"
     }
   }
 }

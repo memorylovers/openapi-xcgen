@@ -2,7 +2,6 @@
 
 ## 未実装項目
 
-- Parameter の `$ref` 参照が警告されスキップされます（`packages/core/src/transformer/visitors/operations/parameters-visitor.ts:117-119`）。
 - `components.responses` など一部のcomponentsセクションが未対応です。
 - discriminatorを使用したoneOf/allOf/anyOfパターンが未サポートで、3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗します。CLAUDE.mdの制限事項にも明記済み。
 
