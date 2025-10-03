@@ -44,6 +44,10 @@ export interface IRProperty {
   defaultValue?: unknown;
   /** 非推奨フラグ */
   deprecated?: true;
+  /** レスポンス専用フラグ */
+  readOnly?: true;
+  /** リクエスト専用フラグ */
+  writeOnly?: true;
   /** バリデーション制約 */
   validation?: IRValidation;
 }

@@ -156,6 +156,8 @@ export function visitObject(
             defaultValue: schemaObj.default,
           }),
           ...(schemaObj.deprecated === true && { deprecated: true }),
+          ...(schemaObj.readOnly === true && { readOnly: true }),
+          ...(schemaObj.writeOnly === true && { writeOnly: true }),
           ...(validation && {
             validation,
           }),
@@ -1258,6 +1260,138 @@ if (import.meta.vitest) {
               },
             ],
             // additionalPropertiesフィールドは存在しない
+          },
+        ],
+      });
+    });
+
+    it("should handle readOnly property", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            readOnly: true,
+          },
+          name: {
+            type: "string",
+          },
+        },
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      });
+
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "User",
+            referencePath: "#/components/schemas/User",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                readOnly: true,
+              },
+              {
+                name: "name",
+                type: "string",
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("should handle writeOnly property", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          password: {
+            type: "string",
+            writeOnly: true,
+          },
+          username: {
+            type: "string",
+          },
+        },
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "UserCreate"],
+        rootSegment: "components",
+      });
+
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "UserCreate",
+            referencePath: "#/components/schemas/UserCreate",
+            properties: [
+              {
+                name: "password",
+                type: "string",
+                writeOnly: true,
+              },
+              {
+                name: "username",
+                type: "string",
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("should handle both readOnly and writeOnly properties", () => {
+      const schema = {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            readOnly: true,
+          },
+          password: {
+            type: "string",
+            writeOnly: true,
+          },
+          username: {
+            type: "string",
+          },
+        },
+      } as SchemaObjectWithNullable;
+
+      const result = visitObject(schema, {
+        documentPath: ["components", "schemas", "UserFull"],
+        rootSegment: "components",
+      });
+
+      expect(result).toEqual({
+        models: [
+          {
+            kind: "object",
+            name: "UserFull",
+            referencePath: "#/components/schemas/UserFull",
+            properties: [
+              {
+                name: "id",
+                type: "string",
+                readOnly: true,
+              },
+              {
+                name: "password",
+                type: "string",
+                writeOnly: true,
+              },
+              {
+                name: "username",
+                type: "string",
+              },
+            ],
           },
         ],
       });

@@ -26,6 +26,12 @@ describe("E2E: Transformer - General", () => {
     });
   });
 
+  describe("Property Modifiers", () => {
+    it("should handle readOnly and writeOnly properties correctly", async () => {
+      await compareWithExpected("general/readonly-writeonly");
+    });
+  });
+
   describe("Modern OpenAPI 3.1 Examples", () => {
     it("should transform Train Travel API correctly", async () => {
       await compareWithExpected("general/train-travel-api");

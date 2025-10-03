@@ -11,8 +11,8 @@
 **Phase 1: コード生成前に完了すべき項目**
 
 1. ✅ **servers**（最高）- 生成コードのベースURL設定に必須
-2. **readOnly**（高）- リクエスト/レスポンスで型を分ける必要
-3. **writeOnly**（高）- セキュリティ上重要（パスワードなど）
+2. ✅ **readOnly**（高）- リクエスト/レスポンスで型を分ける必要
+3. ✅ **writeOnly**（高）- セキュリティ上重要（パスワードなど）
 
 ### 推奨対応（IR構造の完成度を高める）
 
@@ -96,9 +96,9 @@ consola.warn(`Reference parameter not supported yet: ${param.$ref}`);
 
 ---
 
-## 4. 高: readOnly
+## 4. ✅ 高: readOnly
 
-**現状**: 未実装
+**現状**: ✅ 実装済み
 
 **影響範囲**:
 
@@ -110,11 +110,14 @@ consola.warn(`Reference parameter not supported yet: ${param.$ref}`);
 - IRPropertyに`readOnly`フィールド追加
 - コード生成時の除外ロジック
 
+**推奨アクション**:
+✅ 実装完了。IRPropertyにreadOnlyフィールドを追加し、object-visitorで処理を実装。
+
 ---
 
-## 5. 高: writeOnly
+## 5. ✅ 高: writeOnly
 
-**現状**: 未実装
+**現状**: ✅ 実装済み
 
 **影響範囲**:
 
@@ -125,6 +128,9 @@ consola.warn(`Reference parameter not supported yet: ${param.$ref}`);
 
 - IRPropertyに`writeOnly`フィールド追加
 - セキュリティ観点で重要
+
+**推奨アクション**:
+✅ 実装完了。IRPropertyにwriteOnlyフィールドを追加し、object-visitorで処理を実装。
 
 ---
 

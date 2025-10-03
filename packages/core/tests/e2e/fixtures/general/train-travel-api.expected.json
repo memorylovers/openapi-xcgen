@@ -14,6 +14,7 @@
           "name": "id",
           "type": "string",
           "required": true,
+          "readOnly": true,
           "validation": {
             "format": "uuid"
           }
@@ -81,6 +82,7 @@
           "name": "id",
           "type": "string",
           "required": true,
+          "readOnly": true,
           "validation": {
             "format": "uuid"
           }
@@ -143,6 +145,7 @@
           "name": "trip_id",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "format": "uuid"
           }
@@ -210,6 +213,7 @@
           "name": "id",
           "type": "string",
           "required": true,
+          "readOnly": true,
           "validation": {
             "format": "uuid"
           }
@@ -236,19 +240,22 @@
             "kind": "ref",
             "name": "#/components/schemas/BookingStatus"
           },
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "payment_status",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/BookingPaymentStatus"
-          }
+          },
+          "readOnly": true
         },
         {
           "name": "created_at",
           "type": "datetime",
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "total_price",
@@ -382,6 +389,7 @@
           "name": "card_number",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "pattern": "^[0-9]{13,19}$"
           }
@@ -416,6 +424,7 @@
           "name": "cvv",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "pattern": "^[0-9]{3,4}$"
           }
@@ -435,12 +444,14 @@
         {
           "name": "account_number",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true
         },
         {
           "name": "routing_number",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true
         },
         {
           "name": "account_holder",

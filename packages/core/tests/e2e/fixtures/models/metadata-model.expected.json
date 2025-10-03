@@ -26,11 +26,13 @@
         },
         {
           "name": "createdAt",
-          "type": "string"
+          "type": "string",
+          "readOnly": true
         },
         {
           "name": "password",
-          "type": "string"
+          "type": "string",
+          "writeOnly": true
         },
         {
           "name": "oldId",

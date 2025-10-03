@@ -61,6 +61,7 @@
           "name": "event_id",
           "type": "string",
           "required": true,
+          "readOnly": true,
           "validation": {
             "format": "uuid"
           }
@@ -145,11 +146,13 @@
         },
         {
           "name": "created_at",
-          "type": "datetime"
+          "type": "datetime",
+          "readOnly": true
         },
         {
           "name": "updated_at",
-          "type": "datetime"
+          "type": "datetime",
+          "readOnly": true
         }
       ]
     },
@@ -541,6 +544,7 @@
           "name": "visitor_email",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "format": "email"
           }
@@ -548,6 +552,7 @@
         {
           "name": "visitor_name",
           "type": "string",
+          "writeOnly": true,
           "validation": {
             "minLength": 1,
             "maxLength": 200
@@ -633,6 +638,7 @@
           "name": "confirmation_id",
           "type": "string",
           "required": true,
+          "readOnly": true,
           "validation": {
             "pattern": "^[A-Z0-9]{8}$"
           }
@@ -640,7 +646,8 @@
         {
           "name": "purchase_date",
           "type": "datetime",
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "visitor_email",
@@ -692,11 +699,13 @@
             "kind": "ref",
             "name": "#/components/schemas/TicketPurchaseConfirmationStatus"
           },
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "qr_code_url",
           "type": "string",
+          "readOnly": true,
           "validation": {
             "format": "uri"
           }
@@ -781,6 +790,7 @@
           "name": "card_number",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "pattern": "^[0-9]{13,19}$"
           }
@@ -789,6 +799,7 @@
           "name": "card_holder_name",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "minLength": 1,
             "maxLength": 100
@@ -799,6 +810,7 @@
           "type": "string",
           "required": true,
           "description": "MM/YY format",
+          "writeOnly": true,
           "validation": {
             "pattern": "^(0[1-9]|1[0-2])\\/[0-9]{2}$"
           }
@@ -807,6 +819,7 @@
           "name": "cvv",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "pattern": "^[0-9]{3,4}$"
           }
@@ -827,13 +840,15 @@
           "name": "paypal_email",
           "type": "string",
           "required": true,
+          "writeOnly": true,
           "validation": {
             "format": "email"
           }
         },
         {
           "name": "paypal_auth_code",
-          "type": "string"
+          "type": "string",
+          "writeOnly": true
         }
       ]
     },
