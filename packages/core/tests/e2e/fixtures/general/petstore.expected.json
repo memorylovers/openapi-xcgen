@@ -256,5 +256,11 @@
       "operationId": "getPetById",
       "summary": "Info for a specific pet"
     }
+  ],
+  "servers": [
+    {
+      "url": "https://api.petstore.com/v1",
+      "description": "Production server"
+    }
   ]
 }

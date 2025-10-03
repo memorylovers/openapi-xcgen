@@ -1423,6 +1423,11 @@
       ]
     }
   ],
+  "servers": [
+    {
+      "url": "http://petstore.swagger.io/v2"
+    }
+  ],
   "securitySchemes": {
     "petstore_auth": {
       "type": "oauth2",

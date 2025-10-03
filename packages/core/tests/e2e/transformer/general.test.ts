@@ -20,6 +20,12 @@ describe("E2E: Transformer - General", () => {
     });
   });
 
+  describe("Servers Configuration", () => {
+    it("should transform servers with variables correctly", async () => {
+      await compareWithExpected("general/servers");
+    });
+  });
+
   describe("Modern OpenAPI 3.1 Examples", () => {
     it("should transform Train Travel API correctly", async () => {
       await compareWithExpected("general/train-travel-api");

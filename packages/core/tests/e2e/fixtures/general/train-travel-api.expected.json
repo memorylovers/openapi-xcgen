@@ -1202,6 +1202,12 @@
       "description": "Process payment for a booking"
     }
   ],
+  "servers": [
+    {
+      "url": "https://api.example.com",
+      "description": "Production server"
+    }
+  ],
   "securitySchemes": {
     "OAuth2": {
       "type": "oauth2",

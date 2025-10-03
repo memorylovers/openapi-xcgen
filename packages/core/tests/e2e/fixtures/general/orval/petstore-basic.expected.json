@@ -415,5 +415,10 @@
       "operationId": "showPetById",
       "summary": "Info for a specific pet"
     }
+  ],
+  "servers": [
+    {
+      "url": "http://petstore.swagger.io/v1"
+    }
   ]
 }

@@ -64,5 +64,10 @@
       ],
       "operationId": "list"
     }
+  ],
+  "servers": [
+    {
+      "url": "http://api.example.xyz/v1"
+    }
   ]
 }

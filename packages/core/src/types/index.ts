@@ -70,6 +70,8 @@ export type {
   IRScalarType,
   IRSecurityRequirement,
   IRSecurityScheme,
+  IRServer,
+  IRServerVariable,
   IRTag,
   IRType,
   IRValidation,

@@ -29,6 +29,7 @@ import {
   visitComponents,
   visitMetadata,
   visitPaths,
+  visitServers,
   visitTags,
 } from "./visitors";
 
@@ -100,6 +101,9 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     models.push(...pathsResult.models);
   }
 
+  // Servers処理
+  const servers = visitServers(document.servers);
+
   // 重複検出と警告（name + kindの組み合わせで判定）
   const modelKeys = new Set<string>();
   const duplicates = new Set<string>();
@@ -141,6 +145,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     models,
     tags,
     endpoints,
+    ...(servers && { servers }),
     ...(securitySchemes && { securitySchemes }),
     ...(globalSecurity && { globalSecurity }),
     ...(commonResponses && { commonResponses }),

@@ -1707,6 +1707,16 @@
       "description": "Generate a QR code for ticket validation at the museum entrance"
     }
   ],
+  "servers": [
+    {
+      "url": "https://api.museum.com/v2",
+      "description": "Production server"
+    },
+    {
+      "url": "https://staging-api.museum.com/v2",
+      "description": "Staging server"
+    }
+  ],
   "securitySchemes": {
     "ApiKey": {
       "type": "apiKey",

@@ -11,6 +11,7 @@ import type { IRResponse } from "./endpoints/response";
 import type { IRMetadata } from "./metadata";
 import type { IRModel } from "./models/operation";
 import type { IRSecurityRequirement, IRSecurityScheme } from "./security";
+import type { IRServer } from "./servers";
 import type { IRTag } from "./tags";
 
 /**
@@ -26,6 +27,8 @@ export interface XcgenIR {
   tags: IRTag[];
   /** APIエンドポイントの配列 */
   endpoints: IREndpoint[];
+  /** サーバー定義の配列（ルートレベルのserversから変換） */
+  servers?: IRServer[];
   /** セキュリティスキーム定義（components.securitySchemesから変換） */
   securitySchemes?: Record<string, IRSecurityScheme>;
   /** グローバルセキュリティ要件（ルートレベルのsecurityから変換） */
@@ -94,3 +97,5 @@ export type {
   IRSecurityRequirement,
   IRSecurityScheme,
 } from "./security";
+// servers
+export type { IRServer, IRServerVariable } from "./servers";
