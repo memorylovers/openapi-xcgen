@@ -2,66 +2,13 @@
 
 ## 未実装・改善項目
 
-### 優先度: 中
-
-**2. レスポンスヘッダーのIR未取り込み**
-
-- `visitResponse`で完全に無視されている（`packages/core/src/transformer/visitors/operations/response-visitor.ts:191-198`）
-- `IRResponse`と`IRResponseHeader`インターフェースは定義済み（`packages/core/src/types/ir/endpoints/response.ts:34,110`）、実装のみ必要
-- E2Eテスト（museum-api.yaml、train-travel-api.yaml）で実際に使用されている
-- Rate Limit情報やLocationヘッダーなど重要な情報を含む
-
 ### 優先度: 低（制限事項）
 
-**3. discriminatorパターン未対応**
+**1. discriminatorパターン未対応**
 
 - oneOf/allOf/anyOfパターンが未サポート
 - 3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗
 - CLAUDE.mdの制限事項に明記済み
-
-## 詳細な実装計画
-
-### 1. レスポンスヘッダーのIR取り込み
-
-#### 1-1. 問題詳細
-
-Rate-Limit情報などの重要なヘッダー情報がIRに含まれない。
-
-#### 1-2. 実装箇所
-
-- `response-visitor.ts:191-198` - ヘッダー処理のスキップ箇所（TODOコメントあり）
-
-#### 1-3. 実装方法
-
-```typescript
-// response-visitor.tsで
-let headers: IRResponseHeader[] | undefined;
-if (responseObj.headers) {
-  headers = [];
-  for (const [headerName, headerDef] of Object.entries(responseObj.headers)) {
-    if (isReferenceObject(headerDef)) {
-      consola.warn(`Reference header not supported yet: ${headerDef.$ref}`);
-      continue;
-    }
-
-    if (headerDef.schema) {
-      const type = visitType(headerDef.schema, {
-        documentPath: [...context.documentPath, "headers", headerName, "schema"],
-        rootSegment: context.rootSegment,
-      });
-
-      if (type) {
-        headers.push({
-          name: headerName,
-          type,
-          ...(headerDef.description && { description: headerDef.description }),
-          ...(headerDef.deprecated && { deprecated: headerDef.deprecated }),
-        });
-      }
-    }
-  }
-}
-```
 
 ## テスト方針
 
@@ -72,10 +19,6 @@ if (responseObj.headers) {
 3. **Refactor**: コード品質を改善
 
 In-sourceテストを使用し、各visitorファイル内で単体テストを実装。
-
-## 実装順序
-
-1. レスポンスヘッダー対応（優先度: 中 - Rate Limit、Location等の重要情報取り込み）
 
 ## 完了済みタスク
 
@@ -91,6 +34,8 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 - **components.responses対応**: components.responsesセクションの完全サポートを実装。$ref参照を保持し、IRResponseとして変換（`responses-components-visitor.ts`、`components-visitor.ts:78-82`）
 - **IRRequestBody/IRResponse Discriminated Union化**: content/refの相互排他性を型システムで表現。型安全性向上とメモリ効率化を実現（`request.ts`、`response.ts`）
 - **パラメータバリデーション対応**: `IRParameter`に`validation`フィールドを追加し、`extractValidation`ヘルパーを統合。OpenAPI 3.0.x/3.1形式の両方をサポート（`parameter.ts:52`、`parameter-visitor.ts:97`、`create-parameter-model.ts:158`、`extract-validation.ts:62-77`）
+- **レスポンスヘッダー対応**: `visitResponse`でheadersを処理し、`IRResponseWithContent`に格納。Location、Rate-Limit等の重要なヘッダー情報をIRに取り込み（`response-visitor.ts:194-223`、`response.ts:110`）
+- **Header Visitor分離**: ヘッダー処理を専用の`header-visitor.ts`に分離し、単一責任原則に準拠。`HeaderContext`型を追加し、`visitHeader`関数で処理を実装（`header-visitor.ts`、`types.ts:131-145`）
 
 ### 実装済みcomponentsセクション
 

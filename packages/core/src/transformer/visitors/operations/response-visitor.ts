@@ -17,6 +17,7 @@ import type {
   IRRef,
   IRResponse,
   IRResponseContent,
+  IRResponseHeader,
   ReferenceObject,
   ResponseObject,
   SchemaObject,
@@ -26,6 +27,7 @@ import { generateComponentName } from "../../helpers";
 import type { ResponseContext, VisitorContext } from "../../types";
 import { visitResponseObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";
+import { visitHeader } from "./header-visitor";
 
 /**
  * Responseの処理結果
@@ -188,14 +190,43 @@ export function visitResponse(
     }
   }
 
-  // headers は未対応
+  // headersの処理
+  let headers: IRResponseHeader[] | undefined;
+  if (responseObj.headers) {
+    headers = [];
+    for (const [headerName, headerDef] of Object.entries(responseObj.headers)) {
+      // ReferenceObjectの場合は警告
+      if (isReferenceObject(headerDef)) {
+        consola.warn(`Reference header not supported yet: ${headerDef.$ref}`);
+        continue;
+      }
+
+      // visitHeaderで処理
+      const header = visitHeader(headerDef, {
+        documentPath: [...context.documentPath, "headers", headerName],
+        rootSegment: context.rootSegment,
+        headerName,
+        method: context.method,
+        pathTemplate: context.pathTemplate,
+        statusCode: context.statusCode,
+      });
+
+      if (header) {
+        headers.push(header);
+      }
+    }
+    // 空配列は undefined にする
+    if (headers.length === 0) {
+      headers = undefined;
+    }
+  }
 
   const irResponse: IRResponse = {
     kind: "content",
     statusCode: context.statusCode,
     ...(responseObj.description && { description: responseObj.description }),
     ...(content && { content }),
-    // headers は未対応
+    ...(headers && { headers }),
   };
 
   return { response: irResponse, models };
@@ -393,41 +424,6 @@ if (import.meta.vitest) {
           },
         ],
       });
-    });
-
-    it("should handle response with headers", () => {
-      const response: ResponseObject = {
-        description: "Success with headers",
-        headers: {
-          "X-Total-Count": {
-            description: "Total number of items",
-            schema: { type: "integer" },
-          },
-          "X-Rate-Limit": {
-            schema: { type: "integer" },
-          },
-        },
-      };
-
-      const result = visitResponse(response, {
-        documentPath: ["paths", "/users", "get", "responses", "200"],
-        rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users",
-        statusCode: "200",
-        contentType: null,
-        schemaPath: null,
-      });
-
-      expect(result).toEqual({
-        response: {
-          kind: "content",
-          statusCode: "200",
-          description: "Success with headers",
-        },
-        models: [],
-      });
-      // headers は未対応
     });
 
     it("should handle reference response by preserving $ref information", () => {

@@ -137,6 +137,13 @@
                 "name": "#/components/schemas/Pets"
               }
             }
+          ],
+          "headers": [
+            {
+              "name": "x-next",
+              "type": "string",
+              "description": "A link to the next page of responses"
+            }
           ]
         },
         {

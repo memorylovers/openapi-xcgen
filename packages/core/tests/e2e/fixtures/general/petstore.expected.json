@@ -115,7 +115,9 @@
     {
       "method": "get",
       "path": "/pets",
-      "tags": ["pets"],
+      "tags": [
+        "pets"
+      ],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::pets/get/parameters/GetPetsParams"
@@ -156,7 +158,9 @@
     {
       "method": "post",
       "path": "/pets",
-      "tags": ["pets"],
+      "tags": [
+        "pets"
+      ],
       "parameters": [],
       "responses": [
         {
@@ -207,7 +211,9 @@
     {
       "method": "get",
       "path": "/pets/{petId}",
-      "tags": ["pets"],
+      "tags": [
+        "pets"
+      ],
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"

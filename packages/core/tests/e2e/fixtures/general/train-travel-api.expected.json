@@ -991,6 +991,13 @@
                 "name": "#/components/schemas/Booking"
               }
             }
+          ],
+          "headers": [
+            {
+              "name": "Location",
+              "type": "string",
+              "description": "URL of the created booking"
+            }
           ]
         },
         {
@@ -1284,6 +1291,23 @@
             "kind": "ref",
             "name": "#/components/schemas/Problem"
           }
+        }
+      ],
+      "headers": [
+        {
+          "name": "RateLimit-Limit",
+          "type": "int",
+          "description": "Request limit per hour"
+        },
+        {
+          "name": "RateLimit-Remaining",
+          "type": "int",
+          "description": "Remaining requests"
+        },
+        {
+          "name": "RateLimit-Reset",
+          "type": "int",
+          "description": "Time when limit resets (Unix timestamp)"
         }
       ]
     },

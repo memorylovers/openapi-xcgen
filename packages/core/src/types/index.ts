@@ -17,6 +17,7 @@ export type ReferenceObject =
 export type ParameterObject =
   | OpenAPIV3.ParameterObject
   | OpenAPIV3_1.ParameterObject;
+export type HeaderObject = OpenAPIV3.HeaderObject | OpenAPIV3_1.HeaderObject;
 export type RequestBodyObject =
   | OpenAPIV3.RequestBodyObject
   | OpenAPIV3_1.RequestBodyObject;

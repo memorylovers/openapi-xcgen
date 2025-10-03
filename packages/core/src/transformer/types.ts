@@ -129,6 +129,22 @@ export interface ResponseContext extends VisitorContext {
 }
 
 /**
+ * Header処理用のコンテキスト
+ */
+export interface HeaderContext extends VisitorContext {
+  /** ルートセグメント（paths または components） */
+  rootSegment: "paths" | "components";
+  /** ヘッダー名 */
+  headerName: string;
+  /** HTTPメソッド（pathsコンテキストの場合） */
+  method: IRHttpMethod | null;
+  /** パステンプレート（pathsコンテキストの場合） */
+  pathTemplate: string | null;
+  /** HTTPステータスコード */
+  statusCode: string;
+}
+
+/**
  * Visitorの実行結果
  */
 export interface VisitorResult<T> {

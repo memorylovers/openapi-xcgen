@@ -251,6 +251,13 @@
                 "name": "#/components/schemas/PetsArray"
               }
             }
+          ],
+          "headers": [
+            {
+              "name": "x-next",
+              "type": "string",
+              "description": "A link to the next page of responses"
+            }
           ]
         },
         {
@@ -337,6 +344,13 @@
                 "kind": "ref",
                 "name": "#/components/schemas/PetsNestedArray"
               }
+            }
+          ],
+          "headers": [
+            {
+              "name": "x-next",
+              "type": "string",
+              "description": "A link to the next page of responses"
             }
           ]
         },

@@ -1250,6 +1250,23 @@
               "mimeType": "application/json",
               "schema": "string"
             }
+          ],
+          "headers": [
+            {
+              "name": "Set-Cookie",
+              "type": "string",
+              "description": "Cookie authentication key for use with the `api_key` apiKey authentication."
+            },
+            {
+              "name": "X-Rate-Limit",
+              "type": "int",
+              "description": "calls per hour allowed by the user"
+            },
+            {
+              "name": "X-Expires-After",
+              "type": "datetime",
+              "description": "date in UTC when token expires"
+            }
           ]
         },
         {

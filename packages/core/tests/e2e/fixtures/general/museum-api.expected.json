@@ -1313,6 +1313,13 @@
                 "name": "#/components/schemas/SpecialEvent"
               }
             }
+          ],
+          "headers": [
+            {
+              "name": "Location",
+              "type": "string",
+              "description": "URL of the created event"
+            }
           ]
         },
         {
