@@ -1057,14 +1057,21 @@
           "type": "int",
           "in": "query",
           "description": "Maximum number of events to return",
-          "defaultValue": 20
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
         },
         {
           "name": "offset",
           "type": "int",
           "in": "query",
           "description": "Number of events to skip (for pagination)",
-          "defaultValue": 0
+          "defaultValue": 0,
+          "validation": {
+            "minimum": 0
+          }
         }
       ],
       "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
@@ -1079,7 +1086,10 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event"
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "referencePath": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
@@ -1094,7 +1104,10 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event"
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "referencePath": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
@@ -1109,7 +1122,10 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event"
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "referencePath": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
@@ -1124,14 +1140,20 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Ticket purchase confirmation ID"
+          "description": "Ticket purchase confirmation ID",
+          "validation": {
+            "pattern": "^[A-Z0-9]{8}$"
+          }
         },
         {
           "name": "email",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "Email address used for the purchase"
+          "description": "Email address used for the purchase",
+          "validation": {
+            "format": "email"
+          }
         }
       ],
       "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
@@ -1146,14 +1168,20 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Ticket purchase confirmation ID"
+          "description": "Ticket purchase confirmation ID",
+          "validation": {
+            "pattern": "^[A-Z0-9]{8}$"
+          }
         },
         {
           "name": "email",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "Email address used for the purchase"
+          "description": "Email address used for the purchase",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "format",

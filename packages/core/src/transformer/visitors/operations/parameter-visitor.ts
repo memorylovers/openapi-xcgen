@@ -18,7 +18,11 @@ import type {
   SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { isNullable, toIRParameterInType } from "../../helpers";
+import {
+  extractValidation,
+  isNullable,
+  toIRParameterInType,
+} from "../../helpers";
 import type { ParameterContext } from "../../types";
 import { visitType } from "../schema";
 
@@ -89,6 +93,9 @@ export function visitParameter(
     return null;
   }
 
+  // バリデーション情報を抽出
+  const validation = extractValidation(schema);
+
   // IRParameterを構築
   const irParameter: IRParameter = {
     name: parameter.name,
@@ -99,6 +106,7 @@ export function visitParameter(
     ...(isNullable(schema) && { nullable: true }),
     ...(schema.default !== undefined && { defaultValue: schema.default }),
     ...(parameter.deprecated && { deprecated: parameter.deprecated }),
+    ...(validation && { validation }),
   };
 
   return irParameter;
@@ -162,6 +170,10 @@ if (import.meta.vitest) {
         in: "query",
         type: "int",
         defaultValue: 10,
+        validation: {
+          minimum: 1,
+          maximum: 100,
+        },
       });
     });
 
@@ -373,6 +385,76 @@ if (import.meta.vitest) {
         in: "query",
         type: "string",
         nullable: true,
+      });
+    });
+
+    it("should extract string validation constraints", () => {
+      const param: ParameterObject = {
+        name: "username",
+        in: "query",
+        schema: {
+          type: "string",
+          minLength: 3,
+          maxLength: 20,
+          pattern: "^[a-zA-Z0-9_]+$",
+        },
+      };
+
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/users", "post", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "username",
+        in: "query",
+        method: "post",
+        pathTemplate: "/users",
+      });
+
+      expect(result).toEqual({
+        name: "username",
+        in: "query",
+        type: "string",
+        validation: {
+          minLength: 3,
+          maxLength: 20,
+          pattern: "^[a-zA-Z0-9_]+$",
+        },
+      });
+    });
+
+    it("should extract array validation constraints", () => {
+      const param: ParameterObject = {
+        name: "tags",
+        in: "query",
+        schema: {
+          type: "array",
+          items: { type: "string" },
+          minItems: 1,
+          maxItems: 10,
+          uniqueItems: true,
+        },
+      };
+
+      const result = visitParameter(param, {
+        documentPath: ["paths", "/posts", "get", "parameters", "0"],
+        rootSegment: "paths",
+        parameterName: "tags",
+        in: "query",
+        method: "get",
+        pathTemplate: "/posts",
+      });
+
+      expect(result).toEqual({
+        name: "tags",
+        in: "query",
+        type: {
+          kind: "array",
+          itemType: "string",
+        },
+        validation: {
+          minItems: 1,
+          maxItems: 10,
+          uniqueItems: true,
+        },
       });
     });
   });

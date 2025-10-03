@@ -155,7 +155,7 @@ function parameterToParameterProperty(
       defaultValue: parameter.defaultValue,
     }),
     ...(parameter.deprecated && { deprecated: parameter.deprecated }),
-    // validation は未対応
+    ...(parameter.validation && { validation: parameter.validation }),
   };
 
   return property;

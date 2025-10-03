@@ -1,102 +1,37 @@
 # Core Package Review
 
-## 未実装項目
+## 未実装・改善項目
 
-- 一部のcomponentsセクションが未対応です：
-  - `components.parameters` - 再利用可能なパラメータ定義
-  - `components.examples` - 再利用可能なサンプル値
-  - `components.headers` - 再利用可能なヘッダー定義
-  - `components.links` - レスポンス間のリンク定義
-  - `components.callbacks` - Webhookコールバック定義
-- discriminatorを使用したoneOf/allOf/anyOfパターンが未サポートで、3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗します。CLAUDE.mdの制限事項にも明記済み。
+### 優先度: 中
 
-## 挙動上のリスク
+**2. レスポンスヘッダーのIR未取り込み**
 
-- transformer がバージョン/Info 欠如時に例外を投げ、ガイドラインの「例外を投げない」に反しています（`packages/core/src/transformer/transformer.ts:51`）。
-- コンポーネント名生成ヘルパーが必須引数欠如時に例外を送出し、visitor 連鎖を途切れさせます（`packages/core/src/transformer/helpers/generate-component-name.ts:104`）。
+- `visitResponse`で完全に無視されている（`packages/core/src/transformer/visitors/operations/response-visitor.ts:191-198`）
+- `IRResponse`と`IRResponseHeader`インターフェースは定義済み（`packages/core/src/types/ir/endpoints/response.ts:34,110`）、実装のみ必要
+- E2Eテスト（museum-api.yaml、train-travel-api.yaml）で実際に使用されている
+- Rate Limit情報やLocationヘッダーなど重要な情報を含む
 
-## 改善余地
+### 優先度: 低（制限事項）
 
-- レスポンスヘッダーが IR へ取り込まれておらず、`visitResponse` で完全に無視されています（`packages/core/src/transformer/visitors/operations/response-visitor.ts:174`）。`IRResponse`と`IRResponseHeader`インターフェースは定義済み（`packages/core/src/types/ir/endpoints/response.ts:99,34`）なので、実装のみが必要です。
-- パラメータのバリデーション情報が`IRParameter`に含まれていません。`IRParameter`インターフェースに`validation?: IRValidation`フィールドが未定義（`packages/core/src/types/ir/endpoints/parameter.ts:33-49`）。`extractValidation`ヘルパー関数は実装済み（`packages/core/src/transformer/helpers/extract-validation.ts:37`）だが、`parameter-visitor.ts`で未使用。
-- パラメータ統合モデルへバリデーション情報が渡らず `parameterToParameterProperty` で `validation` を無視しています（`packages/core/src/transformer/helpers/create-parameter-model.ts:147`）。
-- `extractValidation` が OpenAPI 3.1 の数値指定形式（`exclusiveMinimum` / `exclusiveMaximum` に数値を取るケース）をカバーしていません（`packages/core/src/transformer/helpers/extract-validation.ts:62`）。
+**3. discriminatorパターン未対応**
+
+- oneOf/allOf/anyOfパターンが未サポート
+- 3つのE2Eテスト（discriminator-one-of.yaml、discriminator-all-of.yaml、discriminator-any-of.yaml）が失敗
+- CLAUDE.mdの制限事項に明記済み
 
 ## 詳細な実装計画
 
-### エラー処理の方針
-
-以下の箇所は**現状維持**とする（例外を投げるのが適切）:
-
-- `transformer.ts:51,56` - OpenAPIバージョン/info欠如時の例外
-- `generate-component-name.ts:104,116` - 必須引数欠如時の例外
-
-理由：エントリーポイントでの必須要件チェックは処理の前提条件であり、満たされない場合は異常終了すべき。
-「例外を投げない」原則は**Visitor関数内**での部分的な処理失敗に対する指針。
-
-### 1. Parameterの$ref参照の処理（優先度: 高）
+### 1. レスポンスヘッダーのIR取り込み
 
 #### 1-1. 問題詳細
 
-Parameterレベルでの$ref参照が解決されず、再利用可能な定義が活用できない。
-
-#### 1-2. 修正箇所
-
-- `parameters-visitor.ts:117-119` - Parameterの$ref警告とスキップ
-
-#### 1-3. 実装方法
-
-schema-level（`visitRef`）での処理に依存する現在の方式を継続、またはParameterレベルでの解決を実装。
-
-### 2. パラメータバリデーション情報のIR反映（優先度: 中）
-
-#### 2-1. 問題詳細
-
-バリデーション情報が失われ、クライアントコードで検証ロジックを生成できない。
-
-#### 2-2. 修正箇所
-
-- `packages/core/src/types/ir/endpoints/parameter.ts` - `IRParameter`インターフェースに`validation?: IRValidation`を追加
-- `parameter-visitor.ts` - `extractValidation`をインポートして使用
-- `create-parameter-model.ts:147` - validation情報の渡し忘れ修正
-- `extract-validation.ts:62-66` - OpenAPI 3.1形式の未対応
-
-#### 2-3. 実装方法
-
-```typescript
-// IRParameterインターフェースに追加
-export interface IRParameter {
-  // 既存のフィールド
-  validation?: IRValidation;
-}
-
-// parameter-visitor.tsで
-import { extractValidation } from "../../helpers";
-
-const validation = extractValidation(schema);
-const irParameter: IRParameter = {
-  // 既存のフィールド
-  ...(validation && { validation }),
-};
-
-// OpenAPI 3.1形式対応
-if (typeof schema.exclusiveMinimum === 'number') {
-  validation.minimum = schema.exclusiveMinimum;
-  validation.exclusiveMinimum = true;
-}
-```
-
-### 3. レスポンスヘッダーのIR取り込み（優先度: 低）
-
-#### 3-1. 問題詳細
-
 Rate-Limit情報などの重要なヘッダー情報がIRに含まれない。
 
-#### 3-2. 実装箇所
+#### 1-2. 実装箇所
 
-- `response-visitor.ts:174` - ヘッダー処理のスキップ箇所
+- `response-visitor.ts:191-198` - ヘッダー処理のスキップ箇所（TODOコメントあり）
 
-#### 3-3. 実装方法
+#### 1-3. 実装方法
 
 ```typescript
 // response-visitor.tsで
@@ -140,9 +75,7 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 
 ## 実装順序
 
-1. Parameterの$ref参照の処理（再利用性の向上）
-2. パラメータバリデーション情報（クライアント側検証）
-3. レスポンスヘッダー対応（追加情報の取り込み）
+1. レスポンスヘッダー対応（優先度: 中 - Rate Limit、Location等の重要情報取り込み）
 
 ## 完了済みタスク
 
@@ -157,6 +90,7 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 - **グローバルセキュリティ対応**: OpenAPI仕様書のルートレベル`security`をIRの`globalSecurity`フィールドに変換する機能を実装。全エンドポイントのデフォルト認証要件をサポート（`transformer.ts:126-138`、`types/ir/index.ts:30`）
 - **components.responses対応**: components.responsesセクションの完全サポートを実装。$ref参照を保持し、IRResponseとして変換（`responses-components-visitor.ts`、`components-visitor.ts:78-82`）
 - **IRRequestBody/IRResponse Discriminated Union化**: content/refの相互排他性を型システムで表現。型安全性向上とメモリ効率化を実現（`request.ts`、`response.ts`）
+- **パラメータバリデーション対応**: `IRParameter`に`validation`フィールドを追加し、`extractValidation`ヘルパーを統合。OpenAPI 3.0.x/3.1形式の両方をサポート（`parameter.ts:52`、`parameter-visitor.ts:97`、`create-parameter-model.ts:158`、`extract-validation.ts:62-77`）
 
 ### 実装済みcomponentsセクション
 
@@ -164,8 +98,6 @@ In-sourceテストを使用し、各visitorファイル内で単体テストを�
 ✅ `components.responses` - 再利用可能なレスポンス定義（完全対応）
 ✅ `components.requestBodies` - 再利用可能なリクエストボディ定義（完全対応）
 ✅ `components.securitySchemes` - 認証スキーム定義（完全対応）
-❌ `components.parameters` - 再利用可能なパラメータ定義（未実装）
-❌ `components.examples` - 再利用可能なサンプル値（未実装）
-❌ `components.headers` - 再利用可能なヘッダー定義（未実装）
-❌ `components.links` - レスポンス間のリンク定義（未実装）
-❌ `components.callbacks` - Webhookコールバック定義（未実装）
+
+※ 以下のcomponentsセクションは基本的なコード生成には不要なため未実装：
+`components.parameters`、`components.examples`、`components.headers`、`components.links`、`components.callbacks`

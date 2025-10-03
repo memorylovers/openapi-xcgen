@@ -3,6 +3,7 @@
  */
 
 import type { IRType } from "../common/type";
+import type { IRValidation } from "../models/validation";
 
 /**
  * IRParameterInType - パラメータの配置場所
@@ -47,4 +48,6 @@ export interface IRParameter {
   defaultValue?: unknown;
   /** 非推奨フラグ */
   deprecated?: true;
+  /** バリデーション制約 */
+  validation?: IRValidation;
 }

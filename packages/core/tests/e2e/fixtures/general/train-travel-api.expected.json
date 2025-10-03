@@ -635,26 +635,40 @@
           "name": "coordinates",
           "type": "string",
           "in": "query",
-          "description": "Find stations close to a location."
+          "description": "Find stations close to a location.",
+          "validation": {
+            "pattern": "^(-?\\\\d+\\\\.\\\\d+),(-?\\\\d+\\\\.\\\\d+)$"
+          }
         },
         {
           "name": "search",
           "type": "string",
           "in": "query",
-          "description": "Search for stations by name or code"
+          "description": "Search for stations by name or code",
+          "validation": {
+            "minLength": 3,
+            "maxLength": 100
+          }
         },
         {
           "name": "country",
           "type": "string",
           "in": "query",
-          "description": "Filter by country code (ISO 3166-1 alpha-2)"
+          "description": "Filter by country code (ISO 3166-1 alpha-2)",
+          "validation": {
+            "pattern": "^[A-Z]{2}$"
+          }
         },
         {
           "name": "limit",
           "type": "int",
           "in": "query",
           "description": "Maximum number of results",
-          "defaultValue": 10
+          "defaultValue": 10,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
         }
       ],
       "referencePath": "#/paths/::stations/get/parameters/GetStationsParams"
@@ -700,14 +714,20 @@
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The ID of the origin station"
+          "description": "The ID of the origin station",
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "destination",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The ID of the destination station"
+          "description": "The ID of the destination station",
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "date",
@@ -771,7 +791,10 @@
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "referencePath": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
@@ -785,7 +808,10 @@
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "referencePath": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
@@ -799,7 +825,10 @@
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "referencePath": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"

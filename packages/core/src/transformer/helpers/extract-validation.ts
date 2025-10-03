@@ -59,10 +59,20 @@ export function extractValidation(
   if (schema.maximum !== undefined) {
     validation.maximum = schema.maximum;
   }
+  // OpenAPI 3.0.x形式: boolean
   if (schema.exclusiveMinimum === true) {
     validation.exclusiveMinimum = true;
   }
   if (schema.exclusiveMaximum === true) {
+    validation.exclusiveMaximum = true;
+  }
+  // OpenAPI 3.1形式: number（数値そのものが境界値となる）
+  if (typeof schema.exclusiveMinimum === "number") {
+    validation.minimum = schema.exclusiveMinimum;
+    validation.exclusiveMinimum = true;
+  }
+  if (typeof schema.exclusiveMaximum === "number") {
+    validation.maximum = schema.exclusiveMaximum;
     validation.exclusiveMaximum = true;
   }
 
@@ -343,6 +353,55 @@ if (import.meta.vitest) {
         minLength: 5,
         maxLength: 100,
         format: "email",
+      });
+    });
+
+    it("should handle OpenAPI 3.1 exclusiveMinimum as number", () => {
+      const schema = {
+        type: "number",
+        exclusiveMinimum: 0,
+        maximum: 100,
+      } as SchemaObject;
+
+      const result = extractValidation(schema);
+
+      expect(result).toEqual({
+        minimum: 0,
+        exclusiveMinimum: true,
+        maximum: 100,
+      });
+    });
+
+    it("should handle OpenAPI 3.1 exclusiveMaximum as number", () => {
+      const schema = {
+        type: "number",
+        minimum: 0,
+        exclusiveMaximum: 100,
+      } as SchemaObject;
+
+      const result = extractValidation(schema);
+
+      expect(result).toEqual({
+        minimum: 0,
+        maximum: 100,
+        exclusiveMaximum: true,
+      });
+    });
+
+    it("should handle OpenAPI 3.1 both exclusive boundaries as numbers", () => {
+      const schema = {
+        type: "number",
+        exclusiveMinimum: 0,
+        exclusiveMaximum: 100,
+      } as SchemaObject;
+
+      const result = extractValidation(schema);
+
+      expect(result).toEqual({
+        minimum: 0,
+        exclusiveMinimum: true,
+        maximum: 100,
+        exclusiveMaximum: true,
       });
     });
   });
