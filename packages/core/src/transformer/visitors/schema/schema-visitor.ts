@@ -23,6 +23,7 @@ import type {
 import { isReferenceObject } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { visitAllOf } from "./allof-visitor";
 import { visitArray } from "./array-visitor";
 import { visitEnum } from "./enum-visitor";
 import { visitMap } from "./map-visitor";
@@ -88,9 +89,9 @@ export function visitSchema(
 
   // 未対応機能の検出と警告
   if ("allOf" in schema && schema.allOf) {
-    consola.warn(
-      `allOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
-    );
+    const allOfResult = visitAllOf(schema, context);
+    result.models.push(...allOfResult.models);
+    result.type = allOfResult.type;
     return result;
   }
   if ("oneOf" in schema && schema.oneOf) {
@@ -775,8 +776,7 @@ if (import.meta.vitest) {
     // ===================================
     // カテゴリ4: 未対応機能の警告
     // ===================================
-    it("should warn for allOf and return empty result", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should handle allOf composition", () => {
       const schema = {
         allOf: [
           { $ref: "#/components/schemas/Base" },
@@ -790,11 +790,34 @@ if (import.meta.vitest) {
 
       const result = visitSchema(schema, context);
 
-      expect(result).toEqual({ type: null, models: [] });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "allOf is not supported yet: #/components/schemas/Composed",
-      );
-      warnSpy.mockRestore();
+      expect(result).toEqual({
+        type: {
+          kind: "ref",
+          name: "#/components/schemas/Composed",
+        },
+        models: [
+          {
+            kind: "allOf",
+            name: "Composed",
+            referencePath: "#/components/schemas/Composed",
+            schemas: [
+              { kind: "ref", name: "#/components/schemas/Base" },
+              { kind: "ref", name: "#/components/schemas/Composed/allOf/1" },
+            ],
+          },
+          {
+            kind: "object",
+            name: "ComposedAllOf1",
+            referencePath: "#/components/schemas/Composed/allOf/1",
+            properties: [
+              {
+                name: "extra",
+                type: "string",
+              },
+            ],
+          },
+        ],
+      });
     });
 
     it("should warn for oneOf and return empty result", () => {

@@ -3,6 +3,7 @@
  */
 
 export type {
+  IRAllOfModel,
   IRArrayModel,
   IREnumModel,
   IREnumValue,

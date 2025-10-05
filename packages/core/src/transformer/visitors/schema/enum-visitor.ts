@@ -16,6 +16,7 @@ import type {
 import {
   buildReferencePath,
   generateEnumName,
+  getModelName,
   toIRScalarType,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
@@ -67,8 +68,8 @@ export function visitEnum(
   schema: SchemaObjectWithNullable,
   context: VisitorContext,
 ): EnumVisitorResult {
-  // documentPathから名前を抽出（最後の要素がEnum名）
-  const name = context.documentPath[context.documentPath.length - 1] || "";
+  // コンテキストからモデル名を取得
+  const name = getModelName(context);
 
   // 名前の妥当性チェック
   if (!name.trim()) {

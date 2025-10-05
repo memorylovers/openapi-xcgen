@@ -40,6 +40,7 @@ const testCases = [
   "general/multi-service",
   "general/train-travel-api",
   "general/museum-api",
+  "general/allof",
   // general/hey-api/
   "general/hey-api/transformers-all-of",
   "general/hey-api/discriminator-one-of",

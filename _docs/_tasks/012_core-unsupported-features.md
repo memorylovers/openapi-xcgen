@@ -49,30 +49,24 @@
 
 ---
 
-## 2. 高: allOf（スキーママージ）
+## 2. ✅ 高: allOf（スキーママージ）
 
-**現状**: 警告を出してスキップ
-
-```typescript
-// schema-visitor.ts:90-94
-if ("allOf" in schema && schema.allOf) {
-  consola.warn(
-    `allOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
-  );
-  return result;
-}
-```
+**現状**: ✅ 実装済み
 
 **影響範囲**:
 
-- e2eテスト: `discriminator-all-of.yaml` が失敗
-- 使用例: 継承関係の表現、複数スキーマの結合
+- TypeSpec `model extends` パターンに対応
+- 継承関係の表現、複数スキーマの結合
 
-**実装時の考慮点**:
+**実装内容**:
 
-- プロパティのマージロジック
-- required配列のマージ
-- 循環参照の処理
+- IR型定義: `IRAllOfModel`を追加
+- Visitor実装: `allof-visitor.ts`で処理
+- インラインスキーマの自動モデル化: `{親名}AllOf{インデックス}`形式
+- E2Eテスト: `allof.yaml`で検証
+
+**推奨アクション**:
+✅ 実装完了。IRAllOfModel型を追加し、allof-visitorで処理を実装。Generator側で継承または交差型として柔軟に実装可能。
 
 ---
 

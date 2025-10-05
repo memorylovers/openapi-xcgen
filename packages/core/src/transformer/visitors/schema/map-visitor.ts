@@ -5,7 +5,7 @@ import type {
   IRType,
   SchemaObjectWithNullable,
 } from "../../../types";
-import { buildReferencePath } from "../../helpers";
+import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitSchema } from "./schema-visitor";
 import type { SchemaTransformationResult } from "../../types";
@@ -31,7 +31,7 @@ export function visitMap(
   }
 
   const referencePath = buildReferencePath(context.documentPath);
-  const name = context.documentPath.at(-1) ?? "";
+  const name = getModelName(context);
 
   if (!name.trim()) {
     consola.warn("Invalid model name: empty or whitespace only");

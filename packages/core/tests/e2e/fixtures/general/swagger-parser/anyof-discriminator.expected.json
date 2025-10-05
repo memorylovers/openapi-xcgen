@@ -51,6 +51,61 @@
       ]
     },
     {
+      "kind": "allOf",
+      "name": "AppleAllOfDisc",
+      "referencePath": "#/components/schemas/AppleAllOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "BananaAllOfDisc",
+      "referencePath": "#/components/schemas/BananaAllOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Parent",
+      "referencePath": "#/components/schemas/Parent",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "AppleGrandparentDisc",
+      "referencePath": "#/components/schemas/AppleGrandparentDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Parent"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "BananaGrandparentDisc",
+      "referencePath": "#/components/schemas/BananaGrandparentDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Parent"
+        }
+      ]
+    },
+    {
       "kind": "object",
       "name": "DiscMissingNoProperties",
       "referencePath": "#/components/schemas/DiscMissingNoProperties",

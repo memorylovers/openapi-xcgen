@@ -152,3 +152,37 @@ export interface IRMapModel {
   /** 値の型 */
   valueType: IRType;
 }
+
+/**
+ * IRAllOfModel - allOf合成モデル定義
+ * OpenAPIのallOfキーワードを表現し、複数のスキーマの合成（継承・インターセクション）を表す
+ *
+ * @example
+ * ```yaml
+ * # OpenAPI → IRAllOfModel
+ * Extended:
+ *   allOf:
+ *     - $ref: '#/components/schemas/Base'
+ *     - type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *
+ * # TypeSpec相当
+ * model Extended extends Base {
+ *   email: string;
+ * }
+ * ```
+ */
+export interface IRAllOfModel {
+  /** 型種別 */
+  kind: "allOf";
+  /** モデル名（PascalCase） */
+  name: string;
+  /** 参照パス */
+  referencePath: string;
+  /** モデルの説明 */
+  description?: string;
+  /** 合成する型の配列（通常はIRRefまたはインライン型） */
+  schemas: IRType[];
+}

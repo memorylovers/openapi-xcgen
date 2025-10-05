@@ -23,8 +23,9 @@ import type {
   SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { generateComponentName } from "../../helpers";
-import type { ResponseContext, VisitorContext } from "../../types";
+import { isPathsResponseContext } from "../../../types/guards.js";
+import { getModelName } from "../../helpers/get-model-name.js";
+import type { ResponseContext } from "../../types";
 import { visitResponseObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";
 import { visitHeader } from "./header-visitor";
@@ -87,7 +88,7 @@ export function visitResponse(
 
     const irResponse: IRResponse = {
       kind: "ref",
-      statusCode: context.statusCode,
+      statusCode: isPathsResponseContext(context) ? context.statusCode : "200",
       ref,
     };
 
@@ -103,25 +104,16 @@ export function visitResponse(
     content = [];
     for (const [mimeType, mediaType] of Object.entries(responseObj.content)) {
       if (mediaType.schema) {
-        // インラインのobjectスキーマを検出
-        if (
-          !isReferenceObject(mediaType.schema) &&
-          mediaType.schema.type === "object"
-        ) {
-          // コンポーネント名を生成
-          const componentName = generateComponentName(
-            context.pathTemplate,
-            context.method,
-            "response",
-            context.statusCode,
-            undefined,
-            mimeType,
-          );
+        // getModelNameで名前を生成（すべてのスキーマに対して）
+        const componentName = getModelName({
+          ...context,
+          contentType: mimeType,
+        } as ResponseContext);
 
-          // レスポンスvisitorで処理して、IRResponseModelとして抽出
-          const responseResult = visitResponseObject(
-            mediaType.schema as SchemaObject,
-            {
+        // ResponseContextを作成（documentPathにコンポーネント名を追加）
+        const schemaContext: ResponseContext = isPathsResponseContext(context)
+          ? {
+              kind: "response",
               documentPath: [
                 ...context.documentPath,
                 "content",
@@ -129,9 +121,37 @@ export function visitResponse(
                 "schema",
                 componentName,
               ],
-              rootSegment: "paths",
-            },
-            context.statusCode,
+              rootSegment: context.rootSegment,
+              method: context.method,
+              pathTemplate: context.pathTemplate,
+              statusCode: context.statusCode,
+              contentType: mimeType,
+              schemaPath: ["content", mimeType, "schema"],
+            }
+          : {
+              kind: "componentsResponse",
+              documentPath: [
+                ...context.documentPath,
+                "content",
+                mimeType,
+                "schema",
+                componentName,
+              ],
+              rootSegment: context.rootSegment,
+              contentType: mimeType,
+              schemaPath: ["content", mimeType, "schema"],
+            };
+
+        // インラインのobjectスキーマを検出
+        if (
+          !isReferenceObject(mediaType.schema) &&
+          mediaType.schema.type === "object"
+        ) {
+          // レスポンスvisitorで処理して、IRResponseModelとして抽出
+          const responseResult = visitResponseObject(
+            mediaType.schema as SchemaObject,
+            schemaContext,
+            isPathsResponseContext(context) ? context.statusCode : "200",
           );
 
           if (responseResult && responseResult.models.length > 0) {
@@ -155,24 +175,6 @@ export function visitResponse(
           }
         } else {
           // それ以外のスキーマは通常通り処理
-          const componentName = generateComponentName(
-            context.pathTemplate,
-            context.method,
-            "response",
-            context.statusCode,
-            undefined,
-            mimeType,
-          );
-          const schemaContext: VisitorContext = {
-            documentPath: [
-              ...context.documentPath,
-              "content",
-              mimeType,
-              "schema",
-              componentName,
-            ],
-            rootSegment: "paths",
-          };
           const schemaResult = visitSchema(mediaType.schema, schemaContext);
           if (schemaResult.type) {
             content.push({ mimeType, schema: schemaResult.type });
@@ -203,12 +205,17 @@ export function visitResponse(
 
       // visitHeaderで処理
       const header = visitHeader(headerDef, {
+        kind: "header",
         documentPath: [...context.documentPath, "headers", headerName],
         rootSegment: context.rootSegment,
         headerName,
-        method: context.method,
-        pathTemplate: context.pathTemplate,
-        statusCode: context.statusCode,
+        method: isPathsResponseContext(context) ? context.method : null,
+        pathTemplate: isPathsResponseContext(context)
+          ? context.pathTemplate
+          : null,
+        statusCode: isPathsResponseContext(context)
+          ? context.statusCode
+          : "200",
       });
 
       if (header) {
@@ -223,7 +230,7 @@ export function visitResponse(
 
   const irResponse: IRResponse = {
     kind: "content",
-    statusCode: context.statusCode,
+    statusCode: isPathsResponseContext(context) ? context.statusCode : "200",
     ...(responseObj.description && { description: responseObj.description }),
     ...(content && { content }),
     ...(headers && { headers }),
@@ -243,13 +250,12 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponse(response, {
+        kind: "response",
         documentPath: ["paths", "/users", "get", "responses", "200"],
         rootSegment: "paths",
         method: "get",
         pathTemplate: "/users",
         statusCode: "200",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -281,13 +287,12 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponse(response, {
+        kind: "response",
         documentPath: ["paths", "/users", "get", "responses", "200"],
         rootSegment: "paths",
         method: "get",
         pathTemplate: "/users",
         statusCode: "200",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -360,13 +365,12 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponse(response, {
+        kind: "response",
         documentPath: ["paths", "/data", "get", "responses", "200"],
         rootSegment: "paths",
         method: "get",
         pathTemplate: "/data",
         statusCode: "200",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -432,13 +436,12 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponse(response, {
+        kind: "response",
         documentPath: ["paths", "/users/{id}", "get", "responses", "404"],
         rootSegment: "paths",
         method: "get",
         pathTemplate: "/users/{id}",
         statusCode: "404",
-        contentType: null,
-        schemaPath: null,
       });
 
       // $ref情報がIRRefとして保持される
@@ -462,13 +465,12 @@ if (import.meta.vitest) {
       };
 
       const result400 = visitResponse(badRequest, {
+        kind: "response",
         documentPath: ["paths", "/api/users", "post", "responses", "400"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/api/users",
         statusCode: "400",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result400).toEqual({
@@ -489,13 +491,12 @@ if (import.meta.vitest) {
       };
 
       const result500 = visitResponse(serverError, {
+        kind: "response",
         documentPath: ["paths", "/api/users", "post", "responses", "500"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/api/users",
         statusCode: "500",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result500).toEqual({
@@ -528,13 +529,12 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponse(response, {
+        kind: "response",
         documentPath: ["paths", "/users", "post", "responses", "400"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/users",
         statusCode: "400",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({

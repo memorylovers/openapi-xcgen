@@ -120,6 +120,7 @@ export function visitParameters(
     }
 
     const paramContext: ParameterContext = {
+      kind: "parameter",
       documentPath: [...context.documentPath, "parameters", param.name],
       parameterName: param.name,
       in: param.in as "path" | "query" | "header" | "cookie",
@@ -221,6 +222,7 @@ if (import.meta.vitest) {
   describe("visitParameters", () => {
     it("should return empty result for null parameters", () => {
       const result = visitParameters(null, {
+        kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
         method: "get",
@@ -235,6 +237,7 @@ if (import.meta.vitest) {
 
     it("should return empty result for empty parameters array", () => {
       const result = visitParameters([], {
+        kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
         method: "get",
@@ -259,6 +262,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(parameters, {
+        kind: "parameters",
         documentPath: ["paths", "/users/{id}", "get"],
         rootSegment: "paths",
         method: "get",
@@ -316,6 +320,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(parameters, {
+        kind: "parameters",
         documentPath: ["paths", "/users/{id}/posts", "get"],
         rootSegment: "paths",
         method: "get",
@@ -386,6 +391,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(parameters, {
+        kind: "parameters",
         documentPath: ["paths", "/ref/{id}", "get"],
         rootSegment: "paths",
         method: "get",
@@ -437,6 +443,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(parameters, {
+        kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
         method: "get",
@@ -483,6 +490,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(parameters, {
+        kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
         method: "get",
@@ -510,6 +518,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(parameters, {
+        kind: "parameters",
         documentPath: ["paths", "/api/test", "post"],
         rootSegment: "paths",
         method: "post",
@@ -560,6 +569,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(operationParams, {
+        kind: "parameters",
         documentPath: ["paths", "/users/{id}", "get"],
         rootSegment: "paths",
         method: "get",
@@ -593,6 +603,7 @@ if (import.meta.vitest) {
       ];
 
       const result = visitParameters(operationParams, {
+        kind: "parameters",
         documentPath: ["paths", "/users/{id}", "get"],
         rootSegment: "paths",
         method: "get",

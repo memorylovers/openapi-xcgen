@@ -27,6 +27,7 @@ import type {
 import {
   buildReferencePath,
   extractValidation,
+  getModelName,
   isNullable,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
@@ -100,7 +101,7 @@ export function visitObject(
   };
 
   // documentPathから名前を抽出（最後の要素がモデル名）
-  const name = context.documentPath[context.documentPath.length - 1] || "";
+  const name = getModelName(context);
 
   // 名前の妥当性チェック
   if (!name.trim()) {
@@ -230,8 +231,8 @@ export function visitResponseObject(
     models: [],
   };
 
-  // documentPathから名前を抽出（最後の要素がモデル名）
-  const name = context.documentPath[context.documentPath.length - 1] || "";
+  // contextから名前を取得
+  const name = getModelName(context);
 
   // 名前の妥当性チェック
   if (!name.trim()) {
@@ -358,8 +359,8 @@ export function visitRequestBodyObject(
     models: [],
   };
 
-  // documentPathから名前を抽出（最後の要素がモデル名）
-  const name = context.documentPath[context.documentPath.length - 1] || "";
+  // contextから名前を取得
+  const name = getModelName(context);
 
   // 名前の妥当性チェック
   if (!name.trim()) {

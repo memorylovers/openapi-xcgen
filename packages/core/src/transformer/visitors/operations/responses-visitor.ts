@@ -75,13 +75,12 @@ export function visitResponses(
   // 各ステータスコードのレスポンスを処理
   for (const [statusCode, response] of Object.entries(responses)) {
     const responseContext: ResponseContext = {
+      kind: "response",
       documentPath: [...context.documentPath, statusCode],
       method: context.method,
       pathTemplate: context.pathTemplate,
       statusCode,
       rootSegment: "paths",
-      contentType: null,
-      schemaPath: null,
     };
 
     const responseResult = visitResponse(response, responseContext);
@@ -109,6 +108,7 @@ if (import.meta.vitest) {
   describe("visitResponses", () => {
     it("should return empty result for null responses", () => {
       const result = visitResponses(null, {
+        kind: "responses",
         documentPath: ["paths", "/test", "get", "responses"],
         rootSegment: "paths",
         method: "get",
@@ -125,6 +125,7 @@ if (import.meta.vitest) {
       const result = visitResponses(
         {},
         {
+          kind: "responses",
           documentPath: ["paths", "/test", "get", "responses"],
           rootSegment: "paths",
           method: "get",
@@ -146,6 +147,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponses(responses, {
+        kind: "responses",
         documentPath: ["paths", "/test", "get", "responses"],
         rootSegment: "paths",
         method: "get",
@@ -178,6 +180,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponses(responses, {
+        kind: "responses",
         documentPath: ["paths", "/api/users/{id}", "get", "responses"],
         rootSegment: "paths",
         method: "get",
@@ -239,6 +242,7 @@ if (import.meta.vitest) {
       } as Record<string, ResponseObject | ReferenceObject>;
 
       const result = visitResponses(responses, {
+        kind: "responses",
         documentPath: ["paths", "/users", "post", "responses"],
         rootSegment: "paths",
         method: "post",
@@ -347,6 +351,7 @@ if (import.meta.vitest) {
       } as Record<string, ResponseObject | ReferenceObject>;
 
       const result = visitResponses(responses, {
+        kind: "responses",
         documentPath: ["paths", "/api/resource/{id}", "delete", "responses"],
         rootSegment: "paths",
         method: "delete",
@@ -418,6 +423,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponses(responses, {
+        kind: "responses",
         documentPath: ["paths", "/complex/api/endpoint", "patch", "responses"],
         rootSegment: "paths",
         method: "patch",
@@ -451,6 +457,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitResponses(responses, {
+        kind: "responses",
         documentPath: ["paths", "/test", "get", "responses"],
         rootSegment: "paths",
         method: "get",

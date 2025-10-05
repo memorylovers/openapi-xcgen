@@ -19,7 +19,7 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import { isIRRequestBodyWithContent } from "../../../types/ir/endpoints/request";
-import type { RequestBodyContext } from "../../types";
+import type { ComponentsRequestBodyContext } from "../../types";
 import { visitRequestBody } from "../operations/request-body-visitor";
 
 /**
@@ -72,13 +72,10 @@ export function visitComponentsRequestBodies(
       }
 
       // visitRequestBodyを使用してIRRequestBodyに変換
-      const context: RequestBodyContext = {
+      const context: ComponentsRequestBodyContext = {
+        kind: "componentsRequestBody",
         documentPath: ["components", "requestBodies", name],
         rootSegment: "components",
-        pathTemplate: "/", // components.requestBodiesでは具体的なパスは不明
-        method: "post", // components.requestBodiesでは具体的なメソッドは不明
-        contentType: null, // components.requestBodiesでは具体的なcontentTypeは不明
-        schemaPath: null, // components.requestBodiesでは具体的なschemaPathは不明
       };
 
       const result = visitRequestBody(requestBody, null, context);

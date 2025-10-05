@@ -97,6 +97,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: [
           "paths",
           "/users",
@@ -127,6 +128,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: [
           "paths",
           "/api/v1/resource",
@@ -158,6 +160,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: [
           "paths",
           "/users",
@@ -189,6 +192,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: [
           "paths",
           "/data",
@@ -222,6 +226,7 @@ if (import.meta.vitest) {
       } as HeaderObject;
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: [
           "paths",
           "/test",
@@ -255,6 +260,7 @@ if (import.meta.vitest) {
       } as HeaderObject;
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: [
           "paths",
           "/test",
@@ -286,6 +292,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitHeader(header, {
+        kind: "header",
         documentPath: ["components", "headers", "Retry-After"],
         rootSegment: "components",
         headerName: "Retry-After",

@@ -19,7 +19,7 @@ import type {
 } from "../../../types";
 import { isIRResponseWithContent } from "../../../types/ir/endpoints/response";
 import { isReferenceObject } from "../../../types";
-import type { ResponseContext } from "../../types";
+import type { ComponentsResponseContext } from "../../types";
 import { visitResponse } from "../operations/response-visitor";
 
 /**
@@ -72,14 +72,10 @@ export function visitComponentsResponses(
       }
 
       // visitResponseを使用してIRResponseに変換
-      const context: ResponseContext = {
+      const context: ComponentsResponseContext = {
+        kind: "componentsResponse",
         documentPath: ["components", "responses", name],
         rootSegment: "components",
-        pathTemplate: "/", // components.responsesではダミー値
-        method: "get", // components.responsesではダミー値
-        statusCode: "200", // components.responsesでは具体的なstatusCodeは不明
-        contentType: null,
-        schemaPath: null,
       };
 
       const result = visitResponse(response, context);

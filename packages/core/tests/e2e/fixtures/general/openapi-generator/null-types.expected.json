@@ -5,6 +5,75 @@
   },
   "models": [
     {
+      "kind": "allOf",
+      "name": "Adult",
+      "referencePath": "#/components/schemas/Adult",
+      "description": "A representation of an adult",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Person"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Adult/allOf/1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AdultAllOf1",
+      "referencePath": "#/components/schemas/Adult/allOf/1",
+      "properties": [
+        {
+          "name": "children",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Adult/allOf/AdultAllOf1Children"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "AdultAllOf1Children",
+      "referencePath": "#/components/schemas/Adult/allOf/AdultAllOf1Children",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Child"
+      }
+    },
+    {
+      "kind": "allOf",
+      "name": "Child",
+      "referencePath": "#/components/schemas/Child",
+      "description": "A representation of a child",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Child/allOf/0"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Person"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "ChildAllOf0",
+      "referencePath": "#/components/schemas/Child/allOf/0",
+      "properties": [
+        {
+          "name": "age",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        }
+      ]
+    },
+    {
       "kind": "object",
       "name": "Nullable.Address",
       "referencePath": "#/components/schemas/Nullable.Address",

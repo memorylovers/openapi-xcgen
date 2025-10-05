@@ -62,6 +62,73 @@
           "name": "BAZ"
         }
       ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Baz",
+      "referencePath": "#/components/schemas/Baz",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Baz/allOf/1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BazAllOf1",
+      "referencePath": "#/components/schemas/Baz/allOf/1",
+      "properties": [
+        {
+          "name": "foo",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "bar",
+          "type": "datetime"
+        },
+        {
+          "name": "baz",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Baz/allOf/BazAllOf1Baz"
+          }
+        },
+        {
+          "name": "qux",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BazAllOf1Baz",
+      "referencePath": "#/components/schemas/Baz/allOf/BazAllOf1Baz",
+      "type": "string",
+      "values": [
+        {
+          "value": "foo",
+          "name": "FOO"
+        },
+        {
+          "value": "bar",
+          "name": "BAR"
+        },
+        {
+          "value": "baz",
+          "name": "BAZ"
+        }
+      ]
     }
   ],
   "tags": [],

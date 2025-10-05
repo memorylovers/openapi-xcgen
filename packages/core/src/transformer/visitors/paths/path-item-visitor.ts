@@ -77,6 +77,7 @@ export function visitPathItem(
     const operation = pathItem[method];
     if (operation && typeof operation === "object") {
       const operationContext: OperationContext = {
+        kind: "operation",
         documentPath: [...context.documentPath, method],
         method,
         pathTemplate: context.pathTemplate,
@@ -114,6 +115,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
+        kind: "pathItem",
         documentPath: ["paths", "/pets/{id}"],
         rootSegment: "paths",
         pathTemplate: "/pets/{id}",
@@ -160,6 +162,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
+        kind: "pathItem",
         documentPath: ["paths", "/pets/{id}"],
         rootSegment: "paths",
         pathTemplate: "/pets/{id}",
@@ -216,6 +219,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
+        kind: "pathItem",
         documentPath: ["paths", "/pets/{id}"],
         rootSegment: "paths",
         pathTemplate: "/pets/{id}",
@@ -255,6 +259,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
+        kind: "pathItem",
         documentPath: ["paths", "/pets/{id}"],
         rootSegment: "paths",
         pathTemplate: "/pets/{id}",
@@ -319,6 +324,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
+        kind: "pathItem",
         documentPath: ["paths", "/pets/{id}"],
         rootSegment: "paths",
         pathTemplate: "/pets/{id}",
@@ -418,6 +424,7 @@ if (import.meta.vitest) {
       };
 
       const context: PathItemContext = {
+        kind: "pathItem",
         documentPath: ["paths", "/pets/{id}"],
         rootSegment: "paths",
         pathTemplate: "/pets/{id}",

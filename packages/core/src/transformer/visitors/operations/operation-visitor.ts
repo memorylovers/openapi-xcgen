@@ -76,6 +76,7 @@ export function visitOperation(
 ): OperationResult | null {
   // parameters処理
   const parametersContext: ParametersContext = {
+    kind: "parameters",
     documentPath: [...context.documentPath, "parameters"],
     method: context.method,
     pathTemplate: context.pathTemplate,
@@ -94,12 +95,11 @@ export function visitOperation(
 
   if (operation.requestBody) {
     const requestBodyContext: RequestBodyContext = {
+      kind: "requestBody",
       documentPath: [...context.documentPath, "requestBody"],
       method: context.method,
       pathTemplate: context.pathTemplate,
       rootSegment: "paths",
-      contentType: null,
-      schemaPath: null,
     };
 
     const requestBodyResult = visitRequestBody(
@@ -120,6 +120,7 @@ export function visitOperation(
 
   // responses処理
   const responsesContext: ResponsesContext = {
+    kind: "responses",
     documentPath: [...context.documentPath, "responses"],
     method: context.method,
     pathTemplate: context.pathTemplate,
@@ -198,6 +199,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/pets/{id}", "get"],
         method: "get",
         pathTemplate: "/pets/{id}",
@@ -235,6 +237,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/old/endpoint", "post"],
         method: "post",
         pathTemplate: "/old/endpoint",
@@ -265,6 +268,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/missing", "get"],
         method: "get",
         pathTemplate: "/missing",
@@ -295,6 +299,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/no-tags", "get"],
         method: "get",
         pathTemplate: "/no-tags",
@@ -336,6 +341,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/with/{id}", "get"],
         method: "get",
         pathTemplate: "/with/{id}",
@@ -404,6 +410,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/pets", "post"],
         method: "post",
         pathTemplate: "/pets",
@@ -482,6 +489,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/pets/{id}", "get"],
         method: "get",
         pathTemplate: "/pets/{id}",
@@ -560,6 +568,7 @@ if (import.meta.vitest) {
       };
 
       const context: OperationContext = {
+        kind: "operation",
         documentPath: ["paths", "/ref/{id}", "get"],
         method: "get",
         pathTemplate: "/ref/{id}",

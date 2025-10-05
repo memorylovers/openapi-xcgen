@@ -108,6 +108,7 @@ export function visitComponents(
     try {
       // visitSchemaを呼び出し（SchemaContextを作成）
       const schemaContext: SchemaContext = {
+        kind: "schema",
         documentPath: [...context.documentPath, "schemas", name],
         schemaName: name,
         rootSegment: "components",

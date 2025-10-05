@@ -21,7 +21,8 @@ import type {
   SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { generateComponentName } from "../../helpers";
+import { isPathsRequestBodyContext } from "../../../types/guards.js";
+import { getModelName } from "../../helpers/get-model-name.js";
 import type { RequestBodyContext } from "../../types";
 import { visitRequestBodyObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";
@@ -108,25 +109,18 @@ export function visitRequestBody(
 
   for (const [mimeType, mediaType] of Object.entries(requestBodyObj.content)) {
     if (mediaType.schema) {
-      // インラインのobjectスキーマを検出
-      if (
-        !isReferenceObject(mediaType.schema) &&
-        mediaType.schema.type === "object"
-      ) {
-        // コンポーネント名を生成
-        const componentName = generateComponentName(
-          context.pathTemplate,
-          context.method,
-          "requestBody",
-          undefined,
-          undefined,
-          mimeType,
-        );
+      // getModelNameで名前を生成（すべてのスキーマに対して）
+      const componentName = getModelName({
+        ...context,
+        contentType: mimeType,
+      } as RequestBodyContext);
 
-        // リクエストボディvisitorで処理して、IRRequestBodyModelとして抽出
-        const requestBodyResult = visitRequestBodyObject(
-          mediaType.schema as SchemaObject,
-          {
+      // RequestBodyContextを作成（documentPathにコンポーネント名を追加）
+      const schemaContext: RequestBodyContext = isPathsRequestBodyContext(
+        context,
+      )
+        ? {
+            kind: "requestBody",
             documentPath: [
               ...context.documentPath,
               "content",
@@ -134,8 +128,35 @@ export function visitRequestBody(
               "schema",
               componentName,
             ],
-            rootSegment: "paths",
-          },
+            rootSegment: context.rootSegment,
+            method: context.method,
+            pathTemplate: context.pathTemplate,
+            contentType: mimeType,
+            schemaPath: ["content", mimeType, "schema"],
+          }
+        : {
+            kind: "componentsRequestBody",
+            documentPath: [
+              ...context.documentPath,
+              "content",
+              mimeType,
+              "schema",
+              componentName,
+            ],
+            rootSegment: context.rootSegment,
+            contentType: mimeType,
+            schemaPath: ["content", mimeType, "schema"],
+          };
+
+      // インラインのobjectスキーマを検出
+      if (
+        !isReferenceObject(mediaType.schema) &&
+        mediaType.schema.type === "object"
+      ) {
+        // リクエストボディvisitorで処理して、IRRequestBodyModelとして抽出
+        const requestBodyResult = visitRequestBodyObject(
+          mediaType.schema as SchemaObject,
+          schemaContext,
           requestBodyObj.required === true,
         );
 
@@ -160,24 +181,7 @@ export function visitRequestBody(
         }
       } else {
         // それ以外のスキーマは通常通り処理
-        const componentName = generateComponentName(
-          context.pathTemplate,
-          context.method,
-          "requestBody",
-          undefined,
-          undefined,
-          mimeType,
-        );
-        const schemaResult = visitSchema(mediaType.schema, {
-          documentPath: [
-            ...context.documentPath,
-            "content",
-            mimeType,
-            "schema",
-            componentName,
-          ],
-          rootSegment: "paths",
-        });
+        const schemaResult = visitSchema(mediaType.schema, schemaContext);
         if (schemaResult.type) {
           content.push({ mimeType, schema: schemaResult.type });
           // ネストしたモデルを収集
@@ -235,12 +239,11 @@ if (import.meta.vitest) {
       };
 
       const result = visitRequestBody(requestBody, "createUser", {
+        kind: "requestBody",
         documentPath: ["paths", "/users", "post", "requestBody"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/users",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -312,12 +315,11 @@ if (import.meta.vitest) {
       };
 
       const result = visitRequestBody(requestBody, "uploadFile", {
+        kind: "requestBody",
         documentPath: ["paths", "/files", "post", "requestBody"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/files",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -398,12 +400,11 @@ if (import.meta.vitest) {
       } as RequestBodyObject;
 
       const result = visitRequestBody(requestBody, "testOp", {
+        kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual(null);
@@ -422,12 +423,11 @@ if (import.meta.vitest) {
       };
 
       const result = visitRequestBody(requestBody, "testOp", {
+        kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual(null);
@@ -444,12 +444,11 @@ if (import.meta.vitest) {
       };
 
       const result = visitRequestBody(requestBody, "updateUser", {
+        kind: "requestBody",
         documentPath: ["paths", "/users/{id}", "put", "requestBody"],
         rootSegment: "paths",
         method: "put",
         pathTemplate: "/users/{id}",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -479,12 +478,11 @@ if (import.meta.vitest) {
       };
 
       const result = visitRequestBody(requestBody, "testOp", {
+        kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({
@@ -518,12 +516,11 @@ if (import.meta.vitest) {
       };
 
       const result = visitRequestBody(requestBody, "testOp", {
+        kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
         method: "post",
         pathTemplate: "/test",
-        contentType: null,
-        schemaPath: null,
       });
 
       expect(result).toEqual({

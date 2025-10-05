@@ -127,6 +127,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "id",
@@ -157,6 +158,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "limit",
@@ -186,6 +188,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "X-API-Version",
@@ -211,6 +214,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "session",
@@ -236,6 +240,7 @@ if (import.meta.vitest) {
       } as ParameterObject;
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "invalid",
@@ -262,6 +267,7 @@ if (import.meta.vitest) {
       } as ParameterObject;
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "userId",
@@ -288,6 +294,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "body",
@@ -317,6 +324,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "tags",
@@ -346,6 +354,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "filter",
@@ -372,6 +381,7 @@ if (import.meta.vitest) {
       } as unknown as ParameterObject;
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/products", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "category",
@@ -401,6 +411,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/users", "post", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "username",
@@ -435,6 +446,7 @@ if (import.meta.vitest) {
       };
 
       const result = visitParameter(param, {
+        kind: "parameter",
         documentPath: ["paths", "/posts", "get", "parameters", "0"],
         rootSegment: "paths",
         parameterName: "tags",

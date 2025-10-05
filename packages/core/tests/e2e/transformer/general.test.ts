@@ -32,6 +32,12 @@ describe("E2E: Transformer - General", () => {
     });
   });
 
+  describe("Composition", () => {
+    it("should handle allOf composition correctly", async () => {
+      await compareWithExpected("general/allof");
+    });
+  });
+
   describe("Modern OpenAPI 3.1 Examples", () => {
     it("should transform Train Travel API correctly", async () => {
       await compareWithExpected("general/train-travel-api");

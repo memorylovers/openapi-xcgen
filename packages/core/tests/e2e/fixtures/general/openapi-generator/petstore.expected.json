@@ -1455,7 +1455,7 @@
           "mimeType": "application/json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/requestBodies/UserArray/content/application/json/schema/PostRequestBody"
+            "name": "#/components/requestBodies/UserArray/content/application/json/schema/UserArray"
           }
         }
       ],

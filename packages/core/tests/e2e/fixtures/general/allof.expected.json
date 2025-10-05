@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "title": "allOf Composition Test",
+    "version": "1.0.0",
+    "description": "Test allOf schema composition"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Base",
+      "referencePath": "#/components/schemas/Base",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "description": "Creation timestamp"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "User",
+      "referencePath": "#/components/schemas/User",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Base"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/User/allOf/1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "UserAllOf1",
+      "referencePath": "#/components/schemas/User/allOf/1",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "User name"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "description": "Email address",
+          "validation": {
+            "format": "email"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Timestamps",
+      "referencePath": "#/components/schemas/Timestamps",
+      "properties": [
+        {
+          "name": "createdAt",
+          "type": "datetime"
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "AuditableUser",
+      "referencePath": "#/components/schemas/AuditableUser",
+      "description": "User with audit timestamps",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Base"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Timestamps"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AuditableUser/allOf/2"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AuditableUserAllOf2",
+      "referencePath": "#/components/schemas/AuditableUser/allOf/2",
+      "properties": [
+        {
+          "name": "role",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/AuditableUser/allOf/AuditableUserAllOf2Role"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "AuditableUserAllOf2Role",
+      "referencePath": "#/components/schemas/AuditableUser/allOf/AuditableUserAllOf2Role",
+      "type": "string",
+      "values": [
+        {
+          "value": "admin",
+          "name": "ADMIN"
+        },
+        {
+          "value": "user",
+          "name": "USER"
+        },
+        {
+          "value": "guest",
+          "name": "GUEST"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/users",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/User"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "getUsers",
+      "summary": "Get users"
+    }
+  ]
+}

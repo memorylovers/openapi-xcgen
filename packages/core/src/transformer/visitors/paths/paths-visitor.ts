@@ -65,6 +65,7 @@ export function visitPaths(
     if (!pathItem) continue;
 
     const pathItemContext: PathItemContext = {
+      kind: "pathItem",
       documentPath: [...context.documentPath, pathTemplate],
       pathTemplate,
       rootSegment: "paths",

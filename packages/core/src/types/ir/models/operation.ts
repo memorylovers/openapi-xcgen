@@ -5,6 +5,7 @@
 import type { IRType } from "../common/type";
 import type { IRResponseHeader } from "../endpoints/response";
 import type {
+  IRAllOfModel,
   IRArrayModel,
   IREnumModel,
   IRMapModel,
@@ -161,6 +162,7 @@ export interface IRResponseModel {
 export type IRModel =
   | IRObjectModel
   | IREnumModel
+  | IRAllOfModel
   | IRArrayModel
   | IRMapModel
   | IRParameterModel
