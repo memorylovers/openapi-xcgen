@@ -74,14 +74,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Baz/allOf/1"
+          "name": "#/components/schemas/BazAllOf1"
         }
       ]
     },
     {
       "kind": "object",
       "name": "BazAllOf1",
-      "referencePath": "#/components/schemas/Baz/allOf/1",
+      "referencePath": "#/components/schemas/BazAllOf1",
       "properties": [
         {
           "name": "foo",
@@ -98,7 +98,7 @@
           "name": "baz",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Baz/allOf/BazAllOf1Baz"
+            "name": "#/components/schemas/BazAllOf1Baz"
           }
         },
         {
@@ -113,7 +113,7 @@
     {
       "kind": "enum",
       "name": "BazAllOf1Baz",
-      "referencePath": "#/components/schemas/Baz/allOf/BazAllOf1Baz",
+      "referencePath": "#/components/schemas/BazAllOf1Baz",
       "type": "string",
       "values": [
         {

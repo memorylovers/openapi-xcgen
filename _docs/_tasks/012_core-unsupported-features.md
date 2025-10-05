@@ -4,73 +4,234 @@
 
 本ドキュメントは、`@openapi-xcgen/core`パッケージにおける未対応のOpenAPI機能を網羅的にリストアップしたものです。各機能について実装推奨度を評価し、今後の開発計画の参考とします。
 
-## コード生成前の推奨実装項目
+## 実装状況サマリー
 
-### 必須対応（IR型定義への影響が大きい）
+### ✅ Phase 1完了: 基盤機能（必須対応）
 
-**Phase 1: コード生成前に完了すべき項目**
+1. ✅ **servers** - APIベースURL設定
+2. ✅ **readOnly** - レスポンス専用プロパティ
+3. ✅ **writeOnly** - リクエスト専用プロパティ（セキュリティ）
 
-1. ✅ **servers**（最高）- 生成コードのベースURL設定に必須
-2. ✅ **readOnly**（高）- リクエスト/レスポンスで型を分ける必要
-3. ✅ **writeOnly**（高）- セキュリティ上重要（パスワードなど）
+### ✅ Phase 2完了: 型システム基礎
 
-### 推奨対応（IR構造の完成度を高める）
+4. ✅ **allOf** - 継承・スキーママージ（TypeSpec `model extends`）
 
-**Phase 2: 型システム対応**
+### ✅ Phase 3完了: Union型サポート（anyOf）
 
-4. **allOf**（高）- 継承・マージパターン、IR設計への影響大
-5. **oneOf / anyOf**（中）- Union型の表現方法がIR設計に影響
+5. ✅ **anyOf** - 包含的Union（TypeSpec 1.0で高頻度 ⭐⭐⭐⭐）
 
-### 後回し可能
+### 🚀 Phase 4: Union型サポート（次の優先事項）
 
-以下はIRへの情報追加のみで、コード生成ロジックへの影響が限定的：
+6. **oneOf** - 排他的Union（TypeSpec 1.0で中頻度 ⭐⭐⭐）
+7. **discriminator** - ポリモーフィズム（oneOf/anyOfと連携）
 
-- components.parameters, webhooks, externalDocs, multipleOf など
+### Phase 4以降: 拡張機能
 
----
-
-## 1. ✅ 最高: servers
-
-**現状**: ✅ 実装済み
-
-**影響範囲**:
-
-- APIベースURL情報
-- 環境別エンドポイント管理
-
-**実装時の考慮点**:
-
-- IR型定義に`servers`フィールド追加
-- variables（テンプレート変数）の処理
-- コード生成時の活用方法
-
-**推奨アクション**:
-✅ 実装完了。IR型定義にserversフィールドを追加し、transformerで処理を統合。
+- Reference parameter, components.parameters
+- webhooks, externalDocs
+- その他のバリデーション・メタデータ
 
 ---
 
-## 2. ✅ 高: allOf（スキーママージ）
+## 完了済み機能詳細
 
-**現状**: ✅ 実装済み
+### ✅ servers（最高優先度）
 
-**影響範囲**:
-
-- TypeSpec `model extends` パターンに対応
-- 継承関係の表現、複数スキーマの結合
+**実装状況**: 完了
 
 **実装内容**:
 
-- IR型定義: `IRAllOfModel`を追加
-- Visitor実装: `allof-visitor.ts`で処理
-- インラインスキーマの自動モデル化: `{親名}AllOf{インデックス}`形式
-- E2Eテスト: `allof.yaml`で検証
+- IR型定義に`IRServer`と`IRServerVariable`を追加
+- `servers-visitor.ts`で処理
+- 環境別エンドポイント、テンプレート変数に対応
 
-**推奨アクション**:
-✅ 実装完了。IRAllOfModel型を追加し、allof-visitorで処理を実装。Generator側で継承または交差型として柔軟に実装可能。
+**影響範囲**:
+
+- APIベースURL情報の管理
+- 環境別エンドポイント（dev/stg/prod）
+- URLテンプレート変数の処理
 
 ---
 
-## 3. 高: Reference parameter（components.parameters内の$ref）
+### ✅ readOnly（高優先度）
+
+**実装状況**: 完了
+
+**実装内容**:
+
+- `IRProperty`に`readOnly: boolean`フィールド追加
+- `object-visitor.ts`で処理
+
+**影響範囲**:
+
+- レスポンス専用プロパティの表現
+- リクエストボディから除外される
+
+**使用例**:
+
+```yaml
+properties:
+  id:
+    type: string
+    readOnly: true  # レスポンスのみ
+```
+
+---
+
+### ✅ writeOnly（高優先度）
+
+**実装状況**: 完了
+
+**実装内容**:
+
+- `IRProperty`に`writeOnly: boolean`フィールド追加
+- `object-visitor.ts`で処理
+
+**影響範囲**:
+
+- リクエスト専用プロパティの表現
+- レスポンスから除外される（パスワードなど）
+
+**使用例**:
+
+```yaml
+properties:
+  password:
+    type: string
+    writeOnly: true  # リクエストのみ
+```
+
+---
+
+### ✅ allOf（高優先度）
+
+**実装状況**: 完了（[タスク013参照](./013_allof-implementation-plan.md)）
+
+**実装内容**:
+
+- IR型定義に`IRAllOfModel`を追加
+- `allof-visitor.ts`で処理
+- インラインスキーマの自動モデル化（`{親名}AllOf{インデックス}`形式）
+- E2Eテスト: `allof.yaml`で検証
+
+**TypeSpecでの重要性**: ⭐⭐⭐⭐⭐（最高頻度）
+
+- `model extends`で必ず生成される
+
+**影響範囲**:
+
+- 継承関係の表現
+- 複数スキーマの結合
+- Generator側で継承または交差型として実装可能
+
+**使用例**:
+
+```yaml
+# TypeSpec: model Dog extends Animal { }
+Dog:
+  allOf:
+    - $ref: '#/components/schemas/Animal'
+    - type: object
+      properties:
+        breed: { type: string }
+```
+
+---
+
+## 未対応機能（優先度順）
+
+### 1. ✅ anyOf（包含的Union）
+
+**実装状況**: 完了（[タスク014参照](./014_anyof-implementation-plan.md)）
+
+**実装内容**:
+
+- IR型定義に`IRAnyOfModel`を追加
+- `anyof-visitor.ts`で処理
+- インラインスキーマの自動モデル化（`{親名}AnyOf{インデックス}`形式）
+- **nullable型パターン検出**: `anyOf: [{type: X}, {type: 'null'}]` → `nullable: true`
+- E2Eテスト: `anyof.yaml`、`anyof-discriminator.yaml`で検証
+
+**TypeSpecでの重要性**: ⭐⭐⭐⭐（高頻度）
+
+- TypeSpec 1.0では`union`のデフォルト出力がanyOf
+
+**影響範囲**:
+
+- Union型の表現
+- 型システムでの複数型の選択
+- **OpenAPI 3.1のnullable型パターン対応**
+- Generator側でUnion型として実装可能
+
+**使用例**:
+
+```yaml
+# 通常のUnion: TypeSpec union Fruit { apple: Apple, banana: Banana }
+Fruit:
+  anyOf:
+    - $ref: '#/components/schemas/Apple'
+    - $ref: '#/components/schemas/Banana'
+
+# Nullable型パターン（OpenAPI 3.1）
+NullableString:
+  anyOf:
+    - type: string
+    - type: 'null'
+# → IR: { kind: "anyOf", nullable: true, schemas: ["string"] }
+```
+
+---
+
+### 🔴 高優先度: Union型サポート（残り）
+
+### 2. oneOf（排他的Union）
+
+**現状**: 警告を出してスキップ
+
+**TypeSpecでの重要性**: ⭐⭐⭐（中頻度）
+
+- `@oneOf`デコレータで明示的に指定
+- discriminated unionで使用
+
+**影響範囲**:
+
+- e2eテスト: `discriminator-one-of.yaml`が失敗
+- 使用例: レスポンスが成功/エラーの複数パターン
+
+**実装時の考慮点**:
+
+- 型システムでの表現（TypeScript: Union型、Dart: Sealed class）
+- discriminatorとの連携
+- IR型定義に`IROneOfModel`を追加
+- `oneof-visitor.ts`の実装
+
+**推奨アクション**: anyOf実装後に対応
+
+---
+
+#### 3. discriminator
+
+**現状**: 警告を出してスキップ
+
+**影響範囲**:
+
+- oneOf/anyOfと組み合わせて使用
+- ポリモーフィズムの表現
+- 型安全なUnion型の実現
+
+**実装時の考慮点**:
+
+- oneOf/anyOfの実装が前提
+- propertyNameとmappingの処理
+- Generator側でのタグ付きUnion生成
+
+**推奨アクション**: oneOf/anyOf実装後に対応
+
+---
+
+### 🟡 中優先度: 参照と再利用
+
+#### 4. Reference parameter（components.parameters内の$ref）
 
 **現状**: 警告を出してスキップ
 
@@ -90,125 +251,12 @@ consola.warn(`Reference parameter not supported yet: ${param.$ref}`);
 
 ---
 
-## 4. ✅ 高: readOnly
-
-**現状**: ✅ 実装済み
-
-**影響範囲**:
-
-- レスポンス専用プロパティ
-- リクエストには含めない
-
-**実装時の考慮点**:
-
-- IRPropertyに`readOnly`フィールド追加
-- コード生成時の除外ロジック
-
-**推奨アクション**:
-✅ 実装完了。IRPropertyにreadOnlyフィールドを追加し、object-visitorで処理を実装。
-
----
-
-## 5. ✅ 高: writeOnly
-
-**現状**: ✅ 実装済み
-
-**影響範囲**:
-
-- リクエスト専用プロパティ
-- レスポンスには含めない（パスワードなど）
-
-**実装時の考慮点**:
-
-- IRPropertyに`writeOnly`フィールド追加
-- セキュリティ観点で重要
-
-**推奨アクション**:
-✅ 実装完了。IRPropertyにwriteOnlyフィールドを追加し、object-visitorで処理を実装。
-
----
-
-## 6. 中: oneOf（排他的Union）
+#### 5. components.parameters
 
 **現状**: 警告を出してスキップ
 
 ```typescript
-// schema-visitor.ts:96-100
-if ("oneOf" in schema && schema.oneOf) {
-  consola.warn(
-    `oneOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
-  );
-  return result;
-}
-```
-
-**影響範囲**:
-
-- e2eテスト: `discriminator-one-of.yaml` が失敗
-- 使用例: レスポンスが成功/エラーの複数パターンを持つ場合
-
-**実装時の考慮点**:
-
-- 型システムでの表現（TypeScript: Union型、Dart: Sealed class）
-- discriminatorとの連携
-- 生成コードの複雑性
-
----
-
-## 7. 中: anyOf（包含的Union）
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// schema-visitor.ts:102-106
-if ("anyOf" in schema && schema.anyOf) {
-  consola.warn(
-    `anyOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
-  );
-  return result;
-}
-```
-
-**影響範囲**:
-
-- e2eテスト: `discriminator-any-of.yaml` が失敗
-- 使用例: nullable型の表現（OpenAPI 3.1スタイル）
-
-**実装時の考慮点**:
-
-- oneOfよりも複雑な型関係
-- OpenAPI 3.1でのnullable表現として重要
-
----
-
-## 8. 中: Reference schema（header/parameter内の$ref）
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// header-visitor.ts
-consola.warn(`Reference schema not supported yet in header: ${context.headerName}`);
-
-// parameter-visitor.ts
-consola.warn(`Reference schema not supported yet in parameter: ${parameter.name}`);
-```
-
-**影響範囲**:
-
-- ヘッダー・パラメータで$refスキーマが使えない
-
-**実装時の考慮点**:
-
-- visitTypeで$ref処理を統一
-
----
-
-## 9. 中: components.parameters
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// transformer.ts:64-67
+// transformer.ts
 if (document.components?.parameters) {
   consola.warn(
     `components.parameters is not supported yet and will be skipped`,
@@ -229,7 +277,45 @@ if (document.components?.parameters) {
 
 ---
 
-## 10. 中: webhooks（OpenAPI 3.1）
+#### 6. Reference schema（header/parameter内の$ref）
+
+**現状**: 警告を出してスキップ
+
+```typescript
+// header-visitor.ts
+consola.warn(`Reference schema not supported yet in header`);
+
+// parameter-visitor.ts
+consola.warn(`Reference schema not supported yet in parameter`);
+```
+
+**影響範囲**:
+
+- ヘッダー・パラメータで$refスキーマが使えない
+
+**実装時の考慮点**:
+
+- visitTypeで$ref処理を統一
+
+---
+
+#### 7. Nested $ref（components.responses/requestBodies内）
+
+**現状**: 警告を出してスキップ
+
+**影響範囲**:
+
+- components内で別のcomponentsを参照できない
+
+**実装時の考慮点**:
+
+- $ref解決の再帰処理
+
+---
+
+### 🟡 中優先度: 拡張機能
+
+#### 8. webhooks（OpenAPI 3.1）
 
 **現状**: 未処理
 
@@ -246,7 +332,7 @@ if (document.components?.parameters) {
 
 ---
 
-## 11. 中: externalDocs（ルートレベル）
+#### 9. externalDocs（ルートレベル）
 
 **現状**: tagsには実装済み、ルートレベルは未処理
 
@@ -257,109 +343,11 @@ if (document.components?.parameters) {
 **実装時の考慮点**:
 
 - IRMetadataに`externalDocs`フィールド追加
-- 既存のIRTagExternalDocsを再利用
+- 既存の`IRTagExternalDocs`を再利用
 
 ---
 
-## 12. 低: discriminator
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// schema-visitor.ts:108-112
-if ("discriminator" in schema && schema.discriminator) {
-  consola.warn(
-    `discriminator is not supported yet: ${buildReferencePath(context.documentPath)}`,
-  );
-  return result;
-}
-```
-
-**影響範囲**:
-
-- oneOf/anyOfと組み合わせて使用
-- ポリモーフィズムの表現
-
-**実装時の考慮点**:
-
-- oneOf/anyOfの実装が前提
-- propertyNameとmappingの処理
-
----
-
-## 13. 低: Reference security scheme
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// security-schemes-visitor.ts
-consola.warn(`Reference security scheme not supported yet: ${securityScheme.$ref}`);
-```
-
-**影響範囲**:
-
-- セキュリティスキームの$ref参照ができない
-
-**実装時の考慮点**:
-
-- 外部ファイル参照の必要性は低い
-
----
-
-## 14. 低: Nested $ref（components.responses/requestBodies内）
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// responses-components-visitor.ts
-consola.warn(
-  `Nested $ref in components.responses["${name}"] is not supported: ${response.$ref}`,
-);
-
-// requestBodies-components-visitor.ts
-consola.warn(
-  `Nested $ref in components.requestBodies["${name}"] is not supported: ${requestBody.$ref}`,
-);
-```
-
-**影響範囲**:
-
-- components内で別のcomponentsを参照できない
-
----
-
-## 15. 低: components.examples
-
-**現状**: 未処理（警告なし）
-
-**影響範囲**:
-
-- サンプル値の管理
-- APIドキュメント生成時に有用
-
-**実装時の考慮点**:
-
-- コード生成には直接影響しない
-- ドキュメント生成機能と合わせて実装
-
----
-
-## 16. 低: components.headers
-
-**現状**: 未処理（警告なし）
-
-**影響範囲**:
-
-- 共通ヘッダー定義の再利用
-
-**実装時の考慮点**:
-
-- レスポンスヘッダーは既に実装済み
-- 共通定義の再利用部分のみ
-
----
-
-## 17. 低: multipleOf
+#### 10. multipleOf
 
 **現状**: 未処理
 
@@ -375,7 +363,7 @@ consola.warn(
 
 ---
 
-## 18. 低: contentMediaType/contentEncoding
+#### 11. contentMediaType/contentEncoding
 
 **現状**: 未処理
 
@@ -391,15 +379,62 @@ consola.warn(
 
 ---
 
-## 19. 低: additionalProperties: true
+### 🔵 低優先度
+
+#### 12. Reference security scheme
+
+**現状**: 警告を出してスキップ
+
+**影響範囲**:
+
+- セキュリティスキームの$ref参照ができない
+
+**実装時の考慮点**:
+
+- 外部ファイル参照の必要性は低い
+
+---
+
+#### 13. components.examples
+
+**現状**: 未処理（警告なし）
+
+**影響範囲**:
+
+- サンプル値の管理
+- APIドキュメント生成時に有用
+
+**実装時の考慮点**:
+
+- コード生成には直接影響しない
+- ドキュメント生成機能と合わせて実装
+
+---
+
+#### 14. components.headers
+
+**現状**: 未処理（警告なし）
+
+**影響範囲**:
+
+- 共通ヘッダー定義の再利用
+
+**実装時の考慮点**:
+
+- レスポンスヘッダーは既に実装済み
+- 共通定義の再利用部分のみ
+
+---
+
+#### 15. additionalProperties: true
 
 **現状**: 警告を出してスキップ
 
 ```typescript
-// additional-properties-visitor.ts:48-51
+// additional-properties-visitor.ts
 if (additionalProperties === true) {
   consola.warn(
-    "additionalProperties: true (any type) is not supported; specify a schema for map values",
+    "additionalProperties: true (any type) is not supported",
   );
 }
 ```
@@ -410,20 +445,14 @@ if (additionalProperties === true) {
 
 **実装時の考慮点**:
 
-- `Map<string, any>` として扱う
+- `Map<string, any>`として扱う
 - 型安全性の低下
 
 ---
 
-## 20. 低: OAuth2 flows検証の強化
+#### 16. OAuth2 flows検証の強化
 
 **現状**: 基本的な警告のみ
-
-```typescript
-// security-schemes-visitor.ts
-consola.warn("OAuth2 security scheme without flows");
-consola.warn("OAuth2 security scheme without valid flows");
-```
 
 **影響範囲**:
 
@@ -436,150 +465,96 @@ consola.warn("OAuth2 security scheme without valid flows");
 
 ---
 
-## 21. 最低: not（否定スキーマ）
-
-**現状**: 警告を出してスキップ
-
-```typescript
-// schema-visitor.ts:114-118
-if ("not" in schema && schema.not) {
-  consola.warn(
-    `not schema is not supported yet: ${buildReferencePath(context.documentPath)}`,
-  );
-  return result;
-}
-```
-
-**影響範囲**:
-
-- 使用例: 特定の型を除外する制約
-
-**実装時の考慮点**:
-
-- コード生成での表現が困難
-- バリデーションライブラリ依存
-
----
-
-## 22. 最低: components.links
-
-**現状**: 未処理（警告なし）
-
-**影響範囲**:
-
-- HATEOAS対応
-- リンク関係の定義
-
-**実装時の考慮点**:
-
-- REST成熟度レベル3の機能
-- 使用例が極めて少ない
-
----
-
-## 23. 最低: components.callbacks
-
-**現状**: 未処理（警告なし）
-
-**影響範囲**:
-
-- Webhook定義の再利用
-
-**実装時の考慮点**:
-
-- webhooksの実装が前提
-
----
-
-## 24. 最低: patternProperties
-
-**現状**: 未処理
-
-**影響範囲**:
-
-- 動的なプロパティ名の制約
-- CLAUDE.mdの制限事項に記載
-
-**実装時の考慮点**:
-
-- 型システムでの表現が困難
-- Map型との関係
-
----
-
-## 25. 最低: if/then/else
-
-**現状**: 未処理
-
-**影響範囲**:
-
-- 条件付きスキーマ
-- CLAUDE.mdの制限事項に記載
-
-**実装時の考慮点**:
-
-- JSON Schema Draft 7の機能
-- コード生成での表現が極めて困難
-
----
-
-## 26. 最低: $id/$anchor
-
-**現状**: 未処理
-
-**影響範囲**:
-
-- スキーマ識別子
-- CLAUDE.mdの制限事項に記載
-
-**実装時の考慮点**:
-
-- JSON Schema Draft 2019-09の機能
-- OpenAPIでの使用例が極めて少ない
-
----
-
-## 27. 最低: 空のスキーマ `{}`
-
-**現状**: 未処理
-
-**影響範囲**:
-
-- any型相当（すべての型を許可）
-- CLAUDE.mdの制限事項に記載（意図的に除外）
-
-**実装時の考慮点**:
-
-- 型安全性の観点から推奨しない
-- 必要に応じて明示的なany型サポート
-
----
-
-## 28. 最低: xml
-
-**現状**: 未実装（ドキュメントコメントにのみ存在）
-
-**影響範囲**:
-
-- XML表現のカスタマイズ
-
-**実装時の考慮点**:
-
-- JSON APIが主流
-- XML対応はニッチな要件
-
----
-
-## 制限事項として維持するもの
+### ⚫ 最低優先度（実装予定なし）
 
 以下の機能は実装せず、制限事項として継続：
 
-- **not** - 使用頻度極めて低く、実装困難
-- **if/then/else** - 使用例がほぼなく、コード生成で表現不可
-- **$id/$anchor** - OpenAPI文脈での使用例がほぼない
-- **patternProperties** - 型システムでの表現が困難
-- **components.links** - HATEOAS対応、使用例極めて少ない
-- **components.callbacks** - webhooksで代替可能
+#### 17. not（否定スキーマ）
+
+**理由**: 使用頻度極めて低く、コード生成での表現が困難
+
+---
+
+#### 18. components.links
+
+**理由**: HATEOAS対応、使用例極めて少ない
+
+---
+
+#### 19. components.callbacks
+
+**理由**: webhooksで代替可能
+
+---
+
+#### 20. patternProperties
+
+**理由**: 型システムでの表現が困難、CLAUDE.mdの制限事項に記載
+
+---
+
+#### 21. if/then/else
+
+**理由**: JSON Schema Draft 7の機能、コード生成での表現が極めて困難
+
+---
+
+#### 22. $id/$anchor
+
+**理由**: OpenAPIでの使用例が極めて少ない、CLAUDE.mdの制限事項に記載
+
+---
+
+#### 23. 空のスキーマ `{}`
+
+**理由**: 型安全性の観点から意図的に除外、CLAUDE.mdの制限事項に記載
+
+---
+
+#### 24. xml
+
+**理由**: JSON APIが主流、XML対応はニッチな要件
+
+---
+
+## 次のアクションプラン
+
+### Phase 4: oneOf/discriminatorサポート（優先度: 高）
+
+1. **oneOf実装**
+   - IR型定義: `IROneOfModel`追加
+   - Visitor実装: `oneof-visitor.ts`
+   - discriminatorとの連携設計
+
+3. **discriminator実装**
+   - oneOf/anyOfへの統合
+   - propertyName/mappingの処理
+
+### Phase 4: 参照機能の拡充（優先度: 中）
+
+- components.parameters実装
+- Reference parameter対応
+- Reference schema対応
+- Nested $ref対応
+
+### Phase 5以降: その他の拡張機能
+
+- webhooks (OpenAPI 3.1)
+- externalDocs (ルートレベル)
+- その他のバリデーション強化
+
+---
+
+## TypeSpec 1.0との対応状況
+
+| 機能 | TypeSpec使用頻度 | 実装状況 |
+|------|-----------------|---------|
+| allOf | ⭐⭐⭐⭐⭐ (最高) | ✅ 完了 |
+| anyOf | ⭐⭐⭐⭐ (高) | ✅ 完了 |
+| oneOf | ⭐⭐⭐ (中) | ❌ 未実装 |
+| discriminator | ⭐⭐ (低) | ❌ 未実装 |
+
+**進捗**: anyOf実装完了により、TypeSpec 1.0の主要なunion型に対応
 
 ---
 
@@ -588,4 +563,6 @@ if ("not" in schema && schema.not) {
 - [OpenAPI Specification 3.0.3](https://spec.openapis.org/oas/v3.0.3)
 - [OpenAPI Specification 3.1.0](https://spec.openapis.org/oas/v3.1.0)
 - [JSON Schema Draft 2020-12](https://json-schema.org/draft/2020-12/schema)
+- [TypeSpec Documentation](https://typespec.io/docs/)
 - CLAUDE.md - プロジェクト開発ガイドライン
+- [タスク013: allOf実装計画](./013_allof-implementation-plan.md)

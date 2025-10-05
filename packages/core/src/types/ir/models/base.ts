@@ -186,3 +186,59 @@ export interface IRAllOfModel {
   /** 合成する型の配列（通常はIRRefまたはインライン型） */
   schemas: IRType[];
 }
+
+/**
+ * IRAnyOfModel - anyOf合成モデル定義
+ * OpenAPIのanyOfキーワードを表現し、複数のスキーマのうち1つ以上に適合する（包含的Union）を表す
+ *
+ * @example
+ * ```yaml
+ * # OpenAPI → IRAnyOfModel (通常のUnion)
+ * Fruit:
+ *   anyOf:
+ *     - $ref: '#/components/schemas/Apple'
+ *     - $ref: '#/components/schemas/Banana'
+ *
+ * # TypeSpec相当
+ * union Fruit {
+ *   apple: Apple,
+ *   banana: Banana,
+ * }
+ * ```
+ *
+ * @example
+ * ```yaml
+ * # OpenAPI 3.1 → IRAnyOfModel (nullable型パターン)
+ * NullableString:
+ *   anyOf:
+ *     - type: string
+ *     - type: 'null'
+ *
+ * # IR変換後（null型は除外され、nullable: trueフラグが設定される）
+ * {
+ *   kind: "anyOf",
+ *   name: "NullableString",
+ *   nullable: true,
+ *   schemas: ["string"]
+ * }
+ *
+ * # TypeSpec相当
+ * model NullableString {
+ *   value: string | null;
+ * }
+ * ```
+ */
+export interface IRAnyOfModel {
+  /** 型種別 */
+  kind: "anyOf";
+  /** モデル名（PascalCase） */
+  name: string;
+  /** 参照パス */
+  referencePath: string;
+  /** モデルの説明 */
+  description?: string;
+  /** null許容フラグ（anyOf: [{type: X}, {type: 'null'}]パターンで自動検出） */
+  nullable?: true;
+  /** 合成する型の配列（nullableの場合、null型は除外される） */
+  schemas: IRType[];
+}

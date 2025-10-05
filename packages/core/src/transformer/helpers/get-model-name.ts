@@ -16,6 +16,7 @@ import type {
   ResponseContext,
   VisitorContext,
 } from "../types.js";
+import { buildInlineModelName } from "./build-model-name.js";
 import { getMediaTypeSuffix } from "./media-type-suffix.js";
 
 /**
@@ -124,18 +125,8 @@ export function getModelName(context: VisitorContext): string {
 
   // Composition型（allOf/oneOf/anyOf）
   if (isCompositionContext(context)) {
-    if (context.kind === "allOf") {
-      const ctx = context as AllOfContext;
-      return `${ctx.parentSchemaName}AllOf${ctx.index}`;
-    }
-    if (context.kind === "oneOf") {
-      const ctx = context as OneOfContext;
-      return `${ctx.parentSchemaName}OneOf${ctx.index}`;
-    }
-    if (context.kind === "anyOf") {
-      const ctx = context as AnyOfContext;
-      return `${ctx.parentSchemaName}AnyOf${ctx.index}`;
-    }
+    const ctx = context as AllOfContext | AnyOfContext | OneOfContext;
+    return buildInlineModelName(ctx.parentSchemaName, ctx.kind, ctx.index);
   }
 
   // components配下の通常スキーマ

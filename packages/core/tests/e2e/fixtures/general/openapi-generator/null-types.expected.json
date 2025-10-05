@@ -16,20 +16,20 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Adult/allOf/1"
+          "name": "#/components/schemas/AdultAllOf1"
         }
       ]
     },
     {
       "kind": "object",
       "name": "AdultAllOf1",
-      "referencePath": "#/components/schemas/Adult/allOf/1",
+      "referencePath": "#/components/schemas/AdultAllOf1",
       "properties": [
         {
           "name": "children",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Adult/allOf/AdultAllOf1Children"
+            "name": "#/components/schemas/AdultAllOf1Children"
           }
         }
       ]
@@ -37,7 +37,7 @@
     {
       "kind": "array",
       "name": "AdultAllOf1Children",
-      "referencePath": "#/components/schemas/Adult/allOf/AdultAllOf1Children",
+      "referencePath": "#/components/schemas/AdultAllOf1Children",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Child"
@@ -51,7 +51,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Child/allOf/0"
+          "name": "#/components/schemas/ChildAllOf0"
         },
         {
           "kind": "ref",
@@ -62,7 +62,7 @@
     {
       "kind": "object",
       "name": "ChildAllOf0",
-      "referencePath": "#/components/schemas/Child/allOf/0",
+      "referencePath": "#/components/schemas/ChildAllOf0",
       "properties": [
         {
           "name": "age",

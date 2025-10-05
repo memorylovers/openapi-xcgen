@@ -24,6 +24,7 @@ import { isReferenceObject } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitAllOf } from "./allof-visitor";
+import { visitAnyOf } from "./anyof-visitor";
 import { visitArray } from "./array-visitor";
 import { visitEnum } from "./enum-visitor";
 import { visitMap } from "./map-visitor";
@@ -101,9 +102,9 @@ export function visitSchema(
     return result;
   }
   if ("anyOf" in schema && schema.anyOf) {
-    consola.warn(
-      `anyOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
-    );
+    const anyOfResult = visitAnyOf(schema, context);
+    result.models.push(...anyOfResult.models);
+    result.type = anyOfResult.type;
     return result;
   }
   if ("discriminator" in schema && schema.discriminator) {
@@ -802,13 +803,13 @@ if (import.meta.vitest) {
             referencePath: "#/components/schemas/Composed",
             schemas: [
               { kind: "ref", name: "#/components/schemas/Base" },
-              { kind: "ref", name: "#/components/schemas/Composed/allOf/1" },
+              { kind: "ref", name: "#/components/schemas/ComposedAllOf1" },
             ],
           },
           {
             kind: "object",
             name: "ComposedAllOf1",
-            referencePath: "#/components/schemas/Composed/allOf/1",
+            referencePath: "#/components/schemas/ComposedAllOf1",
             properties: [
               {
                 name: "extra",
@@ -839,23 +840,37 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should warn for anyOf and return empty result", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should handle anyOf composition", () => {
       const schema = {
-        anyOf: [{ type: "string" }, { type: "null" }],
+        anyOf: [
+          { $ref: "#/components/schemas/StringValue" },
+          { $ref: "#/components/schemas/NumberValue" },
+        ],
       } as SchemaObjectWithNullable;
       const context: VisitorContext = {
-        documentPath: ["components", "schemas", "NullableString"],
+        documentPath: ["components", "schemas", "StringOrNumber"],
         rootSegment: "components",
       };
 
       const result = visitSchema(schema, context);
 
-      expect(result).toEqual({ type: null, models: [] });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "anyOf is not supported yet: #/components/schemas/NullableString",
-      );
-      warnSpy.mockRestore();
+      expect(result).toEqual({
+        type: {
+          kind: "ref",
+          name: "#/components/schemas/StringOrNumber",
+        },
+        models: [
+          {
+            kind: "anyOf",
+            name: "StringOrNumber",
+            referencePath: "#/components/schemas/StringOrNumber",
+            schemas: [
+              { kind: "ref", name: "#/components/schemas/StringValue" },
+              { kind: "ref", name: "#/components/schemas/NumberValue" },
+            ],
+          },
+        ],
+      });
     });
 
     it("should warn for discriminator and return empty result", () => {

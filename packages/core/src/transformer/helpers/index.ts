@@ -2,6 +2,11 @@
  * Helper functions exports
  */
 
+export {
+  buildComponentSchemaPath,
+  buildInlineSchemaPath,
+} from "./build-document-path";
+export { buildInlineModelName } from "./build-model-name";
 export { buildReferencePath } from "./build-reference-path";
 export { createParameterModel } from "./create-parameter-model";
 export { extractValidation } from "./extract-validation";

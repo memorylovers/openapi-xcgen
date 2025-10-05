@@ -54,6 +54,7 @@ export type { IRMetadata } from "./metadata";
 // models
 export type {
   IRAllOfModel,
+  IRAnyOfModel,
   IRArrayModel,
   IREnumModel,
   IREnumValue,

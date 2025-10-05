@@ -5,6 +5,21 @@
   },
   "models": [
     {
+      "kind": "anyOf",
+      "name": "fruit",
+      "referencePath": "#/components/schemas/fruit",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/apple"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/banana"
+        }
+      ]
+    },
+    {
       "kind": "object",
       "name": "apple",
       "referencePath": "#/components/schemas/apple",

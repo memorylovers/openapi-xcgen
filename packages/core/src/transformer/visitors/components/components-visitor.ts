@@ -6,6 +6,7 @@
  */
 
 import { consola } from "consola";
+import { buildComponentSchemaPath } from "../../helpers/build-document-path";
 import type {
   ComponentsObject,
   IRModel,
@@ -109,7 +110,7 @@ export function visitComponents(
       // visitSchemaを呼び出し（SchemaContextを作成）
       const schemaContext: SchemaContext = {
         kind: "schema",
-        documentPath: [...context.documentPath, "schemas", name],
+        documentPath: buildComponentSchemaPath(context, name),
         schemaName: name,
         rootSegment: "components",
       };

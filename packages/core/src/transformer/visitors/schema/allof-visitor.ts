@@ -20,7 +20,12 @@ import type {
   SchemaObjectWithNullable,
 } from "../../../types";
 import { isReferenceObject } from "../../../types/guards";
-import { buildReferencePath, getModelName } from "../../helpers";
+import {
+  buildInlineModelName,
+  buildInlineSchemaPath,
+  buildReferencePath,
+  getModelName,
+} from "../../helpers";
 import type { AllOfContext, VisitorContext } from "../../types";
 import { type SchemaVisitorResult, visitSchema } from "./schema-visitor";
 
@@ -99,11 +104,11 @@ export function visitAllOf(
     }
 
     // インラインスキーマの場合は自動モデル化
-    // AllOfContextを作成（getModelNameが適切な命名を行う）
     // 生成されるモデル名: {親名}AllOf{インデックス} (例: ExtendedAllOf1)
+    const inlineModelName = buildInlineModelName(name, "allOf", i);
     const inlineContext: AllOfContext = {
       kind: "allOf",
-      documentPath: [...context.documentPath, "allOf", String(i)],
+      documentPath: buildInlineSchemaPath(context, inlineModelName),
       rootSegment: "components",
       parentSchemaName: name,
       index: i,
@@ -184,13 +189,13 @@ if (import.meta.vitest) {
             referencePath: "#/components/schemas/Extended",
             schemas: [
               { kind: "ref", name: "#/components/schemas/Base" },
-              { kind: "ref", name: "#/components/schemas/Extended/allOf/1" },
+              { kind: "ref", name: "#/components/schemas/ExtendedAllOf1" },
             ],
           },
           {
             kind: "object",
             name: "ExtendedAllOf1",
-            referencePath: "#/components/schemas/Extended/allOf/1",
+            referencePath: "#/components/schemas/ExtendedAllOf1",
             properties: [
               {
                 name: "email",

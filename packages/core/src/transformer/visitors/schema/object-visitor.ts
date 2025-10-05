@@ -25,6 +25,7 @@ import type {
   SchemaObjectWithNullable,
 } from "../../../types";
 import {
+  buildInlineSchemaPath,
   buildReferencePath,
   extractValidation,
   getModelName,
@@ -135,9 +136,8 @@ export function visitObject(
 
       // visitSchemaを使って型を判定・処理
       // ネストされたモデルは独立したコンポーネントとして扱う
-      // 親のコンテキストのパスを継承し、最後の要素を新しい名前に置き換える
       const propResult = visitSchema(schemaObj, {
-        documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+        documentPath: buildInlineSchemaPath(context, propTypeName),
         rootSegment: context.rootSegment,
       });
 
@@ -263,7 +263,7 @@ export function visitResponseObject(
 
       // visitSchemaを使って型を判定・処理
       const propResult = visitSchema(schemaObj, {
-        documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+        documentPath: buildInlineSchemaPath(context, propTypeName),
         rootSegment: context.rootSegment,
       });
 
@@ -393,7 +393,7 @@ export function visitRequestBodyObject(
 
       // visitSchemaを使って型を判定・処理
       const propResult = visitSchema(schemaObj, {
-        documentPath: [...context.documentPath.slice(0, -1), propTypeName],
+        documentPath: buildInlineSchemaPath(context, propTypeName),
         rootSegment: context.rootSegment,
       });
 

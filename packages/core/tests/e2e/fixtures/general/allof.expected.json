@@ -34,14 +34,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/User/allOf/1"
+          "name": "#/components/schemas/UserAllOf1"
         }
       ]
     },
     {
       "kind": "object",
       "name": "UserAllOf1",
-      "referencePath": "#/components/schemas/User/allOf/1",
+      "referencePath": "#/components/schemas/UserAllOf1",
       "properties": [
         {
           "name": "name",
@@ -91,20 +91,20 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AuditableUser/allOf/2"
+          "name": "#/components/schemas/AuditableUserAllOf2"
         }
       ]
     },
     {
       "kind": "object",
       "name": "AuditableUserAllOf2",
-      "referencePath": "#/components/schemas/AuditableUser/allOf/2",
+      "referencePath": "#/components/schemas/AuditableUserAllOf2",
       "properties": [
         {
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AuditableUser/allOf/AuditableUserAllOf2Role"
+            "name": "#/components/schemas/AuditableUserAllOf2Role"
           },
           "required": true
         }
@@ -113,7 +113,7 @@
     {
       "kind": "enum",
       "name": "AuditableUserAllOf2Role",
-      "referencePath": "#/components/schemas/AuditableUser/allOf/AuditableUserAllOf2Role",
+      "referencePath": "#/components/schemas/AuditableUserAllOf2Role",
       "type": "string",
       "values": [
         {

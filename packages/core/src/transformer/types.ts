@@ -9,25 +9,32 @@ import type {
 } from "../types";
 
 /**
+ * Visitorコンテキストの種類
+ *
+ * コンテキストの判別と命名戦略の決定に使用されます。
+ */
+export type VisitorContextKind =
+  | "schema"
+  | "allOf"
+  | "oneOf"
+  | "anyOf"
+  | "parameter"
+  | "pathItem"
+  | "operation"
+  | "parameters"
+  | "requestBody"
+  | "componentsRequestBody"
+  | "responses"
+  | "response"
+  | "componentsResponse"
+  | "header";
+
+/**
  * Visitor実行コンテキスト
  */
 export interface VisitorContext {
   /** コンテキストの種類（判別用） */
-  kind?:
-    | "schema"
-    | "allOf"
-    | "oneOf"
-    | "anyOf"
-    | "parameter"
-    | "pathItem"
-    | "operation"
-    | "parameters"
-    | "requestBody"
-    | "componentsRequestBody"
-    | "responses"
-    | "response"
-    | "componentsResponse"
-    | "header";
+  kind?: VisitorContextKind;
   /** OpenAPIドキュメント内の現在位置 */
   documentPath: string[];
   /** ルートセグメント（documentPathの最初の要素） */

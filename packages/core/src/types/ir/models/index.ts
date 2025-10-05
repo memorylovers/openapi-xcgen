@@ -4,6 +4,7 @@
 
 export type {
   IRAllOfModel,
+  IRAnyOfModel,
   IRArrayModel,
   IREnumModel,
   IREnumValue,
