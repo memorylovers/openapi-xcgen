@@ -34,12 +34,40 @@
       "referencePath": "#/components/schemas/Bar",
       "properties": [
         {
+          "name": "foo",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BarFoo"
+          },
+          "required": true
+        },
+        {
           "name": "bar",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/BarBar"
           },
           "required": true
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "BarFoo",
+      "referencePath": "#/components/schemas/BarFoo",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/BarFooItem"
+      }
+    },
+    {
+      "kind": "union",
+      "name": "BarFooItem",
+      "referencePath": "#/components/schemas/BarFooItem",
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Baz"
         }
       ]
     },

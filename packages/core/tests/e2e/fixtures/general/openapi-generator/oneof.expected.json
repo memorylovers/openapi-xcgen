@@ -5,6 +5,25 @@
   },
   "models": [
     {
+      "kind": "union",
+      "name": "fruit",
+      "referencePath": "#/components/schemas/fruit",
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/apple"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/banana"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/orange"
+        }
+      ]
+    },
+    {
       "kind": "object",
       "name": "apple",
       "referencePath": "#/components/schemas/apple",

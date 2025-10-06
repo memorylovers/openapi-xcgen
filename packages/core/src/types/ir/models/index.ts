@@ -6,10 +6,12 @@ export type {
   IRAllOfModel,
   IRAnyOfModel,
   IRArrayModel,
+  IRDiscriminator,
   IREnumModel,
   IREnumValue,
   IRMapModel,
   IRObjectModel,
+  IRUnionModel,
 } from "./base";
 export type {
   IRModel,

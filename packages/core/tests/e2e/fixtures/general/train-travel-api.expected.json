@@ -828,6 +828,24 @@
       "referencePath": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
     },
     {
+      "kind": "union",
+      "name": "PostBookingsBookingIdPaymentRequestBody",
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody",
+      "discriminator": {
+        "propertyName": "method"
+      },
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/CardPayment"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BankTransferPayment"
+        }
+      ]
+    },
+    {
       "kind": "parameter",
       "name": "PostBookingsBookingIdPaymentParams",
       "description": "Parameters for POST /bookings/{bookingId}/payment",
@@ -1153,6 +1171,19 @@
       "parameters": {
         "kind": "ref",
         "name": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+      },
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody"
+            }
+          }
+        ]
       },
       "responses": [
         {

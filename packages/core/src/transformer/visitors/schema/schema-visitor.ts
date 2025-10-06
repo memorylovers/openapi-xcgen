@@ -29,6 +29,7 @@ import { visitArray } from "./array-visitor";
 import { visitEnum } from "./enum-visitor";
 import { visitMap } from "./map-visitor";
 import { visitObject } from "./object-visitor";
+import { visitOneOf } from "./oneof-visitor";
 import { visitType } from "./type-visitor";
 
 /**
@@ -96,9 +97,9 @@ export function visitSchema(
     return result;
   }
   if ("oneOf" in schema && schema.oneOf) {
-    consola.warn(
-      `oneOf is not supported yet: ${buildReferencePath(context.documentPath)}`,
-    );
+    const oneOfResult = visitOneOf(schema, context);
+    result.models.push(...oneOfResult.models);
+    result.type = oneOfResult.type;
     return result;
   }
   if ("anyOf" in schema && schema.anyOf) {
@@ -821,8 +822,7 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should warn for oneOf and return empty result", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should handle oneOf composition", () => {
       const schema = {
         oneOf: [{ type: "string" }, { type: "number" }],
       } as SchemaObjectWithNullable;
@@ -833,11 +833,20 @@ if (import.meta.vitest) {
 
       const result = visitSchema(schema, context);
 
-      expect(result).toEqual({ type: null, models: [] });
-      expect(warnSpy).toHaveBeenCalledWith(
-        "oneOf is not supported yet: #/components/schemas/StringOrNumber",
-      );
-      warnSpy.mockRestore();
+      expect(result).toEqual({
+        type: {
+          kind: "ref",
+          name: "#/components/schemas/StringOrNumber",
+        },
+        models: [
+          {
+            kind: "union",
+            name: "StringOrNumber",
+            referencePath: "#/components/schemas/StringOrNumber",
+            types: ["string", "double"],
+          },
+        ],
+      });
     });
 
     it("should handle anyOf composition", () => {
@@ -873,8 +882,7 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should warn for discriminator and return empty result", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should handle oneOf with discriminator", () => {
       const schema = {
         oneOf: [
           { $ref: "#/components/schemas/Cat" },
@@ -891,12 +899,26 @@ if (import.meta.vitest) {
 
       const result = visitSchema(schema, context);
 
-      expect(result).toEqual({ type: null, models: [] });
-      // oneOfが先にチェックされるため、oneOfの警告のみが出る
-      expect(warnSpy).toHaveBeenCalledWith(
-        "oneOf is not supported yet: #/components/schemas/Pet",
-      );
-      warnSpy.mockRestore();
+      expect(result).toEqual({
+        type: {
+          kind: "ref",
+          name: "#/components/schemas/Pet",
+        },
+        models: [
+          {
+            kind: "union",
+            name: "Pet",
+            referencePath: "#/components/schemas/Pet",
+            discriminator: {
+              propertyName: "petType",
+            },
+            types: [
+              { kind: "ref", name: "#/components/schemas/Cat" },
+              { kind: "ref", name: "#/components/schemas/Dog" },
+            ],
+          },
+        ],
+      });
     });
 
     it("should warn for not schema and return empty result", () => {

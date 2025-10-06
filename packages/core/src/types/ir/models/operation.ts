@@ -11,6 +11,7 @@ import type {
   IREnumModel,
   IRMapModel,
   IRObjectModel,
+  IRUnionModel,
 } from "./base";
 import type { IRParameterProperty, IRProperty } from "./property";
 
@@ -165,6 +166,7 @@ export type IRModel =
   | IREnumModel
   | IRAllOfModel
   | IRAnyOfModel
+  | IRUnionModel
   | IRArrayModel
   | IRMapModel
   | IRParameterModel

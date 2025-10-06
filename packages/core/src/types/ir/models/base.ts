@@ -242,3 +242,99 @@ export interface IRAnyOfModel {
   /** 合成する型の配列（nullableの場合、null型は除外される） */
   schemas: IRType[];
 }
+
+/**
+ * Discriminator情報（oneOf/anyOfで型判別に使用）
+ *
+ * OpenAPI 3.x の discriminator に対応。
+ * ポリモーフィズムにおける型判別プロパティを指定。
+ *
+ * @example OpenAPI YAML
+ * ```yaml
+ * Pet:
+ *   oneOf:
+ *     - $ref: '#/components/schemas/Cat'
+ *     - $ref: '#/components/schemas/Dog'
+ *   discriminator:
+ *     propertyName: petType
+ *     mapping:
+ *       cat: '#/components/schemas/Cat'
+ *       dog: '#/components/schemas/Dog'
+ * ```
+ */
+export interface IRDiscriminator {
+  /** 判別に使用するプロパティ名 */
+  propertyName: string;
+  /** カスタムマッピング（値 → スキーマ参照） */
+  mapping?: Record<string, string>;
+}
+
+/**
+ * IRUnionModel - oneOf合成モデル（排他的Union - exactly one）
+ *
+ * OpenAPI 3.x の oneOf に対応。
+ * TypeSpecでは @oneOf デコレータや discriminated union で生成。
+ *
+ * セマンティクス: 正確に1つのスキーマにマッチ（XOR）
+ * - anyOf: 1つ以上にマッチ（OR）
+ * - oneOf: 正確に1つにマッチ（XOR）
+ *
+ * @example OpenAPI YAML - シンプルなoneOf
+ * ```yaml
+ * Result:
+ *   oneOf:
+ *     - $ref: '#/components/schemas/Success'
+ *     - $ref: '#/components/schemas/Error'
+ * ```
+ *
+ * @example OpenAPI YAML - discriminator付き
+ * ```yaml
+ * Pet:
+ *   oneOf:
+ *     - $ref: '#/components/schemas/Cat'
+ *     - $ref: '#/components/schemas/Dog'
+ *   discriminator:
+ *     propertyName: petType
+ * ```
+ *
+ * @example IR JSON出力
+ * ```json
+ * {
+ *   kind: "union",
+ *   name: "Pet",
+ *   referencePath: "#/components/schemas/Pet",
+ *   discriminator: {
+ *     propertyName: "petType"
+ *   },
+ *   types: [
+ *     { kind: "ref", name: "#/components/schemas/Cat" },
+ *     { kind: "ref", name: "#/components/schemas/Dog" }
+ *   ]
+ * }
+ * ```
+ *
+ * # TypeSpec相当
+ * ```typespec
+ * @discriminator("petType")
+ * union Pet {
+ *   cat: Cat,
+ *   dog: Dog,
+ * }
+ * ```
+ */
+export interface IRUnionModel {
+  /** 型種別 */
+  kind: "union";
+  /** モデル名（PascalCase） */
+  name: string;
+  /** 参照パス */
+  referencePath: string;
+  /** モデルの説明 */
+  description?: string;
+  /** null許容フラグ（oneOf: [{$ref: X}, {type: 'null'}]パターンで自動検出） */
+  nullable?: true;
+  /** Discriminator情報（型判別用） */
+  discriminator?: IRDiscriminator;
+  /** 合成する型の配列（正確に1つにマッチ） */
+  types: IRType[];
+}

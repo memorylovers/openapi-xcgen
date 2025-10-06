@@ -31,6 +31,13 @@
             "kind": "ref",
             "name": "#/components/schemas/AdultAllOf1Children"
           }
+        },
+        {
+          "name": "nullableChildrenVariant2",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2"
+          }
         }
       ]
     },
@@ -38,6 +45,27 @@
       "kind": "array",
       "name": "AdultAllOf1Children",
       "referencePath": "#/components/schemas/AdultAllOf1Children",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Child"
+      }
+    },
+    {
+      "kind": "union",
+      "name": "AdultAllOf1NullableChildrenVariant2",
+      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2",
+      "nullable": true,
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "AdultAllOf1NullableChildrenVariant2OneOf1",
+      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Child"

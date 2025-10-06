@@ -20,10 +20,10 @@
 
 5. ✅ **anyOf** - 包含的Union（TypeSpec 1.0で高頻度 ⭐⭐⭐⭐）
 
-### 🚀 Phase 4: Union型サポート（次の優先事項）
+### ✅ Phase 4完了: Union型サポート（oneOf + discriminator）
 
-6. **oneOf** - 排他的Union（TypeSpec 1.0で中頻度 ⭐⭐⭐）
-7. **discriminator** - ポリモーフィズム（oneOf/anyOfと連携）
+6. ✅ **oneOf** - 排他的Union（TypeSpec 1.0で中頻度 ⭐⭐⭐）
+7. ✅ **discriminator** - ポリモーフィズム（oneOf/anyOfと連携）
 
 ### Phase 4以降: 拡張機能
 
@@ -182,11 +182,18 @@ NullableString:
 
 ---
 
-### 🔴 高優先度: Union型サポート（残り）
+### 2. ✅ oneOf（排他的Union）
 
-### 2. oneOf（排他的Union）
+**実装状況**: 完了（[タスク015参照](./015_oneof-implementation-plan.md)）
 
-**現状**: 警告を出してスキップ
+**実装内容**:
+
+- IR型定義に`IRUnionModel`と`IRDiscriminator`を追加
+- `oneof-visitor.ts`で処理
+- discriminatorサポート（propertyName + optional mapping）
+- インラインスキーマの自動モデル化（`{親名}OneOf{インデックス}`形式）
+- nullable型パターン検出: `oneOf: [{$ref: X}, {type: 'null'}]` → `nullable: true`
+- E2Eテスト: `oneof.yaml`、`discriminator-one-of.yaml`で検証
 
 **TypeSpecでの重要性**: ⭐⭐⭐（中頻度）
 
@@ -195,23 +202,35 @@ NullableString:
 
 **影響範囲**:
 
-- e2eテスト: `discriminator-one-of.yaml`が失敗
-- 使用例: レスポンスが成功/エラーの複数パターン
+- 排他的Union型（exactly one）の表現
+- レスポンスが成功/エラーの複数パターン
+- Generator側でUnion型またはSealed classとして実装可能
 
-**実装時の考慮点**:
+**使用例**:
 
-- 型システムでの表現（TypeScript: Union型、Dart: Sealed class）
-- discriminatorとの連携
-- IR型定義に`IROneOfModel`を追加
-- `oneof-visitor.ts`の実装
-
-**推奨アクション**: anyOf実装後に対応
+```yaml
+# TypeSpec: @oneOf union Pet { cat: Cat, dog: Dog }
+Pet:
+  oneOf:
+    - $ref: '#/components/schemas/Cat'
+    - $ref: '#/components/schemas/Dog'
+  discriminator:
+    propertyName: petType
+# → IR: { kind: "union", discriminator: { propertyName: "petType" }, types: [...] }
+```
 
 ---
 
-#### 3. discriminator
+#### 3. ✅ discriminator
 
-**現状**: 警告を出してスキップ
+**実装状況**: 完了（oneOfと同時実装）
+
+**実装内容**:
+
+- `IRDiscriminator` interfaceを追加
+- `IRUnionModel`と`IRAnyOfModel`でサポート
+- propertyNameとmappingの処理
+- Generator側でタグ付きUnion生成に活用
 
 **影響範囲**:
 
@@ -219,13 +238,19 @@ NullableString:
 - ポリモーフィズムの表現
 - 型安全なUnion型の実現
 
-**実装時の考慮点**:
+**使用例**:
 
-- oneOf/anyOfの実装が前提
-- propertyNameとmappingの処理
-- Generator側でのタグ付きUnion生成
-
-**推奨アクション**: oneOf/anyOf実装後に対応
+```yaml
+Pet:
+  oneOf:
+    - $ref: '#/components/schemas/Cat'
+    - $ref: '#/components/schemas/Dog'
+  discriminator:
+    propertyName: petType
+    mapping:
+      cat: '#/components/schemas/Cat'
+      dog: '#/components/schemas/Dog'
+```
 
 ---
 
@@ -519,25 +544,25 @@ if (additionalProperties === true) {
 
 ## 次のアクションプラン
 
-### Phase 4: oneOf/discriminatorサポート（優先度: 高）
+### ✅ Phase 4完了: oneOf/discriminatorサポート
 
-1. **oneOf実装**
-   - IR型定義: `IROneOfModel`追加
+1. ✅ **oneOf実装**
+   - IR型定義: `IRUnionModel`追加
    - Visitor実装: `oneof-visitor.ts`
    - discriminatorとの連携設計
 
-3. **discriminator実装**
+2. ✅ **discriminator実装**
    - oneOf/anyOfへの統合
    - propertyName/mappingの処理
 
-### Phase 4: 参照機能の拡充（優先度: 中）
+### Phase 5: 参照機能の拡充（優先度: 中）
 
 - components.parameters実装
 - Reference parameter対応
 - Reference schema対応
 - Nested $ref対応
 
-### Phase 5以降: その他の拡張機能
+### Phase 6以降: その他の拡張機能
 
 - webhooks (OpenAPI 3.1)
 - externalDocs (ルートレベル)
@@ -551,10 +576,10 @@ if (additionalProperties === true) {
 |------|-----------------|---------|
 | allOf | ⭐⭐⭐⭐⭐ (最高) | ✅ 完了 |
 | anyOf | ⭐⭐⭐⭐ (高) | ✅ 完了 |
-| oneOf | ⭐⭐⭐ (中) | ❌ 未実装 |
-| discriminator | ⭐⭐ (低) | ❌ 未実装 |
+| oneOf | ⭐⭐⭐ (中) | ✅ 完了 |
+| discriminator | ⭐⭐ (低) | ✅ 完了 |
 
-**進捗**: anyOf実装完了により、TypeSpec 1.0の主要なunion型に対応
+**進捗**: Phase 4完了により、TypeSpec 1.0のすべての主要なunion型・合成型に対応完了
 
 ---
 
@@ -566,3 +591,5 @@ if (additionalProperties === true) {
 - [TypeSpec Documentation](https://typespec.io/docs/)
 - CLAUDE.md - プロジェクト開発ガイドライン
 - [タスク013: allOf実装計画](./013_allof-implementation-plan.md)
+- [タスク014: anyOf実装計画](./014_anyof-implementation-plan.md)
+- [タスク015: oneOf実装計画](./015_oneof-implementation-plan.md)

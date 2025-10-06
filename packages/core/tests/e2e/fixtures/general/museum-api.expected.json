@@ -594,6 +594,14 @@
           "validation": {
             "maxLength": 500
           }
+        },
+        {
+          "name": "payment_method",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/TicketPurchaseRequestPaymentMethod"
+          },
+          "required": true
         }
       ]
     },
@@ -626,6 +634,24 @@
         {
           "value": "group",
           "name": "GROUP"
+        }
+      ]
+    },
+    {
+      "kind": "union",
+      "name": "TicketPurchaseRequestPaymentMethod",
+      "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod",
+      "discriminator": {
+        "propertyName": "type"
+      },
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/CreditCardPayment"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/PayPalPayment"
         }
       ]
     },
