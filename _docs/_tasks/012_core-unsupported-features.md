@@ -1,8 +1,15 @@
-# タスク012: Coreパッケージ未対応機能一覧
+# タスク012: Coreパッケージ機能実装状況
 
 ## 概要
 
-本ドキュメントは、`@openapi-xcgen/core`パッケージにおける未対応のOpenAPI機能を網羅的にリストアップしたものです。各機能について実装推奨度を評価し、今後の開発計画の参考とします。
+本ドキュメントは、`@openapi-xcgen/core`パッケージにおけるOpenAPI機能の実装状況を網羅的に管理するものです。各機能について実装推奨度を評価し、今後の開発計画の参考とします。
+
+## 📊 実装進捗
+
+**Phase 1-4 完了** (7機能): servers, readOnly, writeOnly, allOf, anyOf, oneOf, discriminator
+**未実装**: Reference機能、webhooks、その他の拡張機能
+
+**現在の状況**: TypeSpec 1.0の全主要union型・合成型に対応完了 ✅
 
 ## 実装状況サマリー
 
@@ -25,11 +32,14 @@
 6. ✅ **oneOf** - 排他的Union（TypeSpec 1.0で中頻度 ⭐⭐⭐）
 7. ✅ **discriminator** - ポリモーフィズム（oneOf/anyOfと連携）
 
-### Phase 4以降: 拡張機能
+**成果**: TypeSpec 1.0の全主要union型・合成型に対応完了
 
-- Reference parameter, components.parameters
-- webhooks, externalDocs
-- その他のバリデーション・メタデータ
+### 🔜 Phase 5以降: 拡張機能（優先度: 中〜低）
+
+次の実装候補：
+
+- **Phase 5**: Reference parameter, components.parameters（参照機能の拡充）
+- **Phase 6以降**: webhooks, externalDocs, その他のバリデーション・メタデータ
 
 ---
 
@@ -138,7 +148,25 @@ Dog:
 
 ---
 
-## 未対応機能（優先度順）
+### ✅ anyOf（高優先度）
+
+**実装状況**: 完了（[タスク014参照](./014_anyof-implementation-plan.md) - 下記「実装機能一覧」セクション参照）
+
+---
+
+### ✅ oneOf（高優先度）
+
+**実装状況**: 完了（[タスク015参照](./015_oneof-implementation-plan.md) - 下記「実装機能一覧」セクション参照）
+
+---
+
+### ✅ discriminator（中優先度）
+
+**実装状況**: 完了（oneOfと同時実装 - 下記「実装機能一覧」セクション参照）
+
+---
+
+## 実装機能・未対応機能一覧（優先度順）
 
 ### 1. ✅ anyOf（包含的Union）
 
