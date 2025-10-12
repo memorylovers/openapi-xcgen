@@ -6,8 +6,10 @@
 
 ## ステータス
 
-- **状態**: Phase 1完了（基本機能実装済み）
-- **次のステップ**: Phase 2（Valibotスキーマ生成）、CLI実装
+- **状態**: Phase 2進行中（80%完了）
+  - ✅ Phase 1完了（types, services, client生成）
+  - 🔄 Phase 2実装中（Valibotスキーマ生成 - コンポーネント完了、orchestrator残り）
+- **次のステップ**: schemas.ts orchestrator実装、generator.ts更新、CLI実装
 
 ## 前提条件
 
@@ -68,11 +70,32 @@
 - `src/helpers/naming.ts` - 命名変換（toTypeName, toFunctionName, toPropertyName）
 - `src/helpers/type-mapper.ts` - IR型 → TypeScript型マッピング
 
-### ❌ 未実装（Phase 2以降）
+### 🔄 Phase 2実装中（Valibotスキーマ生成）
 
 #### Schemas Generator（バリデーションスキーマ生成）
 
-- `src/generators/schemas/` - Valibotスキーマ生成（Phase 2予定）
+**✅ 実装済みコンポーネント（11ファイル）:**
+
+- `src/generators/schemas/schemas.ts` - Orchestrator（未実装）
+- `src/generators/schemas/schemas-header.ts` - ファイルヘッダーコメント
+- `src/generators/schemas/schemas-imports.ts` - import文生成（`import * as v from "valibot"`）
+- `src/generators/schemas/schemas-primitive.ts` - IRScalarType → Valibot primitives
+  - 全11スカラー型対応（int, long, float, double, string, boolean, null, date, datetime, byte, binary）
+  - **binary型**: `v.instance(Blob)` でTypeScript型（Blob）との整合性確保
+- `src/generators/schemas/schemas-validation.ts` - IRValidation → Valibot pipes
+  - minLength, maxLength, pattern, minimum, maximum対応
+  - format対応（email, uuid, url/uri, date-time, date）
+- `src/generators/schemas/schemas-enum.ts` - IREnumModel → `v.picklist()`
+- `src/generators/schemas/schemas-array.ts` - IRArrayModel → `v.array()`
+- `src/generators/schemas/schemas-object.ts` - IRObjectModel → `v.object()`
+  - optional, nullable, readOnly対応
+- `src/generators/schemas/schemas-allof.ts` - IRAllOfModel → `v.intersect()`
+- `src/generators/schemas/schemas-anyof.ts` - IRAnyOfModel → `v.union()`
+- `src/generators/schemas/schemas-union.ts` - IRUnionModel → `v.variant()`（discriminated union）
+
+**⏳ 未実装:**
+
+- `schemas.ts` orchestrator - IRModel配列を走査してスキーマ定義を統合
 
 #### CLI
 
@@ -456,9 +479,11 @@ try {
 
 **手法**: In-sourceテスティング（`import.meta.vitest`）
 
-**実績**:
+**実績（Phase 2時点）**:
 
-- **31テストファイル** × **103テスト**（全てパス）
+- **41テストファイル** × **155テスト**（全てパス）
+  - Phase 1: 31ファイル × 103テスト
+  - Phase 2追加: 10ファイル × 52テスト（schemas関連）
 - テストフォーマット統一: Template literal + `.trim()` 形式
 - カバレッジ: 全主要関数をカバー
 
@@ -548,7 +573,7 @@ pnpm test        # Unit + E2E + Generated Code Test
 pnpm test:coverage  # カバレッジ計測
 ```
 
-### 検証項目（Phase 1実績）
+### 検証項目
 
 #### ✅ Phase 1完了項目
 
@@ -559,11 +584,25 @@ pnpm test:coverage  # カバレッジ計測
 - ✅ In-sourceテスティングが機能すること
 - ✅ テストフォーマットが統一されていること（Template literal + `.trim()`）
 
-#### ❌ Phase 2以降の項目
+#### ✅ Phase 2完了項目（コンポーネントレベル）
 
+- ✅ Valibotスキーマ生成コンポーネントが実装されていること（11ファイル）
+- ✅ 全IRScalarTypeがサポートされていること（11種類）
+- ✅ binary型がTypeScript型定義と整合性があること（`v.instance(Blob)`）
+- ✅ Unit Testが追加されていること（+10ファイル × +52テスト = 41ファイル × 155テスト）
+- ✅ 型チェックが通ること（型エラー修正完了）
+- ✅ 全テストがパスすること（155/155 passed）
+
+#### ❌ Phase 2残作業
+
+- ❌ schemas.ts orchestratorが実装されていること
+- ❌ generator.tsが`--validator=valibot`フラグに対応していること
 - ❌ E2E Testで主要ユースケースが網羅されていること
 - ❌ 生成コードがTypeScript型チェックを通ること
-- ❌ Valibotスキーマ生成が動作すること
+- ❌ Valibotスキーマ生成がE2Eで動作すること
+
+#### ❌ Phase 3以降の項目
+
 - ❌ CLIコマンドが実行できること
 - ❌ CI/CDパイプラインが通ること
 
@@ -592,7 +631,7 @@ pnpm test:coverage  # カバレッジ計測
 4. **アーキテクチャ**
    - ultrathink原則（1関数1ファイル）
    - Orchestratorパターン
-   - 31ファイル × 103テスト（全てパス）
+   - 31ファイル × 103テスト（Phase 1完了時点、全てパス）
 
 ### 生成コード例
 
@@ -625,25 +664,132 @@ export function setConfig(config: ApiConfig): void;
 export class XcgenApiError extends Error { /* ... */ }
 ```
 
-### 技術スタック
+### 技術スタック（Phase 1）
 
 - **実装**: TypeScript 5.0+、関数ベース、純粋関数
 - **テスト**: Vitest（In-sourceテスティング）、31ファイル × 103テスト
 - **品質**: ESLint、Prettier、markdownlint
 - **ビルド**: unbuild（ESM/CJS両対応）
 
+### 技術スタック（Phase 2時点）
+
+- **実装**: TypeScript 5.0+、関数ベース、純粋関数
+- **テスト**: Vitest（In-sourceテスティング）、41ファイル × 155テスト
+- **品質**: ESLint、Prettier、markdownlint（全てパス）
+- **ビルド**: unbuild（ESM/CJS両対応）
+
 ---
 
-## Phase 2計画
+## Phase 2実装サマリー（進行中）
 
-### 優先度1: Valibotスキーマ生成
+### 完了した機能（80%）
 
-- `src/generators/schemas/` ディレクトリ作成
-- IRValidation → Valibot変換ロジック
-- schemas.ts生成機能
-- `--validator=valibot` フラグ対応
+1. **Valibotスキーマ生成コンポーネント**
+   - 11個のコンポーネントファイル実装完了
+   - 全IRModel型のValibot変換ロジック実装
+   - 52個のテストケース（全てパス）
 
-### 優先度2: E2Eテスト
+2. **スカラー型サポート**
+   - 全11種類のIRScalarType対応
+   - **重要な型整合性**: `binary`型を`v.instance(Blob)`でマッピング
+     - TypeScript型定義: `Blob`
+     - Valibotスキーマ: `v.instance(Blob)`
+     - 完全な型整合性を実現
+
+3. **バリデーションサポート**
+   - minLength, maxLength, pattern
+   - minimum, maximum
+   - format（email, uuid, url/uri, date-time, date）
+   - `v.pipe()`による合成
+
+4. **複合型サポート**
+   - Object（optional, nullable, readOnly対応）
+   - Enum（picklist生成）
+   - Array（アイテム型 + validation）
+   - AllOf（intersection）
+   - AnyOf（union）
+   - Union（discriminated union, variant）
+
+### 残りの作業（20%）
+
+1. **schemas.ts orchestrator**
+   - IRModel配列を走査
+   - 各モデルに応じたスキーマ生成関数を呼び出し
+   - 統合されたschemas.tsファイル生成
+
+2. **generator.ts更新**
+   - `--validator=valibot`フラグ対応
+   - schemas.ts生成の統合
+
+3. **E2Eテスト**
+   - `.expected.ts`ファイル比較
+   - 生成コードの型チェック
+
+### 生成コード例（Phase 2）
+
+```typescript
+// schemas.ts
+import * as v from "valibot";
+
+/**
+ * Schema for Pet
+ * Generated from: Pet API 1.0.0
+ */
+export const PetSchema = v.object({
+  id: v.string(),
+  name: v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
+  age: v.optional(v.nullable(v.pipe(v.number(), v.minValue(0), v.maxValue(100)))),
+  status: v.picklist(["available", "pending", "sold"]),
+});
+
+/**
+ * Schema for binary data (images, PDFs)
+ */
+export const ImageSchema = v.object({
+  data: v.instance(Blob), // TypeScript型との整合性
+  filename: v.string(),
+});
+```
+
+### テスト実績
+
+```bash
+✅ Lint: 全パッケージでパス
+✅ Typecheck: エラーなし
+✅ Tests: 155/155 passed
+  - 41 test files
+  - Duration: ~800ms
+```
+
+---
+
+## Phase 2残作業
+
+### 優先度1: schemas.ts orchestrator実装
+
+**タスク詳細:**
+
+1. IRModel配列を走査してスキーマ定義を生成
+2. 各IRModel.kindに応じて適切な生成関数を呼び出し
+3. スキーマ定義の依存関係解決（$ref参照）
+4. JSDocコメント生成（description, deprecated等）
+5. schemas.tsファイルとして統合出力
+
+**実装方針:**
+
+- Orchestratorパターン踏襲
+- 既存コンポーネントを組み合わせるだけ
+- types.ts生成と同様の構造
+
+### 優先度2: generator.ts更新
+
+**タスク詳細:**
+
+1. `--validator=valibot`フラグ処理追加
+2. schemas.ts生成ロジックの統合
+3. 出力ファイル管理（types.ts, schemas.ts, services.ts, client.ts）
+
+### 優先度3: E2Eテスト
 
 - `.expected.ts` ファイル比較テスト
 - 主要ユースケースの網羅
