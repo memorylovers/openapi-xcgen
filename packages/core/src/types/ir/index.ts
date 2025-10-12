@@ -56,6 +56,7 @@ export type {
   IRAllOfModel,
   IRAnyOfModel,
   IRArrayModel,
+  IRDiscriminator,
   IREnumModel,
   IREnumValue,
   IRMapModel,
@@ -66,6 +67,7 @@ export type {
   IRProperty,
   IRRequestBodyModel,
   IRResponseModel,
+  IRUnionModel,
   IRValidation,
 } from "./models";
 // tags
