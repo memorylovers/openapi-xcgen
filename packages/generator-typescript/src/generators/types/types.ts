@@ -146,9 +146,20 @@ if (import.meta.vitest) {
         const result = generateTypes(ir);
 
         expect(result.count).toBe(1);
-        expect(result.code).toContain("export interface Pet");
-        expect(result.code).toContain("id: number;");
-        expect(result.code).toContain("name: string;");
+        expect(result.code.trim()).toEqual(
+          `
+/**
+ * TypeScript type definitions
+ * Generated from: Pet Store API 1.0.0
+ * DO NOT EDIT - This file is auto-generated
+ */
+
+export interface Pet {
+  id: number;
+  name: string;
+}
+`.trim(),
+        );
       });
     });
 
@@ -169,8 +180,13 @@ if (import.meta.vitest) {
 
         const result = generateModel(model);
 
-        expect(result).toContain("export interface User");
-        expect(result).toContain("email: string;");
+        expect(result).toEqual(
+          `
+export interface User {
+  email: string;
+}
+`.trim(),
+        );
       });
 
       it("should generate enum type", () => {
@@ -187,7 +203,7 @@ if (import.meta.vitest) {
 
         const result = generateModel(model);
 
-        expect(result).toContain('export type Status = "active" | "inactive"');
+        expect(result).toEqual('export type Status = "active" | "inactive";');
       });
     });
   });
