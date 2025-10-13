@@ -10,6 +10,7 @@ import { consola } from "consola";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { generateClient } from "./generators/client/client.js";
+import { generateSchemas } from "./generators/schemas/schemas.js";
 import { generateServices } from "./generators/services/services.js";
 import { generateTypes } from "./generators/types/types.js";
 import type { GenerationResult, GeneratorOptions } from "./types.js";
@@ -79,8 +80,14 @@ export async function generate(
   let schemasCount: number | undefined;
   if (options.validator === "valibot") {
     consola.info("Generating Valibot schemas...");
-    // TODO: Implement schema generation (Phase 2 - next iteration)
-    consola.warn("Valibot schema generation not yet implemented");
+    const schemasResult = generateSchemas(ir);
+    const schemasPath = join(options.output, "schemas.ts");
+    await writeFile(schemasPath, schemasResult.code, "utf-8");
+    files.push(schemasPath);
+    schemasCount = schemasResult.count;
+    consola.success(
+      `Generated ${schemasResult.count} schemas → ${schemasPath}`,
+    );
   }
 
   consola.success(
