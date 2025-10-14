@@ -3,8 +3,9 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
-import { toFunctionName, toTypeName } from "../../helpers/naming.js";
+import { toFunctionName } from "../../helpers/naming.js";
 import { getResponseType } from "./services-response-type.js";
+import { getEndpointDataTypes } from "./services-data-types.js";
 
 /**
  * IREndpointからAPI関数を生成
@@ -18,7 +19,9 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
 
   const lines: string[] = [];
   const functionName = toFunctionName(endpoint.operationId);
-  const dataTypeName = `${toTypeName(endpoint.operationId)}Data`;
+
+  // エンドポイントのデータ型情報を取得
+  const dataTypes = getEndpointDataTypes(endpoint);
 
   // JSDocコメント
   lines.push("/**");
@@ -28,7 +31,11 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
   if (endpoint.description) {
     lines.push(` * ${endpoint.description}`);
   }
-  lines.push(` * @param options - Request parameters`);
+
+  // データ型が必要な場合のみ@paramを追加
+  if (dataTypes.needsDataType) {
+    lines.push(` * @param options - Request parameters`);
+  }
   lines.push(` * @param init - Additional fetch options`);
 
   // レスポンスの型を取得
@@ -46,7 +53,25 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
 
   // 関数シグネチャ
   lines.push(`export async function ${functionName}(`);
-  lines.push(`  options: ${dataTypeName},`);
+
+  // データ型に応じて適切なパラメータを生成
+  if (dataTypes.needsDataType) {
+    // パラメータまたはリクエストボディがある場合
+    // 両方ある場合は統合型、片方の場合はその型を使用
+    let dataTypeName: string;
+    if (dataTypes.parameterType && dataTypes.requestBodyType) {
+      // 両方ある場合: 統合インターフェースが必要だが、現状ではパラメータ型を優先
+      // TODO: 将来的には統合型を生成する
+      dataTypeName = dataTypes.parameterType;
+    } else if (dataTypes.parameterType) {
+      dataTypeName = dataTypes.parameterType;
+    } else {
+      dataTypeName = dataTypes.requestBodyType!;
+    }
+
+    lines.push(`  options: ${dataTypeName},`);
+  }
+
   lines.push(`  init?: RequestInit,`);
   lines.push(`): Promise<${responseType}> {`);
 
@@ -54,7 +79,14 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
   lines.push(`  return request({`);
   lines.push(`    method: "${endpoint.method.toUpperCase()}",`);
   lines.push(`    path: "${endpoint.path}",`);
-  lines.push(`    options,`);
+
+  // データ型がない場合は空オブジェクトを渡す
+  if (dataTypes.needsDataType) {
+    lines.push(`    options,`);
+  } else {
+    lines.push(`    options: {},`);
+  }
+
   lines.push(`    init,`);
   lines.push(`  });`);
   lines.push(`}`);
@@ -100,19 +132,17 @@ if (import.meta.vitest) {
           `
 /**
  * Get all users
- * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns Array<User>
  * @throws {XcgenApiError} API error with status and response details
  */
 export async function getUsers(
-  options: GetUsersData,
   init?: RequestInit,
 ): Promise<Array<User>> {
   return request({
     method: "GET",
     path: "/users",
-    options,
+    options: {},
     init,
   });
 }
@@ -155,19 +185,17 @@ export async function getUsers(
         expect(result).toEqual(
           `
 /**
- * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns void
  * @throws {XcgenApiError} API error with status and response details
  */
 export async function logout(
-  options: LogoutData,
   init?: RequestInit,
 ): Promise<void> {
   return request({
     method: "POST",
     path: "/logout",
-    options,
+    options: {},
     init,
   });
 }

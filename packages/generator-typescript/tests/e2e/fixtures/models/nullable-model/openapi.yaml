@@ -1,0 +1,61 @@
+openapi: 3.1.0
+info:
+  title: Nullable Model Test
+  version: 1.0.0
+  description: Test nullable property handling
+
+paths:
+  # TODO: 未実装 - operationIdがない操作は自動生成が必要
+  /profiles:
+    get:
+      summary: Get profiles
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+components:
+  schemas:
+    Profile:
+      type: object
+      required:
+        - id
+      properties:
+        # required文字列（非null）
+        id:
+          type: string
+        # optional文字列（暗黙的にnullable）
+        name:
+          type: string
+        # OpenAPI 3.0形式の明示的nullable
+        bio:
+          type: string
+          nullable: true
+        # OpenAPI 3.1形式のtype配列
+        nickname:
+          type:
+            - string
+            - "null"
+        # nullable + format
+        lastLoginDate:
+          type: string
+          format: date-time
+          nullable: true
+        # nullable object
+        # TODO: 未対応 - nullable属性が失われる（通常のrefとして処理）
+        settings:
+          type: object
+          nullable: true
+          properties:
+            theme:
+              type: string
+        # nullable array
+        # TODO: 未対応 - nullable属性が失われる（通常のarrayとして処理）
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: string

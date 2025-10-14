@@ -13,6 +13,8 @@ export default [
       "**/node_modules/**",
       "*.config.ts",
       "*.config.mjs",
+      "**/tests/e2e/fixtures/*/expected/**",
+      "**/tests/e2e/fixtures/*/*/expected/**",
     ],
   },
   js.configs.recommended,

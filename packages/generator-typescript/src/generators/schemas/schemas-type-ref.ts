@@ -35,8 +35,12 @@ export function irTypeToValibotSchemaRef(type: IRType): string {
   }
 
   switch (type.kind) {
-    case "ref":
-      return `${toTypeName(type.name)}Schema`;
+    case "ref": {
+      // Core packageはreference path全体を保存: "#/components/schemas/Pet"
+      // 最後のセグメントを抽出: "Pet"
+      const modelName = type.name.split("/").at(-1) ?? type.name;
+      return `${toTypeName(modelName)}Schema`;
+    }
     case "array": {
       const itemSchema = irTypeToValibotSchemaRef(type.itemType);
       return `v.array(${itemSchema})`;

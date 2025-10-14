@@ -98,7 +98,8 @@ if (import.meta.vitest) {
 
         expect(result.count).toBe(1);
         expect(result.code).toContain("export async function getPet");
-        expect(result.code).toContain("options: GetPetData");
+        expect(result.code).toContain("init?: RequestInit");
+        expect(result.code).toContain("options: {}");
         expect(result.code).toContain("Promise<Pet>");
       });
     });

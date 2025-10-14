@@ -8,6 +8,7 @@ import type { XcgenIR } from "@openapi-xcgen/core";
 import { generateSchemasHeader } from "./schemas-header.js";
 import { generateSchemasImports } from "./schemas-imports.js";
 import { generateSchemaModel } from "./schemas-model.js";
+import { sortModelsByDependencies } from "./schemas-sort.js";
 
 /**
  * 生成されたValibotスキーマコード
@@ -45,8 +46,11 @@ export function generateSchemas(ir: XcgenIR): GeneratedSchemas {
 
   let count = 0;
 
+  // モデルを依存関係順にソート（依存先が先に来るように）
+  const sortedModels = sortModelsByDependencies(ir.models);
+
   // 各モデルをスキーマに変換
-  for (const model of ir.models) {
+  for (const model of sortedModels) {
     const schemaCode = generateSchemaModel(model);
     if (schemaCode) {
       parts.push(schemaCode);

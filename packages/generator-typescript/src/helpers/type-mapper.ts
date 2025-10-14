@@ -49,7 +49,10 @@ export function irTypeToTsType(irType: IRType): string {
   switch (irType.kind) {
     case "ref": {
       // $refから型名を抽出してPascalCaseに変換
-      return toTypeName(irType.name);
+      // Core packageはreference path全体を保存: "#/components/schemas/Base"
+      // 最後のセグメントを抽出: "Base"
+      const modelName = irType.name.split("/").at(-1) ?? irType.name;
+      return toTypeName(modelName);
     }
 
     case "array": {

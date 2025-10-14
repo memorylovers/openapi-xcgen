@@ -4,6 +4,7 @@
 
 import type { IREndpoint } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming.js";
+import { getEndpointDataTypes } from "./services-data-types.js";
 
 /**
  * サービスファイルのインポート文を生成
@@ -21,11 +22,20 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
   const importedTypes = new Set<string>();
   for (const endpoint of endpoints) {
     if (endpoint.operationId) {
-      // パラメータ型
-      const dataTypeName = `${toTypeName(endpoint.operationId)}Data`;
-      importedTypes.add(dataTypeName);
+      // エンドポイントのデータ型情報を取得
+      const dataTypes = getEndpointDataTypes(endpoint);
 
-      // レスポンス型
+      // パラメータ型をインポート
+      if (dataTypes.parameterType) {
+        importedTypes.add(dataTypes.parameterType);
+      }
+
+      // リクエストボディ型をインポート
+      if (dataTypes.requestBodyType) {
+        importedTypes.add(dataTypes.requestBodyType);
+      }
+
+      // レスポンス型をインポート
       for (const response of endpoint.responses) {
         if (response.kind === "content" && response.content) {
           for (const content of response.content) {
@@ -33,7 +43,11 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
               typeof content.schema !== "string" &&
               content.schema.kind === "ref"
             ) {
-              importedTypes.add(toTypeName(content.schema.name));
+              // Core packageはreference path全体を保存: "#/components/schemas/Pet"
+              // 最後のセグメントを抽出: "Pet"
+              const modelName =
+                content.schema.name.split("/").at(-1) ?? content.schema.name;
+              importedTypes.add(toTypeName(modelName));
             }
           }
         }
@@ -99,7 +113,7 @@ import type { XcgenApiError } from "./client.js";
           `
 import { request } from "./client.js";
 import type { XcgenApiError } from "./client.js";
-import type { GetPetData, Pet } from "./types.js";
+import type { Pet } from "./types.js";
 `.trim(),
         );
       });

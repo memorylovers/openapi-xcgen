@@ -23,7 +23,11 @@ export function getResponseType(endpoint: IREndpoint): string {
   }
 
   if (successResponse.kind === "ref") {
-    return toTypeName(successResponse.ref.name);
+    // Core packageはreference path全体を保存: "#/components/schemas/User"
+    // 最後のセグメントを抽出: "User"
+    const modelName =
+      successResponse.ref.name.split("/").at(-1) ?? successResponse.ref.name;
+    return toTypeName(modelName);
   }
 
   if (!successResponse.content || successResponse.content.length === 0) {

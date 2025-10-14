@@ -118,9 +118,12 @@ export function generateSchemaModel(model: IRModel): string | null {
           .filter((type) => typeof type !== "string" && type.kind === "ref")
           .map((type) => {
             if (typeof type !== "string" && type.kind === "ref") {
+              // Core packageはreference path全体を保存: "#/components/schemas/Cat"
+              // 最後のセグメントを抽出: "Cat"
+              const modelName = type.name.split("/").at(-1) ?? type.name;
               return {
-                key: type.name, // discriminatorValueとしてtype名を使用
-                schemaRef: `${toTypeName(type.name)}Schema`,
+                key: modelName, // discriminatorValueとしてtype名を使用
+                schemaRef: `${toTypeName(modelName)}Schema`,
               };
             }
             return null;
