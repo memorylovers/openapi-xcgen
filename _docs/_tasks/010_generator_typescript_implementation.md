@@ -6,10 +6,11 @@
 
 ## ステータス
 
-- **状態**: Phase 2完了（100%）
+- **状態**: Phase 2完了（100%）、Phase 3準備中
   - ✅ Phase 1完了（types, services, client生成）
-  - ✅ Phase 2完了（Valibotスキーマ生成、型エラー修正）
-- **次のステップ**: Phase 3（E2Eテスト実装）
+  - ✅ Phase 2完了（Valibotスキーマ生成、型エラー修正、実例検証）
+  - 🔄 Phase 3準備中（E2Eテスト実装）
+- **次のステップ**: E2Eテスト実装、CLI動作確認
 
 ## 前提条件
 
@@ -592,7 +593,9 @@ pnpm test:coverage  # カバレッジ計測
 - ✅ In-sourceテスティングが機能すること
 - ✅ テストフォーマットが統一されていること（Template literal + `.trim()`）
 
-#### ✅ Phase 2完了項目
+#### ✅ Phase 2完了項目（100%）
+
+**実装完了:**
 
 - ✅ Valibotスキーマ生成が完全実装されていること（14ファイル）
   - schemas.ts orchestrator実装完了
@@ -601,22 +604,18 @@ pnpm test:coverage  # カバレッジ計測
 - ✅ binary型がTypeScript型定義と整合性があること（`v.instance(Blob)`）
 - ✅ Unit Testが追加されていること（+14ファイル × +68テスト = 45ファイル × 171テスト）
 - ✅ テストスタイルが統一されていること（toEqual + trim パターン）
-- ✅ 型チェックが通ること（型エラー修正完了）
-- ✅ 全テストがパスすること（171/171 passed）
 
-#### ✅ Phase 2完了項目（最終）
+**統合・検証完了:**
 
 - ✅ generator.tsが`--validator=valibot`フラグに対応していること（既存実装を発見）
-- ✅ 生成コードがTypeScript型チェックを通ること（client.ts型エラー修正完了）
-- ✅ Valibotスキーマ生成が実例で動作すること（petstore, train-travel examples）
+- ✅ 型チェックが通ること（client.ts型エラー修正完了）
+- ✅ 全テストがパスすること（171/171 passed）
+- ✅ Valibotスキーマ生成が実例で動作すること（petstore: 4スキーマ, train-travel: 25スキーマ）
 
 #### ❌ Phase 3以降の項目
 
 - ❌ E2E Testで主要ユースケースが網羅されていること
 - ❌ .expected.tsファイル比較テスト実装
-
-#### ❌ Phase 3以降の項目
-
 - ❌ CLIコマンドが実行できること
 - ❌ CI/CDパイプラインが通ること
 
@@ -797,48 +796,72 @@ export const ImageSchema = v.object({
 
 ---
 
-## Phase 2残作業
+## Phase 3実装計画
 
-### ✅ 完了: schemas.ts orchestrator実装
+Phase 2が100%完了したため、次のフェーズに進みます。
 
-**実装完了:**
+### 優先度1: E2Eテスト実装
 
-1. ✅ IRModel配列を走査してスキーマ定義を生成
-2. ✅ 各IRModel.kindに応じて適切な生成関数を呼び出し
-3. ✅ スキーマ定義の依存関係解決（$ref参照）
-4. ✅ JSDocコメント生成（description等）
-5. ✅ schemas.tsファイルとして統合出力
-6. ✅ ultrathink原則による4ファイル分割（schemas.ts 109行）
-
-**実装成果:**
-
-- Orchestratorパターン踏襲
-- 45ファイル × 171テスト（全てパス）
-- テストスタイル統一（toEqual + trim）
-
-### 優先度1: generator.ts更新
+**目的**: 生成コードの品質保証と回帰テスト
 
 **タスク詳細:**
 
-1. `--validator=valibot`フラグ処理追加
-2. schemas.ts生成ロジックの統合
-3. 出力ファイル管理（types.ts, schemas.ts, services.ts, client.ts）
-
-### 優先度2: E2Eテスト
-
-- `.expected.ts` ファイル比較テスト
+- `.expected.ts`ファイル比較テスト実装
+  - petstore: 基本的なCRUD操作
+  - complex-models: allOf, anyOf, oneOf, 複雑なネスト
 - 主要ユースケースの網羅
-- 生成コードの型チェックテスト
+  - バリデーション付きモデル
+  - readOnly/writeOnly プロパティ
+  - enum型、配列型
+- 生成コードの型チェック自動化
+  - TypeScriptコンパイラによる検証
+  - 生成コードがstrictモードでパスすること
+- テストヘルパー実装
+  - ファイル比較ユーティリティ
+  - OpenAPI fixture管理
 
-### 優先度3: CLI実装
+**成果物:**
 
-- `src/cli.ts` 実装
-- `bin/cli.mjs` 実行可能ファイル
-- `xcgen-ts` コマンド
-- 設定ファイル対応（`xcgen.config.ts`）
+```
+packages/generator-typescript/tests/
+├── e2e/
+│   ├── fixtures/
+│   │   ├── petstore/
+│   │   └── complex-models/
+│   ├── generator.test.ts
+│   └── test-helper.ts
+```
 
-### 優先度4: CI/CD
+### 優先度2: CLI機能完成
+
+**目的**: コマンドライン実行の完全動作確認
+
+**タスク詳細:**
+
+- `src/cli.ts`の動作確認（既存実装の可能性あり）
+- `xcgen-ts`コマンドのテスト
+  - 基本オプション（-i, -o, --validator）
+  - ヘルプメッセージ
+  - エラーハンドリング
+- 設定ファイル対応検証
+  - `xcgen.config.ts`の読み込み
+  - デフォルト値のマージ
+- ドキュメント更新
+  - CLI使用例の追加
+  - トラブルシューティング
+
+### 優先度3: CI/CD統合
+
+**目的**: 自動化されたテストとビルドパイプライン
+
+**タスク詳細:**
 
 - GitHub Actions設定
-- 自動テスト、ビルド、型チェック
-- カバレッジレポート
+  - Lint, typecheck, test, buildの自動実行
+  - マトリックステスト（Node.js複数バージョン）
+- カバレッジレポート生成
+  - Codecov / Coveralls統合
+  - バッジ追加
+- リリース自動化
+  - semantic-release設定
+  - CHANGELOGの自動生成

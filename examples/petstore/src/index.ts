@@ -36,12 +36,13 @@ function configureClient() {
 /**
  * List all pets without any filters
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function exampleListAllPets() {
   console.log("🐾 Example 1: List all pets");
   console.log("─".repeat(50));
 
   try {
-    const pets = await listPets();
+    const pets = await listPets({ query: {} });
     console.log(`✅ Found ${pets.length} pets`);
     console.log("Response type:", typeof pets); // "object" (array)
     console.log("Sample:", pets[0]);
@@ -60,6 +61,7 @@ async function exampleListAllPets() {
  * List pets with a limit parameter
  * Demonstrates query parameter usage
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function exampleListPetsWithLimit() {
   console.log("🐾 Example 2: List pets with limit");
   console.log("─".repeat(50));
@@ -91,6 +93,7 @@ async function exampleListPetsWithLimit() {
  * Create a new pet
  * Demonstrates request body and type safety
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function exampleCreatePet() {
   console.log("🐾 Example 3: Create a new pet");
   console.log("─".repeat(50));
@@ -102,9 +105,7 @@ async function exampleCreatePet() {
   };
 
   try {
-    const createdPet: Pet = await createPet({
-      body: newPetData,
-    });
+    const createdPet: Pet = await createPet(newPetData);
 
     console.log("✅ Pet created successfully!");
     console.log("  ID:", createdPet.id);
@@ -125,6 +126,7 @@ async function exampleCreatePet() {
  * Get a specific pet by ID
  * Demonstrates path parameter usage
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function exampleGetPetById() {
   console.log("🐾 Example 4: Get pet by ID");
   console.log("─".repeat(50));
@@ -155,6 +157,7 @@ async function exampleGetPetById() {
 /**
  * Demonstrate error handling for non-existent pet
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function exampleErrorHandling() {
   console.log("🐾 Example 5: Error handling");
   console.log("─".repeat(50));

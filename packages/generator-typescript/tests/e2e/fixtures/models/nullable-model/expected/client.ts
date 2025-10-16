@@ -135,7 +135,7 @@ export async function request<T>(params: {
 
   // Handle JSON responses
   if (contentType.includes('application/json')) {
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   // Default to text
