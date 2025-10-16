@@ -1,0 +1,21 @@
+{
+  "name": "petstore-example",
+  "version": "0.0.0",
+  "description": "Petstore API client example using @openapi-xcgen/generator-typescript",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "tsx generate.ts",
+    "generate:valibot": "tsx generate-valibot.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openapi-xcgen/generator-typescript": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3",
+    "valibot": "^1.0.0"
+  }
+}

@@ -688,3 +688,6 @@ doc/api/
 
 # Turbo
 .turbo
+
+# Examples generated code
+examples/*/generated/

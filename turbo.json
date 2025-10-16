@@ -1,10 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": ["NODE_ENV"],
+  "globalDependencies": ["!examples/**"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!examples/**"],
       "outputs": ["dist/**"],
       "cache": true
     },
@@ -14,16 +16,18 @@
     },
     "test": {
       "dependsOn": ["build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!examples/**"],
       "outputs": ["coverage/**"],
       "cache": true
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
+      "inputs": ["$TURBO_DEFAULT$", "!examples/**"],
       "cache": true
     },
     "lint": {
       "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "!examples/**"],
       "cache": true
     },
     "lint:fix": {
