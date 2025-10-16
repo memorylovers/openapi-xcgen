@@ -33,7 +33,7 @@ export function generateResponseParseCode(): string {
   lines.push("");
   lines.push("  // Handle JSON responses");
   lines.push("  if (contentType.includes('application/json')) {");
-  lines.push("    return response.json();");
+  lines.push("    return response.json() as Promise<T>;");
   lines.push("  }");
   lines.push("");
   lines.push("  // Default to text");
@@ -73,7 +73,7 @@ if (import.meta.vitest) {
             "\n" +
             "  // Handle JSON responses\n" +
             "  if (contentType.includes('application/json')) {\n" +
-            "    return response.json();\n" +
+            "    return response.json() as Promise<T>;\n" +
             "  }\n" +
             "\n" +
             "  // Default to text\n" +
