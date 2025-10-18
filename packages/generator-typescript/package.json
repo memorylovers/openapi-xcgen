@@ -30,7 +30,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "typecheck:expected": "for dir in tests/e2e/fixtures/*/expected tests/e2e/fixtures/*/*/expected; do echo \"Checking $dir...\"; (cd \"$dir\" 2>/dev/null && tsc --noEmit) || true; done",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "regenerate:expected": "pnpm jiti tests/e2e/generate-expected.ts"
   },
   "dependencies": {
     "@openapi-xcgen/core": "workspace:*",

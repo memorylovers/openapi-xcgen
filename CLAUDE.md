@@ -127,7 +127,9 @@ pnpm lint:fix    # Lintエラーの自動修正
 
 - ESLintとPrettierの設定に従う
 - markdownlintでドキュメント品質を維持
-- インポートパスは`.js`拡張子を使用（ESM対応）
+- インポートパス：
+  - 生成器のソースコード：`.js`拡張子を使用（ESM対応）
+  - 生成されるコード：拡張子なし（バンドラー前提）
 - エラーメッセージは具体的で実行可能な内容にする
 
 ### 命名規約
@@ -241,6 +243,9 @@ pnpm build        # ビルド
 pnpm test         # テスト実行
 pnpm test:watch   # watchモードでテスト
 pnpm test:coverage # カバレッジ付きテスト
+
+# E2E期待値再生成
+pnpm regenerate:expected  # E2E期待値ファイルを再生成（coreまたはgenerator-typescript）
 
 # 品質チェック
 pnpm check        # lint + typecheck + test

@@ -9,20 +9,17 @@
 
 import { setConfig, type XcgenApiError } from "../generated/client.js";
 import {
+  createBooking,
+  getBooking,
+  getBookings,
   getStations,
   getTrips,
-  createBooking,
-  getBookings,
-  getBooking,
-  payForBooking,
 } from "../generated/services.js";
 import type {
+  Booking,
+  BookingRequest,
   Station,
   Trip,
-  BookingRequest,
-  Booking,
-  CardPayment,
-  BankTransferPayment,
 } from "../generated/types.js";
 
 // ============================================================================
@@ -53,7 +50,7 @@ function configureClient() {
  * Search for stations near a specific location
  * Demonstrates complex query parameters with pattern validation
  */
-async function exampleSearchStationsByCoordinates() {
+export async function exampleSearchStationsByCoordinates() {
   console.log("🚉 Example 1: Search stations by coordinates");
   console.log("─".repeat(50));
 
@@ -67,9 +64,14 @@ async function exampleSearchStationsByCoordinates() {
       },
     });
 
+    if (!result.data) {
+      console.log("⚠️ No data returned");
+      return;
+    }
+
     console.log(`✅ Found ${result.data.length} stations near London:`);
     result.data.forEach((station: Station) => {
-      console.log(`  • ${station.name} (${station.country_code})`);
+      console.log(`  • ${station.name} (${station.countryCode})`);
       console.log(`    Address: ${station.address}`);
       if (station.coordinates) {
         console.log(
@@ -92,7 +94,7 @@ async function exampleSearchStationsByCoordinates() {
  * Search for stations in a specific country
  * Demonstrates pattern validation for country codes (ISO 3166-1 alpha-2)
  */
-async function exampleSearchStationsByCountry() {
+export async function exampleSearchStationsByCountry() {
   console.log("🚉 Example 2: Search stations by country");
   console.log("─".repeat(50));
 
@@ -106,13 +108,20 @@ async function exampleSearchStationsByCountry() {
       },
     });
 
-    console.log(`✅ Found ${result.data.length} stations in GB matching "King":`);
+    if (!result.data) {
+      console.log("⚠️ No data returned");
+      return;
+    }
+
+    console.log(
+      `✅ Found ${result.data.length} stations in GB matching "King":`,
+    );
     result.data.forEach((station: Station) => {
       console.log(`  • ${station.name}`);
     });
 
     // Pagination links
-    if (result.links.next) {
+    if (result.links?.next) {
       console.log(`\n  Next page: ${result.links.next}`);
     }
   } catch (error) {
@@ -130,7 +139,7 @@ async function exampleSearchStationsByCountry() {
  * Search for available trips between two stations
  * Demonstrates UUID format validation and multiple query parameters
  */
-async function exampleFindTrips() {
+export async function exampleFindTrips() {
   console.log("🚄 Example 3: Find available trips");
   console.log("─".repeat(50));
 
@@ -146,18 +155,21 @@ async function exampleFindTrips() {
       },
     });
 
+    if (!result.data) {
+      console.log("⚠️ No data returned");
+      return;
+    }
+
     console.log(`✅ Found ${result.data.length} trips:`);
     result.data.forEach((trip: Trip) => {
       console.log(`\n  Trip ${trip.id}:`);
       console.log(`    ${trip.origin.name} → ${trip.destination.name}`);
-      console.log(`    Departure: ${trip.departure_time}`);
-      console.log(`    Arrival: ${trip.arrival_time}`);
+      console.log(`    Departure: ${trip.departureTime}`);
+      console.log(`    Arrival: ${trip.arrivalTime}`);
       console.log(`    Operator: ${trip.operator}`);
-      console.log(
-        `    Price: ${trip.price.amount} ${trip.price.currency}`,
-      );
-      console.log(`    Bicycles: ${trip.bicycles_allowed ? "✓" : "✗"}`);
-      console.log(`    Dogs: ${trip.dogs_allowed ? "✓" : "✗"}`);
+      console.log(`    Price: ${trip.price.amount} ${trip.price.currency}`);
+      console.log(`    Bicycles: ${trip.bicyclesAllowed ? "✓" : "✗"}`);
+      console.log(`    Dogs: ${trip.dogsAllowed ? "✓" : "✗"}`);
     });
   } catch (error) {
     handleApiError(error);
@@ -174,42 +186,40 @@ async function exampleFindTrips() {
  * Create a new booking for a trip
  * Demonstrates nested objects and array validation (1-10 passengers)
  */
-async function exampleCreateBooking() {
+export async function exampleCreateBooking() {
   console.log("📋 Example 4: Create a booking");
   console.log("─".repeat(50));
 
   try {
     const bookingRequest: BookingRequest = {
       // writeOnly property - only used in requests
-      trip_id: "c0f8a9b2-3456-7890-bcde-f01234567890",
+      tripId: "c0f8a9b2-3456-7890-bcde-f01234567890",
       passengers: [
         {
           name: "Alice Johnson",
           email: "alice@example.com",
-          date_of_birth: "1990-05-15",
-          passport_number: "AB1234567",
+          dateOfBirth: "1990-05-15",
+          passportNumber: "AB1234567",
         },
         {
           name: "Bob Smith",
           email: "bob@example.com",
-          date_of_birth: "1985-08-22",
+          dateOfBirth: "1985-08-22",
         },
       ],
-      seat_preferences: "window", // Enum: window | aisle | table | quiet
+      seatPreferences: "window", // Enum: window | aisle | table | quiet
     };
 
-    const booking: Booking = await createBooking({
-      body: bookingRequest,
-    });
+    const booking: Booking = await createBooking(bookingRequest);
 
     console.log("✅ Booking created successfully!");
     console.log(`  Booking ID: ${booking.id}`); // readOnly property
     console.log(`  Status: ${booking.status}`); // readOnly: pending | confirmed | cancelled
-    console.log(`  Payment Status: ${booking.payment_status}`); // readOnly
+    console.log(`  Payment Status: ${booking.paymentStatus}`); // readOnly
     console.log(
-      `  Total Price: ${booking.total_price.amount} ${booking.total_price.currency}`,
+      `  Total Price: ${booking.totalPrice.amount} ${booking.totalPrice.currency}`,
     );
-    console.log(`  Created: ${booking.created_at}`);
+    console.log(`  Created: ${booking.createdAt}`);
     console.log(`  Passengers: ${booking.passengers.length}`);
   } catch (error) {
     handleApiError(error);
@@ -219,111 +229,118 @@ async function exampleCreateBooking() {
 }
 
 // ============================================================================
-// Example 5: Pay with Card (Discriminated Union)
+// Example 5: Pay with Card (Discriminated Union) - NOT IMPLEMENTED YET
 // ============================================================================
-
-/**
- * Pay for a booking using a credit card
- * Demonstrates oneOf with discriminator (method: "card")
- */
-async function examplePayWithCard(bookingId: string) {
-  console.log("💳 Example 5: Pay with card");
-  console.log("─".repeat(50));
-
-  try {
-    // CardPayment type with discriminator property "method"
-    const cardPayment: CardPayment = {
-      method: "card", // Discriminator - must be "card" for CardPayment
-      card_number: "4111111111111111", // Pattern: 13-19 digits
-      card_holder: "Alice Johnson",
-      expiry_month: 12, // 1-12
-      expiry_year: 2025, // >= 2024
-      cvv: "123", // Pattern: 3-4 digits
-    };
-
-    const confirmation = await payForBooking({
-      path: {
-        bookingId,
-      },
-      body: cardPayment,
-    });
-
-    console.log("✅ Payment processed successfully!");
-    console.log(`  Payment ID: ${confirmation.payment_id}`);
-    console.log(`  Status: ${confirmation.status}`); // success | pending | failed
-    console.log(
-      `  Amount: ${confirmation.amount.amount} ${confirmation.amount.currency}`,
-    );
-    console.log(`  Timestamp: ${confirmation.timestamp}`);
-    if (confirmation.receipt_url) {
-      console.log(`  Receipt: ${confirmation.receipt_url}`);
-    }
-  } catch (error) {
-    handleApiError(error);
-  }
-
-  console.log();
-}
-
-// ============================================================================
-// Example 6: Pay with Bank Transfer (Discriminated Union)
-// ============================================================================
-
-/**
- * Pay for a booking using bank transfer
- * Demonstrates oneOf with discriminator (method: "bank_transfer")
- */
-async function examplePayWithBankTransfer(bookingId: string) {
-  console.log("🏦 Example 6: Pay with bank transfer");
-  console.log("─".repeat(50));
-
-  try {
-    // BankTransferPayment type with discriminator property "method"
-    const bankPayment: BankTransferPayment = {
-      method: "bank_transfer", // Discriminator - must be "bank_transfer"
-      account_number: "12345678",
-      routing_number: "987654321",
-      account_holder: "Alice Johnson",
-    };
-
-    const confirmation = await payForBooking({
-      path: {
-        bookingId,
-      },
-      body: bankPayment,
-    });
-
-    console.log("✅ Payment processed successfully!");
-    console.log(`  Payment ID: ${confirmation.payment_id}`);
-    console.log(`  Status: ${confirmation.status}`);
-  } catch (error) {
-    handleApiError(error);
-  }
-
-  console.log();
-}
+//
+// NOTE: This example is currently disabled because the generator does not yet
+// support unified parameter interfaces for endpoints with both path parameters
+// and request body. This will be implemented in a future version.
+//
+// /**
+//  * Pay for a booking using a credit card
+//  * Demonstrates oneOf with discriminator (method: "card")
+//  */
+// export async function examplePayWithCard(bookingId: string) {
+//   console.log("💳 Example 5: Pay with card");
+//   console.log("─".repeat(50));
+//
+//   try {
+//     const cardPayment: CardPayment = {
+//       method: "card",              // Discriminator - must be "card" for CardPayment
+//       cardNumber: "4111111111111111", // Pattern: 13-19 digits
+//       cardHolder: "Alice Johnson",
+//       expiryMonth: 12,             // 1-12
+//       expiryYear: 2025,            // >= 2024
+//       cvv: "123",                  // Pattern: 3-4 digits
+//     };
+//     const confirmation = await payForBooking({
+//       path: { bookingId },
+//       body: cardPayment,
+//     });
+//
+//     console.log("✅ Payment processed successfully!");
+//     console.log(`  Payment ID: ${confirmation.paymentId}`);
+//     console.log(`  Status: ${confirmation.status}`); // success | pending | failed
+//     console.log(
+//       `  Amount: ${confirmation.amount.amount} ${confirmation.amount.currency}`,
+//     );
+//     console.log(`  Timestamp: ${confirmation.timestamp}`);
+//     if (confirmation.receiptUrl) {
+//       console.log(`  Receipt: ${confirmation.receiptUrl}`);
+//     }
+//   } catch (error) {
+//     handleApiError(error);
+//   }
+//
+//   console.log();
+// }
 
 // ============================================================================
-// Example 7: List User Bookings
+// Example 6: Pay with Bank Transfer (Discriminated Union) - NOT IMPLEMENTED YET
+// ============================================================================
+//
+// NOTE: This example is currently disabled because the generator does not yet
+// support unified parameter interfaces for endpoints with both path parameters
+// and request body. This will be implemented in a future version.
+//
+// /**
+//  * Pay for a booking using bank transfer
+//  * Demonstrates oneOf with discriminator (method: "bank_transfer")
+//  */
+// export async function examplePayWithBankTransfer(bookingId: string) {
+//   console.log("🏦 Example 6: Pay with bank transfer");
+//   console.log("─".repeat(50));
+//
+//   try {
+//     const bankPayment: BankTransferPayment = {
+//       method: "bank_transfer",     // Discriminator - must be "bank_transfer"
+//       accountNumber: "12345678",
+//       routingNumber: "987654321",
+//       accountHolder: "Alice Johnson",
+//     };
+//     const confirmation = await payForBooking({
+//       path: { bookingId },
+//       body: bankPayment,
+//     });
+//
+//     console.log("✅ Payment processed successfully!");
+//     console.log(`  Payment ID: ${confirmation.paymentId}`);
+//     console.log(`  Status: ${confirmation.status}`);
+//   } catch (error) {
+//     handleApiError(error);
+//   }
+//
+//   console.log();
+// }
+
+// ============================================================================
+// Example 5: List User Bookings
 // ============================================================================
 
 /**
  * List all bookings for the authenticated user
  * Demonstrates pagination
  */
-async function exampleListBookings() {
-  console.log("📚 Example 7: List user bookings");
+export async function exampleListBookings() {
+  console.log("📚 Example 5: List user bookings");
   console.log("─".repeat(50));
 
   try {
     const result = await getBookings();
 
+    if (!result.data) {
+      console.log("⚠️ No data returned");
+      return;
+    }
+
     console.log(`✅ Found ${result.data.length} bookings:`);
     result.data.forEach((booking: Booking) => {
       console.log(`\n  Booking ${booking.id}:`);
-      console.log(`    Trip: ${booking.trip.origin.name} → ${booking.trip.destination.name}`);
+      console.log(
+        `    Trip: ${booking.trip.origin.name} → ${booking.trip.destination.name}`,
+      );
       console.log(`    Status: ${booking.status}`);
-      console.log(`    Payment: ${booking.payment_status}`);
+      console.log(`    Payment: ${booking.paymentStatus}`);
     });
 
     // Pagination links
@@ -340,15 +357,15 @@ async function exampleListBookings() {
 }
 
 // ============================================================================
-// Example 8: Get Booking Details
+// Example 6: Get Booking Details
 // ============================================================================
 
 /**
  * Get details of a specific booking
  * Demonstrates path parameter with UUID format
  */
-async function exampleGetBookingDetails(bookingId: string) {
-  console.log("🔍 Example 8: Get booking details");
+export async function exampleGetBookingDetails(bookingId: string) {
+  console.log("🔍 Example 6: Get booking details");
   console.log("─".repeat(50));
 
   try {
@@ -361,10 +378,14 @@ async function exampleGetBookingDetails(bookingId: string) {
     console.log("✅ Booking details:");
     console.log(`  ID: ${booking.id}`);
     console.log(`  Status: ${booking.status}`);
-    console.log(`  Payment Status: ${booking.payment_status}`);
-    console.log(`  Trip: ${booking.trip.origin.name} → ${booking.trip.destination.name}`);
-    console.log(`  Departure: ${booking.trip.departure_time}`);
-    console.log(`  Total: ${booking.total_price.amount} ${booking.total_price.currency}`);
+    console.log(`  Payment Status: ${booking.paymentStatus}`);
+    console.log(
+      `  Trip: ${booking.trip.origin.name} → ${booking.trip.destination.name}`,
+    );
+    console.log(`  Departure: ${booking.trip.departureTime}`);
+    console.log(
+      `  Total: ${booking.totalPrice.amount} ${booking.totalPrice.currency}`,
+    );
     console.log(`  Passengers:`);
     booking.passengers.forEach((passenger, index) => {
       console.log(`    ${index + 1}. ${passenger.name} (${passenger.email})`);
@@ -447,8 +468,6 @@ async function main() {
 
   // Use a real booking ID from the createBooking response
   const bookingId = "d1e9f0c3-4567-8901-cdef-012345678901";
-  await examplePayWithCard(bookingId);
-  await examplePayWithBankTransfer(bookingId);
   await exampleListBookings();
   await exampleGetBookingDetails(bookingId);
   */

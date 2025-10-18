@@ -21,6 +21,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "generated/**/*"],
+  "include": ["src/**/*", "generated/**/*", "*.ts"],
   "exclude": ["node_modules", "dist"]
 }

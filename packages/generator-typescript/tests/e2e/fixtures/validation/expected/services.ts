@@ -4,16 +4,17 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { CreateUserRequest, User } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { CreateUserRequest, User } from "./types";
+export type { CreateUserRequest, User } from "./types";
 
 /**
  * Create a user
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns User
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function createUser(
   options: CreateUserRequest,

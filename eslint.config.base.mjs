@@ -15,7 +15,7 @@ export default [
       "*.config.mjs",
       "**/tests/e2e/fixtures/*/expected/**",
       "**/tests/e2e/fixtures/*/*/expected/**",
-      "examples/**",
+      "examples/**/generated/**",
     ],
   },
   js.configs.recommended,

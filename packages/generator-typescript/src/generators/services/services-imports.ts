@@ -15,8 +15,10 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
   const lines: string[] = [];
 
   // clientのインポート
-  lines.push('import { request } from "./client.js";');
-  lines.push('import type { XcgenApiError } from "./client.js";');
+  lines.push('import { request } from "./client";');
+  lines.push(
+    'import type { XcgenApiError as _XcgenApiError } from "./client";',
+  );
 
   // 型定義のインポート（必要な型のみ）
   const importedTypes = new Set<string>();
@@ -31,24 +33,28 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
       }
 
       // リクエストボディ型をインポート
-      if (dataTypes.requestBodyType) {
+      // ただし、parameterTypeとrequestBodyTypeの両方がある場合、
+      // services-function.tsではparameterTypeのみが使用されるため、
+      // requestBodyTypeはインポートしない
+      if (dataTypes.requestBodyType && !dataTypes.parameterType) {
         importedTypes.add(dataTypes.requestBodyType);
       }
 
-      // レスポンス型をインポート
-      for (const response of endpoint.responses) {
-        if (response.kind === "content" && response.content) {
-          for (const content of response.content) {
-            if (
-              typeof content.schema !== "string" &&
-              content.schema.kind === "ref"
-            ) {
-              // Core packageはreference path全体を保存: "#/components/schemas/Pet"
-              // 最後のセグメントを抽出: "Pet"
-              const modelName =
-                content.schema.name.split("/").at(-1) ?? content.schema.name;
-              importedTypes.add(toTypeName(modelName));
-            }
+      // レスポンス型をインポート（成功レスポンス2xxのみ）
+      const successResponse = endpoint.responses.find((r) =>
+        r.statusCode.startsWith("2"),
+      );
+      if (successResponse?.kind === "content" && successResponse.content) {
+        for (const content of successResponse.content) {
+          if (
+            typeof content.schema !== "string" &&
+            content.schema.kind === "ref"
+          ) {
+            // Core packageはreference path全体を保存: "#/components/schemas/Pet"
+            // 最後のセグメントを抽出: "Pet"
+            const modelName =
+              content.schema.name.split("/").at(-1) ?? content.schema.name;
+            importedTypes.add(toTypeName(modelName));
           }
         }
       }
@@ -56,9 +62,11 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
   }
 
   if (importedTypes.size > 0) {
-    lines.push(
-      `import type { ${Array.from(importedTypes).join(", ")} } from "./types.js";`,
-    );
+    const types = Array.from(importedTypes).join(", ");
+    // Import types for use in this file
+    lines.push(`import type { ${types} } from "./types";`);
+    // Re-export types for user convenience
+    lines.push(`export type { ${types} } from "./types";`);
   }
 
   return lines.join("\n");
@@ -77,8 +85,8 @@ if (import.meta.vitest) {
 
         expect(result).toEqual(
           `
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
 `.trim(),
         );
       });
@@ -111,9 +119,10 @@ import type { XcgenApiError } from "./client.js";
 
         expect(result).toEqual(
           `
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { Pet } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { Pet } from "./types";
+export type { Pet } from "./types";
 `.trim(),
         );
       });
@@ -133,8 +142,56 @@ import type { Pet } from "./types.js";
 
         expect(result).toEqual(
           `
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+`.trim(),
+        );
+      });
+
+      it("should only import success response types, not error types", () => {
+        const endpoints: IREndpoint[] = [
+          {
+            path: "/bookings",
+            method: "get",
+            operationId: "getBookings",
+            tags: [],
+            parameters: [],
+            responses: [
+              {
+                kind: "content",
+                statusCode: "200",
+                description: "Success",
+                content: [
+                  {
+                    mimeType: "application/json",
+                    schema: { kind: "ref", name: "GetBookings200Response" },
+                  },
+                ],
+              },
+              {
+                kind: "content",
+                statusCode: "400",
+                description: "Bad Request",
+                content: [
+                  {
+                    mimeType: "application/json",
+                    schema: { kind: "ref", name: "Problem" },
+                  },
+                ],
+              },
+            ],
+          },
+        ];
+
+        const result = generateServicesImports(endpoints);
+
+        // Should only import GetBookings200Response, not Problem
+        expect(result).toEqual(
+          `
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { GetBookings200Response } from "./types";
+export type { GetBookings200Response } from "./types";
 `.trim(),
         );
       });

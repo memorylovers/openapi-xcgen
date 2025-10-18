@@ -8,7 +8,8 @@
     "generate": "tsx generate.ts",
     "generate:valibot": "tsx generate-valibot.ts",
     "start": "tsx src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm generate && pnpm typecheck"
   },
   "dependencies": {
     "@openapi-xcgen/generator-typescript": "workspace:*"

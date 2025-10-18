@@ -4,16 +4,17 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { UserCreate, User, GetUsersUserIdParams, PatchUsersUserIdParams, UserUpdate } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { UserCreate, User, GetUsersUserIdParams, PatchUsersUserIdParams } from "./types";
+export type { UserCreate, User, GetUsersUserIdParams, PatchUsersUserIdParams } from "./types";
 
 /**
  * Create a new user
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns User
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function createUser(
   options: UserCreate,
@@ -32,7 +33,7 @@ export async function createUser(
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns User
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getUser(
   options: GetUsersUserIdParams,
@@ -51,7 +52,7 @@ export async function getUser(
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns User
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function updateUser(
   options: PatchUsersUserIdParams,

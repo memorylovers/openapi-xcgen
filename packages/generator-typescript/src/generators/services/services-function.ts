@@ -42,7 +42,7 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
   const responseType = getResponseType(endpoint);
   lines.push(` * @returns ${responseType}`);
   lines.push(
-    ` * @throws {XcgenApiError} API error with status and response details`,
+    ` * @throws {_XcgenApiError} API error with status and response details`,
   );
 
   if (endpoint.deprecated) {
@@ -134,7 +134,7 @@ if (import.meta.vitest) {
  * Get all users
  * @param init - Additional fetch options
  * @returns Array<User>
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getUsers(
   init?: RequestInit,
@@ -187,7 +187,7 @@ export async function getUsers(
 /**
  * @param init - Additional fetch options
  * @returns void
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function logout(
   init?: RequestInit,

@@ -4,9 +4,10 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { GetTest1ParametersIdParams, GetTest1ParametersId200Response, PostTest2RequestRequestBody, PostTest2Request201Response, GetTest3ResponseParams, GetTest3Response201Response, GetTest3Response202Response, UserResponse } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { GetTest1ParametersIdParams, GetTest1ParametersId200Response, PostTest2RequestRequestBody, PostTest2Request201Response, GetTest3ResponseParams } from "./types";
+export type { GetTest1ParametersIdParams, GetTest1ParametersId200Response, PostTest2RequestRequestBody, PostTest2Request201Response, GetTest3ResponseParams } from "./types";
 
 /**
  * Test 1: Parameters model generation (Basic)
@@ -14,7 +15,7 @@ import type { GetTest1ParametersIdParams, GetTest1ParametersId200Response, PostT
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns GetTest1ParametersId200Response
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function testParametersModelGeneration(
   options: GetTest1ParametersIdParams,
@@ -34,7 +35,7 @@ export async function testParametersModelGeneration(
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns PostTest2Request201Response
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function testRequestInlineExtraction(
   options: PostTest2RequestRequestBody,
@@ -54,7 +55,7 @@ export async function testRequestInlineExtraction(
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns string
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function testResponseInlineExtraction(
   options: GetTest3ResponseParams,

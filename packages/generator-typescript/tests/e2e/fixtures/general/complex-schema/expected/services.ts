@@ -4,16 +4,17 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { Order } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { Order } from "./types";
+export type { Order } from "./types";
 
 /**
  * Create a new order
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns Order
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function createOrder(
   options: Order,

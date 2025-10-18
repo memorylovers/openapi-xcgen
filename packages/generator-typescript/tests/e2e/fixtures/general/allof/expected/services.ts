@@ -4,15 +4,16 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { User } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { User } from "./types";
+export type { User } from "./types";
 
 /**
  * Get users
  * @param init - Additional fetch options
  * @returns User
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getUsers(
   init?: RequestInit,

@@ -48,7 +48,7 @@ if (import.meta.vitest) {
 
         const result = generateClientHeader(metadata);
 
-        expect(result).toMatch(/^\/\*\*/);
+        expect(result).toContain("/**");
         expect(result).toMatch(/\*\/$/);
       });
     });

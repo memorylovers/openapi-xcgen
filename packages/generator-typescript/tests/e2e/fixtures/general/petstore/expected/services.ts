@@ -4,16 +4,17 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
-import type { GetPetsParams, GetPets200Response, Error, NewPet, Pet, GetPetsPetIdParams } from "./types.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
+import type { GetPetsParams, GetPets200Response, NewPet, Pet, GetPetsPetIdParams } from "./types";
+export type { GetPetsParams, GetPets200Response, NewPet, Pet, GetPetsPetIdParams } from "./types";
 
 /**
  * List all pets
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns GetPets200Response
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function listPets(
   options: GetPetsParams,
@@ -32,7 +33,7 @@ export async function listPets(
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns Pet
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function createPet(
   options: NewPet,
@@ -51,7 +52,7 @@ export async function createPet(
  * @param options - Request parameters
  * @param init - Additional fetch options
  * @returns Pet
- * @throws {XcgenApiError} API error with status and response details
+ * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getPetById(
   options: GetPetsPetIdParams,

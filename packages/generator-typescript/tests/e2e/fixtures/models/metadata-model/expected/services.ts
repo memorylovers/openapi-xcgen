@@ -4,5 +4,5 @@
  * DO NOT EDIT - This file is auto-generated
  */
 
-import { request } from "./client.js";
-import type { XcgenApiError } from "./client.js";
+import { request } from "./client";
+import type { XcgenApiError as _XcgenApiError } from "./client";
