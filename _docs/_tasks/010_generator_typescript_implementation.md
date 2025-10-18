@@ -6,11 +6,13 @@
 
 ## ステータス
 
-- **状態**: Phase 2完了（100%）、Phase 3準備中
+- **状態**: Phase 3完了（コア機能実装完了、一部機能は Phase 4 へ延期）
   - ✅ Phase 1完了（types, services, client生成）
   - ✅ Phase 2完了（Valibotスキーマ生成、型エラー修正、実例検証）
-  - 🔄 Phase 3準備中（E2Eテスト実装）
-- **次のステップ**: E2Eテスト実装、CLI動作確認
+  - ✅ Phase 2.5完了（品質改善、Examples統合）
+  - ✅ Phase 3完了（E2Eテスト、型チェックテスト）
+  - ⚠️ **既知の制限事項**: CLI未実装、統合パラメータインターフェース未対応
+- **次のステップ**: Phase 4（CLI実装、制限事項解消）→ 実用段階（ドキュメント整備、npm公開準備）
 
 ## 前提条件
 
@@ -103,37 +105,6 @@
 - `src/generators/schemas/schemas-allof.ts` - IRAllOfModel → `v.intersect()`
 - `src/generators/schemas/schemas-anyof.ts` - IRAnyOfModel → `v.union()`
 - `src/generators/schemas/schemas-union.ts` - IRUnionModel → `v.variant()`（discriminated union）
-
-#### CLI
-
-- `src/cli.ts` - CLIエントリーポイント
-- `bin/cli.mjs` - 実行可能ファイル
-
-**CLI使用例**:
-
-```bash
-# 基本形式
-xcgen-ts -i ./openapi.yaml -o ./generated
-
-# Valibotスキーマ含めて生成
-xcgen-ts -i ./openapi.yaml -o ./generated --validator=valibot
-
-# 設定ファイル使用（xcgen.config.ts）
-xcgen-ts
-```
-
-**設定ファイル例**:
-
-```typescript
-// xcgen.config.ts
-import { defineConfig } from '@openapi-xcgen/generator-typescript';
-
-export default defineConfig({
-  input: './openapi.yaml',
-  output: './src/generated',
-  validator: 'valibot',
-});
-```
 
 ### テンプレート（オプション）
 
@@ -796,65 +767,281 @@ export const ImageSchema = v.object({
 
 ---
 
-## Phase 3実装計画
+## Phase 2.5実装サマリー（品質改善・Examples統合）
 
-Phase 2が100%完了したため、次のフェーズに進みます。
+**実装期間**: 2025-10-15 ~ 2025-10-18
 
-### 優先度1: E2Eテスト実装
+### Phase 2.5完了項目
 
-**目的**: 生成コードの品質保証と回帰テスト
+1. **生成器品質改善**
+   - 未使用インポート削減（成功レスポンス2xxのみ）
+     - `services-imports.ts`: 重要なリファクタリング（111行変更）
+     - エラーレスポンス型の不要なインポートを削減
+   - **.js拡張子削除**（バンドラー前提設計）
+     - 生成コードから`.js`拡張子を削除
+     - バンドラー最適化（Tree-shaking向上）
+   - **48個のE2E expected files更新**
+     - 全テストケースで期待値を再生成
+     - 品質改善を全体に適用
 
-**タスク詳細:**
+2. **Examples統合**
+   - **petstore example**: 基本的なCRUD操作
+   - **train-travel example**: 複雑なモデル、バリデーション
+     - 30モデル、7エンドポイント
+     - 6実装例（駅検索、旅程検索、予約作成、一覧取得、詳細取得）
+     - 2コメントアウト例（未実装機能の参考コード）
+   - **自動テスト対象化**（`pnpm check`）
+     - turbo.json統合
+     - examples/*/package.json に test スクリプト追加
+   - **厳格なESLint適用**（no 'as any'）
+     - eslint.config.mjs でexamples統合
+     - 型安全性の強化
 
-- `.expected.ts`ファイル比較テスト実装
-  - petstore: 基本的なCRUD操作
-  - complex-models: allOf, anyOf, oneOf, 複雑なネスト
-- 主要ユースケースの網羅
-  - バリデーション付きモデル
-  - readOnly/writeOnly プロパティ
-  - enum型、配列型
-- 生成コードの型チェック自動化
-  - TypeScriptコンパイラによる検証
-  - 生成コードがstrictモードでパスすること
-- テストヘルパー実装
-  - ファイル比較ユーティリティ
-  - OpenAPI fixture管理
+3. **テスト強化**
+   - services-imports.ts: 4テスト追加
+   - **テスト総数: 243 passed (49 files)**
+     - Phase 2完了時: 171 tests (45 files)
+     - Phase 2.5追加: +72 tests (+4 files)
 
-**成果物:**
+4. **ドキュメント更新**
+   - CLAUDE.md: バンドラー前提設計の明記
+   - 完了タスクのクリーンアップ
+
+### コミット履歴
+
+1. `03c269e`: fix(generator-typescript): resolve ESLint and TypeScript errors
+2. `7abde48`: feat(examples): add TypeScript generator examples
+3. `95cb2db`: fix(generator-typescript): add type cast for response.json()
+4. `4ffdc69`: feat: include petstore example in automated testing
+5. `6912e1f`: feat(generator-typescript): improve code generation and integrate examples
+
+### 検証結果
+
+```bash
+✅ Lint: 全パッケージでパス
+✅ Typecheck: エラーなし（packages + examples）
+✅ Tests: 243/243 passed (49 files)
+✅ Examples: petstore, train-travel 生成成功
+```
+
+---
+
+## Phase 3実装サマリー（100%完了）
+
+**実装期間**: 2025-10-14 ~ 2025-10-15
+
+### 実装した機能（100%）
+
+#### 1. E2Eテスト実装
+
+**12 fixtures実装:**
+
+- **general (4)**: allof, complex-schema, petstore, readonly-writeonly
+- **models (7)**: complex-structures, data-types, inline-schemas, metadata-model, nullable-model, ref-model, validation-model
+- **validation (1)**: validation
+
+**テストファイル:**
+
+- `generator.test.ts`: .expected.ts比較テスト（24テスト）
+- `type-check.test.ts`: 型チェックテスト（36テスト）
+- `test-helper.ts`: テストヘルパー実装
+- `generate-expected.ts`: 期待値生成スクリプト
+
+**ディレクトリ構成:**
 
 ```
-packages/generator-typescript/tests/
-├── e2e/
-│   ├── fixtures/
+packages/generator-typescript/tests/e2e/
+├── fixtures/
+│   ├── general/
+│   │   ├── allof/
+│   │   ├── complex-schema/
 │   │   ├── petstore/
-│   │   └── complex-models/
-│   ├── generator.test.ts
-│   └── test-helper.ts
+│   │   └── readonly-writeonly/
+│   ├── models/
+│   │   ├── complex-structures/
+│   │   ├── data-types/
+│   │   ├── inline-schemas/
+│   │   ├── metadata-model/
+│   │   ├── nullable-model/
+│   │   ├── ref-model/
+│   │   └── validation-model/
+│   └── validation/
+├── generator.test.ts
+├── type-check.test.ts
+├── test-helper.ts
+└── generate-expected.ts
 ```
 
-### 優先度2: CLI機能完成
+#### 2. 型チェックテスト実装
 
-**目的**: コマンドライン実行の完全動作確認
+**自動化された型検証:**
 
-**タスク詳細:**
+- 生成コードの型チェック自動化
+- 12 fixtures × 3 variants = 36 tests
+  1. should type-check expected files
+  2. should pass type checking (without validator)
+  3. should pass type checking (with valibot)
+- strictモード検証
 
-- `src/cli.ts`の動作確認（既存実装の可能性あり）
-- `xcgen-ts`コマンドのテスト
-  - 基本オプション（-i, -o, --validator）
-  - ヘルプメッセージ
-  - エラーハンドリング
-- 設定ファイル対応検証
-  - `xcgen.config.ts`の読み込み
-  - デフォルト値のマージ
-- ドキュメント更新
-  - CLI使用例の追加
-  - トラブルシューティング
+#### 3. Examples実証
+
+**petstore example:**
+
+- 基本的なCRUD操作
+- 6モデル、3エンドポイント
+- 型定義、サービス、クライアント生成
+
+**train-travel example:**
+
+- 複雑なユースケース
+- 30モデル、7エンドポイント
+- バリデーション、ネスト、discriminated union
+
+### Phase 3テスト実績
+
+```bash
+✅ Test Files: 49 passed
+✅ Tests: 243 passed
+  - Unit tests: ~183
+  - E2E tests: 24 (12 fixtures × 2)
+  - Type check tests: 36 (12 fixtures × 3)
+✅ Duration: ~48s
+```
+
+### 主要ユースケース網羅
+
+- ✅ 基本的なCRUD（petstore）
+- ✅ 複雑なモデル（allOf, anyOf, oneOf, discriminator）
+- ✅ バリデーション付き（minLength, pattern, format等）
+- ✅ readOnly/writeOnly プロパティ
+- ✅ enum型、配列型、マップ型
+- ✅ ネストした構造
+- ✅ Valibotスキーマ生成
+
+---
+
+## 既知の制限事項
+
+Phase 3までに実装されたコア機能は実用可能ですが、以下の制限事項があります。
+
+### 1. CLI未実装
+
+- **状態**: ドキュメント化されているが未実装
+- **詳細**:
+  - `src/cli.ts`, `bin/cli.mjs` ファイルが存在しない
+  - package.jsonに`bin`エントリがない
+  - 依存関係（c12, citty）はインストール済みだが未使用
+- **現在の使用方法**: プログラマティックAPI（`import { generate } from '@openapi-xcgen/generator-typescript'`）のみ利用可能
+- **影響**: CLIコマンド（`xcgen-ts -i ./openapi.yaml -o ./generated`）は使用不可
+- **対応予定**: Phase 4で実装
+
+**回避策**:
+
+```typescript
+// プログラマティックAPIを使用
+import { generate } from '@openapi-xcgen/generator-typescript';
+
+await generate({
+  input: './openapi.yaml',
+  output: './src/generated',
+  validator: 'valibot',
+});
+```
+
+### 2. 統合パラメータインターフェース未対応
+
+- **状態**: 既知の制限（`services-function.ts:62-70`にTODOコメントあり）
+- **問題**: pathパラメータとrequestBodyの両方を持つエンドポイントで、正しい型定義を生成できない
+- **現在の動作**: pathパラメータ型のみ生成、requestBodyは無視される
+- **影響**: train-travelのpayment endpointがこの制限の対象
+  - `POST /bookings/{bookingId}/payment`
+  - 必要: `path: { bookingId: string }` + `body: CardPayment | BankTransferPayment`
+  - 生成: `path: { bookingId: string }` のみ（bodyプロパティが欠落）
+- **対応予定**: Phase 4で統合型生成機能を実装
+
+**現在生成されるコード例（不完全）**:
+
+```typescript
+// types.ts
+export type PostBookingsBookingIdPaymentRequestBody = CardPayment | BankTransferPayment;
+
+export interface PostBookingsBookingIdPaymentParams {
+  path: {
+    bookingId: string;
+  };
+  // MISSING: body property
+}
+```
+
+**期待される生成コード（Phase 4で対応予定）**:
+
+```typescript
+export interface PostBookingsBookingIdPaymentParams {
+  path: {
+    bookingId: string;
+  };
+  body: CardPayment | BankTransferPayment;
+}
+```
+
+### 3. Union型はサポート済み
+
+注意: train-travelのpayment examplesがコメントアウトされているのは、Union型のサポート不足ではありません。
+Core、TypeScript generatorともにallOf, anyOf, oneOf, discriminatorを完全サポートしています。
+payment examplesは上記の「統合パラメータインターフェース」の制限により無効化されています。
+
+**サポート状況**:
+
+- ✅ allOf → TypeScript intersection types (`A & B`) + Valibot `v.intersect()`
+- ✅ anyOf → TypeScript union types (`A | B`) + Valibot `v.union()`
+- ✅ oneOf → TypeScript discriminated unions + Valibot `v.variant()`
+- ✅ discriminator → 完全サポート（JSDocコメント、Valibotマッピング）
+
+---
+
+## 次のステップ
+
+Phase 3完了により、generator-typescriptのコア機能は実用可能な状態になりました。
+
+### Phase 4: 制限事項解消
+
+**優先度：高**
+
+1. **CLI実装**
+   - `src/cli.ts` - CLIエントリーポイント実装
+   - `bin/cli.mjs` - 実行可能ファイル作成
+   - package.jsonに`bin`エントリ追加
+   - c12（設定ファイル）、citty（CLI framework）の活用
+   - 基本コマンド: `xcgen-ts -i <input> -o <output> [--validator=valibot]`
+   - 設定ファイル対応: `xcgen.config.ts` でdefineConfig()使用
+
+2. **統合パラメータインターフェース実装**
+   - `services-function.ts` のTODO解消
+   - pathパラメータ + requestBodyの統合型生成
+   - train-travel payment examplesの有効化
+   - E2Eテスト追加（path + body両方持つエンドポイント）
+
+### 実用段階への移行
+
+Phase 4完了後:
+
+### 優先度1: ドキュメント整備
+
+- README更新（使用例、機能一覧、インストール手順）
+- CLI使用ガイド（オプション詳細、設定ファイル）
+- トラブルシューティング（よくある問題と解決策）
+- Migration guide（他ツールから移行）
+- API Reference（生成されるコードの仕様）
+
+### 優先度2: npm公開準備
+
+- CHANGELOG生成（semantic-release）
+- バージョニング戦略（semver）
+- リリースノート作成
+- ライセンス確認（MIT）
+- package.json メタデータ整備
 
 ### 優先度3: CI/CD統合
-
-**目的**: 自動化されたテストとビルドパイプライン
-
-**タスク詳細:**
 
 - GitHub Actions設定
   - Lint, typecheck, test, buildの自動実行
@@ -864,4 +1051,14 @@ packages/generator-typescript/tests/
   - バッジ追加
 - リリース自動化
   - semantic-release設定
-  - CHANGELOGの自動生成
+  - npm publish自動化
+
+### Phase 5: 拡張機能（オプション）
+
+Phase 4完了後、さらなる機能拡張を検討:
+
+- **Zod対応**: バリデーションライブラリの選択肢拡大
+- **x-extensions サポート**: カスタム拡張プロパティのサポート
+- **パフォーマンス最適化**: 大規模APIへの対応
+- **追加HTTPクライアント対応**: Axios, ky等（オプション）
+- **Mock生成**: MSW等によるモック生成
