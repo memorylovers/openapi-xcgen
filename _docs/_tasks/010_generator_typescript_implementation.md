@@ -89,11 +89,11 @@ export interface PostBookingsBookingIdPaymentParams {
 
 **検証項目**:
 
-- [ ] path + body統合型が正しく生成される
-- [ ] path + query + body統合型が正しく生成される
-- [ ] train-travel payment examplesが動作する
-- [ ] E2Eテストがパスする
-- [ ] 型チェックがパスする
+- [x] path + body統合型が正しく生成される
+- [x] path + query + body統合型が正しく生成される
+- [x] train-travel payment examplesが動作する
+- [x] E2Eテストがパスする
+- [x] 型チェックがパスする
 
 ---
 
@@ -153,6 +153,42 @@ export interface PostBookingsBookingIdPaymentParams {
 
 - [ ] MSW（Mock Service Worker）統合
 - [ ] テストデータ生成（faker.js統合）
+
+### タスク6.6: Hey API discriminator対応
+
+**優先度**: 中（Phase 5完了後）
+
+**現在の問題**:
+
+- allOf + 親discriminator参照パターンで警告が出てモデル生成が失敗
+- Hey APIテストが3件失敗している状態（discriminator-one-of, discriminator-all-of, discriminator-any-of）
+
+**実装内容**:
+
+1. **schema-visitor.ts修正**
+   - discriminatorのみの早期returnロジックを改善
+   - allOf解決時の親discriminator伝播を適切に処理
+
+2. **allof-visitor.ts拡張**
+   - 親スキーマのdiscriminatorを子スキーマに継承する処理
+
+3. **テスト有効化**
+   - `packages/core/tests/e2e/transformer/general-hey-api.test.ts`
+   - 3つのskipを解除（現在はコメントアウトされている）
+
+**検証項目**:
+
+- [ ] discriminator-one-of テストがパス
+- [ ] discriminator-all-of テストがパス
+- [ ] discriminator-any-of テストがパス
+- [ ] `pnpm test`が全てパス
+- [ ] train-travel examplesが引き続き動作
+
+**参考情報**:
+
+- Hey APIテストfixture: `packages/core/tests/e2e/fixtures/general/hey-api/`
+- 警告メッセージ: `discriminator is not supported yet: #/components/schemas/Qux`
+- 関連コード: `packages/core/src/transformer/visitors/schema/schema-visitor.ts:111-116`
 
 ---
 

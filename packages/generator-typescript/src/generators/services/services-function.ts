@@ -57,11 +57,10 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
   // データ型に応じて適切なパラメータを生成
   if (dataTypes.needsDataType) {
     // パラメータまたはリクエストボディがある場合
-    // 両方ある場合は統合型、片方の場合はその型を使用
+    // 両方ある場合は統合型（parameterType名で生成済み）、片方の場合はその型を使用
     let dataTypeName: string;
     if (dataTypes.parameterType && dataTypes.requestBodyType) {
-      // 両方ある場合: 統合インターフェースが必要だが、現状ではパラメータ型を優先
-      // TODO: 将来的には統合型を生成する
+      // 両方ある場合: types.tsで統合型として生成済み（path/query/header + body）
       dataTypeName = dataTypes.parameterType;
     } else if (dataTypes.parameterType) {
       dataTypeName = dataTypes.parameterType;

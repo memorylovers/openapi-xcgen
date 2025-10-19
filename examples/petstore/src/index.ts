@@ -36,7 +36,7 @@ function configureClient() {
 /**
  * List all pets without any filters
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 async function exampleListAllPets() {
   console.log("🐾 Example 1: List all pets");
   console.log("─".repeat(50));
@@ -61,7 +61,7 @@ async function exampleListAllPets() {
  * List pets with a limit parameter
  * Demonstrates query parameter usage
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 async function exampleListPetsWithLimit() {
   console.log("🐾 Example 2: List pets with limit");
   console.log("─".repeat(50));
@@ -93,7 +93,7 @@ async function exampleListPetsWithLimit() {
  * Create a new pet
  * Demonstrates request body and type safety
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 async function exampleCreatePet() {
   console.log("🐾 Example 3: Create a new pet");
   console.log("─".repeat(50));
@@ -126,7 +126,7 @@ async function exampleCreatePet() {
  * Get a specific pet by ID
  * Demonstrates path parameter usage
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 async function exampleGetPetById() {
   console.log("🐾 Example 4: Get pet by ID");
   console.log("─".repeat(50));
@@ -157,7 +157,7 @@ async function exampleGetPetById() {
 /**
  * Demonstrate error handling for non-existent pet
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 async function exampleErrorHandling() {
   console.log("🐾 Example 5: Error handling");
   console.log("─".repeat(50));
@@ -215,19 +215,13 @@ async function main() {
   configureClient();
 
   // Note: These examples will fail because there's no real API server running.
-  // Uncomment the examples below when you have a real API to test against.
+  // They are here to demonstrate the usage patterns and verify type safety.
 
-  /*
   await exampleListAllPets();
   await exampleListPetsWithLimit();
   await exampleCreatePet();
   await exampleGetPetById();
   await exampleErrorHandling();
-  */
-
-  console.log("💡 Tip: Uncomment the example calls in main() to run them");
-  console.log("💡 Tip: Make sure to generate the client first:");
-  console.log("   pnpm generate\n");
 }
 
 // Run the examples

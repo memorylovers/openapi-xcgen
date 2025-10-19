@@ -14,10 +14,13 @@ import {
   getBookings,
   getStations,
   getTrips,
+  payForBooking,
 } from "../generated/services.js";
 import type {
+  BankTransferPayment,
   Booking,
   BookingRequest,
+  CardPayment,
   Station,
   Trip,
 } from "../generated/types.js";
@@ -229,89 +232,81 @@ export async function exampleCreateBooking() {
 }
 
 // ============================================================================
-// Example 5: Pay with Card (Discriminated Union) - NOT IMPLEMENTED YET
+// Example 5: Pay with Card (Discriminated Union)
 // ============================================================================
-//
-// NOTE: This example is currently disabled because the generator does not yet
-// support unified parameter interfaces for endpoints with both path parameters
-// and request body. This will be implemented in a future version.
-//
-// /**
-//  * Pay for a booking using a credit card
-//  * Demonstrates oneOf with discriminator (method: "card")
-//  */
-// export async function examplePayWithCard(bookingId: string) {
-//   console.log("💳 Example 5: Pay with card");
-//   console.log("─".repeat(50));
-//
-//   try {
-//     const cardPayment: CardPayment = {
-//       method: "card",              // Discriminator - must be "card" for CardPayment
-//       cardNumber: "4111111111111111", // Pattern: 13-19 digits
-//       cardHolder: "Alice Johnson",
-//       expiryMonth: 12,             // 1-12
-//       expiryYear: 2025,            // >= 2024
-//       cvv: "123",                  // Pattern: 3-4 digits
-//     };
-//     const confirmation = await payForBooking({
-//       path: { bookingId },
-//       body: cardPayment,
-//     });
-//
-//     console.log("✅ Payment processed successfully!");
-//     console.log(`  Payment ID: ${confirmation.paymentId}`);
-//     console.log(`  Status: ${confirmation.status}`); // success | pending | failed
-//     console.log(
-//       `  Amount: ${confirmation.amount.amount} ${confirmation.amount.currency}`,
-//     );
-//     console.log(`  Timestamp: ${confirmation.timestamp}`);
-//     if (confirmation.receiptUrl) {
-//       console.log(`  Receipt: ${confirmation.receiptUrl}`);
-//     }
-//   } catch (error) {
-//     handleApiError(error);
-//   }
-//
-//   console.log();
-// }
+
+/**
+ * Pay for a booking using a credit card
+ * Demonstrates oneOf with discriminator (method: "card")
+ */
+export async function examplePayWithCard(bookingId: string) {
+  console.log("💳 Example 5: Pay with card");
+  console.log("─".repeat(50));
+
+  try {
+    const cardPayment: CardPayment = {
+      method: "card", // Discriminator - must be "card" for CardPayment
+      cardNumber: "4111111111111111", // Pattern: 13-19 digits
+      cardHolder: "Alice Johnson",
+      expiryMonth: 12, // 1-12
+      expiryYear: 2025, // >= 2024
+      cvv: "123", // Pattern: 3-4 digits
+    };
+    const confirmation = await payForBooking({
+      path: { bookingId },
+      body: cardPayment,
+    });
+
+    console.log("✅ Payment processed successfully!");
+    console.log(`  Payment ID: ${confirmation.paymentId}`);
+    console.log(`  Status: ${confirmation.status}`); // success | pending | failed
+    console.log(
+      `  Amount: ${confirmation.amount.amount} ${confirmation.amount.currency}`,
+    );
+    console.log(`  Timestamp: ${confirmation.timestamp}`);
+    if (confirmation.receiptUrl) {
+      console.log(`  Receipt: ${confirmation.receiptUrl}`);
+    }
+  } catch (error) {
+    handleApiError(error);
+  }
+
+  console.log();
+}
 
 // ============================================================================
-// Example 6: Pay with Bank Transfer (Discriminated Union) - NOT IMPLEMENTED YET
+// Example 6: Pay with Bank Transfer (Discriminated Union)
 // ============================================================================
-//
-// NOTE: This example is currently disabled because the generator does not yet
-// support unified parameter interfaces for endpoints with both path parameters
-// and request body. This will be implemented in a future version.
-//
-// /**
-//  * Pay for a booking using bank transfer
-//  * Demonstrates oneOf with discriminator (method: "bank_transfer")
-//  */
-// export async function examplePayWithBankTransfer(bookingId: string) {
-//   console.log("🏦 Example 6: Pay with bank transfer");
-//   console.log("─".repeat(50));
-//
-//   try {
-//     const bankPayment: BankTransferPayment = {
-//       method: "bank_transfer",     // Discriminator - must be "bank_transfer"
-//       accountNumber: "12345678",
-//       routingNumber: "987654321",
-//       accountHolder: "Alice Johnson",
-//     };
-//     const confirmation = await payForBooking({
-//       path: { bookingId },
-//       body: bankPayment,
-//     });
-//
-//     console.log("✅ Payment processed successfully!");
-//     console.log(`  Payment ID: ${confirmation.paymentId}`);
-//     console.log(`  Status: ${confirmation.status}`);
-//   } catch (error) {
-//     handleApiError(error);
-//   }
-//
-//   console.log();
-// }
+
+/**
+ * Pay for a booking using bank transfer
+ * Demonstrates oneOf with discriminator (method: "bank_transfer")
+ */
+export async function examplePayWithBankTransfer(bookingId: string) {
+  console.log("🏦 Example 6: Pay with bank transfer");
+  console.log("─".repeat(50));
+
+  try {
+    const bankPayment: BankTransferPayment = {
+      method: "bank_transfer", // Discriminator - must be "bank_transfer"
+      accountNumber: "12345678",
+      routingNumber: "987654321",
+      accountHolder: "Alice Johnson",
+    };
+    const confirmation = await payForBooking({
+      path: { bookingId },
+      body: bankPayment,
+    });
+
+    console.log("✅ Payment processed successfully!");
+    console.log(`  Payment ID: ${confirmation.paymentId}`);
+    console.log(`  Status: ${confirmation.status}`);
+  } catch (error) {
+    handleApiError(error);
+  }
+
+  console.log();
+}
 
 // ============================================================================
 // Example 5: List User Bookings
@@ -458,9 +453,8 @@ async function main() {
   configureClient();
 
   // Note: These examples will fail because there's no real API server running.
-  // Uncomment the examples below when you have a real API to test against.
+  // They are here to demonstrate the usage patterns and verify type safety.
 
-  /*
   await exampleSearchStationsByCoordinates();
   await exampleSearchStationsByCountry();
   await exampleFindTrips();
@@ -468,15 +462,10 @@ async function main() {
 
   // Use a real booking ID from the createBooking response
   const bookingId = "d1e9f0c3-4567-8901-cdef-012345678901";
+  await examplePayWithCard(bookingId);
+  await examplePayWithBankTransfer(bookingId);
   await exampleListBookings();
   await exampleGetBookingDetails(bookingId);
-  */
-
-  console.log("💡 Tip: Uncomment the example calls in main() to run them");
-  console.log("💡 Tip: Make sure to generate the client first:");
-  console.log("   pnpm generate\n");
-  console.log("💡 Advanced: Generate with Valibot validation:");
-  console.log("   pnpm generate:valibot\n");
 }
 
 // Run the examples

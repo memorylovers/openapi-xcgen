@@ -5,6 +5,7 @@
  */
 
 import type { IRModel, XcgenIR } from "@openapi-xcgen/core";
+import { toTypeName } from "../../helpers/naming.js";
 import { generateObjectType } from "./types-object.js";
 import { generateEnumType } from "./types-enum.js";
 import { generateArrayType } from "./types-array.js";
@@ -12,7 +13,10 @@ import { generateMapType } from "./types-map.js";
 import { generateAllOfType } from "./types-allof.js";
 import { generateAnyOfType } from "./types-anyof.js";
 import { generateUnionType } from "./types-union.js";
-import { generateParameterType } from "./types-parameter.js";
+import {
+  generateParameterType,
+  generateUnifiedParameterType,
+} from "./types-parameter.js";
 
 /**
  * 生成されたTypeScriptコード
@@ -50,9 +54,53 @@ export function generateTypes(ir: XcgenIR): GeneratedTypes {
 
   let count = 0;
 
+  // endpointsを走査して、統合型が必要なparameterモデルを検出
+  // Map<parameterReferencePath, requestBodyTypeName>
+  const unifiedParameterTypes = new Map<string, string>();
+
+  for (const endpoint of ir.endpoints) {
+    // parametersとrequestBodyの両方がある場合
+    if (
+      !Array.isArray(endpoint.parameters) &&
+      typeof endpoint.parameters !== "string" &&
+      endpoint.parameters?.kind === "ref" &&
+      endpoint.requestBody?.kind === "content"
+    ) {
+      const parameterPath = endpoint.parameters.name;
+
+      // requestBodyの型名を抽出
+      for (const content of endpoint.requestBody.content) {
+        if (
+          typeof content.schema !== "string" &&
+          content.schema.kind === "ref"
+        ) {
+          const requestBodyModelName =
+            content.schema.name.split("/").at(-1) ?? content.schema.name;
+          const requestBodyTypeName = toTypeName(requestBodyModelName);
+          unifiedParameterTypes.set(parameterPath, requestBodyTypeName);
+          break; // 最初のスキーマのみ使用
+        }
+      }
+    }
+  }
+
   // 各モデルを変換
   for (const model of ir.models) {
-    const typeCode = generateModel(model);
+    let typeCode: string | null = null;
+
+    // parameterモデルで統合型が必要な場合
+    if (
+      model.kind === "parameter" &&
+      unifiedParameterTypes.has(model.referencePath)
+    ) {
+      const requestBodyTypeName = unifiedParameterTypes.get(
+        model.referencePath,
+      )!;
+      typeCode = generateUnifiedParameterType(model, requestBodyTypeName);
+    } else {
+      typeCode = generateModel(model);
+    }
+
     if (typeCode) {
       lines.push(typeCode);
       lines.push("");
