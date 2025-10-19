@@ -7,6 +7,9 @@
 // Main generator
 export { generate } from "./generator.js";
 
+// CLI
+export { runCli } from "./cli.js";
+
 // Types
 export { defineConfig } from "./types.js";
 export type {
