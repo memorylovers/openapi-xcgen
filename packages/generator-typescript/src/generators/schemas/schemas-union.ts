@@ -44,14 +44,15 @@ export function generateUnionSchema(
     return options[0].schemaRef;
   }
 
+  // Valibot v1のvariantは配列形式を使用
   const lines: string[] = [];
-  lines.push(`v.variant("${discriminatorKey}", {`);
+  lines.push(`v.variant("${discriminatorKey}", [`);
 
   for (const option of options) {
-    lines.push(`  ${option.key}: ${option.schemaRef},`);
+    lines.push(`  ${option.schemaRef},`);
   }
 
-  lines.push("})");
+  lines.push("])");
 
   return lines.join("\n");
 }
@@ -77,10 +78,10 @@ if (import.meta.vitest) {
 
         expect(result).toEqual(
           `
-v.variant("type", {
-  cat: CatSchema,
-  dog: DogSchema,
-})
+v.variant("type", [
+  CatSchema,
+  DogSchema,
+])
 `.trim(),
         );
       });
@@ -94,11 +95,11 @@ v.variant("type", {
 
         expect(result).toEqual(
           `
-v.variant("petType", {
-  cat: CatSchema,
-  dog: DogSchema,
-  bird: BirdSchema,
-})
+v.variant("petType", [
+  CatSchema,
+  DogSchema,
+  BirdSchema,
+])
 `.trim(),
         );
       });

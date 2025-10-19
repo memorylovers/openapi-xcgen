@@ -114,6 +114,7 @@ export function generateSchemaModel(model: IRModel): string | null {
     case "union": {
       // discriminatorがある場合のみvariantを使用
       if (model.discriminator) {
+        const discriminator = model.discriminator;
         const options = model.types
           .filter((type) => typeof type !== "string" && type.kind === "ref")
           .map((type) => {
@@ -121,8 +122,23 @@ export function generateSchemaModel(model: IRModel): string | null {
               // Core packageはreference path全体を保存: "#/components/schemas/Cat"
               // 最後のセグメントを抽出: "Cat"
               const modelName = type.name.split("/").at(-1) ?? type.name;
+
+              // Phase 2で自動生成されたmappingから正しいdiscriminator値を取得
+              let discriminatorValue = modelName;
+              if (discriminator.mapping) {
+                // mappingの中からtype.nameに一致するエントリを探す
+                for (const [key, refPath] of Object.entries(
+                  discriminator.mapping,
+                )) {
+                  if (refPath === type.name) {
+                    discriminatorValue = key;
+                    break;
+                  }
+                }
+              }
+
               return {
-                key: modelName, // discriminatorValueとしてtype名を使用
+                key: discriminatorValue, // 実際のdiscriminator値を使用
                 schemaRef: `${toTypeName(modelName)}Schema`,
               };
             }
@@ -133,7 +149,7 @@ export function generateSchemaModel(model: IRModel): string | null {
           );
 
         schemaExpression = generateUnionSchema(
-          model.discriminator.propertyName,
+          discriminator.propertyName,
           options,
         );
       } else {

@@ -642,7 +642,11 @@
       "name": "TicketPurchaseRequestPaymentMethod",
       "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod",
       "discriminator": {
-        "propertyName": "type"
+        "propertyName": "type",
+        "mapping": {
+          "credit_card": "#/components/schemas/CreditCardPayment",
+          "paypal": "#/components/schemas/PayPalPayment"
+        }
       },
       "types": [
         {
@@ -810,7 +814,10 @@
         {
           "name": "type",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "credit_card"
+          }
         },
         {
           "name": "card_number",
@@ -860,7 +867,10 @@
         {
           "name": "type",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "paypal"
+          }
         },
         {
           "name": "paypal_email",

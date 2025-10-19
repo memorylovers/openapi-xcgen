@@ -38,6 +38,15 @@ export function irTypeToValibotSchema(
   type: IRType,
   validation?: IRValidation,
 ): string {
+  // const値がある場合はv.literal()を使用（discriminatorプロパティ用）
+  if (validation?.const !== undefined) {
+    const literalValue =
+      typeof validation.const === "string"
+        ? `"${validation.const}"`
+        : validation.const;
+    return `v.literal(${literalValue})`;
+  }
+
   let baseSchema: string;
 
   // IRScalarType (string literal)

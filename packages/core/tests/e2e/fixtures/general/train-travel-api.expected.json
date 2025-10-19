@@ -383,7 +383,10 @@
         {
           "name": "method",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "card"
+          }
         },
         {
           "name": "card_number",
@@ -439,7 +442,10 @@
         {
           "name": "method",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "bank_transfer"
+          }
         },
         {
           "name": "account_number",
@@ -832,7 +838,11 @@
       "name": "PostBookingsBookingIdPaymentRequestBody",
       "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody",
       "discriminator": {
-        "propertyName": "method"
+        "propertyName": "method",
+        "mapping": {
+          "card": "#/components/schemas/CardPayment",
+          "bank_transfer": "#/components/schemas/BankTransferPayment"
+        }
       },
       "types": [
         {
@@ -1172,19 +1182,6 @@
         "kind": "ref",
         "name": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
       },
-      "requestBody": {
-        "kind": "content",
-        "required": true,
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody"
-            }
-          }
-        ]
-      },
       "responses": [
         {
           "kind": "content",
@@ -1241,7 +1238,20 @@
       ],
       "operationId": "payForBooking",
       "summary": "Pay for a booking",
-      "description": "Process payment for a booking"
+      "description": "Process payment for a booking",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody"
+            }
+          }
+        ],
+        "required": true
+      }
     }
   ],
   "servers": [

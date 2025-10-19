@@ -104,6 +104,17 @@ export function extractValidation(
     validation.format = schema.format;
   }
 
+  // const値（OpenAPI 3.1リテラル値）- discriminator mapping自動生成に使用
+  if ("const" in schema && schema.const !== undefined) {
+    if (
+      typeof schema.const === "string" ||
+      typeof schema.const === "number" ||
+      typeof schema.const === "boolean"
+    ) {
+      validation.const = schema.const;
+    }
+  }
+
   // バリデーションが空の場合はundefinedを返す
   // プロパティが1つもない場合
   const hasValidation = Object.keys(validation).length > 0;

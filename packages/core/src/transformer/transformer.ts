@@ -25,6 +25,7 @@ import type {
   PathsObject,
   XcgenIR,
 } from "../types";
+import { enrichDiscriminatorMappings } from "./helpers/enrich-discriminator-mappings.js";
 import {
   visitComponents,
   visitMetadata,
@@ -151,6 +152,9 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     ...(commonResponses && { commonResponses }),
     ...(commonRequestBodies && { commonRequestBodies }),
   };
+
+  // Phase 2: Post-processing - discriminator.mappingの自動生成
+  enrichDiscriminatorMappings(xcgenIR);
 
   return xcgenIR;
 }

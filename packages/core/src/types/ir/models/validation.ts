@@ -40,4 +40,6 @@ export interface IRValidation {
   maxProperties?: number;
   /** フォーマット（uuid、email、uri、ipv4等のバリデーション用） */
   format?: string;
+  /** const値（リテラル値、OpenAPI 3.1） - discriminator mappingの自動生成に使用 */
+  const?: string | number | boolean;
 }
