@@ -15,8 +15,8 @@
 - [ ] lerna-lite導入（モノレポバージョン管理）
 - [ ] CHANGELOG自動生成（conventional-changelog）
 - [ ] リリース自動化（lerna version + lerna publish）
-- [ ] ライセンス確認
-- [ ] package.jsonメタデータ整備
+- [x] ライセンス確認
+- [x] package.jsonメタデータ整備
 
 ### タスク5.3: CI/CD統合
 

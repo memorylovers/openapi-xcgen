@@ -4,6 +4,28 @@
   "description": "TypeScript code generator for OpenAPI specifications",
   "author": "Memory Lovers, LLC<https://github.com/memorylovers>",
   "license": "MIT",
+  "funding": "https://github.com/sponsors/memory-lovers",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/memorylovers/openapi-xcgen.git",
+    "directory": "packages/xcgen-ts"
+  },
+  "bugs": {
+    "url": "https://github.com/memorylovers/openapi-xcgen/issues"
+  },
+  "homepage": "https://github.com/memorylovers/openapi-xcgen#readme",
+  "keywords": [
+    "openapi",
+    "typescript",
+    "code-generator",
+    "api-client",
+    "cli",
+    "valibot"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.13.1",
   "type": "module",
   "exports": {
     ".": {

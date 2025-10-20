@@ -4,6 +4,26 @@
   "description": "Core utilities for OpenAPI code generation",
   "author": "Memory Lovers, LLC<https://github.com/memorylovers>",
   "license": "MIT",
+  "funding": "https://github.com/sponsors/memory-lovers",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/memorylovers/openapi-xcgen.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/memorylovers/openapi-xcgen/issues"
+  },
+  "homepage": "https://github.com/memorylovers/openapi-xcgen#readme",
+  "keywords": [
+    "openapi",
+    "code-generation",
+    "typescript",
+    "api-client"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.13.1",
   "type": "module",
   "exports": {
     ".": {
