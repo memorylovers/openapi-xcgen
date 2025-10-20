@@ -6,114 +6,44 @@
 
 ## 現在のステータス
 
-### 完了済み（Phase 1-4 一部）
+### 完了済み機能
 
-- ✅ **Phase 1**: TypeScript型定義、API関数、HTTPクライアント生成
-- ✅ **Phase 2**: Valibotスキーマ生成（discriminator自動生成、v1対応）
-- ✅ **Phase 3**: E2Eテスト、型チェックテスト（49 files, 243 tests passed）
-- ✅ **Phase 4.1**: CLI実装（citty + c12、引数パース、設定ファイル対応）
+**Core機能**:
 
-### 主要機能
+- ✅ OpenAPIパーサー（3.0.x / 3.1.x対応）
+- ✅ IR変換器（oneOf/anyOf/allOf/discriminator完全サポート）
+- ✅ 421テスト全てパス
 
-- TypeScript型定義生成（Object, Enum, AllOf, AnyOf, Union, Array, Map）
-- API関数生成（構造化パラメータ、エラーハンドリング）
-- HTTPクライアント（ゼロ依存、グローバル設定、カスタムfetch対応）
-- Valibotスキーマ生成（`--validator=valibot`）
-  - 11種類のスカラー型、全validation対応
-  - allOf, anyOf, oneOf, discriminator完全サポート
-  - discriminator自動生成（const値からmapping生成）
-  - Valibot v1 variant()構文対応
+**TypeScript Generator**:
 
-### 品質
+- ✅ TypeScript型定義生成（Object, Enum, AllOf, AnyOf, Union, Array, Map）
+- ✅ API関数生成（統合パラメータ、discriminated union対応）
+- ✅ HTTPクライアント（ゼロ依存、グローバル設定、カスタムfetch対応）
+- ✅ Valibotスキーマ生成（v.variant()によるdiscriminator対応）
+- ✅ CLI実装（citty + c12、引数パース、設定ファイル対応）
+- ✅ 252テスト全てパス
 
-- **49 test files, 243 tests passed**
-- E2Eテスト: 12 fixtures（petstore, train-travel等）
-- 型チェックテスト: strictモード検証
-- Examples統合: petstore, train-travel
+**Examples**:
 
----
-
-## 既知の制限事項
-
-### 1. 統合パラメータインターフェース未対応
-
-**問題**: pathパラメータとrequestBodyの両方を持つエンドポイントで、bodyプロパティが生成されない
-
-**影響例**: `POST /bookings/{bookingId}/payment`
-
-**現在**:
-
-```typescript
-export interface PostBookingsBookingIdPaymentParams {
-  path: { bookingId: string };
-  // bodyプロパティが欠落
-}
-```
-
-**期待される動作**:
-
-```typescript
-export interface PostBookingsBookingIdPaymentParams {
-  path: { bookingId: string };
-  body: CardPayment | BankTransferPayment;
-}
-```
-
-**対応予定**: タスク4.2で実装
-
----
-
-## Phase 4: 統合パラメータ対応
-
-**優先度**: 高
-
-### タスク4.2: 統合パラメータインターフェース実装
-
-**実装内容**:
-
-1. **services-function.ts修正**
-   - TODOコメント解消（62-70行）
-   - 統合インターフェース生成
-
-2. **types-parameter.ts拡張**
-   - path + body統合型の生成ロジック
-   - query, header パラメータも考慮
-
-3. **train-travel payment examples有効化**
-   - `examples/train-travel/src/index.ts`のコメント解除
-
-4. **テスト追加**
-   - E2Eテスト（path + body両方持つendpoint）
-   - 型チェックテスト
-   - train-travel examples実行確認
-
-**検証項目**:
-
-- [x] path + body統合型が正しく生成される
-- [x] path + query + body統合型が正しく生成される
-- [x] train-travel payment examplesが動作する
-- [x] E2Eテストがパスする
-- [x] 型チェックがパスする
+- ✅ petstore: 基本的なCRUD操作
+- ✅ train-travel: 複雑なユースケース（discriminated union、統合パラメータ）
 
 ---
 
 ## Phase 5: 実用段階への移行
 
-**優先度**: 中（Phase 4完了後）
+**優先度**: 高
 
 ### タスク5.1: ドキュメント整備
 
 - [ ] README更新（インストール、クイックスタート、機能一覧）
 - [ ] CLI使用ガイド
-- [ ] トラブルシューティング
-- [ ] Migration guide（他ツールからの移行）
-- [ ] API Reference
 
 ### タスク5.2: npm公開準備
 
-- [ ] CHANGELOG生成（semantic-release）
-- [ ] バージョニング戦略（semver準拠）
-- [ ] リリースノート作成
+- [ ] lerna-lite導入（モノレポバージョン管理）
+- [ ] CHANGELOG自動生成（conventional-changelog）
+- [ ] リリース自動化（lerna version + lerna publish）
 - [ ] ライセンス確認
 - [ ] package.jsonメタデータ整備
 
@@ -127,68 +57,12 @@ export interface PostBookingsBookingIdPaymentParams {
 
 ## Phase 6: 拡張機能（オプション）
 
-**優先度**: 低（Phase 5完了後、需要に応じて）
-
-### タスク6.1: Zod対応
-
-- [ ] `--validator=zod`フラグ実装
-- [ ] Valibotと同等の機能サポート
+**優先度**: 低（需要に応じて）
 
 ### タスク6.2: x-extensions サポート
 
 - [ ] カスタム拡張プロパティのサポート
 - [ ] プラグインシステム設計
-
-### タスク6.3: パフォーマンス最適化
-
-- [ ] 大規模API（1000+ endpoints）への対応
-- [ ] 並列処理実装
-
-### タスク6.4: 追加HTTPクライアント対応
-
-- [ ] Axios, ky等のアダプター
-- [ ] カスタムHTTPクライアントプラグイン
-
-### タスク6.5: Mock生成
-
-- [ ] MSW（Mock Service Worker）統合
-- [ ] テストデータ生成（faker.js統合）
-
-### タスク6.6: Hey API discriminator対応
-
-**優先度**: 中（Phase 5完了後）
-
-**現在の問題**:
-
-- allOf + 親discriminator参照パターンで警告が出てモデル生成が失敗
-- Hey APIテストが3件失敗している状態（discriminator-one-of, discriminator-all-of, discriminator-any-of）
-
-**実装内容**:
-
-1. **schema-visitor.ts修正**
-   - discriminatorのみの早期returnロジックを改善
-   - allOf解決時の親discriminator伝播を適切に処理
-
-2. **allof-visitor.ts拡張**
-   - 親スキーマのdiscriminatorを子スキーマに継承する処理
-
-3. **テスト有効化**
-   - `packages/core/tests/e2e/transformer/general-hey-api.test.ts`
-   - 3つのskipを解除（現在はコメントアウトされている）
-
-**検証項目**:
-
-- [ ] discriminator-one-of テストがパス
-- [ ] discriminator-all-of テストがパス
-- [ ] discriminator-any-of テストがパス
-- [ ] `pnpm test`が全てパス
-- [ ] train-travel examplesが引き続き動作
-
-**参考情報**:
-
-- Hey APIテストfixture: `packages/core/tests/e2e/fixtures/general/hey-api/`
-- 警告メッセージ: `discriminator is not supported yet: #/components/schemas/Qux`
-- 関連コード: `packages/core/src/transformer/visitors/schema/schema-visitor.ts:111-116`
 
 ---
 
@@ -202,7 +76,7 @@ pnpm dev          # 開発モード（watch）
 pnpm build        # ビルド
 
 # テスト
-pnpm test         # 243 tests
+pnpm test         # Core: 421 tests, Generator: 252 tests
 pnpm test:watch   # watchモード
 pnpm test:coverage # カバレッジ
 
@@ -218,6 +92,7 @@ pnpm typecheck    # TypeScript型チェック
 - **テスト**: Vitest（In-sourceテスティング）
 - **ビルド**: unbuild（ESM/CJS両対応）
 - **CLI**: c12, citty
+- **Validator**: Valibot v1（オプション）
 
 ### 関連ドキュメント
 
