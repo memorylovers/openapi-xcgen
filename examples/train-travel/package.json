@@ -1,7 +1,7 @@
 {
   "name": "train-travel-example",
   "version": "0.0.0",
-  "description": "Train Travel API client example using @openapi-xcgen/generator-typescript",
+  "description": "Train Travel API client example using @openapi-xcgen/xcgen-ts",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openapi-xcgen/generator-typescript": "workspace:*"
+    "@openapi-xcgen/xcgen-ts": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.2",

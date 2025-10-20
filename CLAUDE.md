@@ -226,7 +226,7 @@ packages/
 │   │   └── types/
 │   │       └── ir/           # 中間表現型定義
 │   └── tests/                # 統合テストのみ（単体テストはin-source）
-├── generator-typescript/      # TypeScript生成器
+├── xcgen-ts/                  # TypeScript生成器
 └── generator-dart/           # Dart生成器
 ```
 
@@ -245,7 +245,7 @@ pnpm test:watch   # watchモードでテスト
 pnpm test:coverage # カバレッジ付きテスト
 
 # E2E期待値再生成
-pnpm regenerate:expected  # E2E期待値ファイルを再生成（coreまたはgenerator-typescript）
+pnpm regenerate:expected  # E2E期待値ファイルを再生成（coreまたはxcgen-ts）
 
 # 品質チェック
 pnpm check        # lint + typecheck + test

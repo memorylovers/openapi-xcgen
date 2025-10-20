@@ -1,5 +1,5 @@
 {
-  "name": "@openapi-xcgen/generator-typescript",
+  "name": "@openapi-xcgen/xcgen-ts",
   "version": "0.0.0",
   "description": "TypeScript code generator for OpenAPI specifications",
   "author": "Memory Lovers, LLC<https://github.com/memorylovers>",

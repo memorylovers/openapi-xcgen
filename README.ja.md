@@ -27,10 +27,10 @@ OpenAPI仕様から型安全なコードを生成するコードジェネレー�
 
 ```bash
 # グローバルインストール
-npm install -g @openapi-xcgen/generator-typescript
+npm install -g @openapi-xcgen/xcgen-ts
 
 # または開発依存としてインストール
-npm install --save-dev @openapi-xcgen/generator-typescript
+npm install --save-dev @openapi-xcgen/xcgen-ts
 ```
 
 ### クライアント生成
@@ -85,7 +85,7 @@ xcgen-ts -i <input> -o <output> [options]
 プロジェクトルートに`xcgen.config.ts`を作成：
 
 ```typescript
-import { defineConfig } from "@openapi-xcgen/generator-typescript";
+import { defineConfig } from "@openapi-xcgen/xcgen-ts";
 
 export default defineConfig({
   input: "./openapi.yaml",
@@ -104,7 +104,7 @@ export default defineConfig({
 ## パッケージ
 
 - **[@openapi-xcgen/core](./packages/core/)** - OpenAPIパーサーとIR変換器
-- **[@openapi-xcgen/generator-typescript](./packages/generator-typescript/)** - TypeScriptコードジェネレーター
+- **[@openapi-xcgen/xcgen-ts](./packages/xcgen-ts/)** - TypeScriptコードジェネレーター
 - **@openapi-xcgen/generator-dart** - Dartジェネレーター（計画中）
 
 ## 開発
@@ -178,7 +178,7 @@ pnpm typecheck        # TypeScript型チェック
 3. **グローバルインストール**：
 
    ```bash
-   npm install -g @openapi-xcgen/generator-typescript
+   npm install -g @openapi-xcgen/xcgen-ts
    ```
 
 ### 生成されたコードに型エラーがある

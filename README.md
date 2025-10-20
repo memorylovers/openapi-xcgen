@@ -27,10 +27,10 @@ Currently available:
 
 ```bash
 # Install globally
-npm install -g @openapi-xcgen/generator-typescript
+npm install -g @openapi-xcgen/xcgen-ts
 
 # Or install as dev dependency
-npm install --save-dev @openapi-xcgen/generator-typescript
+npm install --save-dev @openapi-xcgen/xcgen-ts
 ```
 
 ### Generate Client
@@ -85,7 +85,7 @@ The generator creates the following files:
 Create `xcgen.config.ts` in your project root:
 
 ```typescript
-import { defineConfig } from "@openapi-xcgen/generator-typescript";
+import { defineConfig } from "@openapi-xcgen/xcgen-ts";
 
 export default defineConfig({
   input: "./openapi.yaml",
@@ -104,7 +104,7 @@ Then run: `xcgen-ts` (uses config file automatically)
 ## Packages
 
 - **[@openapi-xcgen/core](./packages/core/)** - OpenAPI parser and IR transformer
-- **[@openapi-xcgen/generator-typescript](./packages/generator-typescript/)** - TypeScript code generator
+- **[@openapi-xcgen/xcgen-ts](./packages/xcgen-ts/)** - TypeScript code generator
 - **@openapi-xcgen/generator-dart** - Dart generator (planned)
 
 ## Development
@@ -178,7 +178,7 @@ If you installed locally (not globally), you have several options:
 3. **Install globally**:
 
    ```bash
-   npm install -g @openapi-xcgen/generator-typescript
+   npm install -g @openapi-xcgen/xcgen-ts
    ```
 
 ### Generated code has type errors
