@@ -15,6 +15,7 @@ export default [
     ignores: [
       "tests/e2e/fixtures/*/expected/**",
       "tests/e2e/fixtures/*/*/expected/**",
+      "tests/e2e/fixtures/*/*/*/expected/**",
     ],
   },
 ];

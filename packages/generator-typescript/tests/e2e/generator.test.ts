@@ -115,6 +115,38 @@ describe("E2E: TypeScript Generator", () => {
     });
   });
 
+  describe("General - Hey API", () => {
+    it("should handle discriminator with oneOf", async () => {
+      await compareWithExpected("general/hey-api/discriminator-one-of");
+    });
+
+    it("should handle discriminator with oneOf (with valibot)", async () => {
+      await compareWithExpected("general/hey-api/discriminator-one-of", {
+        validator: "valibot",
+      });
+    });
+
+    it("should handle discriminator with allOf", async () => {
+      await compareWithExpected("general/hey-api/discriminator-all-of");
+    });
+
+    it("should handle discriminator with allOf (with valibot)", async () => {
+      await compareWithExpected("general/hey-api/discriminator-all-of", {
+        validator: "valibot",
+      });
+    });
+
+    it("should handle discriminator with anyOf", async () => {
+      await compareWithExpected("general/hey-api/discriminator-any-of");
+    });
+
+    it("should handle discriminator with anyOf (with valibot)", async () => {
+      await compareWithExpected("general/hey-api/discriminator-any-of", {
+        validator: "valibot",
+      });
+    });
+  });
+
   describe("Validation - Special Test Cases", () => {
     it("should generate code from validation spec", async () => {
       await compareWithExpected("validation");

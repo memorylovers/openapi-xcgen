@@ -157,6 +157,35 @@
           "name": "BAZ"
         }
       ]
+    },
+    {
+      "kind": "object",
+      "name": "Qux",
+      "referencePath": "#/components/schemas/Qux",
+      "properties": [
+        {
+          "name": "foo",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "bar",
+          "type": "double",
+          "required": true
+        },
+        {
+          "name": "baz",
+          "type": "datetime"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        }
+      ]
     }
   ],
   "tags": [],

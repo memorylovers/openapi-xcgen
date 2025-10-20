@@ -108,12 +108,14 @@ export function visitSchema(
     result.type = anyOfResult.type;
     return result;
   }
-  if ("discriminator" in schema && schema.discriminator) {
-    consola.warn(
-      `discriminator is not supported yet: ${buildReferencePath(context.documentPath)}`,
-    );
-    return result;
-  }
+  // Note: discriminator は oneOf/anyOf/allOf visitor で適切に処理される
+  // discriminator のみのスキーマは object 型として扱う
+  // if ("discriminator" in schema && schema.discriminator) {
+  //   consola.warn(
+  //     `discriminator is not supported yet: ${buildReferencePath(context.documentPath)}`,
+  //   );
+  //   return result;
+  // }
   if ("not" in schema && schema.not) {
     consola.warn(
       `not schema is not supported yet: ${buildReferencePath(context.documentPath)}`,

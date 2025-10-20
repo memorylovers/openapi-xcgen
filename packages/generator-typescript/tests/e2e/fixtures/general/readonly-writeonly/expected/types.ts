@@ -33,9 +33,7 @@ export interface UserUpdate {
   /** Email address */ email?: string | undefined;
   /** Current password for verification */ currentPassword?: string | undefined;
   /** New password */ newPassword?: string | undefined;
-  /** Last login timestamp (server-managed) */ readonly lastLoginAt?:
-    | string
-    | undefined;
+  /** Last login timestamp (server-managed) */ readonly lastLoginAt?: string | undefined;
 }
 
 /**

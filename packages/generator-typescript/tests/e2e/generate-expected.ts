@@ -98,6 +98,10 @@ async function main() {
       "general/readonly-writeonly",
       "general/allof",
       "general/complex-schema",
+      // General - Hey API
+      "general/hey-api/discriminator-one-of",
+      "general/hey-api/discriminator-all-of",
+      "general/hey-api/discriminator-any-of",
       // Models fixtures
       "models/data-types",
       "models/complex-structures",

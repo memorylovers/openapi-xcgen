@@ -1,15 +1,13 @@
 {
   "metadata": {
     "title": "OpenAPI 3.1.0 discriminator one of example",
-    "version": "1.0.0",
-    "description": null
+    "version": "1.0.0"
   },
   "models": [
     {
       "kind": "union",
       "name": "Foo",
       "referencePath": "#/components/schemas/Foo",
-      "description": null,
       "discriminator": {
         "propertyName": "type"
       },
@@ -25,95 +23,35 @@
       ]
     },
     {
-      "kind": "object",
-      "name": "Bar",
-      "referencePath": "#/components/schemas/Bar",
-      "description": null,
-      "properties": [
-        {
-          "name": "id",
-          "description": null,
-          "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "type",
-          "description": null,
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/Quux"
-          },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        }
-      ]
-    },
-    {
-      "kind": "object",
+      "kind": "allOf",
       "name": "Baz",
       "referencePath": "#/components/schemas/Baz",
-      "description": null,
-      "properties": [
+      "schemas": [
         {
-          "name": "id",
-          "description": null,
-          "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "type",
-          "description": null,
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/Quux"
-          },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
         }
       ]
     },
     {
-      "kind": "object",
+      "kind": "allOf",
+      "name": "Bar",
+      "referencePath": "#/components/schemas/Bar",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
       "name": "Spæcial",
       "referencePath": "#/components/schemas/Spæcial",
-      "description": null,
-      "properties": [
+      "schemas": [
         {
-          "name": "id",
-          "description": null,
-          "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
-        },
-        {
-          "name": "type",
-          "description": null,
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/Quux"
-          },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
         }
       ]
     },
@@ -121,30 +59,19 @@
       "kind": "object",
       "name": "Qux",
       "referencePath": "#/components/schemas/Qux",
-      "description": null,
       "properties": [
         {
           "name": "id",
-          "description": null,
           "type": "string",
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         },
         {
           "name": "type",
-          "description": null,
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/Quux"
           },
-          "required": true,
-          "nullable": null,
-          "defaultValue": null,
-          "deprecated": null,
-          "validation": null
+          "required": true
         }
       ]
     },
@@ -152,18 +79,15 @@
       "kind": "enum",
       "name": "Quux",
       "referencePath": "#/components/schemas/Quux",
-      "description": null,
       "type": "string",
       "values": [
         {
           "value": "Bar",
-          "name": "BAR",
-          "description": null
+          "name": "BAR"
         },
         {
           "value": "Baz",
-          "name": "BAZ",
-          "description": null
+          "name": "BAZ"
         }
       ]
     },
@@ -171,7 +95,6 @@
       "kind": "union",
       "name": "Quuz",
       "referencePath": "#/components/schemas/Quuz",
-      "description": null,
       "discriminator": {
         "propertyName": "type",
         "mapping": {
@@ -191,11 +114,34 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Spæcial"
+          "name": "#/components/schemas/Sp%C3%A6cial"
         }
       ]
     }
   ],
   "tags": [],
-  "endpoints": []
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/foo",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Foo"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
