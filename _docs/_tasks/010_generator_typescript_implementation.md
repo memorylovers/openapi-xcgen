@@ -36,8 +36,19 @@
 
 ### タスク5.1: ドキュメント整備
 
-- [ ] README更新（インストール、クイックスタート、機能一覧）
-- [ ] CLI使用ガイド
+- [ ] _guides/ディレクトリ作成
+- [ ] Getting Started
+  - [ ] _guides/getting-started.md（英語・インストール、基本的な使い方）
+  - [ ] _guides/getting-started.ja.md（日本語）
+- [ ] CLI Guide
+  - [ ] _guides/cli.md（英語・CLIコマンド詳細）
+  - [ ] _guides/cli.ja.md（日本語）
+- [ ] Specification
+  - [ ] _guides/spec.md（英語・Type System、変換仕様等）
+  - [ ] _guides/spec.ja.md（日本語）
+- [ ] README更新
+  - [ ] README.md（簡潔版、_guides/へのリンク、100行程度）
+  - [ ] README.ja.md（日本語版）
 
 ### タスク5.2: npm公開準備
 
