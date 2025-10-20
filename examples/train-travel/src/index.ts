@@ -152,7 +152,7 @@ export async function exampleFindTrips() {
         // UUID format validation
         origin: "a8f7e8d0-1234-5678-9abc-def012345678",
         destination: "b9e8f9e1-2345-6789-abcd-ef0123456789",
-        date: "2024-12-25", // ISO 8601 date format
+        date: new Date("2024-12-25"), // Date object (ISO 8601 validated)
         bicycles: true,
         dogs: false,
       },
@@ -201,13 +201,13 @@ export async function exampleCreateBooking() {
         {
           name: "Alice Johnson",
           email: "alice@example.com",
-          dateOfBirth: "1990-05-15",
+          dateOfBirth: new Date("1990-05-15"),
           passportNumber: "AB1234567",
         },
         {
           name: "Bob Smith",
           email: "bob@example.com",
-          dateOfBirth: "1985-08-22",
+          dateOfBirth: new Date("1985-08-22"),
         },
       ],
       seatPreferences: "window", // Enum: window | aisle | table | quiet

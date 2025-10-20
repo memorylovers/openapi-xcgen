@@ -9,7 +9,7 @@ export interface Profile {
   name?: string | undefined;
   bio?: string | null | undefined;
   nickname?: string | null | undefined;
-  lastLoginDate?: string | null | undefined;
+  lastLoginDate?: Date | null | undefined;
   settings?: ProfileSettings | null | undefined;
   tags?: ProfileTags | null | undefined;
 }

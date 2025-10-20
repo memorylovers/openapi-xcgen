@@ -17,8 +17,8 @@ The following table shows the mapping between OpenAPI types, IR types, and TypeS
 | Double precision | `number` | - or `double` | `double` | `number` |
 | Single precision | `number` | `float` | `float` | `number` |
 | String | `string` | - | `string` | `string` |
-| Date | `string` | `date` | `date` | `string` |
-| Date-Time | `string` | `date-time` | `datetime` | `string` |
+| Date | `string` | `date` | `date` | `Date` |
+| Date-Time | `string` | `date-time` | `datetime` | `Date` |
 | Binary data | `string` | `binary` | `binary` | `Blob` |
 | Base64 encoded | `string` | `byte` | `byte` | `string` |
 | Boolean | `boolean` | - | `boolean` | `boolean` |
@@ -55,9 +55,9 @@ The following table shows the mapping between OpenAPI types, IR types, and TypeS
 | `string` | `v.string()` | String |
 | `boolean` | `v.boolean()` | Boolean |
 | `null` | `v.null()` | Null value |
-| `date` | `v.string()` | Date |
-| `datetime` | `v.string()` | Date-Time |
-| `byte` | `v.string()` | Base64 encoded |
+| `date` | `v.pipe(v.string(), v.isoDate(), v.transform(...))` | Date |
+| `datetime` | `v.pipe(v.string(), v.isoDateTime(), v.transform(...))` | Date-Time |
+| `byte` | `v.pipe(v.string(), v.base64())` | Base64 encoded |
 | `binary` | `v.instance(Blob)` | Binary data |
 
 ### Complex Type Validation

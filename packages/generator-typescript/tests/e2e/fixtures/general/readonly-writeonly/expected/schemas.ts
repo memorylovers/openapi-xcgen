@@ -14,8 +14,8 @@ export const UserSchema = v.object({
   id: v.string(), // readOnly
   username: v.string(),
   email: v.pipe(v.string(), v.email()),
-  createdAt: v.optional(v.string()), // readOnly
-  updatedAt: v.optional(v.string()), // readOnly
+  createdAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))), // readOnly
+  updatedAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))), // readOnly
 });
 
 /**
@@ -38,5 +38,5 @@ export const UserUpdateSchema = v.object({
   email: v.optional(v.pipe(v.string(), v.email())),
   currentPassword: v.optional(v.string()),
   newPassword: v.optional(v.string()),
-  lastLoginAt: v.optional(v.string()), // readOnly
+  lastLoginAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))), // readOnly
 });

@@ -65,13 +65,8 @@ export function generateValidationPipes(
       case "uri":
         pipes.push("v.url()");
         break;
-      case "date-time":
-        pipes.push("v.isoDateTime()");
-        break;
-      case "date":
-        pipes.push("v.isoDate()");
-        break;
       // 他のformatは現時点ではスキップ（ipv4, ipv6等）
+      // 注: date/date-timeはIRValidation.formatから除外されているため、ここでは処理されない
     }
   }
 

@@ -25,10 +25,11 @@ export function irTypeToTsType(irType: IRType): string {
   if (typeof irType === "string") {
     switch (irType) {
       case "string":
-      case "date":
-      case "datetime":
       case "byte": // Base64-encoded string
         return "string";
+      case "date":
+      case "datetime":
+        return "Date";
       case "binary": // Raw binary data (images, PDFs, etc.)
         return "Blob";
       case "int":
@@ -124,8 +125,8 @@ if (import.meta.vitest) {
         expect(irTypeToTsType("float")).toBe("number");
         expect(irTypeToTsType("double")).toBe("number");
         expect(irTypeToTsType("boolean")).toBe("boolean");
-        expect(irTypeToTsType("date")).toBe("string");
-        expect(irTypeToTsType("datetime")).toBe("string");
+        expect(irTypeToTsType("date")).toBe("Date");
+        expect(irTypeToTsType("datetime")).toBe("Date");
       });
 
       it("should convert binary types correctly", () => {

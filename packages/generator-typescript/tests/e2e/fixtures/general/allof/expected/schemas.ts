@@ -11,7 +11,7 @@ import * as v from "valibot";
  */
 export const BaseSchema = v.object({
   id: v.string(),
-  createdAt: v.optional(v.string()),
+  createdAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
 });
 
 /**
@@ -31,8 +31,8 @@ export const UserSchema = v.intersect([BaseSchema, UserAllOf1Schema]);
  * Schema for Timestamps
  */
 export const TimestampsSchema = v.object({
-  createdAt: v.optional(v.string()),
-  updatedAt: v.optional(v.string()),
+  createdAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
+  updatedAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
 });
 
 /**

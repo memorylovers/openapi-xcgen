@@ -12,8 +12,8 @@ export interface Order {
   priority?: OrderPriority | undefined;
   tags?: OrderTags | undefined;
   metadata?: OrderMetadata | undefined;
-  createdAt?: string | undefined;
-  updatedAt?: string | undefined;
+  createdAt?: Date | undefined;
+  updatedAt?: Date | undefined;
 }
 
 export type OrderItems = Array<OrderItemsItem>;

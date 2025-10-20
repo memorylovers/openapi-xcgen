@@ -17,8 +17,8 @@ openapi-xcgenの型システムと制限事項に関する技術仕様です。
 | 倍精度浮動小数点数 | `number` | - または `double` | `double` | `number` |
 | 単精度浮動小数点数 | `number` | `float` | `float` | `number` |
 | 文字列 | `string` | - | `string` | `string` |
-| 日付 | `string` | `date` | `date` | `string` |
-| 日付時刻 | `string` | `date-time` | `datetime` | `string` |
+| 日付 | `string` | `date` | `date` | `Date` |
+| 日付時刻 | `string` | `date-time` | `datetime` | `Date` |
 | バイナリデータ | `string` | `binary` | `binary` | `Blob` |
 | Base64エンコード | `string` | `byte` | `byte` | `string` |
 | 真偽値 | `boolean` | - | `boolean` | `boolean` |
@@ -55,9 +55,9 @@ openapi-xcgenの型システムと制限事項に関する技術仕様です。
 | `string` | `v.string()` | 文字列 |
 | `boolean` | `v.boolean()` | 真偽値 |
 | `null` | `v.null()` | null値 |
-| `date` | `v.string()` | 日付 |
-| `datetime` | `v.string()` | 日付時刻 |
-| `byte` | `v.string()` | Base64エンコード |
+| `date` | `v.pipe(v.string(), v.isoDate(), v.transform(...))` | 日付 |
+| `datetime` | `v.pipe(v.string(), v.isoDateTime(), v.transform(...))` | 日付時刻 |
+| `byte` | `v.pipe(v.string(), v.base64())` | Base64エンコード |
 | `binary` | `v.instance(Blob)` | バイナリデータ |
 
 ### 複合型バリデーション

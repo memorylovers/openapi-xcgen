@@ -6,7 +6,7 @@
 
 export interface Base {
   /** Unique identifier */ id: string;
-  /** Creation timestamp */ createdAt?: string | undefined;
+  /** Creation timestamp */ createdAt?: Date | undefined;
 }
 
 export type User = Base & UserAllOf1;
@@ -17,8 +17,8 @@ export interface UserAllOf1 {
 }
 
 export interface Timestamps {
-  createdAt?: string | undefined;
-  updatedAt?: string | undefined;
+  createdAt?: Date | undefined;
+  updatedAt?: Date | undefined;
 }
 
 /**

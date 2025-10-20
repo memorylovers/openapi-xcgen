@@ -9,8 +9,8 @@ export interface DataTypes {
   name?: string | undefined;
   score?: number | undefined;
   isActive?: boolean | undefined;
-  birthDate?: string | undefined;
-  createdAt?: string | undefined;
+  birthDate?: Date | undefined;
+  createdAt?: Date | undefined;
   profile?: DataTypesProfile | undefined;
   tags?: DataTypesTags | undefined;
   numbers?: DataTypesNumbers | undefined;

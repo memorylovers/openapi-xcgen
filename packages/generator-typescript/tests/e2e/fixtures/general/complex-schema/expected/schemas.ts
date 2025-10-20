@@ -72,6 +72,6 @@ export const OrderSchema = v.object({
   priority: v.optional(OrderPrioritySchema),
   tags: v.optional(OrderTagsSchema),
   metadata: v.optional(OrderMetadataSchema),
-  createdAt: v.optional(v.string()),
-  updatedAt: v.optional(v.string()),
+  createdAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
+  updatedAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
 });

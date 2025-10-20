@@ -18,9 +18,9 @@ import type { IRScalarType } from "@openapi-xcgen/core";
  * generatePrimitiveSchema("double")   // => "v.number()"
  * generatePrimitiveSchema("boolean")  // => "v.boolean()"
  * generatePrimitiveSchema("null")     // => "v.null()"
- * generatePrimitiveSchema("date")     // => "v.string()"
- * generatePrimitiveSchema("datetime") // => "v.string()"
- * generatePrimitiveSchema("byte")     // => "v.string()"
+ * generatePrimitiveSchema("date")     // => "v.pipe(v.string(), v.isoDate(), v.transform((val) => new Date(val)))"
+ * generatePrimitiveSchema("datetime") // => "v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))"
+ * generatePrimitiveSchema("byte")     // => "v.pipe(v.string(), v.base64())"
  * generatePrimitiveSchema("binary")   // => "v.instance(Blob)"
  * ```
  */
@@ -38,9 +38,11 @@ export function generatePrimitiveSchema(type: IRScalarType): string {
     case "null":
       return "v.null()";
     case "date":
+      return "v.pipe(v.string(), v.isoDate(), v.transform((val) => new Date(val)))";
     case "datetime":
+      return "v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))";
     case "byte":
-      return "v.string()";
+      return "v.pipe(v.string(), v.base64())";
     case "binary":
       return "v.instance(Blob)";
     default:
@@ -90,19 +92,23 @@ if (import.meta.vitest) {
         expect(result).toBe("v.null()");
       });
 
-      it("should generate date schema as string", () => {
+      it("should generate date schema with validation and transformation", () => {
         const result = generatePrimitiveSchema("date");
-        expect(result).toBe("v.string()");
+        expect(result).toBe(
+          "v.pipe(v.string(), v.isoDate(), v.transform((val) => new Date(val)))",
+        );
       });
 
-      it("should generate datetime schema as string", () => {
+      it("should generate datetime schema with validation and transformation", () => {
         const result = generatePrimitiveSchema("datetime");
-        expect(result).toBe("v.string()");
+        expect(result).toBe(
+          "v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))",
+        );
       });
 
-      it("should generate byte schema as string", () => {
+      it("should generate byte schema with base64 validation", () => {
         const result = generatePrimitiveSchema("byte");
-        expect(result).toBe("v.string()");
+        expect(result).toBe("v.pipe(v.string(), v.base64())");
       });
 
       it("should generate binary schema as Blob instance", () => {
