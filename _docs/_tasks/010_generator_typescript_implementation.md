@@ -2,7 +2,7 @@
 
 ## 概要
 
-`@openapi-xcgen/generator-typescript`パッケージの未完了タスク管理。
+`@openapi-xcgen/xcgen-ts`パッケージの未完了タスク管理。
 
 ---
 
@@ -12,8 +12,6 @@
 
 ### タスク5.2: npm公開準備
 
-- [ ] パッケージ名変更（generator-typescript → xcgen-ts）
-  - 参照: `_docs/_tasks/011_package_rename_to_xcgen_ts.md`
 - [ ] lerna-lite導入（モノレポバージョン管理）
 - [ ] CHANGELOG自動生成（conventional-changelog）
 - [ ] リリース自動化（lerna version + lerna publish）
