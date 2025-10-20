@@ -1,141 +1,111 @@
 # openapi-xcgen
 
-A cross-language code generator that transforms OpenAPI specifications into TypeScript and Dart client code.
+[English](./README.md) | [日本語](./README.ja.md)
 
-## Overview
+A cross-language code generator that transforms OpenAPI specifications into type-safe TypeScript client code.
 
-openapi-xcgen takes OpenAPI specification files (YAML/JSON) generated from TypeSpec and produces type-safe client code for multiple languages. The library uses an intermediate representation (IR) to ensure consistent code generation across different target languages.
+## Features
+
+- ✅ **Cross-language support** - TypeScript, Dart (planned)
+- ✅ **OpenAPI 3.0/3.1** - Full specification support
+- ✅ **Type-safe code generation** - Leverages native type systems
+- ✅ **Advanced features** - oneOf/anyOf/allOf, discriminator support
+- ✅ **Inline schema extraction** - Converts to reusable models
+- ✅ **Validation integration** - Supports major validation libraries
+
+## TypeScript (xcgen-ts)
+
+Currently available:
+
+- **Zero runtime dependencies** - fetch-based lightweight HTTP client
+- **Valibot integration** - Optional runtime validation
+- **Tree-shakeable** - Function-based architecture
+
+## Quick Start
+
+### Installation
+
+```bash
+# Install globally
+npm install -g @openapi-xcgen/generator-typescript
+
+# Or install as dev dependency
+npm install --save-dev @openapi-xcgen/generator-typescript
+```
+
+### Generate Client
+
+```bash
+# Basic generation
+xcgen-ts -i openapi.yaml -o ./generated
+
+# With Valibot validation
+xcgen-ts -i openapi.yaml -o ./generated --validator=valibot
+```
+
+### Use Generated Client
+
+```typescript
+import { listUsers } from "./generated/services.js";
+import { setConfig } from "./generated/client.js";
+
+setConfig({ baseUrl: "https://api.example.com" });
+
+const users = await listUsers();
+```
+
+## CLI Usage
+
+### Basic Command
+
+```bash
+xcgen-ts -i <input> -o <output> [options]
+```
+
+### Options
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-i, --input <path>` | Input OpenAPI file (YAML/JSON) | `-i openapi.yaml` |
+| `-o, --output <path>` | Output directory | `-o ./generated` |
+| `--validator <lib>` | Validation library (valibot) | `--validator=valibot` |
+| `-c, --config <path>` | Config file path | `-c ./xcgen.config.ts` |
+
+### Generated Files
+
+The generator creates the following files:
+
+- **`types.ts`** - TypeScript type definitions
+- **`client.ts`** - HTTP client and error handling
+- **`services.ts`** - API service functions
+- **`schemas.ts`** - Validation schemas (when `--validator` is specified)
+
+### Configuration File
+
+Create `xcgen.config.ts` in your project root:
+
+```typescript
+import { defineConfig } from "@openapi-xcgen/generator-typescript";
+
+export default defineConfig({
+  input: "./openapi.yaml",
+  output: "./src/generated",
+  validator: "valibot",
+});
+```
+
+Then run: `xcgen-ts` (uses config file automatically)
+
+## Documentation
+
+- **[Specification](./_guides/spec.md)** - Type system and limitations
+- **[Examples](./examples/)** - Working code examples
 
 ## Packages
 
-- **@openapi-xcgen/core**: Parser and transformer for OpenAPI to IR conversion
-- **@openapi-xcgen/generator-typescript**: TypeScript code generator (planned)
-- **@openapi-xcgen/generator-dart**: Dart code generator (planned)
-
-## Type System
-
-### IR Scalar Types
-
-The following table shows the mapping between OpenAPI types and IR scalar types:
-
-| IR Type | Description | OpenAPI `type` | OpenAPI `format` |
-|---------|-------------|----------------|------------------|
-| `int` | 32-bit integer | `integer` | - or `int32` |
-| `long` | 64-bit integer | `integer` | `int64` |
-| `float` | Single precision float | `number` | `float` |
-| `double` | Double precision float | `number` | - or `double` |
-| `string` | String | `string` | - |
-| `boolean` | Boolean | `boolean` | - |
-| `date` | Date only | `string` | `date` |
-| `datetime` | Date and time | `string` | `date-time` |
-| `binary` | Binary data | `string` | `binary` |
-| `byte` | Base64 encoded | `string` | `byte` |
-
-### IR Model Structure
-
-openapi-xcgen uses a unified model structure with discriminated unions for type safety:
-
-```typescript
-type IRModel = IRObjectModel | IREnumModel | IRArrayModel | IRMapModel;
-
-interface IRObjectModel {
-  kind: "object";
-  name: string;
-  referencePath: string;
-  properties: IRProperty[];
-  // ... other properties
-}
-
-interface IREnumModel {
-  kind: "enum";
-  name: string; 
-  referencePath: string;
-  type: string;
-  values: IREnumValue[];
-  // ... other properties
-}
-```
-
-### Complex Types
-
-- **Array**: Represented as `IRArray` with element type
-- **Object**: Represented as `IRMap` for additional properties or `IRObjectModel` for defined structures
-- **Reference**: Represented as `IRRef` pointing to components or inline models
-
-### Type Modifiers
-
-- **Nullable**: Handled at usage level (`IRProperty`, `IRParameter`) rather than type definition
-- **Required**: Specified in model's required array or parameter's required flag
-
-## Model References
-
-Every IR model includes a `referencePath` field that preserves the original location in the OpenAPI specification. This enables accurate source tracking and debugging.
-
-### Reference Path Formats
-
-#### Components References
-
-Models defined in `components/schemas` use the standard JSON Pointer format:
-
-```
-#/components/schemas/User
-#/components/schemas/UserProfile
-```
-
-#### Inline Schema References  
-
-Inline schemas are automatically extracted and assigned reference paths using `::` notation:
-
-```
-#/paths/::users/get/responses/200/content/application/json/schema
-#/paths/::users::{userId}/post/requestBody/content/application/json/schema
-```
-
-#### Parameter Model References
-
-Parameters are consolidated into unified models with descriptive reference paths:
-
-```
-#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams
-```
-
-### Inline Schema Processing
-
-openapi-xcgen automatically extracts inline schemas into independent models:
-
-- **Request Body Schemas**: Converted to `{Method}{Path}RequestBody` models
-- **Response Schemas**: Converted to `{Method}{Path}{Status}Response` models  
-- **Parameter Groups**: Consolidated into `{Method}{Path}Params` models
-- **Nested Objects**: Recursively extracted with appropriate naming
-
-Example transformations:
-
-```yaml
-# OpenAPI inline schema
-/users/{id}:
-  get:
-    responses:
-      200:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name: { type: string }
-```
-
-Becomes:
-
-```typescript
-{
-  kind: "object",
-  name: "GetUsersId200Response", 
-  referencePath: "#/paths/::users::{id}/get/responses/200/content/application/json/schema",
-  properties: [
-    { name: "name", type: "string", required: false }
-  ]
-}
-```
+- **[@openapi-xcgen/core](./packages/core/)** - OpenAPI parser and IR transformer
+- **[@openapi-xcgen/generator-typescript](./packages/generator-typescript/)** - TypeScript code generator
+- **@openapi-xcgen/generator-dart** - Dart generator (planned)
 
 ## Development
 
@@ -143,16 +113,6 @@ Becomes:
 
 - Node.js v20+
 - pnpm 10.13.1
-
-### Architecture
-
-openapi-xcgen follows functional programming principles with:
-
-- **Tree-shaking Support**: Function-based architecture avoids classes
-- **Type Safety**: Discriminated unions with TypeScript strict mode
-- **Visitor Pattern**: Each OpenAPI construct has dedicated visitor functions
-- **Test Coverage**: 308+ comprehensive tests including unit and E2E tests
-- **In-source Testing**: Tests co-located with implementation using `import.meta.vitest`
 
 ### Setup
 
@@ -166,7 +126,7 @@ pnpm build
 # Run tests
 pnpm test
 
-# Check code quality
+# Check code quality (lint + typecheck + test)
 pnpm check
 ```
 
@@ -174,40 +134,69 @@ pnpm check
 
 ```bash
 # Development
-pnpm dev          # Watch mode
-pnpm build        # Build packages
+pnpm dev              # Watch mode
+pnpm build            # Build packages
 
 # Testing
-pnpm test         # Run tests
-pnpm test:watch   # Watch mode testing
-pnpm test:coverage # Coverage report
+pnpm test             # Run all tests
+pnpm test:watch       # Watch mode
+pnpm test:coverage    # Coverage report
 
 # Quality
-pnpm check        # Run all checks
-pnpm lint         # Lint code
-pnpm lint:fix     # Fix lint issues
-pnpm typecheck    # TypeScript check
+pnpm check            # Run all checks
+pnpm lint             # Lint code
+pnpm lint:fix         # Fix lint issues
+pnpm typecheck        # TypeScript check
 ```
 
-## Currently Unsupported Features
+See [CLAUDE.md](./CLAUDE.md) for detailed development guidelines.
 
-The following OpenAPI features are not yet supported:
+## Common Issues
 
-### Schema Features
+### "xcgen-ts: command not found"
 
-- `oneOf`, `anyOf`, `allOf` (union types and schema composition)
-- `discriminator` (polymorphism)
-- `not` (negation schema)
-- `additionalProperties` (dynamic properties)
-- `if`/`then`/`else` (conditional schemas)
-- Empty schemas `{}`
+If you installed locally (not globally), you have several options:
 
-### Operation Features
+1. **Use npx**:
 
-- Response headers (Rate-Limit information, etc.)
-- Path-level common parameters
-- Security definitions (`security`/`securitySchemes`)
-- Parameter validation constraints (`minimum`, `maximum`, `pattern`, etc.)
+   ```bash
+   npx xcgen-ts -i openapi.yaml -o generated
+   ```
+
+2. **Add to package.json scripts** (recommended):
+
+   ```json
+   {
+     "scripts": {
+       "generate": "xcgen-ts -i openapi.yaml -o generated"
+     }
+   }
+   ```
+
+   Then run: `npm run generate`
+
+3. **Install globally**:
+
+   ```bash
+   npm install -g @openapi-xcgen/generator-typescript
+   ```
+
+### Generated code has type errors
+
+Make sure your `tsconfig.json` includes:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true
+  }
+}
+```
+
+See `examples/petstore/tsconfig.json` for a complete working configuration.
 
 ## License
 
