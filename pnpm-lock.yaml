@@ -123,7 +123,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@24.2.0)(jiti@2.5.1)(tsx@4.20.6)
 
-  packages/generator-dart:
+  packages/xcgen-dart:
     dependencies:
       '@openapi-xcgen/core':
         specifier: workspace:*

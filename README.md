@@ -105,7 +105,7 @@ Then run: `xcgen-ts` (uses config file automatically)
 
 - **[@openapi-xcgen/core](./packages/core/)** - OpenAPI parser and IR transformer
 - **[@openapi-xcgen/xcgen-ts](./packages/xcgen-ts/)** - TypeScript code generator
-- **@openapi-xcgen/generator-dart** - Dart generator (planned)
+- **@openapi-xcgen/xcgen-dart** - Dart generator (planned)
 
 ## Development
 

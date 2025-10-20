@@ -105,7 +105,7 @@ export default defineConfig({
 
 - **[@openapi-xcgen/core](./packages/core/)** - OpenAPIパーサーとIR変換器
 - **[@openapi-xcgen/xcgen-ts](./packages/xcgen-ts/)** - TypeScriptコードジェネレーター
-- **@openapi-xcgen/generator-dart** - Dartジェネレーター（計画中）
+- **@openapi-xcgen/xcgen-dart** - Dartジェネレーター（計画中）
 
 ## 開発
 

@@ -1,5 +1,5 @@
 {
-  "name": "@openapi-xcgen/generator-dart",
+  "name": "@openapi-xcgen/xcgen-dart",
   "version": "0.0.0",
   "description": "Dart code generator for OpenAPI specifications",
   "author": "Memory Lovers, LLC<https://github.com/memorylovers>",

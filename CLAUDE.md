@@ -227,7 +227,7 @@ packages/
 │   │       └── ir/           # 中間表現型定義
 │   └── tests/                # 統合テストのみ（単体テストはin-source）
 ├── xcgen-ts/                  # TypeScript生成器
-└── generator-dart/           # Dart生成器
+└── xcgen-dart/               # Dart生成器
 ```
 
 ## 重要なコマンド

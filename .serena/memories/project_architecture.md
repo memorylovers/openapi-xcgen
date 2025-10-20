@@ -8,8 +8,8 @@ Monorepo architecture with independent language generators sharing a common core
 openapi-xcgen/
 ├── packages/
 │   ├── core/                    # Shared functionality
-│   ├── generator-typescript/    # TypeScript generator
-│   └── generator-dart/          # Dart generator
+│   ├── xcgen-ts/                # TypeScript generator
+│   └── xcgen-dart/              # Dart generator
 ├── _docs/                       # Documentation
 │   ├── design/                  # Design documents
 │   └── _tasks/                  # Task tracking
@@ -19,8 +19,8 @@ openapi-xcgen/
 ## Package Dependencies
 
 ```
-@openapi-xcgen/generator-typescript → @openapi-xcgen/core
-@openapi-xcgen/generator-dart → @openapi-xcgen/core
+@openapi-xcgen/xcgen-ts → @openapi-xcgen/core
+@openapi-xcgen/xcgen-dart → @openapi-xcgen/core
 @openapi-xcgen/core (standalone)
 ```
 
