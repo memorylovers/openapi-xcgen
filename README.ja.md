@@ -147,6 +147,10 @@ pnpm check            # 全チェック実行
 pnpm lint             # Lintチェック
 pnpm lint:fix         # Lint自動修正
 pnpm typecheck        # TypeScript型チェック
+
+# バージョン管理とリリース
+pnpm lerna:version    # パッケージバージョンアップ（Conventional Commits使用）
+pnpm lerna:publish    # npm公開
 ```
 
 詳細な開発ガイドラインは[CLAUDE.md](./CLAUDE.md)を参照してください。

@@ -17,11 +17,15 @@
     "lint:fix:ts": "turbo lint:fix",
     "lint:md:fix": "markdownlint-cli2 --fix",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
+    "lerna:version": "lerna version",
+    "lerna:publish": "lerna publish from-package",
     "#lint": "eslint .",
     "#lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@lerna-lite/cli": "^4.9.1",
+    "@lerna-lite/publish": "^4.9.1",
     "@types/node": "^24.2.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",

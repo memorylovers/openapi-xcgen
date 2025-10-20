@@ -147,6 +147,10 @@ pnpm check            # Run all checks
 pnpm lint             # Lint code
 pnpm lint:fix         # Fix lint issues
 pnpm typecheck        # TypeScript check
+
+# Version management and release
+pnpm lerna:version    # Bump package versions (using Conventional Commits)
+pnpm lerna:publish    # Publish to npm
 ```
 
 See [CLAUDE.md](./CLAUDE.md) for detailed development guidelines.

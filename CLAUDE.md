@@ -195,7 +195,7 @@ if (!isPrimitiveType(schema.type)) {
 - **Node.js**: v20以上
 - **TypeScript**: 5.0以上
 - **パッケージマネージャー**: pnpm 10.13.1
-- **モノレポ管理**: Turbo
+- **モノレポ管理**: Turbo + lerna-lite
 
 ### 対応形式
 
@@ -252,6 +252,10 @@ pnpm check        # lint + typecheck + test
 pnpm lint         # Lintチェック
 pnpm lint:fix     # Lint自動修正
 pnpm typecheck    # 型チェック
+
+# バージョン管理とリリース
+pnpm lerna:version    # パッケージバージョンアップ（Conventional Commits使用）
+pnpm lerna:publish    # npm公開
 
 # パッケージ別実行
 cd packages/core && pnpm test

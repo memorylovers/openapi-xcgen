@@ -12,9 +12,9 @@
 
 ### タスク5.2: npm公開準備
 
-- [ ] lerna-lite導入（モノレポバージョン管理）
-- [ ] CHANGELOG自動生成（conventional-changelog）
-- [ ] リリース自動化（lerna version + lerna publish）
+- [x] lerna-lite導入（モノレポバージョン管理）
+- [x] CHANGELOG自動生成（conventional-changelog）
+- [x] リリース自動化（lerna version + lerna publish）
 - [x] ライセンス確認
 - [x] package.jsonメタデータ整備
 
