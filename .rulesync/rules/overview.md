@@ -1,3 +1,11 @@
+---
+root: true
+targets: ["*"]
+description: "project overview and development guidelines for unified AI rules management CLI tool"
+globs: ["**/*"]
+
+---
+
 # openapi-xcgen 開発ガイドライン
 
 ## プロジェクト概要
