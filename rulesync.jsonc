@@ -1,0 +1,16 @@
+{
+  // 生成対象のAI開発ツール
+  "targets": ["claudecode", "codexcli", "agentsmd"],
+
+  // 生成する機能
+  "features": ["rules", "mcp", "commands", "subagents"],
+
+  // 生成対象ディレクトリ
+  "baseDirs": ["."],
+
+  // 生成前に既存ファイルを削除
+  "delete": true,
+
+  // 詳細ログを表示
+  "verbose": false
+}

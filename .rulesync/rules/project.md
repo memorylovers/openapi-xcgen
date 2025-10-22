@@ -40,7 +40,7 @@ export function isPrimitiveType(type: unknown): boolean {
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  
+
   describe("isPrimitiveType", () => {
     it("should return true for primitive types", () => {
       expect(isPrimitiveType("string")).toBe(true);
@@ -57,12 +57,12 @@ const { vi } = import.meta.vitest;
 
 it("should warn for invalid types", () => {
   const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
-  
+
   const result = visitPrimitive({ type: "array" });
-  
+
   expect(result).toBe(null);
   expect(warnSpy).toHaveBeenCalledWith("Invalid type for primitive visitor: array");
-  
+
   warnSpy.mockRestore(); // クリーンアップ
 });
 ```
@@ -127,7 +127,9 @@ pnpm lint:fix    # Lintエラーの自動修正
 
 - ESLintとPrettierの設定に従う
 - markdownlintでドキュメント品質を維持
-- インポートパスは`.js`拡張子を使用（ESM対応）
+- インポートパス：
+  - 生成器のソースコード：`.js`拡張子を使用（ESM対応）
+  - 生成されるコード：拡張子なし（バンドラー前提）
 - エラーメッセージは具体的で実行可能な内容にする
 
 ### 命名規約
@@ -157,7 +159,7 @@ pnpm lint:fix    # Lintエラーの自動修正
  * プリミティブ型のSchemaObjectをIRPrimitiveに変換
  * @param schema - 変換対象のスキーマ
  * @returns IRPrimitive型の結果、無効な場合はnull
- * 
+ *
  * @example OpenAPI YAML
  * ```yaml
  * name:
@@ -224,8 +226,8 @@ packages/
 │   │   └── types/
 │   │       └── ir/           # 中間表現型定義
 │   └── tests/                # 統合テストのみ（単体テストはin-source）
-├── generator-typescript/      # TypeScript生成器
-└── generator-dart/           # Dart生成器
+├── xcgen-ts/                  # TypeScript生成器
+└── xcgen-dart/               # Dart生成器
 ```
 
 ## 重要なコマンド
@@ -242,11 +244,32 @@ pnpm test         # テスト実行
 pnpm test:watch   # watchモードでテスト
 pnpm test:coverage # カバレッジ付きテスト
 
+# E2E期待値再生成
+pnpm regenerate:expected  # E2E期待値ファイルを再生成（coreまたはxcgen-ts）
+
 # 品質チェック
 pnpm check        # lint + typecheck + test
 pnpm lint         # Lintチェック
 pnpm lint:fix     # Lint自動修正
 pnpm typecheck    # 型チェック
+
+# GitHub Actions テスト（ローカル検証）
+pnpm lint:actions              # actionlintでworkflow検証
+pnpm test:actions              # actで全workflowをdry-run実行
+pnpm test:actions:release-latest   # release-latestのみテスト
+pnpm test:actions:release-canary   # release-canaryのみテスト
+
+# AI設定の同期（Rulesync）
+pnpm sync:rules        # ルールファイルを各AIツールに同期
+pnpm sync:rules:watch  # watchモードで自動同期
+
+# このプロジェクトではrulesyncを使用してAI設定を管理しています
+# .rulesync/rules/project.md が唯一の真実のソース（Single Source of Truth）
+# 以下のファイルは自動生成されます（手動編集しないでください）:
+#   - .claude/memories/project.md (Claude Code用)
+#   - .codex/memories/project.md (Codex CLI用)
+#   - .agents/memories/project.md (AGENTS.md形式)
+#   - .mcp.json (Model Context Protocol設定)
 
 # リリース（タグベース自動化）
 pnpm release    # バージョンアップ＆タグpush（→GitHub Actionsで自動npm公開）

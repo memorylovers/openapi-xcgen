@@ -694,3 +694,8 @@ examples/*/generated/
 
 # act secrets file (for local GitHub Actions testing)
 .secrets
+
+# rulesync generated files
+.claude/memories/
+.codex/
+.agents/
