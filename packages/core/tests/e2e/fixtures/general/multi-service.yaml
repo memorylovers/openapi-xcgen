@@ -1,0 +1,114 @@
+openapi: 3.1.0
+info:
+  title: Multi-Service API
+  version: 2.0.0
+  description: API with multiple services/tags
+
+paths:
+  /users:
+    get:
+      operationId: listUsers
+      summary: List all users
+      tags:
+        - users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      tags:
+        - users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /posts:
+    get:
+      operationId: listPosts
+      summary: List all posts
+      tags:
+        - posts
+      responses:
+        '200':
+          description: List of posts
+    post:
+      operationId: createPost
+      summary: Create a new post
+      tags:
+        - posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPost'
+      responses:
+        '201':
+          description: Post created
+
+  /admin/settings:
+    get:
+      operationId: getSettings
+      summary: Get admin settings
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Settings retrieved
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check endpoint
+      # No tags - should go to 'default' service
+      responses:
+        '200':
+          description: Service is healthy
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, user, guest]
+
+    NewPost:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        authorId:
+          type: string

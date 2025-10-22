@@ -1,0 +1,99 @@
+{
+  "metadata": {
+    "title": "Nullable Model Test",
+    "version": "1.0.0",
+    "description": "Test nullable property handling"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Profile",
+      "referencePath": "#/components/schemas/Profile",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "bio",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "nickname",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "lastLoginDate",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "settings",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/ProfileSettings"
+          },
+          "nullable": true
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/ProfileTags"
+          },
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "ProfileSettings",
+      "referencePath": "#/components/schemas/ProfileSettings",
+      "properties": [
+        {
+          "name": "theme",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "ProfileTags",
+      "referencePath": "#/components/schemas/ProfileTags",
+      "itemType": "string"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/profiles",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Profile"
+              }
+            }
+          ]
+        }
+      ],
+      "summary": "Get profiles"
+    }
+  ]
+}

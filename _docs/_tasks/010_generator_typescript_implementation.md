@@ -1,52 +1,55 @@
-# タスク010: TypeScript生成器実装
+# タスク010: TypeScript生成器 - 残りタスク
 
 ## 概要
 
-`@openapi-xcgen/generator-typescript`パッケージのソースコード実装を行います。
+`@openapi-xcgen/xcgen-ts`パッケージの未完了タスク管理。
 
-## ステータス
+---
 
-- 状態: 未実施
+## 残りタスク
 
-## 前提条件
+### 拡張機能（オプション）
 
-- タスク004（TypeScript生成器環境構築）が完了していること
-- タスク009（Coreパッケージのソースコード実装）が完了していること
+**優先度**: 低（需要に応じて）
 
-## 実装対象ファイル
+- [ ] x-extensions サポート（カスタム拡張プロパティ）
+- [ ] プラグインシステム設計
 
-### 基本ファイル
+---
 
-- `src/types.ts` - TypeScript生成器の型定義
-- `src/generator.ts` - メインジェネレータークラス
-- `src/index.ts` - パッケージのエクスポート
+## 開発コマンド
 
-### ジェネレーター
+```bash
+# 開発
+pnpm dev          # 開発モード（watch）
+pnpm build        # ビルド
 
-- `src/generators/models.ts` - 型定義の生成
-- `src/generators/schemas.ts` - Valibotスキーマの生成
-- `src/generators/services.ts` - APIサービス関数の生成
-- `src/generators/client.ts` - HTTPクライアントの生成
-- `src/generators/index-file.ts` - インデックスファイルの生成
+# テスト
+pnpm test         # 全テスト実行
+pnpm test:watch   # watchモード
+pnpm test:coverage # カバレッジ
 
-### CLI
+# 品質
+pnpm check        # lint + typecheck + test
+pnpm lint         # ESLint + Prettier + markdownlint
+pnpm typecheck    # TypeScript型チェック
 
-- `src/cli.ts` - CLIエントリーポイント
-- `bin/cli.mjs` - 実行可能ファイル
+# リリース
+pnpm release      # バージョンアップ＆タグpush（→GitHub Actionsで自動npm公開）
+```
 
-### テンプレート（オプション）
+## 技術スタック
 
-- `src/templates/model.hbs` - Handlebarsテンプレート
+- **言語**: TypeScript 5.0+、関数ベース
+- **テスト**: Vitest（In-sourceテスティング）
+- **ビルド**: unbuild（ESM/CJS両対応）
+- **CLI**: c12, citty
+- **Validator**: Valibot v1（オプション）
+- **モノレポ**: Turbo + lerna-lite
 
-## 実装方針
+## 関連ドキュメント
 
-- Tree-shaking対応のため関数ベースのエクスポート
-- Valibotをデフォルトのバリデーターとして使用
-- エラーハンドリングはシンプルなオブジェクトベース
-- 各APIエンドポイントは個別の関数として生成
-
-## 検証
-
-- ビルドが正常に完了すること
-- 型チェックが通ること
-- CLIコマンドが実行できること
+- `CLAUDE.md`: 開発ガイドライン
+- `_guides/spec.md`: 型システムと仕様
+- `examples/petstore/`: 基本的なCRUD例
+- `examples/train-travel/`: 複雑なユースケース例

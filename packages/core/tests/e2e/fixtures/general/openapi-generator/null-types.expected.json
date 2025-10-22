@@ -1,0 +1,300 @@
+{
+  "metadata": {
+    "title": "Example",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Person",
+      "referencePath": "#/components/schemas/Person",
+      "properties": [
+        {
+          "name": "$_type",
+          "type": "string"
+        },
+        {
+          "name": "lastName",
+          "type": "string"
+        },
+        {
+          "name": "firstName",
+          "type": "string"
+        },
+        {
+          "name": "maidenName",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PersonMaidenName"
+          }
+        },
+        {
+          "name": "address",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PersonAddress"
+          }
+        },
+        {
+          "name": "secondHomeAddress",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Nullable.Address"
+          }
+        },
+        {
+          "name": "skills",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PersonSkills"
+          }
+        },
+        {
+          "name": "nullableSkillsVariant2",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PersonNullableSkillsVariant2"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "union",
+      "name": "PersonMaidenName",
+      "referencePath": "#/components/schemas/PersonMaidenName",
+      "nullable": true,
+      "types": [
+        "string"
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PersonAddress",
+      "referencePath": "#/components/schemas/PersonAddress",
+      "properties": [
+        {
+          "name": "street",
+          "type": "string"
+        },
+        {
+          "name": "city",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "PersonSkills",
+      "referencePath": "#/components/schemas/PersonSkills",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/PersonSkillsItem"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "PersonSkillsItem",
+      "referencePath": "#/components/schemas/PersonSkillsItem",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "union",
+      "name": "PersonNullableSkillsVariant2",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2",
+      "nullable": true,
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "PersonNullableSkillsVariant2OneOf1",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "PersonNullableSkillsVariant2OneOf1Item",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Adult",
+      "referencePath": "#/components/schemas/Adult",
+      "description": "A representation of an adult",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Person"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AdultAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AdultAllOf1",
+      "referencePath": "#/components/schemas/AdultAllOf1",
+      "properties": [
+        {
+          "name": "children",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/AdultAllOf1Children"
+          }
+        },
+        {
+          "name": "nullableChildrenVariant2",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "AdultAllOf1Children",
+      "referencePath": "#/components/schemas/AdultAllOf1Children",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Child"
+      }
+    },
+    {
+      "kind": "union",
+      "name": "AdultAllOf1NullableChildrenVariant2",
+      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2",
+      "nullable": true,
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "AdultAllOf1NullableChildrenVariant2OneOf1",
+      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Child"
+      }
+    },
+    {
+      "kind": "allOf",
+      "name": "Child",
+      "referencePath": "#/components/schemas/Child",
+      "description": "A representation of a child",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/ChildAllOf0"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Person"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "ChildAllOf0",
+      "referencePath": "#/components/schemas/ChildAllOf0",
+      "properties": [
+        {
+          "name": "age",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Nullable.Address",
+      "referencePath": "#/components/schemas/Nullable.Address",
+      "properties": [
+        {
+          "name": "street",
+          "type": "string"
+        },
+        {
+          "name": "city",
+          "type": "string"
+        }
+      ],
+      "description": "A representation of an address whose value can be null."
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPersonDisplayPersonIdParams",
+      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve",
+      "properties": [
+        {
+          "name": "personId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The id of the person to retrieve"
+        }
+      ],
+      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/person/display/{personId}",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Person"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "list"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://api.example.xyz/v1"
+    }
+  ]
+}

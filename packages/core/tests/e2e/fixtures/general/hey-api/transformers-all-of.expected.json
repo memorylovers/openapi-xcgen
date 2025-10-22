@@ -1,0 +1,216 @@
+{
+  "metadata": {
+    "title": "OpenAPI 3.1.1 transformers all of example",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Foo",
+      "referencePath": "#/components/schemas/Foo",
+      "properties": [
+        {
+          "name": "foo",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/FooFoo"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "FooFoo",
+      "referencePath": "#/components/schemas/FooFoo",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Bar"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "Bar",
+      "referencePath": "#/components/schemas/Bar",
+      "properties": [
+        {
+          "name": "foo",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BarFoo"
+          },
+          "required": true
+        },
+        {
+          "name": "bar",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BarBar"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "BarFoo",
+      "referencePath": "#/components/schemas/BarFoo",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/BarFooItem"
+      }
+    },
+    {
+      "kind": "union",
+      "name": "BarFooItem",
+      "referencePath": "#/components/schemas/BarFooItem",
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Baz"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BarBar",
+      "referencePath": "#/components/schemas/BarBar",
+      "type": "string",
+      "values": [
+        {
+          "value": "foo",
+          "name": "FOO"
+        },
+        {
+          "value": "bar",
+          "name": "BAR"
+        },
+        {
+          "value": "baz",
+          "name": "BAZ"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Baz",
+      "referencePath": "#/components/schemas/Baz",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BazAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BazAllOf1",
+      "referencePath": "#/components/schemas/BazAllOf1",
+      "properties": [
+        {
+          "name": "foo",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "bar",
+          "type": "datetime"
+        },
+        {
+          "name": "baz",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BazAllOf1Baz"
+          }
+        },
+        {
+          "name": "qux",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BazAllOf1Baz",
+      "referencePath": "#/components/schemas/BazAllOf1Baz",
+      "type": "string",
+      "values": [
+        {
+          "value": "foo",
+          "name": "FOO"
+        },
+        {
+          "value": "bar",
+          "name": "BAR"
+        },
+        {
+          "value": "baz",
+          "name": "BAZ"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Qux",
+      "referencePath": "#/components/schemas/Qux",
+      "properties": [
+        {
+          "name": "foo",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "bar",
+          "type": "double",
+          "required": true
+        },
+        {
+          "name": "baz",
+          "type": "datetime"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/foo",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "*/*",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Foo"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

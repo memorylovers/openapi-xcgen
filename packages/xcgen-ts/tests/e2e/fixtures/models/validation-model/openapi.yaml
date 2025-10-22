@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: Validation Model Test
+  version: 1.0.0
+  description: Test validation constraints
+
+paths:
+  # TODO: 未実装 - operationIdがない操作は自動生成が必要
+  /products:
+    get:
+      summary: Get products
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        # 文字列長
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        # パターン
+        code:
+          type: string
+          pattern: "^[A-Z]{3}$"
+        # formatバリデーション - UUID
+        userId:
+          type: string
+          format: uuid
+        # formatバリデーション - メール
+        email:
+          type: string
+          format: email
+        # formatバリデーション - URI
+        website:
+          type: string
+          format: uri
+        # formatバリデーション - IPv4
+        ipAddress:
+          type: string
+          format: ipv4
+        # 数値範囲
+        price:
+          type: number
+          minimum: 0
+          maximum: 1000
+        # 整数範囲
+        quantity:
+          type: integer
+          minimum: 1
+        # 配列制約
+        tags:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 5

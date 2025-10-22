@@ -1,0 +1,119 @@
+openapi: 3.1.0
+info:
+  title: Complex Structures Test
+  version: 1.0.0
+  description: Test complex object structures and arrays
+
+paths:
+  # TODO: 未実装 - operationIdがない操作は自動生成が必要
+  # === ネストされたオブジェクト ===
+  /level1:
+    get:
+      summary: 1階層ネスト
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Level1'
+  /level2:
+    get:
+      summary: 2階層ネスト
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Level2'
+  /level3:
+    get:
+      summary: 3階層ネスト
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Level3'
+  # === オブジェクトの配列 ===
+  /teams:
+    get:
+      summary: オブジェクト内の配列
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+  /users:
+    get:
+      summary: トップレベルが配列
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    # === ネストされたオブジェクト ===
+    Level1:
+      type: object
+      properties:
+        # 1階層ネスト
+        data:
+          type: object
+          properties:
+            value:
+              type: string
+    Level2:
+      type: object
+      properties:
+        # 2階層ネスト
+        outer:
+          type: object
+          properties:
+            inner:
+              type: object
+              properties:
+                value:
+                  type: string
+    Level3:
+      type: object
+      properties:
+        # 3階層ネスト
+        level1:
+          type: object
+          properties:
+            level2:
+              type: object
+              properties:
+                level3:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+    # === オブジェクトの配列 ===
+    Team:
+      type: object
+      properties:
+        # オブジェクト内の配列
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+    User:
+      type: object
+      properties:
+        name:
+          type: string

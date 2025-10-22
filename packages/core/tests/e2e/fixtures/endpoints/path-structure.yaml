@@ -1,0 +1,83 @@
+openapi: 3.1.0
+info:
+  title: Path Structure Test
+  version: 1.0.0
+  description: Test path parsing and normalization
+
+paths:
+  # Root path
+  /:
+    get:
+      operationId: root
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Simple path
+  /users:
+    get:
+      operationId: users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Single path parameter
+  /users/{id}:
+    get:
+      operationId: userById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Multiple path parameters
+  /org/{orgId}/projects/{projectId}:
+    get:
+      operationId: projectInOrg
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Path with special characters
+  /api-gateway/health_check:
+    get:
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string

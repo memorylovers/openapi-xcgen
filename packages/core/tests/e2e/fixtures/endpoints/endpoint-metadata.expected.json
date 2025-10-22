@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "title": "Endpoint Metadata Test",
+    "version": "1.0.0",
+    "description": "Test summary and description preservation"
+  },
+  "models": [],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/endpoint1",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint1",
+      "summary": "Test summary",
+      "description": "Test description"
+    },
+    {
+      "method": "get",
+      "path": "/endpoint2",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint2",
+      "summary": "Test summary only"
+    },
+    {
+      "method": "get",
+      "path": "/endpoint3",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint3",
+      "description": "Test description only"
+    },
+    {
+      "method": "get",
+      "path": "/endpoint4",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint4"
+    }
+  ]
+}

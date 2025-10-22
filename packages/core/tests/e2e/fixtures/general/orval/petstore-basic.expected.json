@@ -1,0 +1,424 @@
+{
+  "metadata": {
+    "title": "Swagger Petstore",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Name of pet",
+          "validation": {
+            "minLength": 0,
+            "maxLength": 40
+          }
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "validation": {
+            "minimum": 0,
+            "maximum": 30,
+            "exclusiveMinimum": true,
+            "exclusiveMaximum": true,
+            "format": "int32"
+          }
+        },
+        {
+          "name": "tag",
+          "type": "string",
+          "nullable": true,
+          "validation": {
+            "pattern": "^\\\\d{3}-\\\\d{2}-\\\\d{4}$"
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
+        },
+        {
+          "name": "callingCode",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PetCallingCode"
+          }
+        },
+        {
+          "name": "country",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PetCountry"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "PetCallingCode",
+      "referencePath": "#/components/schemas/PetCallingCode",
+      "type": "string",
+      "values": [
+        {
+          "value": "+33",
+          "name": "33"
+        },
+        {
+          "value": "+420",
+          "name": "420"
+        },
+        {
+          "value": "+33",
+          "name": "33"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "PetCountry",
+      "referencePath": "#/components/schemas/PetCountry",
+      "type": "string",
+      "values": [
+        {
+          "value": "People's Republic of China",
+          "name": "PEOPLE_S_REPUBLIC_OF_CHINA"
+        },
+        {
+          "value": "Uruguay",
+          "name": "URUGUAY"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PetsNestedArray",
+      "referencePath": "#/components/schemas/PetsNestedArray",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PetsNestedArrayData"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "PetsNestedArrayData",
+      "referencePath": "#/components/schemas/PetsNestedArrayData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "array",
+      "name": "PetsArray",
+      "referencePath": "#/components/schemas/PetsArray",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "Error",
+      "referencePath": "#/components/schemas/Error",
+      "properties": [
+        {
+          "name": "code",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetsParams",
+      "description": "Parameters for GET /pets\nlimit: How many items to return at one time (max 100)",
+      "properties": [
+        {
+          "name": "limit",
+          "type": "string",
+          "in": "query",
+          "description": "How many items to return at one time (max 100)"
+        }
+      ],
+      "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostPetsRequestBody",
+      "referencePath": "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tag",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "required": true
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetsNestedArrayParams",
+      "description": "Parameters for GET /pets-nested-array\nlimit: How many items to return at one time (max 100)",
+      "properties": [
+        {
+          "name": "limit",
+          "type": "string",
+          "in": "query",
+          "description": "How many items to return at one time (max 100)"
+        }
+      ],
+      "referencePath": "#/paths/::pets-nested-array/get/parameters/GetPetsNestedArrayParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetsPetIdParams",
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve\ntestId: The id of the pet to retrieve",
+      "properties": [
+        {
+          "name": "petId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The id of the pet to retrieve"
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The id of the pet to retrieve"
+        }
+      ],
+      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/pets",
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets/get/parameters/GetPetsParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "A paged array of pets",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/PetsArray"
+              }
+            }
+          ],
+          "headers": [
+            {
+              "name": "x-next",
+              "type": "string",
+              "description": "A link to the next page of responses"
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "listPets",
+      "summary": "List all pets"
+    },
+    {
+      "method": "post",
+      "path": "/pets",
+      "tags": [
+        "pets"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Null response"
+        },
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "createPets",
+      "summary": "Create a pet",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody"
+            }
+          }
+        ],
+        "required": true
+      }
+    },
+    {
+      "method": "get",
+      "path": "/pets-nested-array",
+      "tags": [
+        "pets, pets-nested-array"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets-nested-array/get/parameters/GetPetsNestedArrayParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "A paged array of pets",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/PetsNestedArray"
+              }
+            }
+          ],
+          "headers": [
+            {
+              "name": "x-next",
+              "type": "string",
+              "description": "A link to the next page of responses"
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "listPetsNestedArray",
+      "summary": "List all pets as nested array"
+    },
+    {
+      "method": "get",
+      "path": "/pets/{petId}",
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Expected response to a valid request",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "showPetById",
+      "summary": "Info for a specific pet"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://petstore.swagger.io/v1"
+    }
+  ]
+}

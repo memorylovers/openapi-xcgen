@@ -210,9 +210,37 @@ type ApiErrorResponse<T = unknown> = {
 
 ## 制限事項（初版）
 
+### レスポンス形式
+
 - JSONレスポンスのみ対応（SSE/ストリーミング非対応）
 - 認証機能は手動実装が必要
 - OpenAPI拡張（`x-`）は無視
+
+### 未対応のOpenAPI仕様
+
+基本機能の安定化を優先し、以下の機能は現バージョンでは未対応：
+
+#### Union型とスキーママージ（使用頻度: 5-10%）
+
+- **oneOf**: 排他的Union（exactly one）
+- **anyOf**: 包含的Union（one or more）  
+- **allOf**: スキーママージ
+- **discriminator**: ポリモーフィズムのヒント
+
+#### 高度なバリデーション（使用頻度: 1-5%）
+
+- **not**: 否定スキーマ
+- **additionalProperties**: 追加プロパティ制約
+- **patternProperties**: パターンプロパティ
+- **if/then/else**: 条件付きスキーマ
+- **multipleOf**: 数値の倍数制約
+
+#### その他（使用頻度: <1%）
+
+- **contentMediaType/contentEncoding**: コンテンツエンコーディング
+- **$id/$anchor**: スキーマ識別子
+
+※ 基本的な型処理（object、array、primitive、enum、$ref）で90%以上のAPIに対応可能
 
 ## ライブラリ情報
 

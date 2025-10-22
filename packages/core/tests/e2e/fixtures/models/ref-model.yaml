@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info:
+  title: Ref Model Test
+  version: 1.0.0
+  description: Test $ref references to components
+
+paths:
+  # TODO: 未実装 - operationIdがない操作は自動生成が必要
+  # TODO: 未実装 - pathsのレスポンススキーマは現在処理されない
+  /orders:
+    get:
+      summary: Get orders
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                # TODO: 未実装 - レスポンスレベルの単一$refは無視される
+                $ref: '#/components/schemas/Order'
+  /customers:
+    get:
+      summary: Get customers
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                # TODO: 未実装 - レスポンスレベルの配列$refも無視される
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+components:
+  schemas:
+    # メインモデル（$ref参照を含む）
+    Order:
+      type: object
+      properties:
+        # 単一オブジェクトへの$ref
+        customer:
+          $ref: '#/components/schemas/Customer'
+        # 配列要素への$ref
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    # 参照先モデル1
+    Customer:
+      type: object
+      properties:
+        name:
+          type: string
+    # 参照先モデル2
+    OrderItem:
+      type: object
+      properties:
+        productId:
+          type: string

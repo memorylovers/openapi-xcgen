@@ -1,0 +1,1387 @@
+{
+  "metadata": {
+    "title": "Train Travel API",
+    "version": "1.2.1",
+    "description": "API for finding and booking train trips across Europe.\n\n## Run in Postman\n\nExperiment with this API in Postman, using our Postman Collection.\n\n[![Run In Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9265903-7a75a0d0-b108-4436-ba54-c6139698dc08?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D9265903-7a75a0d0-b108-4436-ba54-c6139698dc08%26entityType%3Dcollection%26workspaceId%3Df507f69d-9564-419c-89a2-cb8e4c8c7b8f)\n"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Station",
+      "referencePath": "#/components/schemas/Station",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "address",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "country_code",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "pattern": "^[A-Z]{2}$"
+          }
+        },
+        {
+          "name": "timezone",
+          "type": "string"
+        },
+        {
+          "name": "coordinates",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/StationCoordinates"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "StationCoordinates",
+      "referencePath": "#/components/schemas/StationCoordinates",
+      "properties": [
+        {
+          "name": "latitude",
+          "type": "double",
+          "validation": {
+            "minimum": -90,
+            "maximum": 90
+          }
+        },
+        {
+          "name": "longitude",
+          "type": "double",
+          "validation": {
+            "minimum": -180,
+            "maximum": 180
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Trip",
+      "referencePath": "#/components/schemas/Trip",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "origin",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Station"
+          },
+          "required": true
+        },
+        {
+          "name": "destination",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Station"
+          },
+          "required": true
+        },
+        {
+          "name": "departure_time",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "arrival_time",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "operator",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "price",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Price"
+          },
+          "required": true
+        },
+        {
+          "name": "bicycles_allowed",
+          "type": "boolean"
+        },
+        {
+          "name": "dogs_allowed",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BookingRequest",
+      "referencePath": "#/components/schemas/BookingRequest",
+      "properties": [
+        {
+          "name": "trip_id",
+          "type": "string",
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "passengers",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingRequestPassengers"
+          },
+          "required": true,
+          "validation": {
+            "minItems": 1,
+            "maxItems": 10
+          }
+        },
+        {
+          "name": "seat_preferences",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingRequestSeatPreferences"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "BookingRequestPassengers",
+      "referencePath": "#/components/schemas/BookingRequestPassengers",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Passenger"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "BookingRequestSeatPreferences",
+      "referencePath": "#/components/schemas/BookingRequestSeatPreferences",
+      "type": "string",
+      "values": [
+        {
+          "value": "window",
+          "name": "WINDOW"
+        },
+        {
+          "value": "aisle",
+          "name": "AISLE"
+        },
+        {
+          "value": "table",
+          "name": "TABLE"
+        },
+        {
+          "value": "quiet",
+          "name": "QUIET"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Booking",
+      "referencePath": "#/components/schemas/Booking",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "trip",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Trip"
+          },
+          "required": true
+        },
+        {
+          "name": "passengers",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingPassengers"
+          },
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingStatus"
+          },
+          "required": true,
+          "readOnly": true
+        },
+        {
+          "name": "payment_status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/BookingPaymentStatus"
+          },
+          "readOnly": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "required": true,
+          "readOnly": true
+        },
+        {
+          "name": "total_price",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Price"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "BookingPassengers",
+      "referencePath": "#/components/schemas/BookingPassengers",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Passenger"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "BookingStatus",
+      "referencePath": "#/components/schemas/BookingStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "pending",
+          "name": "PENDING"
+        },
+        {
+          "value": "confirmed",
+          "name": "CONFIRMED"
+        },
+        {
+          "value": "cancelled",
+          "name": "CANCELLED"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "BookingPaymentStatus",
+      "referencePath": "#/components/schemas/BookingPaymentStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "unpaid",
+          "name": "UNPAID"
+        },
+        {
+          "value": "paid",
+          "name": "PAID"
+        },
+        {
+          "value": "refunded",
+          "name": "REFUNDED"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Passenger",
+      "referencePath": "#/components/schemas/Passenger",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "format": "email"
+          }
+        },
+        {
+          "name": "date_of_birth",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "passport_number",
+          "type": "string",
+          "validation": {
+            "pattern": "^[A-Z0-9]+$"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Price",
+      "referencePath": "#/components/schemas/Price",
+      "properties": [
+        {
+          "name": "amount",
+          "type": "double",
+          "required": true,
+          "validation": {
+            "minimum": 0
+          }
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "pattern": "^[A-Z]{3}$"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "CardPayment",
+      "referencePath": "#/components/schemas/CardPayment",
+      "properties": [
+        {
+          "name": "method",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "const": "card"
+          }
+        },
+        {
+          "name": "card_number",
+          "type": "string",
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^[0-9]{13,19}$"
+          }
+        },
+        {
+          "name": "card_holder",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        {
+          "name": "expiry_month",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "minimum": 1,
+            "maximum": 12
+          }
+        },
+        {
+          "name": "expiry_year",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "minimum": 2024
+          }
+        },
+        {
+          "name": "cvv",
+          "type": "string",
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^[0-9]{3,4}$"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BankTransferPayment",
+      "referencePath": "#/components/schemas/BankTransferPayment",
+      "properties": [
+        {
+          "name": "method",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "const": "bank_transfer"
+          }
+        },
+        {
+          "name": "account_number",
+          "type": "string",
+          "required": true,
+          "writeOnly": true
+        },
+        {
+          "name": "routing_number",
+          "type": "string",
+          "required": true,
+          "writeOnly": true
+        },
+        {
+          "name": "account_holder",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PaymentConfirmation",
+      "referencePath": "#/components/schemas/PaymentConfirmation",
+      "properties": [
+        {
+          "name": "payment_id",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaymentConfirmationStatus"
+          },
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Price"
+          },
+          "required": true
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "receipt_url",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "PaymentConfirmationStatus",
+      "referencePath": "#/components/schemas/PaymentConfirmationStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "success",
+          "name": "SUCCESS"
+        },
+        {
+          "value": "pending",
+          "name": "PENDING"
+        },
+        {
+          "value": "failed",
+          "name": "FAILED"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "PaginationLinks",
+      "referencePath": "#/components/schemas/PaginationLinks",
+      "properties": [
+        {
+          "name": "self",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        },
+        {
+          "name": "next",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        },
+        {
+          "name": "prev",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        },
+        {
+          "name": "first",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        },
+        {
+          "name": "last",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Problem",
+      "referencePath": "#/components/schemas/Problem",
+      "properties": [
+        {
+          "name": "type",
+          "type": "string",
+          "required": true,
+          "defaultValue": "about:blank",
+          "validation": {
+            "format": "uri"
+          }
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "minimum": 100,
+            "maximum": 599
+          }
+        },
+        {
+          "name": "detail",
+          "type": "string"
+        },
+        {
+          "name": "instance",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "response",
+      "name": "GetStations200Response",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData"
+          }
+        },
+        {
+          "name": "links",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          }
+        }
+      ],
+      "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetStations200ResponseData",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Station"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetStationsParams",
+      "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results",
+      "properties": [
+        {
+          "name": "coordinates",
+          "type": "string",
+          "in": "query",
+          "description": "Find stations close to a location.",
+          "validation": {
+            "pattern": "^(-?\\\\d+\\\\.\\\\d+),(-?\\\\d+\\\\.\\\\d+)$"
+          }
+        },
+        {
+          "name": "search",
+          "type": "string",
+          "in": "query",
+          "description": "Search for stations by name or code",
+          "validation": {
+            "minLength": 3,
+            "maxLength": 100
+          }
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "in": "query",
+          "description": "Filter by country code (ISO 3166-1 alpha-2)",
+          "validation": {
+            "pattern": "^[A-Z]{2}$"
+          }
+        },
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "Maximum number of results",
+          "defaultValue": 10,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      ],
+      "referencePath": "#/paths/::stations/get/parameters/GetStationsParams"
+    },
+    {
+      "kind": "response",
+      "name": "GetTrips200Response",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData"
+          }
+        },
+        {
+          "name": "links",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          }
+        }
+      ],
+      "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetTrips200ResponseData",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Trip"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTripsParams",
+      "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs",
+      "properties": [
+        {
+          "name": "origin",
+          "type": "string",
+          "in": "query",
+          "required": true,
+          "description": "The ID of the origin station",
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "destination",
+          "type": "string",
+          "in": "query",
+          "required": true,
+          "description": "The ID of the destination station",
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "date",
+          "type": "date",
+          "in": "query",
+          "required": true,
+          "description": "Date of travel (ISO 8601)"
+        },
+        {
+          "name": "bicycles",
+          "type": "boolean",
+          "in": "query",
+          "description": "Only return trips that allow bicycles"
+        },
+        {
+          "name": "dogs",
+          "type": "boolean",
+          "in": "query",
+          "description": "Only return trips that allow dogs"
+        }
+      ],
+      "referencePath": "#/paths/::trips/get/parameters/GetTripsParams"
+    },
+    {
+      "kind": "response",
+      "name": "GetBookings200Response",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData"
+          }
+        },
+        {
+          "name": "links",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          }
+        }
+      ],
+      "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetBookings200ResponseData",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Booking"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetBookingsBookingIdParams",
+      "description": "Parameters for GET /bookings/{bookingId}",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "DeleteBookingsBookingIdParams",
+      "description": "Parameters for DELETE /bookings/{bookingId}",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+    },
+    {
+      "kind": "union",
+      "name": "PostBookingsBookingIdPaymentRequestBody",
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody",
+      "discriminator": {
+        "propertyName": "method",
+        "mapping": {
+          "card": "#/components/schemas/CardPayment",
+          "bank_transfer": "#/components/schemas/BankTransferPayment"
+        }
+      },
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/CardPayment"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BankTransferPayment"
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "PostBookingsBookingIdPaymentParams",
+      "description": "Parameters for POST /bookings/{bookingId}/payment",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/stations",
+      "tags": [
+        "Stations"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::stations/get/parameters/GetStationsParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "429",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/TooManyRequests"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "500",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/InternalServerError"
+          }
+        }
+      ],
+      "operationId": "getStations",
+      "summary": "Get a list of train stations",
+      "description": "Returns a list of all train stations in the system."
+    },
+    {
+      "method": "get",
+      "path": "/trips",
+      "tags": [
+        "Trips"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::trips/get/parameters/GetTripsParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        }
+      ],
+      "operationId": "getTrips",
+      "summary": "Get available train trips",
+      "description": "Returns a list of available trips between stations"
+    },
+    {
+      "method": "get",
+      "path": "/bookings",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        }
+      ],
+      "operationId": "getBookings",
+      "summary": "List bookings for the authenticated user",
+      "description": "Returns a list of bookings for the authenticated user"
+    },
+    {
+      "method": "post",
+      "path": "/bookings",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Booking created successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Booking"
+              }
+            }
+          ],
+          "headers": [
+            {
+              "name": "Location",
+              "type": "string",
+              "description": "URL of the created booking"
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "409",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Conflict"
+          }
+        }
+      ],
+      "operationId": "createBooking",
+      "summary": "Create a new booking",
+      "description": "Book a trip for one or more passengers",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/BookingRequest"
+            }
+          }
+        ],
+        "required": true
+      }
+    },
+    {
+      "method": "get",
+      "path": "/bookings/{bookingId}",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Booking"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        }
+      ],
+      "operationId": "getBooking",
+      "summary": "Get booking details",
+      "description": "Returns details of a specific booking"
+    },
+    {
+      "method": "delete",
+      "path": "/bookings/{bookingId}",
+      "tags": [
+        "Bookings"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "204",
+          "description": "Booking cancelled successfully"
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "409",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Conflict"
+          }
+        }
+      ],
+      "operationId": "cancelBooking",
+      "summary": "Cancel a booking",
+      "description": "Cancel an existing booking"
+    },
+    {
+      "method": "post",
+      "path": "/bookings/{bookingId}/payment",
+      "tags": [
+        "Payments"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Payment processed successfully",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/PaymentConfirmation"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "400",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/BadRequest"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "kind": "content",
+          "statusCode": "402",
+          "description": "Payment Required - Payment failed",
+          "content": [
+            {
+              "mimeType": "application/problem+json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Problem"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "ref",
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        }
+      ],
+      "operationId": "payForBooking",
+      "summary": "Pay for a booking",
+      "description": "Process payment for a booking",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody"
+            }
+          }
+        ],
+        "required": true
+      }
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api.example.com",
+      "description": "Production server"
+    }
+  ],
+  "securitySchemes": {
+    "OAuth2": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://auth.example.com/oauth/authorize",
+          "tokenUrl": "https://auth.example.com/oauth/token",
+          "scopes": {
+            "read": "Read access",
+            "write": "Write access",
+            "admin": "Admin access"
+          }
+        }
+      }
+    }
+  },
+  "globalSecurity": [
+    {
+      "scheme": "OAuth2"
+    }
+  ],
+  "commonResponses": {
+    "BadRequest": {
+      "kind": "content",
+      "statusCode": "200",
+      "description": "Bad Request - Invalid input",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Unauthorized": {
+      "kind": "content",
+      "statusCode": "200",
+      "description": "Unauthorized - Authentication required",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "NotFound": {
+      "kind": "content",
+      "statusCode": "200",
+      "description": "Not Found - Resource not found",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Conflict": {
+      "kind": "content",
+      "statusCode": "200",
+      "description": "Conflict - Resource state conflict",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "TooManyRequests": {
+      "kind": "content",
+      "statusCode": "200",
+      "description": "Too Many Requests - Rate limit exceeded",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ],
+      "headers": [
+        {
+          "name": "RateLimit-Limit",
+          "type": "int",
+          "description": "Request limit per hour"
+        },
+        {
+          "name": "RateLimit-Remaining",
+          "type": "int",
+          "description": "Remaining requests"
+        },
+        {
+          "name": "RateLimit-Reset",
+          "type": "int",
+          "description": "Time when limit resets (Unix timestamp)"
+        }
+      ]
+    },
+    "InternalServerError": {
+      "kind": "content",
+      "statusCode": "200",
+      "description": "Internal Server Error",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    }
+  }
+}

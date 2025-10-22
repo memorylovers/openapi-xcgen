@@ -1,0 +1,287 @@
+{
+  "metadata": {
+    "title": "Complex Schema API",
+    "version": "1.0.0",
+    "description": "API with complex nested schemas"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Order",
+      "referencePath": "#/components/schemas/Order",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "items",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderItems"
+          },
+          "required": true,
+          "validation": {
+            "minItems": 1
+          }
+        },
+        {
+          "name": "customer",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderCustomer"
+          },
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderStatus"
+          }
+        },
+        {
+          "name": "priority",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderPriority"
+          }
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderTags"
+          }
+        },
+        {
+          "name": "metadata",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderMetadata"
+          }
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime"
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "OrderItems",
+      "referencePath": "#/components/schemas/OrderItems",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/OrderItemsItem"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "OrderItemsItem",
+      "referencePath": "#/components/schemas/OrderItemsItem",
+      "properties": [
+        {
+          "name": "productId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "minimum": 1
+          }
+        },
+        {
+          "name": "price",
+          "type": "float",
+          "validation": {
+            "format": "float"
+          }
+        },
+        {
+          "name": "discount",
+          "type": "float",
+          "validation": {
+            "minimum": 0,
+            "maximum": 100,
+            "format": "float"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "OrderCustomer",
+      "referencePath": "#/components/schemas/OrderCustomer",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
+        },
+        {
+          "name": "address",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderCustomerAddress"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "OrderCustomerAddress",
+      "referencePath": "#/components/schemas/OrderCustomerAddress",
+      "properties": [
+        {
+          "name": "street",
+          "type": "string"
+        },
+        {
+          "name": "city",
+          "type": "string"
+        },
+        {
+          "name": "country",
+          "type": "string"
+        },
+        {
+          "name": "zipCode",
+          "type": "string",
+          "validation": {
+            "pattern": "^\\d{5}(-\\d{4})?$"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "OrderStatus",
+      "referencePath": "#/components/schemas/OrderStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "pending",
+          "name": "PENDING"
+        },
+        {
+          "value": "processing",
+          "name": "PROCESSING"
+        },
+        {
+          "value": "shipped",
+          "name": "SHIPPED"
+        },
+        {
+          "value": "delivered",
+          "name": "DELIVERED"
+        },
+        {
+          "value": "cancelled",
+          "name": "CANCELLED"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "OrderPriority",
+      "referencePath": "#/components/schemas/OrderPriority",
+      "type": "string",
+      "values": [
+        {
+          "value": "low",
+          "name": "LOW"
+        },
+        {
+          "value": "normal",
+          "name": "NORMAL"
+        },
+        {
+          "value": "high",
+          "name": "HIGH"
+        },
+        {
+          "value": "urgent",
+          "name": "URGENT"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "OrderTags",
+      "referencePath": "#/components/schemas/OrderTags",
+      "itemType": "string"
+    },
+    {
+      "kind": "map",
+      "name": "OrderMetadata",
+      "referencePath": "#/components/schemas/OrderMetadata",
+      "valueType": "string"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "post",
+      "path": "/orders",
+      "tags": [
+        "orders"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Order created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "createOrder",
+      "summary": "Create a new order",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Order"
+            }
+          }
+        ],
+        "required": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,446 @@
+{
+  "metadata": {
+    "title": "Inline Schemas Test API",
+    "version": "1.0.0",
+    "description": "Test cases for inline schema extraction - validates conversion from inline schemas to independent models"
+  },
+  "models": [
+    {
+      "kind": "enum",
+      "name": "RoleEnum",
+      "referencePath": "#/components/schemas/RoleEnum",
+      "type": "string",
+      "values": [
+        {
+          "value": "admin",
+          "name": "ADMIN"
+        },
+        {
+          "value": "user",
+          "name": "USER"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "StatusEnum",
+      "referencePath": "#/components/schemas/StatusEnum",
+      "type": "string",
+      "values": [
+        {
+          "value": "active",
+          "name": "ACTIVE"
+        },
+        {
+          "value": "inactive",
+          "name": "INACTIVE"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "UserResponse",
+      "referencePath": "#/components/schemas/UserResponse",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "profile",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/UserProfile"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "UserProfile",
+      "referencePath": "#/components/schemas/UserProfile",
+      "properties": [
+        {
+          "name": "bio",
+          "type": "string"
+        },
+        {
+          "name": "active",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "kind": "response",
+      "name": "GetTest1ParametersId200Response",
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema/GetTest1ParametersId200Response",
+      "properties": [
+        {
+          "name": "result",
+          "type": "string"
+        }
+      ],
+      "statusCode": "200"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTest1ParametersIdParams",
+      "description": "Parameters for GET /test-1-parameters/{id}\nid: Path parameter - always required\ncategory: Optional enum query parameter\nstatus: Required enum query parameter\nlimit: Optional integer parameter with default value\nincludeDetails: Optional boolean parameter with default value\nAuthorization: Optional header parameter\nsessionId: Optional cookie parameter",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Path parameter - always required"
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "in": "query",
+          "description": "Optional enum query parameter"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "in": "query",
+          "required": true,
+          "description": "Required enum query parameter"
+        },
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "Optional integer parameter with default value",
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        {
+          "name": "includeDetails",
+          "type": "boolean",
+          "in": "query",
+          "description": "Optional boolean parameter with default value",
+          "defaultValue": false
+        },
+        {
+          "name": "Authorization",
+          "type": "string",
+          "in": "header",
+          "description": "Optional header parameter"
+        },
+        {
+          "name": "sessionId",
+          "type": "string",
+          "in": "cookie",
+          "description": "Optional cookie parameter"
+        }
+      ],
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParams"
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostTest2RequestRequestBody",
+      "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "format": "email"
+          }
+        },
+        {
+          "name": "nested",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested"
+          }
+        }
+      ],
+      "required": true
+    },
+    {
+      "kind": "object",
+      "name": "PostTest2RequestRequestBodyNested",
+      "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested",
+      "properties": [
+        {
+          "name": "value",
+          "type": "string"
+        },
+        {
+          "name": "count",
+          "type": "int"
+        },
+        {
+          "name": "role",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/RoleEnum"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "response",
+      "name": "PostTest2Request201Response",
+      "referencePath": "#/paths/::test-2-request/post/responses/201/content/application::json/schema/PostTest2Request201Response",
+      "properties": [
+        {
+          "name": "result",
+          "type": "string"
+        }
+      ],
+      "statusCode": "201"
+    },
+    {
+      "kind": "array",
+      "name": "GetTest3Response201Response",
+      "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201ResponseItem"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "GetTest3Response201ResponseItem",
+      "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201ResponseItem",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "testStatus",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/StatusEnum"
+          }
+        },
+        {
+          "name": "isActive",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "kind": "response",
+      "name": "GetTest3Response202Response",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202Response",
+      "properties": [
+        {
+          "name": "count",
+          "type": "int"
+        },
+        {
+          "name": "result",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult"
+          }
+        }
+      ],
+      "statusCode": "202"
+    },
+    {
+      "kind": "object",
+      "name": "GetTest3Response202ResponseResult",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
+      "properties": [
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "GetTest3Response202ResponseResultStatus",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResultStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "success",
+          "name": "SUCCESS"
+        },
+        {
+          "value": "failed",
+          "name": "FAILED"
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTest3ResponseParams",
+      "description": "Parameters for GET /test-3-response",
+      "properties": [
+        {
+          "name": "page",
+          "type": "int",
+          "in": "query",
+          "defaultValue": 1
+        },
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "defaultValue": 10
+        }
+      ],
+      "referencePath": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/test-1-parameters/{id}",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success - validates parameter model generation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema/GetTest1ParametersId200Response"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "testParametersModelGeneration",
+      "summary": "Test 1: Parameters model generation (Basic)",
+      "description": "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion."
+    },
+    {
+      "method": "post",
+      "path": "/test-2-request",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Created - validates simple response schema extraction",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-2-request/post/responses/201/content/application::json/schema/PostTest2Request201Response"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "testRequestInlineExtraction",
+      "summary": "Test 2: Request body inline schema extraction (Basic)",
+      "description": "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBody"
+            }
+          }
+        ],
+        "required": true
+      }
+    },
+    {
+      "method": "get",
+      "path": "/test-3-response",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::test-3-response/get/parameters/GetTest3ResponseParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Primitive response - validates direct string return",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Array response - validates direct array with inline objects",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-3-response/get/responses/201/content/application::json/schema/GetTest3Response201Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "202",
+          "description": "Complex object response - validates nested object extraction",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "203",
+          "description": "Direct schema reference - validates full schema $ref",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/UserResponse"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "testResponseInlineExtraction",
+      "summary": "Test 3: Response inline schema extraction (Intermediate)",
+      "description": "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation."
+    }
+  ]
+}

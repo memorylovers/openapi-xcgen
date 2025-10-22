@@ -1,0 +1,54 @@
+openapi: 3.1.0
+info:
+  title: Operation ID Optional Field Test
+  version: 1.0.0
+  description: Test operationId as optional field per OpenAPI specification
+
+paths:
+  # Explicit operationId provided
+  /users:
+    get:
+      operationId: listUsers
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # operationId omitted - optional field
+  /users/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # Multiple methods on same path - both without operationId
+  /products:
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+    post:
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string

@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "title": "fruity",
+    "version": "0.0.1"
+  },
+  "models": [
+    {
+      "kind": "union",
+      "name": "fruit",
+      "referencePath": "#/components/schemas/fruit",
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/apple"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/banana"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/orange"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "apple",
+      "referencePath": "#/components/schemas/apple",
+      "properties": [
+        {
+          "name": "kind",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "banana",
+      "referencePath": "#/components/schemas/banana",
+      "properties": [
+        {
+          "name": "count",
+          "type": "double"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "orange",
+      "referencePath": "#/components/schemas/orange",
+      "properties": [
+        {
+          "name": "sweet",
+          "type": "boolean"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "desc",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/fruit"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

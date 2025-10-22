@@ -1,0 +1,136 @@
+{
+  "metadata": {
+    "title": "OpenAPI 3.0.3 discriminator any of example",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "anyOf",
+      "name": "Foo",
+      "referencePath": "#/components/schemas/Foo",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Bar"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Baz"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Baz",
+      "referencePath": "#/components/schemas/Baz",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Bar",
+      "referencePath": "#/components/schemas/Bar",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Spæcial",
+      "referencePath": "#/components/schemas/Spæcial",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Qux"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Qux",
+      "referencePath": "#/components/schemas/Qux",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "type",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Quux"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "Quux",
+      "referencePath": "#/components/schemas/Quux",
+      "type": "string",
+      "values": [
+        {
+          "value": "Bar",
+          "name": "BAR"
+        },
+        {
+          "value": "Baz",
+          "name": "BAZ"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "Quuz",
+      "referencePath": "#/components/schemas/Quuz",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Bar"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Baz"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Sp%C3%A6cial"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/foo",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Foo"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

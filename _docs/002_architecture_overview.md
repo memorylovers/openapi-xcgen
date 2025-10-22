@@ -34,25 +34,66 @@ openapi-xcgen/
 
 **責務:**
 
-- OpenAPIドキュメントのパース・バリデーション
+- OpenAPIドキュメントのパース（@apidevtools/swagger-parserのbundleメソッド使用）
+  - bundle()メソッドにより$refを内部参照として保持
+  - コンポーネント名を保存したままコード生成が可能
 - CLI基盤機能（cittyベース）
 - 共通ユーティリティ（文字列変換、ファイル書き込み等）
 - 再利用可能なCLIコマンド定義
+- 中間表現（XcgenIR）への変換
 
 **主要なエクスポート:**
 
 ```typescript
-// パーサー・バリデーター
-export { parseOpenAPIDocument, validateOpenAPIDocument } from "./parser.js";
-export { resolveSchemas, resolvePaths } from "./resolver.js";
+// パーサー（bundleメソッドで$refを内部参照として保持）
+export { parse } from "./parser";
 
-// CLI基盤
-export { createGenerateCommand, createValidateCommand } from "./cli/commands.js";
-export { writeGeneratedFiles, getPackageInfo } from "./cli/utils.js";
+// Transformer（Visitorパターンで実装）
+export { transform } from "./transformer";
 
-// ユーティリティ
-export { toPascalCase, toCamelCase, toKebabCase } from "./utils/case.js";
+// 中間表現（IR）型定義
+export type {
+  IRDocument,  // 現在の簡易版
+  IRInfo,
+  IRModel,
+  IREnum,
+  IRService,
+  IREndpoint,
+  IRType,
+  // ... その他のIR型
+} from "./types/ir";
+
+// CLI基盤（未実装）
+// export { createGenerateCommand, createValidateCommand } from "./cli/commands";
+// export { writeGeneratedFiles, getPackageInfo } from "./cli/utils";
+
+// ユーティリティ（部分実装）
+// export { toPascalCase, toCamelCase, toKebabCase } from "./utils/case";
 ```
+
+**中間表現の構造:**
+
+```typescript
+// 現在実装済み（簡易版）
+export interface IRDocument {
+  info: IRInfo;               // API基本情報（簡易版）
+  models: IRModel[];          // データモデル
+  enums: IREnum[];           // 列挙型
+  services: IRService[];     // APIサービス（タグでグループ化）
+}
+
+// 将来的な完全版
+export interface XcgenIR {
+  metadata: IRMetadata;        // API基本情報（完全版）
+  models: IRModel[];           // データモデル
+  enums: IREnum[];            // 列挙型
+  services: IRService[];      // APIサービス（タグでグループ化）
+  servers: IRServer[];        // サーバー情報
+  security?: IRSecurityScheme[]; // セキュリティ定義
+}
+```
+
+IR型は判別共用体（discriminated union）を採用し、型安全性を向上させています。
 
 ### @openapi-xcgen/generator-typescript
 

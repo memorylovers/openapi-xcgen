@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  title: Data Types Test
+  version: 1.0.0
+  description: Test all supported data types
+
+paths:
+  # TODO: 未実装 - operationIdがない操作は自動生成が必要
+  /data:
+    get:
+      summary: Get data
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataTypes'
+
+components:
+  schemas:
+    DataTypes:
+      type: object
+      properties:
+        # スカラー型
+        id:
+          type: integer
+        name:
+          type: string
+        score:
+          type: number
+        isActive:
+          type: boolean
+        # 日付型（型変換あり）
+        birthDate:
+          type: string
+          format: date
+        # 日時型（型変換あり）
+        createdAt:
+          type: string
+          format: date-time
+        # 基本的なobject
+        profile:
+          type: object
+          properties:
+            bio:
+              type: string
+        # 文字列配列
+        tags:
+          type: array
+          items:
+            type: string
+        # 整数配列
+        numbers:
+          type: array
+          items:
+            type: integer
+        # 数値配列
+        scores:
+          type: array
+          items:
+            type: number
+        # 真偽値配列
+        flags:
+          type: array
+          items:
+            type: boolean

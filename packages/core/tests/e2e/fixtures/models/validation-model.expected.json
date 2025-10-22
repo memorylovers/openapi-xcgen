@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "title": "Validation Model Test",
+    "version": "1.0.0",
+    "description": "Test validation constraints"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Product",
+      "referencePath": "#/components/schemas/Product",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        {
+          "name": "code",
+          "type": "string",
+          "validation": {
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        {
+          "name": "userId",
+          "type": "string",
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
+        },
+        {
+          "name": "website",
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
+        },
+        {
+          "name": "ipAddress",
+          "type": "string",
+          "validation": {
+            "format": "ipv4"
+          }
+        },
+        {
+          "name": "price",
+          "type": "double",
+          "validation": {
+            "minimum": 0,
+            "maximum": 1000
+          }
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "validation": {
+            "minimum": 1
+          }
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/ProductTags"
+          },
+          "validation": {
+            "minItems": 1,
+            "maxItems": 5
+          }
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "ProductTags",
+      "referencePath": "#/components/schemas/ProductTags",
+      "itemType": "string"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/products",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Product"
+              }
+            }
+          ]
+        }
+      ],
+      "summary": "Get products"
+    }
+  ]
+}

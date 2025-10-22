@@ -1,0 +1,89 @@
+{
+  "name": "@openapi-xcgen/xcgen-ts",
+  "version": "0.0.0",
+  "description": "TypeScript code generator for OpenAPI specifications",
+  "author": "Memory Lovers, LLC<https://github.com/memorylovers>",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/memory-lovers",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/memorylovers/openapi-xcgen.git",
+    "directory": "packages/xcgen-ts"
+  },
+  "bugs": {
+    "url": "https://github.com/memorylovers/openapi-xcgen/issues"
+  },
+  "homepage": "https://github.com/memorylovers/openapi-xcgen#readme",
+  "keywords": [
+    "openapi",
+    "typescript",
+    "code-generator",
+    "api-client",
+    "cli",
+    "valibot"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "xcgen-ts": "./bin/cli.mjs"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "dev": "unbuild --stub",
+    "build": "unbuild",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "typecheck:expected": "for dir in tests/e2e/fixtures/*/expected tests/e2e/fixtures/*/*/expected; do echo \"Checking $dir...\"; (cd \"$dir\" 2>/dev/null && tsc --noEmit) || true; done",
+    "lint": "eslint .",
+    "regenerate:expected": "pnpm jiti tests/e2e/generate-expected.ts"
+  },
+  "dependencies": {
+    "@openapi-xcgen/core": "workspace:*",
+    "c12": "^2.0.1",
+    "citty": "^0.1.6",
+    "consola": "^3.4.2",
+    "defu": "^6.1.4",
+    "es-toolkit": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "jiti": "^2.6.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "unbuild": "^3.6.1",
+    "valibot": "^1.0.0",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0",
+    "valibot": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "valibot": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "metadata": {
+    "title": "Petstore API",
+    "version": "1.0.0",
+    "description": "A simple petstore API"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tag",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "NewPet",
+      "referencePath": "#/components/schemas/NewPet",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tag",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Error",
+      "referencePath": "#/components/schemas/Error",
+      "properties": [
+        {
+          "name": "code",
+          "type": "int",
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "GetPets200Response",
+      "referencePath": "#/paths/::pets/get/responses/200/content/application::json/schema/GetPets200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetsParams",
+      "description": "Parameters for GET /pets\nlimit: How many items to return at one time",
+      "properties": [
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "How many items to return at one time",
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100,
+            "format": "int32"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetsPetIdParams",
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
+      "properties": [
+        {
+          "name": "petId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The id of the pet to retrieve"
+        }
+      ],
+      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/pets",
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets/get/parameters/GetPetsParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "A paged array of pets",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::pets/get/responses/200/content/application::json/schema/GetPets200Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "500",
+          "description": "Unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "listPets",
+      "summary": "List all pets"
+    },
+    {
+      "method": "post",
+      "path": "/pets",
+      "tags": [
+        "pets"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Pet created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "500",
+          "description": "Unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "createPet",
+      "summary": "Create a pet",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/NewPet"
+            }
+          }
+        ],
+        "required": true
+      }
+    },
+    {
+      "method": "get",
+      "path": "/pets/{petId}",
+      "tags": [
+        "pets"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Expected response to a valid request",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "Pet not found"
+        },
+        {
+          "kind": "content",
+          "statusCode": "500",
+          "description": "Unexpected error",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Error"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "getPetById",
+      "summary": "Info for a specific pet"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api.petstore.com/v1",
+      "description": "Production server"
+    }
+  ]
+}

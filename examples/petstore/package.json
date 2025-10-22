@@ -1,0 +1,26 @@
+{
+  "name": "petstore-example",
+  "version": "0.0.0",
+  "description": "Petstore API client example using @openapi-xcgen/xcgen-ts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm generate",
+    "clean": "rm -rf generated",
+    "generate": "pnpm clean && xcgen-ts -i openapi.yaml -o generated",
+    "generate:valibot": "pnpm clean && xcgen-ts -i openapi.yaml -o generated --validator=valibot",
+    "test:plain": "pnpm generate && pnpm typecheck",
+    "test:valibot": "pnpm generate:valibot && pnpm typecheck",
+    "test": "pnpm test:plain && pnpm test:valibot",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openapi-xcgen/xcgen-ts": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "valibot": "^1.0.0"
+  }
+}

@@ -1,0 +1,36 @@
+openapi: 3.0.0
+info:
+  title: Servers API
+  version: 1.0.0
+  description: API for testing servers configuration
+
+servers:
+  - url: https://{environment}.example.com/{version}
+    description: Production server
+    variables:
+      environment:
+        default: api
+        enum:
+          - api
+          - staging
+      version:
+        default: v1
+        description: API version
+  - url: https://localhost:8080
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Health check endpoint
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string

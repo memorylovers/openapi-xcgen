@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "title": "Operation ID Optional Field Test",
+    "version": "1.0.0",
+    "description": "Test operationId as optional field per OpenAPI specification"
+  },
+  "models": [
+    {
+      "kind": "parameter",
+      "name": "GetUsersIdParams",
+      "description": "Parameters for GET /users/{id}",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/users",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "listUsers"
+    },
+    {
+      "method": "get",
+      "path": "/users/{id}",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/products",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "post",
+      "path": "/products",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

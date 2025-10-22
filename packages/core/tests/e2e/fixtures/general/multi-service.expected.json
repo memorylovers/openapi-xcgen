@@ -1,0 +1,239 @@
+{
+  "metadata": {
+    "title": "Multi-Service API",
+    "version": "2.0.0",
+    "description": "API with multiple services/tags"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "User",
+      "referencePath": "#/components/schemas/User",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
+        },
+        {
+          "name": "role",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/UserRole"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "UserRole",
+      "referencePath": "#/components/schemas/UserRole",
+      "type": "string",
+      "values": [
+        {
+          "value": "admin",
+          "name": "ADMIN"
+        },
+        {
+          "value": "user",
+          "name": "USER"
+        },
+        {
+          "value": "guest",
+          "name": "GUEST"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "NewPost",
+      "referencePath": "#/components/schemas/NewPost",
+      "properties": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "authorId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "GetUsers200Response",
+      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/User"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUsersUserIdParams",
+      "description": "Parameters for GET /users/{userId}",
+      "properties": [
+        {
+          "name": "userId",
+          "type": "string",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/users",
+      "tags": [
+        "users"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "List of users",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "listUsers",
+      "summary": "List all users"
+    },
+    {
+      "method": "get",
+      "path": "/users/{userId}",
+      "tags": [
+        "users"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "User details",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/User"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "getUser",
+      "summary": "Get user by ID"
+    },
+    {
+      "method": "get",
+      "path": "/posts",
+      "tags": [
+        "posts"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "List of posts"
+        }
+      ],
+      "operationId": "listPosts",
+      "summary": "List all posts"
+    },
+    {
+      "method": "post",
+      "path": "/posts",
+      "tags": [
+        "posts"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Post created"
+        }
+      ],
+      "operationId": "createPost",
+      "summary": "Create a new post",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/NewPost"
+            }
+          }
+        ],
+        "required": true
+      }
+    },
+    {
+      "method": "get",
+      "path": "/admin/settings",
+      "tags": [
+        "admin"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Settings retrieved"
+        }
+      ],
+      "operationId": "getSettings",
+      "summary": "Get admin settings"
+    },
+    {
+      "method": "get",
+      "path": "/health",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Service is healthy"
+        }
+      ],
+      "operationId": "healthCheck",
+      "summary": "Health check endpoint"
+    }
+  ]
+}

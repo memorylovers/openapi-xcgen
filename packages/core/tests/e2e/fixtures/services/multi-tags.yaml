@@ -1,0 +1,49 @@
+openapi: 3.1.0
+info:
+  title: Multi Tags Service Classification Test
+  version: 1.0.0
+  description: Test multi-tag service classification
+
+paths:
+  /endpoint1:
+    get:
+      operationId: endpoint1
+      tags:
+        - users
+        - admin
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /endpoint2:
+    get:
+      operationId: endpoint2
+      tags:
+        - admin
+        - users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /endpoint3:
+    get:
+      operationId: endpoint3
+      tags:
+        - products
+        - admin
+        - moderation
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string

@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "title": "Webhook Example",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tag",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": []
+}

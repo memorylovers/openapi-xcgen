@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "title": "Single Tag Service Classification Test",
+    "version": "1.0.0",
+    "description": "Test single tag service classification"
+  },
+  "models": [],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/users",
+      "tags": [
+        "users"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "getUsers"
+    },
+    {
+      "method": "get",
+      "path": "/products",
+      "tags": [
+        "products"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "getProducts"
+    }
+  ]
+}

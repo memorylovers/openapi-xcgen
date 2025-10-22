@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "Multi Tags Service Classification Test",
+    "version": "1.0.0",
+    "description": "Test multi-tag service classification"
+  },
+  "models": [],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/endpoint1",
+      "tags": [
+        "users",
+        "admin"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint1"
+    },
+    {
+      "method": "get",
+      "path": "/endpoint2",
+      "tags": [
+        "admin",
+        "users"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint2"
+    },
+    {
+      "method": "get",
+      "path": "/endpoint3",
+      "tags": [
+        "products",
+        "admin",
+        "moderation"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ],
+      "operationId": "endpoint3"
+    }
+  ]
+}

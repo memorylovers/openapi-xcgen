@@ -1,0 +1,22 @@
+{
+  // 生成対象のAI開発ツール
+  "targets": ["agentsmd", "claudecode", "geminicli", "codexcli"],
+
+  // 生成する機能
+  "features": ["rules", "mcp", "commands", "subagents"],
+
+  // 生成対象ディレクトリ
+  "baseDirs": ["."],
+
+  // 生成前に既存ファイルを削除
+  "delete": true,
+
+  // 詳細ログを表示
+  "verbose": true,
+
+  // コマンドファイルをシミュレート（実ファイルがなくても生成）
+  "simulateCommands": true,
+
+  // サブエージェントファイルをシミュレート（実ファイルがなくても生成）
+  "simulateSubagents": true
+}

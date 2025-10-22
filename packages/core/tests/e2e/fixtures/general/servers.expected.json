@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "title": "Servers API",
+    "version": "1.0.0",
+    "description": "API for testing servers configuration"
+  },
+  "models": [
+    {
+      "kind": "response",
+      "name": "GetHealth200Response",
+      "referencePath": "#/paths/::health/get/responses/200/content/application::json/schema/GetHealth200Response",
+      "properties": [
+        {
+          "name": "status",
+          "type": "string"
+        }
+      ],
+      "statusCode": "200"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/health",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Health status",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::health/get/responses/200/content/application::json/schema/GetHealth200Response"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "getHealth",
+      "summary": "Health check endpoint"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://{environment}.example.com/{version}",
+      "description": "Production server",
+      "variables": {
+        "environment": {
+          "default": "api",
+          "enum": [
+            "api",
+            "staging"
+          ]
+        },
+        "version": {
+          "default": "v1",
+          "description": "API version"
+        }
+      }
+    },
+    {
+      "url": "https://localhost:8080",
+      "description": "Local development server"
+    }
+  ]
+}

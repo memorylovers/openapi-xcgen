@@ -1,0 +1,902 @@
+openapi: 3.1.0
+info:
+  title: Museum API
+  description: |
+    An imaginary, but delightful Museum API for interacting with museum services and information.
+    Built with love by Redocly.
+  version: 2.3.0
+  contact:
+    name: Museum API Support
+    email: support@museum-api.com
+    url: https://museum-api.com/support
+  license:
+    name: MIT
+    identifier: MIT
+
+servers:
+  - url: https://api.museum.com/v2
+    description: Production server
+  - url: https://staging-api.museum.com/v2
+    description: Staging server
+
+tags:
+  - name: Operations
+    description: Museum operational information
+  - name: Events
+    description: Special events hosted by the museum
+  - name: Tickets
+    description: Museum ticket purchasing
+
+paths:
+  /museum-hours:
+    get:
+      summary: Get museum operating hours
+      description: Returns the operating hours for the museum for the next seven days.
+      operationId: getMuseumHours
+      tags:
+        - Operations
+      parameters:
+        - name: date
+          in: query
+          description: Specific date to retrieve hours for (ISO 8601 format)
+          required: false
+          schema:
+            type: string
+            format: date
+            examples:
+              - "2024-01-15"
+        - name: timezone
+          in: query
+          description: Timezone for displaying hours (IANA timezone format)
+          required: false
+          schema:
+            type: string
+            default: America/New_York
+            examples:
+              - "America/New_York"
+              - "Europe/London"
+              - "Asia/Tokyo"
+      responses:
+        '200':
+          description: Museum hours retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timezone:
+                    type: string
+                    description: Timezone used for the hours
+                  daily_hours:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DailyHours'
+              examples:
+                default:
+                  value:
+                    timezone: "America/New_York"
+                    daily_hours:
+                      - date: "2024-01-15"
+                        open: "09:00"
+                        close: "18:00"
+                        special_hours: false
+                      - date: "2024-01-16"
+                        open: "09:00"
+                        close: "21:00"
+                        special_hours: true
+                        note: "Extended hours for Tuesday nights"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /special-events:
+    get:
+      summary: List special events
+      description: Get a list of upcoming special events at the museum
+      operationId: listSpecialEvents
+      tags:
+        - Events
+      parameters:
+        - name: start_date
+          in: query
+          description: Filter events starting from this date
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Filter events until this date
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: category
+          in: query
+          description: Filter by event category
+          required: false
+          schema:
+            type: string
+            enum:
+              - exhibition
+              - workshop
+              - tour
+              - lecture
+              - family
+              - members-only
+        - name: limit
+          in: query
+          description: Maximum number of events to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: Number of events to skip (for pagination)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of special events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SpecialEvent'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    post:
+      summary: Create a new special event
+      description: Create a new special event (requires admin privileges)
+      operationId: createSpecialEvent
+      tags:
+        - Events
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialEventRequest'
+      responses:
+        '201':
+          description: Event created successfully
+          headers:
+            Location:
+              description: URL of the created event
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /special-events/{eventId}:
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        description: Unique identifier of the special event
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Get special event details
+      description: Get details about a specific special event
+      operationId: getSpecialEvent
+      tags:
+        - Events
+      responses:
+        '200':
+          description: Event details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialEvent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Update special event
+      description: Update a special event (requires admin privileges)
+      operationId: updateSpecialEvent
+      tags:
+        - Events
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialEventUpdate'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete special event
+      description: Delete a special event (requires admin privileges)
+      operationId: deleteSpecialEvent
+      tags:
+        - Events
+      security:
+        - ApiKey: []
+      responses:
+        '204':
+          description: Event deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tickets:
+    post:
+      summary: Purchase museum tickets
+      description: Purchase tickets for museum admission
+      operationId: purchaseTickets
+      tags:
+        - Tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketPurchaseRequest'
+      responses:
+        '201':
+          description: Tickets purchased successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketPurchaseConfirmation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '402':
+          description: Payment Required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflict - Tickets not available for selected date/time
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+  /tickets/{confirmationId}:
+    parameters:
+      - name: confirmationId
+        in: path
+        required: true
+        description: Ticket purchase confirmation ID
+        schema:
+          type: string
+          pattern: '^[A-Z0-9]{8}$'
+
+    get:
+      summary: Retrieve ticket details
+      description: Get details of a ticket purchase
+      operationId: getTicket
+      tags:
+        - Tickets
+      parameters:
+        - name: email
+          in: query
+          required: true
+          description: Email address used for the purchase
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Ticket details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketPurchaseConfirmation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tickets/{confirmationId}/qr-code:
+    parameters:
+      - name: confirmationId
+        in: path
+        required: true
+        description: Ticket purchase confirmation ID
+        schema:
+          type: string
+          pattern: '^[A-Z0-9]{8}$'
+
+    get:
+      summary: Generate QR code for tickets
+      description: Generate a QR code for ticket validation at the museum entrance
+      operationId: getTicketQRCode
+      tags:
+        - Tickets
+      parameters:
+        - name: email
+          in: query
+          required: true
+          description: Email address used for the purchase
+          schema:
+            type: string
+            format: email
+        - name: format
+          in: query
+          description: QR code format
+          schema:
+            type: string
+            enum:
+              - png
+              - svg
+            default: png
+      responses:
+        '200':
+          description: QR code generated successfully
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for admin operations
+
+  schemas:
+    DailyHours:
+      type: object
+      required:
+        - date
+        - open
+        - close
+      properties:
+        date:
+          type: string
+          format: date
+        open:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: Opening time in 24-hour format
+        close:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: Closing time in 24-hour format
+        special_hours:
+          type: boolean
+          default: false
+        note:
+          type: string
+          maxLength: 500
+        closed:
+          type: boolean
+          default: false
+      additionalProperties: false
+
+    SpecialEvent:
+      type: object
+      required:
+        - event_id
+        - name
+        - description
+        - start_date
+        - end_date
+        - category
+        - location
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        category:
+          type: string
+          enum:
+            - exhibition
+            - workshop
+            - tour
+            - lecture
+            - family
+            - members-only
+        location:
+          type: string
+          enum:
+            - main-hall
+            - gallery-a
+            - gallery-b
+            - gallery-c
+            - auditorium
+            - classroom-1
+            - classroom-2
+            - outdoor
+        price:
+          $ref: '#/components/schemas/Money'
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        registration_required:
+          type: boolean
+          default: false
+        registration_url:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      additionalProperties: false
+
+    SpecialEventRequest:
+      type: object
+      required:
+        - name
+        - description
+        - start_date
+        - end_date
+        - category
+        - location
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        category:
+          type: string
+          enum:
+            - exhibition
+            - workshop
+            - tour
+            - lecture
+            - family
+            - members-only
+        location:
+          type: string
+          enum:
+            - main-hall
+            - gallery-a
+            - gallery-b
+            - gallery-c
+            - auditorium
+            - classroom-1
+            - classroom-2
+            - outdoor
+        price:
+          $ref: '#/components/schemas/Money'
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        registration_required:
+          type: boolean
+          default: false
+        registration_url:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+      additionalProperties: false
+
+    SpecialEventUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        category:
+          type: string
+          enum:
+            - exhibition
+            - workshop
+            - tour
+            - lecture
+            - family
+            - members-only
+        location:
+          type: string
+          enum:
+            - main-hall
+            - gallery-a
+            - gallery-b
+            - gallery-c
+            - auditorium
+            - classroom-1
+            - classroom-2
+            - outdoor
+        price:
+          $ref: '#/components/schemas/Money'
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        registration_required:
+          type: boolean
+        registration_url:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+      additionalProperties: false
+
+    TicketPurchaseRequest:
+      type: object
+      required:
+        - visitor_email
+        - visit_date
+        - ticket_type
+        - quantity
+        - payment_method
+      properties:
+        visitor_email:
+          type: string
+          format: email
+          writeOnly: true
+        visitor_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          writeOnly: true
+        visit_date:
+          type: string
+          format: date
+        visit_time:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: Preferred entry time in 24-hour format
+        ticket_type:
+          type: string
+          enum:
+            - adult
+            - senior
+            - student
+            - child
+            - family
+            - group
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 20
+        special_requests:
+          type: string
+          maxLength: 500
+        payment_method:
+          oneOf:
+            - $ref: '#/components/schemas/CreditCardPayment'
+            - $ref: '#/components/schemas/PayPalPayment'
+          discriminator:
+            propertyName: type
+      additionalProperties: false
+
+    TicketPurchaseConfirmation:
+      type: object
+      required:
+        - confirmation_id
+        - purchase_date
+        - visit_date
+        - ticket_type
+        - quantity
+        - total_amount
+        - status
+      properties:
+        confirmation_id:
+          type: string
+          pattern: '^[A-Z0-9]{8}$'
+          readOnly: true
+        purchase_date:
+          type: string
+          format: date-time
+          readOnly: true
+        visitor_email:
+          type: string
+          format: email
+        visitor_name:
+          type: string
+        visit_date:
+          type: string
+          format: date
+        visit_time:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+        ticket_type:
+          type: string
+          enum:
+            - adult
+            - senior
+            - student
+            - child
+            - family
+            - group
+        quantity:
+          type: integer
+        total_amount:
+          $ref: '#/components/schemas/Money'
+        status:
+          type: string
+          enum:
+            - pending
+            - confirmed
+            - used
+            - cancelled
+            - refunded
+          readOnly: true
+        qr_code_url:
+          type: string
+          format: uri
+          readOnly: true
+        special_requests:
+          type: string
+      additionalProperties: false
+
+    CreditCardPayment:
+      type: object
+      required:
+        - type
+        - card_number
+        - card_holder_name
+        - expiry_date
+        - cvv
+      properties:
+        type:
+          type: string
+          const: credit_card
+        card_number:
+          type: string
+          pattern: '^[0-9]{13,19}$'
+          writeOnly: true
+        card_holder_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          writeOnly: true
+        expiry_date:
+          type: string
+          pattern: '^(0[1-9]|1[0-2])\/[0-9]{2}$'
+          description: MM/YY format
+          writeOnly: true
+        cvv:
+          type: string
+          pattern: '^[0-9]{3,4}$'
+          writeOnly: true
+      additionalProperties: false
+
+    PayPalPayment:
+      type: object
+      required:
+        - type
+        - paypal_email
+      properties:
+        type:
+          type: string
+          const: paypal
+        paypal_email:
+          type: string
+          format: email
+          writeOnly: true
+        paypal_auth_code:
+          type: string
+          writeOnly: true
+      additionalProperties: false
+
+    Money:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          default: USD
+          examples:
+            - USD
+            - EUR
+            - GBP
+      additionalProperties: false
+
+    Pagination:
+      type: object
+      required:
+        - total
+        - limit
+        - offset
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        has_more:
+          type: boolean
+      additionalProperties: false
+
+    Problem:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+          default: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        timestamp:
+          type: string
+          format: date-time
+        correlation_id:
+          type: string
+          format: uuid
+      additionalProperties: false
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid input parameters
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://api.museum.com/errors/bad-request
+            title: Invalid Request
+            status: 400
+            detail: The date parameter must be in ISO 8601 format
+
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://api.museum.com/errors/unauthorized
+            title: Authentication Required
+            status: 401
+            detail: Please provide valid authentication credentials
+
+    Forbidden:
+      description: Forbidden - Insufficient privileges
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://api.museum.com/errors/forbidden
+            title: Insufficient Privileges
+            status: 403
+            detail: Admin privileges required for this operation
+
+    NotFound:
+      description: Not Found - Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://api.museum.com/errors/not-found
+            title: Resource Not Found
+            status: 404
+            detail: The requested resource could not be found
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://api.museum.com/errors/internal-server-error
+            title: Internal Server Error
+            status: 500
+            detail: An unexpected error occurred. Please try again later.

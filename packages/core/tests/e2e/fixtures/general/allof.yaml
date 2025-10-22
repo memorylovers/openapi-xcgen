@@ -1,0 +1,75 @@
+openapi: 3.0.3
+info:
+  title: allOf Composition Test
+  version: 1.0.0
+  description: Test allOf schema composition
+
+paths:
+  /users:
+    get:
+      summary: Get users
+      operationId: getUsers
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    # Base model
+    Base:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+      required:
+        - id
+
+    # Simple inheritance ($ref + object)
+    User:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          properties:
+            name:
+              type: string
+              description: User name
+            email:
+              type: string
+              format: email
+              description: Email address
+          required:
+            - name
+            - email
+
+    # Multiple $refs composition
+    Timestamps:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AuditableUser:
+      description: User with audit timestamps
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - $ref: '#/components/schemas/Timestamps'
+        - type: object
+          properties:
+            role:
+              type: string
+              enum: [admin, user, guest]
+          required:
+            - role

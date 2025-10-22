@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "title": "Metadata Model Test",
+    "version": "1.0.0",
+    "description": "Test metadata attributes"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Article",
+      "referencePath": "#/components/schemas/Article",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Name description"
+        },
+        {
+          "name": "code",
+          "type": "string"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "defaultValue": "active"
+        },
+        {
+          "name": "createdAt",
+          "type": "string",
+          "readOnly": true
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "writeOnly": true
+        },
+        {
+          "name": "oldId",
+          "type": "string",
+          "deprecated": true
+        }
+      ],
+      "description": "Article model with metadata"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/articles",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Article"
+              }
+            }
+          ]
+        }
+      ],
+      "summary": "Get articles"
+    }
+  ]
+}

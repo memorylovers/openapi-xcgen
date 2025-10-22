@@ -1,0 +1,477 @@
+{
+  "metadata": {
+    "title": "fruity",
+    "version": "0.0.1"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "FruitType",
+      "referencePath": "#/components/schemas/FruitType",
+      "properties": [
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitInlineDisc",
+      "referencePath": "#/components/schemas/FruitInlineDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitInlineDiscAnyOf0"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitInlineDiscAnyOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "FruitInlineDiscAnyOf0",
+      "referencePath": "#/components/schemas/FruitInlineDiscAnyOf0",
+      "properties": [
+        {
+          "name": "seeds",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "FruitInlineDiscAnyOf1",
+      "referencePath": "#/components/schemas/FruitInlineDiscAnyOf1",
+      "properties": [
+        {
+          "name": "length",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitInlineInlineDisc",
+      "referencePath": "#/components/schemas/FruitInlineInlineDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf0"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf1"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitInlineInlineDiscAnyOf0",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf0",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf0AnyOf0"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "FruitInlineInlineDiscAnyOf0AnyOf0",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf0AnyOf0",
+      "properties": [
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitInlineInlineDiscAnyOf1",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf1",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf1AnyOf0"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "FruitInlineInlineDiscAnyOf1AnyOf0",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf1AnyOf0",
+      "properties": [
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitReqDisc",
+      "referencePath": "#/components/schemas/FruitReqDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AppleReqDisc"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BananaReqDisc"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "AppleReqDisc",
+      "referencePath": "#/components/schemas/AppleReqDisc",
+      "properties": [
+        {
+          "name": "seeds",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BananaReqDisc",
+      "referencePath": "#/components/schemas/BananaReqDisc",
+      "properties": [
+        {
+          "name": "length",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "fruitType",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitAllOfDisc",
+      "referencePath": "#/components/schemas/FruitAllOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AppleAllOfDisc"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BananaAllOfDisc"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "AppleAllOfDisc",
+      "referencePath": "#/components/schemas/AppleAllOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "BananaAllOfDisc",
+      "referencePath": "#/components/schemas/BananaAllOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitAnyOfDisc",
+      "referencePath": "#/components/schemas/FruitAnyOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AppleAnyOfDisc"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BananaAnyOfDisc"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "AppleAnyOfDisc",
+      "referencePath": "#/components/schemas/AppleAnyOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "BananaAnyOfDisc",
+      "referencePath": "#/components/schemas/BananaAnyOfDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "FruitGrandparentDisc",
+      "referencePath": "#/components/schemas/FruitGrandparentDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/AppleGrandparentDisc"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BananaGrandparentDisc"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Parent",
+      "referencePath": "#/components/schemas/Parent",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "AppleGrandparentDisc",
+      "referencePath": "#/components/schemas/AppleGrandparentDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Parent"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "BananaGrandparentDisc",
+      "referencePath": "#/components/schemas/BananaGrandparentDisc",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Parent"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscMissingNoProperties",
+      "referencePath": "#/components/schemas/ComposedDiscMissingNoProperties",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscMissingNoProperties"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscMissingNoProperties",
+      "referencePath": "#/components/schemas/DiscMissingNoProperties",
+      "properties": []
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscMissingFromProperties",
+      "referencePath": "#/components/schemas/ComposedDiscMissingFromProperties",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscMissingFromProperties"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscMissingFromProperties",
+      "referencePath": "#/components/schemas/DiscMissingFromProperties",
+      "properties": [
+        {
+          "name": "length",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscOptionalTypeCorrect",
+      "referencePath": "#/components/schemas/ComposedDiscOptionalTypeCorrect",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscOptionalTypeCorrect"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscOptionalTypeCorrect",
+      "referencePath": "#/components/schemas/DiscOptionalTypeCorrect",
+      "properties": [
+        {
+          "name": "fruitType",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscOptionalTypeIncorrect",
+      "referencePath": "#/components/schemas/ComposedDiscOptionalTypeIncorrect",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscOptionalTypeIncorrect"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscOptionalTypeIncorrect",
+      "referencePath": "#/components/schemas/DiscOptionalTypeIncorrect",
+      "properties": [
+        {
+          "name": "fruitType",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscOptionalTypeInconsistent",
+      "referencePath": "#/components/schemas/ComposedDiscOptionalTypeInconsistent",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscOptionalTypeIncorrect"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscOptionalTypeCorrect"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscTypeIncorrect",
+      "referencePath": "#/components/schemas/ComposedDiscTypeIncorrect",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscTypeIncorrect"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DiscTypeIncorrect",
+      "referencePath": "#/components/schemas/DiscTypeIncorrect",
+      "properties": [
+        {
+          "name": "fruitType",
+          "type": "int",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscTypeInconsistent",
+      "referencePath": "#/components/schemas/ComposedDiscTypeInconsistent",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscTypeIncorrect"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    },
+    {
+      "kind": "anyOf",
+      "name": "ComposedDiscRequiredInconsistent",
+      "referencePath": "#/components/schemas/ComposedDiscRequiredInconsistent",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/DiscOptionalTypeCorrect"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FruitType"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "desc",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/FruitAllOfDisc"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "title": "fruity",
+    "version": "0.0.1"
+  },
+  "models": [
+    {
+      "kind": "anyOf",
+      "name": "fruit",
+      "referencePath": "#/components/schemas/fruit",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/apple"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/banana"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "apple",
+      "referencePath": "#/components/schemas/apple",
+      "properties": [
+        {
+          "name": "kind",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "banana",
+      "referencePath": "#/components/schemas/banana",
+      "properties": [
+        {
+          "name": "count",
+          "type": "double"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "desc",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/fruit"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

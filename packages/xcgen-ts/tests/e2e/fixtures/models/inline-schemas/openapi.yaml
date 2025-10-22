@@ -1,0 +1,197 @@
+openapi: 3.1.0
+info:
+  title: Inline Schemas Test API
+  version: 1.0.0
+  description: Test cases for inline schema extraction - validates conversion from inline schemas to independent models
+
+paths:
+  /test-1-parameters/{id}:
+    get:
+      operationId: testParametersModelGeneration
+      summary: "Test 1: Parameters model generation (Basic)"
+      description: "Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "Path parameter - always required"
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["electronics", "books", "clothing"]
+          description: "Optional enum query parameter"
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: ["active", "inactive", "pending"]
+          description: "Required enum query parameter"
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Optional integer parameter with default value"
+        - name: includeDetails
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: "Optional boolean parameter with default value"
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+          description: "Optional header parameter"
+        - name: sessionId
+          in: cookie
+          required: false
+          schema:
+            type: string
+          description: "Optional cookie parameter"
+      responses:
+        "200":
+          description: Success - validates parameter model generation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+
+  /test-2-request:
+    post:
+      operationId: testRequestInlineExtraction  
+      summary: "Test 2: Request body inline schema extraction (Basic)"
+      description: "Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                nested:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    count:
+                      type: integer
+                    role:
+                      $ref: "#/components/schemas/RoleEnum"
+      responses:
+        "201":
+          description: Created - validates simple response schema extraction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+
+  /test-3-response:
+    get:
+      operationId: testResponseInlineExtraction
+      summary: "Test 3: Response inline schema extraction (Intermediate)"
+      description: "Validates extraction of inline schemas from response body into separate models. Tests: array items extraction, enum extraction, parameter model generation."
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Primitive response - validates direct string return
+          content:
+            application/json:
+              schema:
+                type: string
+        "201":
+          description: Array response - validates direct array with inline objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    testStatus:
+                      $ref: "#/components/schemas/StatusEnum"
+                    isActive:
+                      type: boolean
+        "202":
+          description: Complex object response - validates nested object extraction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  result:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: ["success", "failed"]
+        "203":
+          description: Direct schema reference - validates full schema $ref
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+
+components:
+  schemas:
+    RoleEnum:
+      type: string
+      enum: ["admin", "user"]
+    StatusEnum:
+      type: string
+      enum: ["active", "inactive"]
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+    UserProfile:
+      type: object
+      properties:
+        bio:
+          type: string
+        active:
+          type: boolean
+

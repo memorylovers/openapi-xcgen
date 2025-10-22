@@ -31,5 +31,12 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
-  }
+  },
+
+  // ESLint設定
+  "eslint.workingDirectories": [
+    "./packages/core",
+    "./packages/generator-typescript",
+    "./packages/generator-dart"
+  ]
 }

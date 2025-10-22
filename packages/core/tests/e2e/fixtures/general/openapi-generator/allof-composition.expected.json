@@ -1,0 +1,193 @@
+{
+  "metadata": {
+    "title": "Example",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "allOf",
+      "name": "SuperBaby",
+      "referencePath": "#/components/schemas/SuperBaby",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Human"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/SuperBabyAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SuperBabyAllOf1",
+      "referencePath": "#/components/schemas/SuperBabyAllOf1",
+      "properties": [
+        {
+          "name": "gender",
+          "type": "string"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "SuperBoy",
+      "referencePath": "#/components/schemas/SuperBoy",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Human"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/SuperBoyAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SuperBoyAllOf1",
+      "referencePath": "#/components/schemas/SuperBoyAllOf1",
+      "properties": [
+        {
+          "name": "category",
+          "type": "string"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "SuperMan",
+      "referencePath": "#/components/schemas/SuperMan",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Human"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Hero"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/SuperManAllOf2"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "SuperManAllOf2",
+      "referencePath": "#/components/schemas/SuperManAllOf2",
+      "properties": [
+        {
+          "name": "category",
+          "type": "string"
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "Hero",
+      "referencePath": "#/components/schemas/Hero",
+      "properties": [
+        {
+          "name": "reward",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "origin",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "description": "Hero"
+    },
+    {
+      "kind": "object",
+      "name": "Human",
+      "referencePath": "#/components/schemas/Human",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "description": "Human"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPersonDisplayPersonIdParams",
+      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve",
+      "properties": [
+        {
+          "name": "personId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The id of the person to retrieve"
+        }
+      ],
+      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/person/display/{personId}",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/SuperMan"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "list"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://api.example.xyz/v1"
+    }
+  ]
+}

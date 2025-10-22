@@ -1,0 +1,276 @@
+{
+  "metadata": {
+    "title": "OpenAPI 3.1.0 discriminator all of example",
+    "version": "1.0.0"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Foo",
+      "referencePath": "#/components/schemas/Foo",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Bar",
+      "referencePath": "#/components/schemas/Bar",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Foo"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BarAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BarAllOf1",
+      "referencePath": "#/components/schemas/BarAllOf1",
+      "properties": [
+        {
+          "name": "bar",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Baz",
+      "referencePath": "#/components/schemas/Baz",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Foo"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BazAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BazAllOf1",
+      "referencePath": "#/components/schemas/BazAllOf1",
+      "properties": [
+        {
+          "name": "baz",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "Qux",
+      "referencePath": "#/components/schemas/Qux",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/Foo"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/QuxAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "QuxAllOf1",
+      "referencePath": "#/components/schemas/QuxAllOf1",
+      "properties": [
+        {
+          "name": "qux",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "FooMapped",
+      "referencePath": "#/components/schemas/FooMapped",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "BarMapped",
+      "referencePath": "#/components/schemas/BarMapped",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FooMapped"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BarMappedAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BarMappedAllOf1",
+      "referencePath": "#/components/schemas/BarMappedAllOf1",
+      "properties": [
+        {
+          "name": "bar",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "BazMapped",
+      "referencePath": "#/components/schemas/BazMapped",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FooMapped"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BazMappedAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BazMappedAllOf1",
+      "referencePath": "#/components/schemas/BazMappedAllOf1",
+      "properties": [
+        {
+          "name": "baz",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "QuxMapped",
+      "referencePath": "#/components/schemas/QuxMapped",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FooMapped"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/QuxMappedAllOf1"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "QuxMappedAllOf1",
+      "referencePath": "#/components/schemas/QuxMappedAllOf1",
+      "properties": [
+        {
+          "name": "qux",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "kind": "union",
+      "name": "FooUnion",
+      "referencePath": "#/components/schemas/FooUnion",
+      "discriminator": {
+        "propertyName": "id",
+        "mapping": {
+          "bar": "#/components/schemas/BarUnion",
+          "baz": "#/components/schemas/BazUnion"
+        }
+      },
+      "types": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BarUnion"
+        },
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/BazUnion"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BarUnion",
+      "referencePath": "#/components/schemas/BarUnion",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "bar",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "BazUnion",
+      "referencePath": "#/components/schemas/BazUnion",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "baz",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "allOf",
+      "name": "QuxExtend",
+      "referencePath": "#/components/schemas/QuxExtend",
+      "schemas": [
+        {
+          "kind": "ref",
+          "name": "#/components/schemas/FooUnion"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/foo",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "OK",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Foo"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

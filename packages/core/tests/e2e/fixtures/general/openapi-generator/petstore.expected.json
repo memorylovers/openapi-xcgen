@@ -1,0 +1,1487 @@
+{
+  "metadata": {
+    "title": "OpenAPI Petstore",
+    "version": "1.0.0",
+    "description": "This is a sample server Petstore server. For this sample, you can use the api key `special-key` to test the authorization filters."
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Order",
+      "referencePath": "#/components/schemas/Order",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "petId",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "shipDate",
+          "type": "datetime"
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderStatus"
+          },
+          "description": "Order Status"
+        },
+        {
+          "name": "complete",
+          "type": "boolean",
+          "defaultValue": false
+        }
+      ],
+      "description": "An order for a pets from the pet store"
+    },
+    {
+      "kind": "enum",
+      "name": "OrderStatus",
+      "referencePath": "#/components/schemas/OrderStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "placed",
+          "name": "PLACED"
+        },
+        {
+          "value": "approved",
+          "name": "APPROVED"
+        },
+        {
+          "value": "delivered",
+          "name": "DELIVERED"
+        }
+      ],
+      "description": "Order Status"
+    },
+    {
+      "kind": "object",
+      "name": "Category",
+      "referencePath": "#/components/schemas/Category",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "validation": {
+            "pattern": "^[a-zA-Z0-9]+[a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]+$"
+          }
+        }
+      ],
+      "description": "A category for a pet"
+    },
+    {
+      "kind": "object",
+      "name": "User",
+      "referencePath": "#/components/schemas/User",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "firstName",
+          "type": "string"
+        },
+        {
+          "name": "lastName",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string"
+        },
+        {
+          "name": "password",
+          "type": "string"
+        },
+        {
+          "name": "phone",
+          "type": "string"
+        },
+        {
+          "name": "userStatus",
+          "type": "int",
+          "description": "User Status",
+          "validation": {
+            "format": "int32"
+          }
+        }
+      ],
+      "description": "A User who is purchasing from the pet store"
+    },
+    {
+      "kind": "object",
+      "name": "Tag",
+      "referencePath": "#/components/schemas/Tag",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "description": "A tag for a pet"
+    },
+    {
+      "kind": "object",
+      "name": "Pet",
+      "referencePath": "#/components/schemas/Pet",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
+        },
+        {
+          "name": "category",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Category"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "photoUrls",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PetPhotoUrls"
+          },
+          "required": true
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PetTags"
+          }
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PetStatus"
+          },
+          "description": "pet status in the store",
+          "deprecated": true
+        }
+      ],
+      "description": "A pet for sale in the pet store"
+    },
+    {
+      "kind": "array",
+      "name": "PetPhotoUrls",
+      "referencePath": "#/components/schemas/PetPhotoUrls",
+      "itemType": "string"
+    },
+    {
+      "kind": "array",
+      "name": "PetTags",
+      "referencePath": "#/components/schemas/PetTags",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Tag"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "PetStatus",
+      "referencePath": "#/components/schemas/PetStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "available",
+          "name": "AVAILABLE"
+        },
+        {
+          "value": "pending",
+          "name": "PENDING"
+        },
+        {
+          "value": "sold",
+          "name": "SOLD"
+        }
+      ],
+      "description": "pet status in the store"
+    },
+    {
+      "kind": "object",
+      "name": "ApiResponse",
+      "referencePath": "#/components/schemas/ApiResponse",
+      "properties": [
+        {
+          "name": "code",
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
+        },
+        {
+          "name": "type",
+          "type": "string"
+        },
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "description": "Describes the result of uploading an image resource"
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByStatus200XmlResponse",
+      "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema/GetPetFindByStatus200XmlResponse",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByStatus200Response",
+      "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema/GetPetFindByStatus200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetFindByStatusParams",
+      "description": "Parameters for GET /pet/findByStatus\nstatus: Status values that need to be considered for filter",
+      "properties": [
+        {
+          "name": "status",
+          "type": {
+            "kind": "array",
+            "itemType": "string"
+          },
+          "in": "query",
+          "required": true,
+          "description": "Status values that need to be considered for filter",
+          "deprecated": true
+        }
+      ],
+      "referencePath": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParams"
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByTags200XmlResponse",
+      "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema/GetPetFindByTags200XmlResponse",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "array",
+      "name": "GetPetFindByTags200Response",
+      "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema/GetPetFindByTags200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Pet"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetFindByTagsParams",
+      "description": "Parameters for GET /pet/findByTags\ntags: Tags to filter by",
+      "properties": [
+        {
+          "name": "tags",
+          "type": {
+            "kind": "array",
+            "itemType": "string"
+          },
+          "in": "query",
+          "required": true,
+          "description": "Tags to filter by"
+        }
+      ],
+      "referencePath": "#/paths/::pet::findByTags/get/parameters/GetPetFindByTagsParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetPetPetIdParams",
+      "description": "Parameters for GET /pet/{petId}\npetId: ID of pet to return",
+      "properties": [
+        {
+          "name": "petId",
+          "type": "long",
+          "in": "path",
+          "required": true,
+          "description": "ID of pet to return",
+          "validation": {
+            "format": "int64"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::pet::{petId}/get/parameters/GetPetPetIdParams"
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostPetPetIdWwwFormUrlencodedRequestBody",
+      "referencePath": "#/paths/::pet::{petId}/post/requestBody/content/application::x-www-form-urlencoded/schema/PostPetPetIdWwwFormUrlencodedRequestBody",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Updated name of the pet"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "description": "Updated status of the pet"
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "PostPetPetIdParams",
+      "description": "Parameters for POST /pet/{petId}\npetId: ID of pet that needs to be updated",
+      "properties": [
+        {
+          "name": "petId",
+          "type": "long",
+          "in": "path",
+          "required": true,
+          "description": "ID of pet that needs to be updated",
+          "validation": {
+            "format": "int64"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::pet::{petId}/post/parameters/PostPetPetIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "DeletePetPetIdParams",
+      "description": "Parameters for DELETE /pet/{petId}\npetId: Pet id to delete",
+      "properties": [
+        {
+          "name": "api_key",
+          "type": "string",
+          "in": "header"
+        },
+        {
+          "name": "petId",
+          "type": "long",
+          "in": "path",
+          "required": true,
+          "description": "Pet id to delete",
+          "validation": {
+            "format": "int64"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::pet::{petId}/delete/parameters/DeletePetPetIdParams"
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostPetPetIdUploadImageMultipartFormDataRequestBody",
+      "referencePath": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema/PostPetPetIdUploadImageMultipartFormDataRequestBody",
+      "properties": [
+        {
+          "name": "additionalMetadata",
+          "type": "string",
+          "description": "Additional data to pass to server"
+        },
+        {
+          "name": "file",
+          "type": "binary",
+          "description": "file to upload"
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "PostPetPetIdUploadImageParams",
+      "description": "Parameters for POST /pet/{petId}/uploadImage\npetId: ID of pet to update",
+      "properties": [
+        {
+          "name": "petId",
+          "type": "long",
+          "in": "path",
+          "required": true,
+          "description": "ID of pet to update",
+          "validation": {
+            "format": "int64"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
+    },
+    {
+      "kind": "response",
+      "name": "GetStoreInventory200Response",
+      "referencePath": "#/paths/::store::inventory/get/responses/200/content/application::json/schema/GetStoreInventory200Response",
+      "properties": [],
+      "statusCode": "200",
+      "additionalProperties": "int"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetStoreOrderOrderIdParams",
+      "description": "Parameters for GET /store/order/{orderId}\norderId: ID of pet that needs to be fetched",
+      "properties": [
+        {
+          "name": "orderId",
+          "type": "long",
+          "in": "path",
+          "required": true,
+          "description": "ID of pet that needs to be fetched",
+          "validation": {
+            "minimum": 1,
+            "maximum": 5,
+            "format": "int64"
+          }
+        }
+      ],
+      "referencePath": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderOrderIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "DeleteStoreOrderOrderIdParams",
+      "description": "Parameters for DELETE /store/order/{orderId}\norderId: ID of the order that needs to be deleted",
+      "properties": [
+        {
+          "name": "orderId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "ID of the order that needs to be deleted"
+        }
+      ],
+      "referencePath": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderOrderIdParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUserLoginParams",
+      "description": "Parameters for GET /user/login\nusername: The user name for login\npassword: The password for login in clear text",
+      "properties": [
+        {
+          "name": "username",
+          "type": "string",
+          "in": "query",
+          "required": true,
+          "description": "The user name for login",
+          "validation": {
+            "pattern": "^[a-zA-Z0-9]+[a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]+$"
+          }
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "in": "query",
+          "required": true,
+          "description": "The password for login in clear text"
+        }
+      ],
+      "referencePath": "#/paths/::user::login/get/parameters/GetUserLoginParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUserUsernameParams",
+      "description": "Parameters for GET /user/{username}\nusername: The name that needs to be fetched. Use user1 for testing.",
+      "properties": [
+        {
+          "name": "username",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The name that needs to be fetched. Use user1 for testing."
+        }
+      ],
+      "referencePath": "#/paths/::user::{username}/get/parameters/GetUserUsernameParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "PutUserUsernameParams",
+      "description": "Parameters for PUT /user/{username}\nusername: name that need to be deleted",
+      "properties": [
+        {
+          "name": "username",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "name that need to be deleted"
+        }
+      ],
+      "referencePath": "#/paths/::user::{username}/put/parameters/PutUserUsernameParams"
+    },
+    {
+      "kind": "parameter",
+      "name": "DeleteUserUsernameParams",
+      "description": "Parameters for DELETE /user/{username}\nusername: The name that needs to be deleted",
+      "properties": [
+        {
+          "name": "username",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "The name that needs to be deleted"
+        }
+      ],
+      "referencePath": "#/paths/::user::{username}/delete/parameters/DeleteUserUsernameParams"
+    }
+  ],
+  "tags": [
+    {
+      "name": "pet",
+      "description": "Everything about your Pets"
+    },
+    {
+      "name": "store",
+      "description": "Access to Petstore orders"
+    },
+    {
+      "name": "user",
+      "description": "Operations about user"
+    }
+  ],
+  "endpoints": [
+    {
+      "method": "post",
+      "path": "/pet",
+      "tags": [
+        "pet"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "405",
+          "description": "Invalid input"
+        }
+      ],
+      "operationId": "addPet",
+      "summary": "Add a new pet to the store",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/Pet"
+        }
+      },
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "put",
+      "path": "/pet",
+      "tags": [
+        "pet"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid ID supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "Pet not found"
+        },
+        {
+          "kind": "content",
+          "statusCode": "405",
+          "description": "Validation exception"
+        }
+      ],
+      "operationId": "updatePet",
+      "summary": "Update an existing pet",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/Pet"
+        }
+      },
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/pet/findByStatus",
+      "tags": [
+        "pet"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema/GetPetFindByStatus200XmlResponse"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema/GetPetFindByStatus200Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid status value"
+        }
+      ],
+      "operationId": "findPetsByStatus",
+      "summary": "Finds Pets by status",
+      "description": "Multiple status values can be provided with comma separated strings",
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/pet/findByTags",
+      "tags": [
+        "pet"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pet::findByTags/get/parameters/GetPetFindByTagsParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema/GetPetFindByTags200XmlResponse"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema/GetPetFindByTags200Response"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid tag value"
+        }
+      ],
+      "operationId": "findPetsByTags",
+      "summary": "Finds Pets by tags",
+      "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+      "deprecated": true,
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/pet/{petId}",
+      "tags": [
+        "pet"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pet::{petId}/get/parameters/GetPetPetIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Pet"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid ID supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "Pet not found"
+        }
+      ],
+      "operationId": "getPetById",
+      "summary": "Find pet by ID",
+      "description": "Returns a single pet",
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "post",
+      "path": "/pet/{petId}",
+      "tags": [
+        "pet"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pet::{petId}/post/parameters/PostPetPetIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "405",
+          "description": "Invalid input"
+        }
+      ],
+      "operationId": "updatePetWithForm",
+      "summary": "Updates a pet in the store with form data",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/x-www-form-urlencoded",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::pet::{petId}/post/requestBody/content/application::x-www-form-urlencoded/schema/PostPetPetIdWwwFormUrlencodedRequestBody"
+            }
+          }
+        ]
+      },
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "delete",
+      "path": "/pet/{petId}",
+      "tags": [
+        "pet"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pet::{petId}/delete/parameters/DeletePetPetIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid pet value"
+        }
+      ],
+      "operationId": "deletePet",
+      "summary": "Deletes a pet",
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "post",
+      "path": "/pet/{petId}/uploadImage",
+      "tags": [
+        "pet"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pet::{petId}::uploadImage/post/parameters/PostPetPetIdUploadImageParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/ApiResponse"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "uploadFile",
+      "summary": "uploads an image",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "multipart/form-data",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema/PostPetPetIdUploadImageMultipartFormDataRequestBody"
+            }
+          }
+        ]
+      },
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/store/inventory",
+      "tags": [
+        "store"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::store::inventory/get/responses/200/content/application::json/schema/GetStoreInventory200Response"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "getInventory",
+      "summary": "Returns pet inventories by status",
+      "description": "Returns a map of status codes to quantities",
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "post",
+      "path": "/store/order",
+      "tags": [
+        "store"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid Order"
+        }
+      ],
+      "operationId": "placeOrder",
+      "summary": "Place an order for a pet",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Order"
+            }
+          }
+        ],
+        "required": true,
+        "description": "order placed for purchasing the pet"
+      }
+    },
+    {
+      "method": "get",
+      "path": "/store/order/{orderId}",
+      "tags": [
+        "store"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::store::order::{orderId}/get/parameters/GetStoreOrderOrderIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid ID supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "Order not found"
+        }
+      ],
+      "operationId": "getOrderById",
+      "summary": "Find purchase order by ID",
+      "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions"
+    },
+    {
+      "method": "delete",
+      "path": "/store/order/{orderId}",
+      "tags": [
+        "store"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::store::order::{orderId}/delete/parameters/DeleteStoreOrderOrderIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid ID supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "Order not found"
+        }
+      ],
+      "operationId": "deleteOrder",
+      "summary": "Delete purchase order by ID",
+      "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors"
+    },
+    {
+      "method": "post",
+      "path": "/user",
+      "tags": [
+        "user"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "successful operation"
+        }
+      ],
+      "operationId": "createUser",
+      "summary": "Create user",
+      "description": "This can only be done by the logged in user.",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/User"
+            }
+          }
+        ],
+        "required": true,
+        "description": "Created user object"
+      },
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "post",
+      "path": "/user/createWithArray",
+      "tags": [
+        "user"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "successful operation"
+        }
+      ],
+      "operationId": "createUsersWithArrayInput",
+      "summary": "Creates list of users with given input array",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/UserArray"
+        }
+      },
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "post",
+      "path": "/user/createWithList",
+      "tags": [
+        "user"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "successful operation"
+        }
+      ],
+      "operationId": "createUsersWithListInput",
+      "summary": "Creates list of users with given input array",
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/UserArray"
+        }
+      },
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/user/login",
+      "tags": [
+        "user"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::user::login/get/parameters/GetUserLoginParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": "string"
+            },
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ],
+          "headers": [
+            {
+              "name": "Set-Cookie",
+              "type": "string",
+              "description": "Cookie authentication key for use with the `api_key` apiKey authentication."
+            },
+            {
+              "name": "X-Rate-Limit",
+              "type": "int",
+              "description": "calls per hour allowed by the user"
+            },
+            {
+              "name": "X-Expires-After",
+              "type": "datetime",
+              "description": "date in UTC when token expires"
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid username/password supplied"
+        }
+      ],
+      "operationId": "loginUser",
+      "summary": "Logs user into the system"
+    },
+    {
+      "method": "get",
+      "path": "/user/logout",
+      "tags": [
+        "user"
+      ],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "default",
+          "description": "successful operation"
+        }
+      ],
+      "operationId": "logoutUser",
+      "summary": "Logs out current logged in user session",
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "get",
+      "path": "/user/{username}",
+      "tags": [
+        "user"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::user::{username}/get/parameters/GetUserUsernameParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "successful operation",
+          "content": [
+            {
+              "mimeType": "application/xml",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/User"
+              }
+            },
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/User"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid username supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "User not found"
+        }
+      ],
+      "operationId": "getUserByName",
+      "summary": "Get user by user name"
+    },
+    {
+      "method": "put",
+      "path": "/user/{username}",
+      "tags": [
+        "user"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::user::{username}/put/parameters/PutUserUsernameParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid user supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "User not found"
+        }
+      ],
+      "operationId": "updateUser",
+      "summary": "Updated user",
+      "description": "This can only be done by the logged in user.",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/User"
+            }
+          }
+        ],
+        "required": true,
+        "description": "Updated user object"
+      },
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    },
+    {
+      "method": "delete",
+      "path": "/user/{username}",
+      "tags": [
+        "user"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::user::{username}/delete/parameters/DeleteUserUsernameParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "400",
+          "description": "Invalid username supplied"
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "User not found"
+        }
+      ],
+      "operationId": "deleteUser",
+      "summary": "Delete user",
+      "description": "This can only be done by the logged in user.",
+      "security": [
+        {
+          "scheme": "api_key"
+        }
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://petstore.swagger.io/v2"
+    }
+  ],
+  "securitySchemes": {
+    "petstore_auth": {
+      "type": "oauth2",
+      "flows": {
+        "implicit": {
+          "authorizationUrl": "http://petstore.swagger.io/api/oauth/dialog",
+          "scopes": {
+            "write:pets": "modify pets in your account",
+            "read:pets": "read your pets"
+          }
+        }
+      }
+    },
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header"
+    }
+  },
+  "commonRequestBodies": {
+    "UserArray": {
+      "kind": "content",
+      "content": [
+        {
+          "mimeType": "application/json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/requestBodies/UserArray/content/application/json/schema/UserArray"
+          }
+        }
+      ],
+      "required": true,
+      "description": "List of user object"
+    },
+    "Pet": {
+      "kind": "content",
+      "content": [
+        {
+          "mimeType": "application/json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pet"
+          }
+        },
+        {
+          "mimeType": "application/xml",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pet"
+          }
+        }
+      ],
+      "required": true,
+      "description": "Pet object that needs to be added to the store"
+    }
+  }
+}

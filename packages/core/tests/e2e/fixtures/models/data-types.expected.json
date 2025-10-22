@@ -1,0 +1,136 @@
+{
+  "metadata": {
+    "title": "Data Types Test",
+    "version": "1.0.0",
+    "description": "Test all supported data types"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "DataTypes",
+      "referencePath": "#/components/schemas/DataTypes",
+      "properties": [
+        {
+          "name": "id",
+          "type": "int"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "score",
+          "type": "double"
+        },
+        {
+          "name": "isActive",
+          "type": "boolean"
+        },
+        {
+          "name": "birthDate",
+          "type": "date"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime"
+        },
+        {
+          "name": "profile",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesProfile"
+          }
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesTags"
+          }
+        },
+        {
+          "name": "numbers",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesNumbers"
+          }
+        },
+        {
+          "name": "scores",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesScores"
+          }
+        },
+        {
+          "name": "flags",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/DataTypesFlags"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "DataTypesProfile",
+      "referencePath": "#/components/schemas/DataTypesProfile",
+      "properties": [
+        {
+          "name": "bio",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesTags",
+      "referencePath": "#/components/schemas/DataTypesTags",
+      "itemType": "string"
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesNumbers",
+      "referencePath": "#/components/schemas/DataTypesNumbers",
+      "itemType": "int"
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesScores",
+      "referencePath": "#/components/schemas/DataTypesScores",
+      "itemType": "double"
+    },
+    {
+      "kind": "array",
+      "name": "DataTypesFlags",
+      "referencePath": "#/components/schemas/DataTypesFlags",
+      "itemType": "boolean"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/data",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/DataTypes"
+              }
+            }
+          ]
+        }
+      ],
+      "summary": "Get data"
+    }
+  ]
+}

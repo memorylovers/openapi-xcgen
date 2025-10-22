@@ -1,0 +1,689 @@
+openapi: 3.1.0
+info:
+  title: Train Travel API
+  description: |
+    API for finding and booking train trips across Europe.
+
+    ## Run in Postman
+
+    Experiment with this API in Postman, using our Postman Collection.
+
+    [![Run In Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9265903-7a75a0d0-b108-4436-ba54-c6139698dc08?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D9265903-7a75a0d0-b108-4436-ba54-c6139698dc08%26entityType%3Dcollection%26workspaceId%3Df507f69d-9564-419c-89a2-cb8e4c8c7b8f)
+  version: 1.2.1
+  contact:
+    name: Train Support
+    url: https://example.com/support
+    email: support@example.com
+  license:
+    name: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+    identifier: CC-BY-NC-SA-4.0
+
+servers:
+  - url: https://api.example.com
+    description: Production server
+
+security:
+  - OAuth2: []
+
+paths:
+  /stations:
+    get:
+      summary: Get a list of train stations
+      description: Returns a list of all train stations in the system.
+      operationId: getStations
+      tags:
+        - Stations
+      parameters:
+        - name: coordinates
+          in: query
+          description: Find stations close to a location.
+          required: false
+          schema:
+            type: string
+            pattern: '^(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)$'
+            examples:
+              - value: "51.5074,-0.1278"
+                summary: London coordinates
+        - name: search
+          in: query
+          description: Search for stations by name or code
+          required: false
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 100
+        - name: country
+          in: query
+          description: Filter by country code (ISO 3166-1 alpha-2)
+          required: false
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}$'
+            examples:
+              - value: GB
+                summary: United Kingdom
+              - value: FR
+                summary: France
+        - name: limit
+          in: query
+          description: Maximum number of results
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Station'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /trips:
+    get:
+      summary: Get available train trips
+      description: Returns a list of available trips between stations
+      operationId: getTrips
+      tags:
+        - Trips
+      parameters:
+        - name: origin
+          in: query
+          description: The ID of the origin station
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: destination
+          in: query
+          description: The ID of the destination station
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: date
+          in: query
+          description: Date of travel (ISO 8601)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: bicycles
+          in: query
+          description: Only return trips that allow bicycles
+          required: false
+          schema:
+            type: boolean
+        - name: dogs
+          in: query
+          description: Only return trips that allow dogs
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trip'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /bookings:
+    post:
+      summary: Create a new booking
+      description: Book a trip for one or more passengers
+      operationId: createBooking
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRequest'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+          headers:
+            Location:
+              description: URL of the created booking
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      summary: List bookings for the authenticated user
+      description: Returns a list of bookings for the authenticated user
+      operationId: getBookings
+      tags:
+        - Bookings
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /bookings/{bookingId}:
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Get booking details
+      description: Returns details of a specific booking
+      operationId: getBooking
+      tags:
+        - Bookings
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Cancel a booking
+      description: Cancel an existing booking
+      operationId: cancelBooking
+      tags:
+        - Bookings
+      responses:
+        '204':
+          description: Booking cancelled successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /bookings/{bookingId}/payment:
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      summary: Pay for a booking
+      description: Process payment for a booking
+      operationId: payForBooking
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CardPayment'
+                - $ref: '#/components/schemas/BankTransferPayment'
+              discriminator:
+                propertyName: method
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentConfirmation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Payment Required - Payment failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+webhooks:
+  newBooking:
+    post:
+      summary: New booking notification
+      description: Notification sent when a new booking is created
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+      responses:
+        '200':
+          description: Notification received
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            read: Read access
+            write: Write access
+            admin: Admin access
+
+  schemas:
+    Station:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - country_code
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          examples:
+            - "London Kings Cross"
+        address:
+          type: string
+        country_code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        timezone:
+          type: string
+          examples:
+            - "Europe/London"
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+              minimum: -90
+              maximum: 90
+            longitude:
+              type: number
+              minimum: -180
+              maximum: 180
+      unevaluatedProperties: false
+
+    Trip:
+      type: object
+      required:
+        - id
+        - origin
+        - destination
+        - departure_time
+        - arrival_time
+        - price
+        - operator
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        origin:
+          $ref: '#/components/schemas/Station'
+        destination:
+          $ref: '#/components/schemas/Station'
+        departure_time:
+          type: string
+          format: date-time
+        arrival_time:
+          type: string
+          format: date-time
+        operator:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+        bicycles_allowed:
+          type: boolean
+        dogs_allowed:
+          type: boolean
+      unevaluatedProperties: false
+
+    BookingRequest:
+      type: object
+      required:
+        - trip_id
+        - passengers
+      properties:
+        trip_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        passengers:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/Passenger'
+        seat_preferences:
+          type: string
+          enum:
+            - window
+            - aisle
+            - table
+            - quiet
+      unevaluatedProperties: false
+
+    Booking:
+      type: object
+      required:
+        - id
+        - trip
+        - passengers
+        - status
+        - created_at
+        - total_price
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        trip:
+          $ref: '#/components/schemas/Trip'
+        passengers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Passenger'
+        status:
+          type: string
+          enum:
+            - pending
+            - confirmed
+            - cancelled
+          readOnly: true
+        payment_status:
+          type: string
+          enum:
+            - unpaid
+            - paid
+            - refunded
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        total_price:
+          $ref: '#/components/schemas/Price'
+      unevaluatedProperties: false
+
+    Passenger:
+      type: object
+      required:
+        - name
+        - email
+        - date_of_birth
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        email:
+          type: string
+          format: email
+        date_of_birth:
+          type: string
+          format: date
+        passport_number:
+          type: string
+          pattern: '^[A-Z0-9]+$'
+      unevaluatedProperties: false
+
+    Price:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          minimum: 0
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          examples:
+            - EUR
+            - GBP
+            - USD
+      unevaluatedProperties: false
+
+    CardPayment:
+      type: object
+      required:
+        - method
+        - card_number
+        - card_holder
+        - expiry_month
+        - expiry_year
+        - cvv
+      properties:
+        method:
+          type: string
+          const: card
+        card_number:
+          type: string
+          pattern: '^[0-9]{13,19}$'
+          writeOnly: true
+        card_holder:
+          type: string
+          minLength: 1
+          maxLength: 100
+        expiry_month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        expiry_year:
+          type: integer
+          minimum: 2024
+        cvv:
+          type: string
+          pattern: '^[0-9]{3,4}$'
+          writeOnly: true
+      unevaluatedProperties: false
+
+    BankTransferPayment:
+      type: object
+      required:
+        - method
+        - account_number
+        - routing_number
+        - account_holder
+      properties:
+        method:
+          type: string
+          const: bank_transfer
+        account_number:
+          type: string
+          writeOnly: true
+        routing_number:
+          type: string
+          writeOnly: true
+        account_holder:
+          type: string
+      unevaluatedProperties: false
+
+    PaymentConfirmation:
+      type: object
+      required:
+        - payment_id
+        - status
+        - amount
+        - timestamp
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - success
+            - pending
+            - failed
+        amount:
+          $ref: '#/components/schemas/Price'
+        timestamp:
+          type: string
+          format: date-time
+        receipt_url:
+          type: string
+          format: uri
+      unevaluatedProperties: false
+
+    PaginationLinks:
+      type: object
+      properties:
+        self:
+          type: string
+          format: uri
+        next:
+          type: string
+          format: uri
+        prev:
+          type: string
+          format: uri
+        first:
+          type: string
+          format: uri
+        last:
+          type: string
+          format: uri
+      unevaluatedProperties: false
+
+    Problem:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+          default: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+      unevaluatedProperties: false
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid input
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    NotFound:
+      description: Not Found - Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    Conflict:
+      description: Conflict - Resource state conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      headers:
+        RateLimit-Limit:
+          description: Request limit per hour
+          schema:
+            type: integer
+        RateLimit-Remaining:
+          description: Remaining requests
+          schema:
+            type: integer
+        RateLimit-Reset:
+          description: Time when limit resets (Unix timestamp)
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'

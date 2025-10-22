@@ -1,39 +1,26 @@
-import js from "@eslint/js";
-import typescript from "@typescript-eslint/eslint-plugin";
-import typescriptParser from "@typescript-eslint/parser";
-import prettier from "eslint-config-prettier";
-import prettierPlugin from "eslint-plugin-prettier";
+import baseConfig from "./eslint.config.base.mjs";
 
 export default [
-  {
-    ignores: [
-      "**/dist/**",
-      "**/coverage/**",
-      "**/node_modules/**",
-      "playground/**",
-      "src/**",
-      "tests/**",
-      "bin/**",
-      "build.config.mts",
-    ],
-  },
-  js.configs.recommended,
+  ...baseConfig,
   {
     files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
     languageOptions: {
-      parser: typescriptParser,
       parserOptions: {
-        project: ["./tsconfig.json", "./packages/*/tsconfig.json"],
+        project: [
+          "./tsconfig.json",
+          "./packages/*/tsconfig.json",
+          "./examples/*/tsconfig.json",
+        ],
       },
     },
-    plugins: {
-      "@typescript-eslint": typescript,
-      prettier: prettierPlugin,
-    },
-    rules: {
-      ...typescript.configs.recommended.rules,
-      "prettier/prettier": "error",
+  },
+  {
+    files: ["examples/**/*.ts"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+      },
     },
   },
-  prettier,
 ];

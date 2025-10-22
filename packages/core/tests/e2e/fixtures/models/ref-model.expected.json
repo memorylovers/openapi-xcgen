@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "title": "Ref Model Test",
+    "version": "1.0.0",
+    "description": "Test $ref references to components"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "Order",
+      "referencePath": "#/components/schemas/Order",
+      "properties": [
+        {
+          "name": "customer",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Customer"
+          }
+        },
+        {
+          "name": "items",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/OrderItems"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "OrderItems",
+      "referencePath": "#/components/schemas/OrderItems",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/OrderItem"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "Customer",
+      "referencePath": "#/components/schemas/Customer",
+      "properties": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "OrderItem",
+      "referencePath": "#/components/schemas/OrderItem",
+      "properties": [
+        {
+          "name": "productId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "GetCustomers200Response",
+      "referencePath": "#/paths/::customers/get/responses/200/content/application::json/schema/GetCustomers200Response",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Customer"
+      }
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/orders",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Order"
+              }
+            }
+          ]
+        }
+      ],
+      "summary": "Get orders"
+    },
+    {
+      "method": "get",
+      "path": "/customers",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::customers/get/responses/200/content/application::json/schema/GetCustomers200Response"
+              }
+            }
+          ]
+        }
+      ],
+      "summary": "Get customers"
+    }
+  ]
+}
