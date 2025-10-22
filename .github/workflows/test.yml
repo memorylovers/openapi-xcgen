@@ -24,3 +24,32 @@ jobs:
 
       - name: Run quality checks
         run: pnpm check
+
+      - name: Run tests with coverage
+        run: pnpm test:coverage
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        run: |
+          SUMMARY=$(cat coverage/coverage-summary.json)
+          LINES_PCT=$(echo $SUMMARY | jq -r '.total.lines.pct')
+          STATEMENTS_PCT=$(echo $SUMMARY | jq -r '.total.statements.pct')
+          FUNCTIONS_PCT=$(echo $SUMMARY | jq -r '.total.functions.pct')
+          BRANCHES_PCT=$(echo $SUMMARY | jq -r '.total.branches.pct')
+
+          gh pr comment ${{ github.event.pull_request.number }} --body "## 📊 Coverage Report (All Packages)
+
+          | Metric | Coverage |
+          |--------|----------|
+          | Lines | **${LINES_PCT}%** |
+          | Statements | **${STATEMENTS_PCT}%** |
+          | Functions | **${FUNCTIONS_PCT}%** |
+          | Branches | **${BRANCHES_PCT}%** |
+
+          <details>
+          <summary>View detailed report</summary>
+
+          Run \`pnpm test:coverage\` locally to see the full HTML report.
+          </details>"
+        env:
+          GH_TOKEN: ${{ github.token }}

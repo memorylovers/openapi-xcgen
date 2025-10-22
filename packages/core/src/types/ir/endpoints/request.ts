@@ -77,12 +77,3 @@ export function isIRRequestBodyWithContent(
 ): requestBody is IRRequestBodyWithContent {
   return requestBody.kind === "content";
 }
-
-/**
- * IRRequestBodyが参照型かどうかを判定する型ガード
- */
-export function isIRRequestBodyWithRef(
-  requestBody: IRRequestBody,
-): requestBody is IRRequestBodyWithRef {
-  return requestBody.kind === "ref";
-}

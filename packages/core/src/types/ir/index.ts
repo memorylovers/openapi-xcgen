@@ -73,6 +73,7 @@ export type {
 // tags
 export type { IRTag, IRTagExternalDocs } from "./tags";
 // endpoints
+export { isIRRequestBodyWithContent } from "./endpoints";
 export type {
   IREndpoint,
   IRHttpMethod,
@@ -85,10 +86,6 @@ export type {
   IRResponse,
   IRResponseContent,
   IRResponseHeader,
-} from "./endpoints";
-export {
-  isIRRequestBodyWithContent,
-  isIRRequestBodyWithRef,
 } from "./endpoints";
 // security
 export type {

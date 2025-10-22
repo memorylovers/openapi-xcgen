@@ -10,8 +10,8 @@ import { consola } from "consola";
 import { defu } from "defu";
 import process from "node:process";
 import pkg from "../package.json";
-import { generate } from "./generator.js";
-import type { GeneratorOptions } from "./types.js";
+import { generate } from "./generator";
+import type { GeneratorOptions } from "./types";
 
 /**
  * メインCLIコマンド
@@ -80,6 +80,7 @@ const main = defineCommand({
           "Input file path is required. Use -i or --input option, or specify in config file.",
         );
         process.exit(1);
+        return;
       }
 
       if (!options.output) {
@@ -87,6 +88,7 @@ const main = defineCommand({
           "Output directory path is required. Use -o or --output option, or specify in config file.",
         );
         process.exit(1);
+        return;
       }
 
       // 4. Validate validator option
@@ -119,6 +121,7 @@ const main = defineCommand({
       });
 
       process.exit(0);
+      return;
     } catch (error) {
       // エラーハンドリング
       if (error instanceof Error) {
@@ -133,6 +136,7 @@ const main = defineCommand({
       }
 
       process.exit(1);
+      return;
     }
   },
 });
@@ -140,11 +144,131 @@ const main = defineCommand({
 /**
  * Run CLI
  */
-export async function runCli() {
-  await runMain(main);
+export async function runCli(options?: { rawArgs?: string[] }) {
+  await runMain(main, options);
 }
 
-// Run CLI if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runCli();
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect, vi, beforeEach, afterEach } = import.meta
+    .vitest;
+
+  // Mock generator module
+  vi.mock("./generator", () => ({
+    generate: vi.fn(),
+  }));
+
+  // Mock c12 to prevent loading actual config files
+  vi.mock("c12", () => ({
+    loadConfig: () => Promise.resolve({ config: {} }),
+  }));
+
+  describe("CLI", () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let mockGenerate: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let exitSpy: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let errorSpy: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let boxSpy: any;
+
+    beforeEach(async () => {
+      // Import and get mocked generate function
+      const { generate } = await import("./generator");
+      mockGenerate = vi.mocked(generate);
+      mockGenerate.mockReset();
+
+      // Setup spies
+      exitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+      errorSpy = vi.spyOn(consola, "error").mockImplementation(() => {});
+      boxSpy = vi.spyOn(consola, "box").mockImplementation(() => {});
+
+      // Clear all mocks before each test
+      vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("should generate code successfully with input and output", async () => {
+      mockGenerate.mockResolvedValue({
+        files: ["model.ts", "service.ts"],
+        typesCount: 5,
+        servicesCount: 3,
+        schemasCount: 2,
+      });
+
+      await runCli({ rawArgs: ["-i", "openapi.yaml", "-o", "generated"] });
+
+      expect(mockGenerate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input: "openapi.yaml",
+          output: "generated",
+        }),
+      );
+      expect(boxSpy).toHaveBeenCalled();
+      expect(exitSpy).toHaveBeenCalledWith(0);
+    });
+
+    it("should exit with error when input is missing", async () => {
+      await runCli({ rawArgs: ["-o", "generated"] });
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Input file path is required"),
+      );
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(mockGenerate).not.toHaveBeenCalled();
+    });
+
+    it("should exit with error when output is missing", async () => {
+      await runCli({ rawArgs: ["-i", "openapi.yaml"] });
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Output directory path is required"),
+      );
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(mockGenerate).not.toHaveBeenCalled();
+    });
+
+    it("should pass validator option to generate", async () => {
+      mockGenerate.mockResolvedValue({
+        files: ["model.ts"],
+        typesCount: 1,
+        servicesCount: 1,
+      });
+
+      await runCli({
+        rawArgs: [
+          "-i",
+          "openapi.yaml",
+          "-o",
+          "generated",
+          "--validator",
+          "valibot",
+        ],
+      });
+
+      expect(mockGenerate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          validator: "valibot",
+        }),
+      );
+    });
+
+    it("should handle generation errors", async () => {
+      mockGenerate.mockRejectedValue(new Error("Parse failed"));
+
+      await runCli({ rawArgs: ["-i", "openapi.yaml", "-o", "generated"] });
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        "Failed to generate TypeScript code:",
+      );
+      expect(errorSpy).toHaveBeenCalledWith("Parse failed");
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+  });
 }

@@ -1,9 +1,6 @@
-import type { IRAllOfModel, IRModel, ReferenceObject } from "./index";
 import type {
   AllOfContext,
   AnyOfContext,
-  ComponentsRequestBodyContext,
-  ComponentsResponseContext,
   OneOfContext,
   ParameterContext,
   PathsRequestBodyContext,
@@ -12,6 +9,7 @@ import type {
   ResponseContext,
   VisitorContext,
 } from "../transformer/types.js";
+import type { IRAllOfModel, IRModel, ReferenceObject } from "./index";
 
 /**
  * オブジェクトが$ref参照オブジェクトかどうかを判定
@@ -93,30 +91,12 @@ export function isPathsRequestBodyContext(
 }
 
 /**
- * RequestBodyContextがComponentsRequestBodyContextかどうかを判定
- */
-export function isComponentsRequestBodyContext(
-  context: RequestBodyContext,
-): context is ComponentsRequestBodyContext {
-  return context.kind === "componentsRequestBody";
-}
-
-/**
  * ResponseContextがPathsResponseContextかどうかを判定
  */
 export function isPathsResponseContext(
   context: ResponseContext,
 ): context is PathsResponseContext {
   return context.kind === "response";
-}
-
-/**
- * ResponseContextがComponentsResponseContextかどうかを判定
- */
-export function isComponentsResponseContext(
-  context: ResponseContext,
-): context is ComponentsResponseContext {
-  return context.kind === "componentsResponse";
 }
 
 // === in-source testing ===

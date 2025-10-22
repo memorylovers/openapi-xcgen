@@ -130,12 +130,3 @@ export function isIRResponseWithContent(
 ): response is IRResponseWithContent {
   return response.kind === "content";
 }
-
-/**
- * IRResponseがIRResponseWithRefかどうかを判定する型ガード
- */
-export function isIRResponseWithRef(
-  response: IRResponse,
-): response is IRResponseWithRef {
-  return response.kind === "ref";
-}

@@ -53,8 +53,7 @@ async function typeCheckGeneratedCode(
   tempDir: string,
   validator?: "valibot",
 ): Promise<void> {
-  // eslint-disable-next-line no-undef
-  const fixtureDir = join(process.cwd(), "tests", "e2e", "fixtures", fixture);
+  const fixtureDir = join(__dirname, "fixtures", fixture);
   const inputPath = join(fixtureDir, "openapi.yaml");
   const fixtureName = fixture.replace(/\//g, "-");
   const suffix = validator ? `-${validator}` : "-no-validator";
