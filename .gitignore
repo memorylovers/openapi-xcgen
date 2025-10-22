@@ -691,3 +691,6 @@ doc/api/
 
 # Examples generated code
 examples/*/generated/
+
+# act secrets file (for local GitHub Actions testing)
+.secrets

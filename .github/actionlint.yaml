@@ -1,0 +1,14 @@
+# actionlint configuration
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+
+# Enable shellcheck integration (default: true)
+# Ensures shell scripts in workflow files are checked by shellcheck
+shellcheck:
+  enable: true
+
+# Self-hosted runner labels (empty for GitHub-hosted runners)
+self-hosted-runner:
+  labels: []
+
+# Enable config-variables to validate configuration variables
+config-variables: true

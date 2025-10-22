@@ -1,0 +1,11 @@
+# act configuration
+# https://github.com/nektos/act
+
+# Use the latest Ubuntu image for act
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Load secrets from .secrets file (create from .secrets.example)
+--secret-file .secrets
+
+# Container architecture (uncomment if needed)
+# --container-architecture linux/amd64

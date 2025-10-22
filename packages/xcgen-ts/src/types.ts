@@ -36,3 +36,27 @@ export interface GenerationResult {
   /** 生成されたAPI関数の数 */
   servicesCount: number;
 }
+
+/**
+ * 生成器設定を定義するヘルパー関数
+ *
+ * TypeScript設定ファイルで型補完を提供します
+ *
+ * @param options - 生成器設定オプション
+ * @returns 同じ設定オプション（型推論付き）
+ *
+ * @example
+ * ```typescript
+ * // xcgen.config.ts
+ * import { defineConfig } from '@openapi-xcgen/xcgen-ts';
+ *
+ * export default defineConfig({
+ *   input: './openapi.yaml',
+ *   output: './generated',
+ *   validator: 'valibot'
+ * });
+ * ```
+ */
+export function defineConfig(options: GeneratorOptions): GeneratorOptions {
+  return options;
+}

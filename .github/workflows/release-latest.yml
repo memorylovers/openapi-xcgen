@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - '@*/*@*'  # @openapi-xcgen/core@1.0.0 など
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (skip actual npm publish and GitHub release)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -38,12 +45,26 @@ jobs:
       - name: Build packages
         run: pnpm build
 
+      - name: Publish to npm (Dry Run)
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          echo "🔍 DRY RUN MODE: Skipping actual npm publish"
+          pnpm lerna publish from-git --yes --no-push --no-git-tag-version --no-git-reset || echo "Dry run completed"
+
       - name: Publish to npm
+        if: ${{ inputs.dry_run != true }}
         run: pnpm lerna publish from-git --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Create GitHub Release (Dry Run)
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          echo "🔍 DRY RUN MODE: Skipping GitHub release creation"
+          echo "Would create release for tag: ${{ env.TAG_VERSION }}"
+
       - name: Create GitHub Release
+        if: ${{ inputs.dry_run != true }}
         run: gh release create "${{ env.TAG_VERSION }}" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}

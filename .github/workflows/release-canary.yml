@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (skip actual npm publish)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   release-canary:
@@ -30,7 +36,14 @@ jobs:
       - name: Build packages
         run: pnpm build
 
+      - name: Publish canary to npm (Dry Run)
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          echo "🔍 DRY RUN MODE: Skipping actual canary publish"
+          pnpm lerna publish --canary --preid rc --dist-tag rc --yes --no-push --no-git-tag-version --no-git-reset || echo "Dry run completed"
+
       - name: Publish canary to npm
+        if: ${{ inputs.dry_run != true }}
         run: pnpm lerna publish --canary --preid rc --dist-tag rc --yes --no-git-tag-version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
