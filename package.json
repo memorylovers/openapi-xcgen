@@ -17,8 +17,7 @@
     "lint:fix:ts": "turbo lint:fix",
     "lint:md:fix": "markdownlint-cli2 --fix",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
-    "lerna:version": "lerna version",
-    "lerna:publish": "lerna publish from-package",
+    "release": "lerna version && git push --follow-tags",
     "#lint": "eslint .",
     "#lint:fix": "eslint . --fix"
   },

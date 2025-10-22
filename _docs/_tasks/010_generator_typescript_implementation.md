@@ -6,45 +6,22 @@
 
 ---
 
-## Phase 5: 実用段階への移行
+## 残りタスク
 
-**優先度**: 高
+### CI/CD統合
 
-### タスク5.2: npm公開準備
-
-- [x] lerna-lite導入（モノレポバージョン管理）
-- [x] CHANGELOG自動生成（conventional-changelog）
-- [x] リリース自動化（lerna version + lerna publish）
-- [x] ライセンス確認
-- [x] package.jsonメタデータ整備
-
-### タスク5.3: CI/CD統合
-
-- [ ] GitHub Actions設定（test, release）
 - [ ] カバレッジレポート生成（Codecov/Coveralls）
-- [ ] リリース自動化（タグベース、npm publish）
 
----
-
-## Phase 6: 拡張機能（オプション）
+### 拡張機能（オプション）
 
 **優先度**: 低（需要に応じて）
 
-### タスク6.1: 追加バリデーター
-
-- [ ] Zod対応（--validator=zod）
-- [ ] Yup対応（--validator=yup）
-
-### タスク6.2: x-extensions サポート
-
-- [ ] カスタム拡張プロパティのサポート
+- [ ] x-extensions サポート（カスタム拡張プロパティ）
 - [ ] プラグインシステム設計
 
 ---
 
-## 参考情報
-
-### コマンド
+## 開発コマンド
 
 ```bash
 # 開発
@@ -60,17 +37,21 @@ pnpm test:coverage # カバレッジ
 pnpm check        # lint + typecheck + test
 pnpm lint         # ESLint + Prettier + markdownlint
 pnpm typecheck    # TypeScript型チェック
+
+# リリース
+pnpm release      # バージョンアップ＆タグpush（→GitHub Actionsで自動npm公開）
 ```
 
-### 技術スタック
+## 技術スタック
 
 - **言語**: TypeScript 5.0+、関数ベース
 - **テスト**: Vitest（In-sourceテスティング）
 - **ビルド**: unbuild（ESM/CJS両対応）
 - **CLI**: c12, citty
 - **Validator**: Valibot v1（オプション）
+- **モノレポ**: Turbo + lerna-lite
 
-### 関連ドキュメント
+## 関連ドキュメント
 
 - `CLAUDE.md`: 開発ガイドライン
 - `_guides/spec.md`: 型システムと仕様

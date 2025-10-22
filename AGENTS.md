@@ -248,9 +248,14 @@ pnpm lint         # Lintチェック
 pnpm lint:fix     # Lint自動修正
 pnpm typecheck    # 型チェック
 
-# バージョン管理とリリース
-pnpm lerna:version    # パッケージバージョンアップ（Conventional Commits使用）
-pnpm lerna:publish    # npm公開
+# リリース（タグベース自動化）
+pnpm release    # バージョンアップ＆タグpush（→GitHub Actionsで自動npm公開）
+
+# 実行フロー:
+# 1. ローカルで `pnpm release` 実行
+# 2. 対話式でバージョン選択（Patch/Minor/Major）
+# 3. CHANGELOG自動生成、git commit & tag作成
+# 4. タグをpush → GitHub Actionsがnpm公開 & GitHub Release作成
 
 # パッケージ別実行
 cd packages/core && pnpm test
