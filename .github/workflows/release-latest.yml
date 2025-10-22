@@ -1,13 +1,15 @@
 name: Release
 
+# Triggered by git tag push (created by `pnpm release` or `pnpm release:rc`)
+# This workflow publishes packages to npm and creates GitHub Release
 on:
   push:
     tags:
-      - '@*/*@*'  # @openapi-xcgen/core@1.0.0 など
+      - "@*/*@*" # @openapi-xcgen/core@1.0.0 など
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run mode (skip actual npm publish and GitHub release)'
+        description: "Dry run mode (skip actual npm publish and GitHub release)"
         required: false
         type: boolean
         default: true
@@ -35,9 +37,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          cache: 'pnpm'
-          node-version-file: '.node-version'
-          registry-url: 'https://registry.npmjs.org/'
+          cache: "pnpm"
+          node-version-file: ".node-version"
+          registry-url: "https://registry.npmjs.org/"
 
       - name: Install dependencies
         run: pnpm install
@@ -53,7 +55,19 @@ jobs:
 
       - name: Publish to npm
         if: ${{ inputs.dry_run != true }}
-        run: pnpm lerna publish from-git --yes
+        run: |
+          # タグからバージョンを抽出
+          VERSION=$(echo "${{ env.TAG_VERSION }}" | grep -oP '@\K[^@]+$')
+
+          # プレリリース識別子を抽出（alpha, beta, rc, など）
+          if [[ $VERSION =~ -([a-z]+)\. ]]; then
+            PRERELEASE_TAG="${BASH_REMATCH[1]}"
+            echo "📦 Publishing prerelease version with dist-tag=$PRERELEASE_TAG"
+            pnpm lerna publish from-git --yes --dist-tag "$PRERELEASE_TAG"
+          else
+            echo "📦 Publishing stable version with dist-tag=latest"
+            pnpm lerna publish from-git --yes
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
