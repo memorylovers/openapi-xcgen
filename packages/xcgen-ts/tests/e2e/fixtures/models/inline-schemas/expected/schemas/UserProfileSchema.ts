@@ -1,0 +1,9 @@
+import * as v from "valibot";
+
+/**
+ * Schema for UserProfile
+ */
+export const UserProfileSchema = v.object({
+  bio: v.optional(v.string()),
+  active: v.optional(v.boolean()),
+});
