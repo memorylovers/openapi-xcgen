@@ -1,6 +1,6 @@
 {
   "name": "@openapi-xcgen/xcgen-ts",
-  "version": "0.1.1",
+  "version": "0.0.0",
   "description": "TypeScript code generator for OpenAPI specifications",
   "author": "Memory Lovers, LLC<https://github.com/memorylovers>",
   "license": "MIT",
