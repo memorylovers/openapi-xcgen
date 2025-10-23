@@ -4,8 +4,7 @@
   "npmClient": "pnpm",
   "command": {
     "version": {
-      "conventionalCommits": true,
-      "message": "chore(release): publish %s"
+      "conventionalCommits": true
     },
     "publish": {
       "registry": "https://registry.npmjs.org/"
