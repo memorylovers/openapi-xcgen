@@ -4,6 +4,9 @@
   "description": "Core utilities for OpenAPI code generation",
   "author": "Memory Lovers, LLC<https://github.com/memorylovers>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "funding": "https://github.com/sponsors/memory-lovers",
   "repository": {
     "type": "git",
