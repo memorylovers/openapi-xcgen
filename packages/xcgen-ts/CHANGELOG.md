@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://github.com/memorylovers/openapi-xcgen/compare/@openapi-xcgen/xcgen-ts@0.1.0...@openapi-xcgen/xcgen-ts@0.1.1) (2025-10-23)
+
+### Bug Fixes
+
+* configure lerna for independent versioning and public npm packages ([#5](https://github.com/memorylovers/openapi-xcgen/issues/5)) ([b9f79eb](https://github.com/memorylovers/openapi-xcgen/commit/b9f79eb0999c8fa9de06924952ab213487a18607))
+
 ## 0.1.0 (2025-10-23)
 
 ### ⚠ BREAKING CHANGES
