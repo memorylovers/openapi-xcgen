@@ -60,7 +60,7 @@ jobs:
           VERSION=$(echo "${{ env.TAG_VERSION }}" | grep -oP '@\K[^@]+$')
 
           # プレリリース識別子を抽出（alpha, beta, rc, など）
-          if [[ $VERSION =~ -([a-z]+)\. ]]; then
+          if [[ $VERSION =~ -([a-z]+)[0-9]*(\.|$) ]]; then
             PRERELEASE_TAG="${BASH_REMATCH[1]}"
             echo "📦 Publishing prerelease version with dist-tag=$PRERELEASE_TAG"
             pnpm lerna publish from-git --yes --dist-tag "$PRERELEASE_TAG"
