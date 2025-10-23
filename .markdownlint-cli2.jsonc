@@ -11,5 +11,5 @@
     "MD047": true // single-trailing-newline
   },
   // Ignore patterns
-  "ignores": [".claude/**", "**/node_modules/**", "**/dist/**", "**/build/**", "**/playground/**", "pnpm-lock.yaml", "AGENTS.md", "GEMINI.md"]
+  "ignores": [".claude/**", "**/node_modules/**", "**/dist/**", "**/build/**", "**/playground/**", "pnpm-lock.yaml", "AGENTS.md", "GEMINI.md", "**/CHANGELOG.md"]
 }
