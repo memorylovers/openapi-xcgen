@@ -31,7 +31,6 @@ expected/
 ```
 expected/
 ├── index.ts           # 新規：トップレベルエクスポート
-├── types.ts           # 変更：共通型のみ
 ├── models/            # 新規ディレクトリ
 │   ├── Pet.ts        # 個別モデル
 │   ├── User.ts
@@ -49,360 +48,93 @@ expected/
 └── tsconfig.json      # 変更なし
 ```
 
-## 対象フィクスチャ一覧（15個）
+**注:** `types.ts` は削除（空の場合は不要、業界標準に準拠）
 
-### ✅ 完了済み (1/15)
+## 設計決定事項
 
-- [x] `general/petstore` - 最もシンプル（基準フィクスチャ）
+### export パターン
 
-### Simple - 優先度高 (2個)
-
-- [ ] `validation/validation` - バリデーション特化
-- [ ] `models/data-types` - データ型バリエーション
-
-### Medium - 優先度中 (7個)
-
-- [ ] `general/readonly-writeonly` - readonly/writeonly修飾子
-- [ ] `general/allof` - allOf（継承）
-- [ ] `general/complex-schema` - 複雑なスキーマ
-- [ ] `models/complex-structures` - 複雑な構造
-- [ ] `models/inline-schemas` - インラインスキーマ
-- [ ] `models/metadata-model` - メタデータ
-- [ ] `models/nullable-model` - nullable型
-
-### Complex - 優先度低 (5個)
-
-- [ ] `general/hey-api/discriminator-all-of` - discriminator + allOf
-- [ ] `general/hey-api/discriminator-any-of` - discriminator + anyOf
-- [ ] `general/hey-api/discriminator-one-of` - discriminator + oneOf
-- [ ] `models/ref-model` - $ref参照
-- [ ] `models/validation-model` - バリデーション（複雑）
-
-## 変換手順（標準パターン）
-
-### ステップ1: 現状分析
-
-```bash
-cd packages/xcgen-ts/tests/e2e/fixtures/[fixture-path]/expected
-ls -la
-```
-
-確認項目：
-
-- `types.ts` - モデル、パラメータ、レスポンス型
-- `services.ts` - サービス関数
-- `schemas.ts` - Valibotスキーマ（validator使用時のみ）
-
-### ステップ2: ディレクトリ作成
-
-```bash
-mkdir -p models schemas services
-```
-
-### ステップ3: types.ts の分割
-
-#### 3.1 モデル型を抽出
+**決定:** `export *` パターンを採用
 
 ```typescript
-// types.ts から
-export interface Pet {
-  id: number;
-  name: string;
-}
-
-// ↓ models/Pet.ts へ
-/**
- * Pet model
- * Auto-generated from OpenAPI specification
- */
-
-export interface Pet {
-  id: number;
-  name: string;
-}
+// models/index.ts
+export * from './Pet';
+export * from './User';
 ```
 
-#### 3.2 パラメータ型を抽出
+**理由:**
+
+- 業界標準（Orval、openapi-ts）で広く採用されている
+- シンプルで保守性が高い
+- 現代のバンドラー（Vite、Rollup、webpack）は効果的にTree-shakingを実行
+- 名前付きre-exportのメンテナンスオーバーヘッドを回避
+
+**却下した選択肢:**
+
+- 名前付きre-export（`export { Pet } from './Pet'`）- Tree-shakingの僅かな利点 vs 大きなメンテナンスコスト
+
+### インポート拡張子
+
+**決定:** 拡張子なし（バンドラー前提）
 
 ```typescript
-// types.ts から
-export interface GetPetsParams {
-  query: { limit?: number };
-}
+// ✅ 採用
+import { Pet } from "./Pet";
 
-// ↓ models/GetPetsParams.ts へ
-/**
- * Parameters for GET /pets
- * Auto-generated from OpenAPI specification
- */
-
-export interface GetPetsParams {
-  query: { limit?: number };
-}
+// ❌ 不採用
+import { Pet } from "./Pet.js";
 ```
 
-#### 3.3 レスポンス型を抽出
+**理由:**
 
-```typescript
-// types.ts から
-export type GetPets200Response = Array<Pet>;
+- CLAUDE.mdの明確な区分に従う
+  - 生成器コード（packages/xcgen-ts/src/）: `.js` 拡張子使用（ESM対応）
+  - 生成されるコード（期待値ファイル）: 拡張子なし（バンドラー前提）
+- 業界標準（Orval、openapi-ts）に準拠
+- ユーザー環境はバンドラー使用を前提
 
-// ↓ models/GetPets200Response.ts へ
-/**
- * GetPets200Response type
- * Auto-generated from OpenAPI specification
- */
+### types.ts の扱い
 
-import type { Pet } from "./Pet.js";
+**決定:** 空の `types.ts` は削除
 
-export type GetPets200Response = Array<Pet>;
-```
+**理由:**
 
-**注意:** インポートパスは `.js` 拡張子を使用（ESM要件）
-
-### ステップ4: schemas.ts の分割
-
-```typescript
-// schemas.ts から
-export const PetSchema = v.object({
-  id: v.number(),
-  name: v.string(),
-});
-
-// ↓ schemas/PetSchema.ts へ
-/**
- * Valibot validation schema for Pet
- * Auto-generated from OpenAPI specification
- */
-
-import * as v from "valibot";
-
-export const PetSchema = v.object({
-  id: v.number(),
-  name: v.string(),
-});
-```
-
-**依存関係のあるスキーマ:**
-
-```typescript
-// schemas/GetPets200ResponseSchema.ts
-import * as v from "valibot";
-import { PetSchema } from "./PetSchema.js";
-
-export const GetPets200ResponseSchema = v.array(PetSchema);
-```
-
-### ステップ5: services.ts の分割
-
-タグごとにファイルを分割（Petstoreの場合、タグなしなので `pets.ts`）:
-
-```typescript
-// services/pets.ts
-/**
- * Pet service functions
- * Auto-generated from OpenAPI specification
- */
-
-import { request } from "../client.js";
-import type { XcgenApiError as _XcgenApiError } from "../client.js";
-import type { GetPetsParams, GetPets200Response, Pet } from "../models/index.js";
-
-export async function listPets(
-  options: GetPetsParams,
-  init?: RequestInit,
-): Promise<GetPets200Response> {
-  return request({
-    method: "GET",
-    path: "/pets",
-    options,
-    init,
-  });
-}
-```
-
-**インポートパスの更新:**
-
-- `"./types"` → `"../models/index.js"`
-- `"./client"` → `"../client.js"`
-
-### ステップ6: index.ts ファイル作成
-
-#### models/index.ts
-
-```typescript
-/**
- * Model type definitions
- * Auto-generated from OpenAPI specification
- */
-
-export * from './Pet.js';
-export * from './GetPetsParams.js';
-export * from './GetPets200Response.js';
-```
-
-#### schemas/index.ts
-
-```typescript
-/**
- * Valibot validation schemas
- * Auto-generated from OpenAPI specification
- */
-
-export * from './PetSchema.js';
-export * from './GetPets200ResponseSchema.js';
-```
-
-#### services/index.ts
-
-```typescript
-/**
- * API service functions
- * Auto-generated from OpenAPI specification
- */
-
-export * from './pets.js';
-```
-
-### ステップ7: トップレベルファイル更新
-
-#### index.ts（新規作成）
-
-```typescript
-/**
- * API Client
- * Generated from: [API Name] [Version]
- * DO NOT EDIT - This file is auto-generated
- */
-
-export * from "./types.js";
-export * from "./models/index.js";
-export * from "./schemas/index.js";
-export * from "./services/index.js";
-export { setConfig, XcgenApiError, type ApiConfig } from "./client.js";
-```
-
-#### types.ts（共通型のみに変更）
-
-```typescript
-/**
- * Common type definitions
- * Generated from: [API Name] [Version]
- * DO NOT EDIT - This file is auto-generated
- */
-
-// No common types for this API
-// または共通型がある場合は記載
-```
-
-### ステップ8: 検証
-
-```bash
-# ディレクトリ構造確認
-tree expected/
-
-# ファイル数確認
-find expected/ -name "*.ts" | wc -l
-```
-
-期待されるファイル数の目安：
-
-- モデル数 × 1 + パラメータ数 × 1 + レスポンス数 × 1
-- スキーマ数（モデル + レスポンス）
-- サービス関数数（タグで分割）
-- インデックスファイル（3-4個）
-
-## 変換テンプレート
-
-### モデルファイル
-
-```typescript
-/**
- * [ModelName] model
- * Auto-generated from OpenAPI specification
- */
-
-// インポートがあれば追加
-import type { OtherModel } from "./OtherModel.js";
-
-export interface [ModelName] {
-  // プロパティ
-}
-```
-
-### スキーマファイル
-
-```typescript
-/**
- * Valibot validation schema for [ModelName]
- * Auto-generated from OpenAPI specification
- */
-
-import * as v from "valibot";
-// 依存スキーマがあれば追加
-import { OtherSchema } from "./OtherSchema.js";
-
-export const [ModelName]Schema = v.object({
-  // スキーマ定義
-});
-```
-
-### サービスファイル
-
-```typescript
-/**
- * [Tag] service functions
- * Auto-generated from OpenAPI specification
- */
-
-import { request } from "../client.js";
-import type { XcgenApiError as _XcgenApiError } from "../client.js";
-import type { /* types */ } from "../models/index.js";
-
-// サービス関数
-```
-
-## チェックリスト（各フィクスチャ）
-
-各フィクスチャ変換時のチェック項目：
-
-- [ ] ディレクトリ作成（models, schemas, services）
-- [ ] models/ - 全てのモデル・パラメータ・レスポンス型を分割
-- [ ] models/index.ts - 全てのモデルをre-export
-- [ ] schemas/ - 全てのスキーマを分割
-- [ ] schemas/index.ts - 全てのスキーマをre-export
-- [ ] services/ - タグごとにサービスを分割
-- [ ] services/index.ts - 全てのサービスをre-export
-- [ ] types.ts - 共通型のみに変更
-- [ ] index.ts - トップレベルエクスポート作成
-- [ ] インポートパス - `.js` 拡張子を使用
-- [ ] 依存関係 - import順序が正しい
+- Orval標準：必要な場合のみ作成
+- 不要なファイルを排除してプロジェクトをクリーンに保つ
+- 空ファイルは TypeScript の "not a module" エラーの原因
+- 共通型が必要になった場合のみ作成する
 
 ## 注意事項
 
-### インポートパスの`.js`拡張子
+### インポートパスの拡張子
 
-ESMモジュール解決のため、TypeScriptソースコードでも `.js` 拡張子が必要：
+バンドラーベースのアプローチを採用し、拡張子は**付けない**：
 
 ```typescript
-// ✅ 正しい
-import { Pet } from "./Pet.js";
-
-// ❌ 間違い
+// ✅ 正しい（バンドラー前提）
 import { Pet } from "./Pet";
+
+// ❌ 間違い（生成器コードの書き方）
+import { Pet } from "./Pet.js";
 ```
+
+**理由:**
+
+- 業界標準（Orval、openapi-ts）に準拠
+- ユーザーコードはバンドラー（webpack/Vite/Rollup）を使用する前提
+- CLAUDE.mdの「生成されるコード：拡張子なし（バンドラー前提）」に従う
 
 ### 相対パスの深さ
 
 ```typescript
 // models/Pet.ts から他のモデル
-import { Tag } from "./Tag.js";
+import { Tag } from "./Tag";
 
 // services/pets.ts からモデル
-import { Pet } from "../models/index.js";
+import { Pet } from "../models/index";
 
 // services/pets.ts からクライアント
-import { request } from "../client.js";
+import { request } from "../client";
 ```
 
 ### 依存関係の順序
@@ -414,7 +146,7 @@ import { request } from "../client.js";
 export const PetSchema = v.object({ ... });
 
 // GetPets200ResponseSchema.ts（PetSchemaに依存）
-import { PetSchema } from "./PetSchema.js";
+import { PetSchema } from "./PetSchema";
 export const GetPets200ResponseSchema = v.array(PetSchema);
 ```
 
@@ -425,47 +157,16 @@ export const GetPets200ResponseSchema = v.array(PetSchema);
 - **サービスファイル**: `kebab-case.ts` (例: `pets.ts`, `user-profile.ts`)
 - **インデックスファイル**: 常に `index.ts`
 
-## トラブルシューティング
-
-### 問題1: 型の依存関係が複雑
-
-**対策:**
-
-1. まず依存のない基本型から作成
-2. 依存する型を後から作成
-3. 循環参照がないか確認
-
-### 問題2: インポートパスの間違い
-
-**対策:**
-
-- 相対パスの深さを確認（`../` の数）
-- `.js` 拡張子を必ず付ける
-- TypeScript の型チェックで検証
-
-### 問題3: 大量のファイル作成
-
-**対策:**
-
-- シンプルなフィクスチャから開始
-- パターンに慣れてから複雑なものに進む
-- 中間チェックポイントでコミット
-
-## 完了条件
-
-- [ ] 全15フィクスチャの変換完了
-- [ ] 各フィクスチャでチェックリスト項目全てクリア
-- [ ] ファイル構造の一貫性確認
-- [ ] 次のステップ（テスト比較ロジック更新）への準備完了
-
 ## 次のアクション
 
-変換完了後：
+Task 015 は完了しました。次は **Task 014 Phase 2: Generator実装** に進みます：
 
-1. テスト比較ロジックを更新（`test-helper.ts`）
-2. テスト実行（Red状態確認）
-3. 実装（Generator修正）
-4. テスト実行（Green状態確認）
+1. ✅ Phase 1: テストフィクスチャ変換（本タスク）
+2. 🔄 **Phase 2: Generator実装** ← 次のステップ
+   - `packages/xcgen-ts/src/generator/` の修正
+   - ディレクトリベース構造の出力実装
+   - TDD Green状態の達成
+3. ⏳ Phase 3: リファクタリング・最適化
 
 ## 参考資料
 
