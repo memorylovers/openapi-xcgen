@@ -7,26 +7,31 @@ TypeSpecから生成されたOpenAPI仕様書（YAML/JSON）を入力として�
 ## アーキテクチャ
 
 ```
-┌─────────────────┐
-│  CLI Interface  │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│  Core Engine    │
-├─────────────────┤
-│ - Parser        │
-│ - Validator     │
-│ - Resolver      │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ Code Generators │
-├─────────────────┤
-│ - TypeScript    │
-│ - Dart          │
-│ - (Extensible)  │
-└─────────────────┘
+┌─────────────────────────────────────────┐
+│           Core Package                  │
+│  (@openapi-xcgen/core)                  │
+├─────────────────────────────────────────┤
+│  - Parser (OpenAPI 3.x)                 │
+│  - Transformer (OpenAPI → IR)           │
+│  - Validator                            │
+└───────────────┬─────────────────────────┘
+                │ IR (Intermediate Representation)
+        ┌───────┴───────┐
+        │               │
+┌───────▼──────┐ ┌──────▼──────┐
+│  xcgen-ts    │ │ xcgen-dart  │
+│  (CLI統合)   │ │ (CLI統合)   │
+├──────────────┤ ├─────────────┤
+│ - Generator  │ │ - Generator │
+│ - CLI        │ │ - CLI       │
+└──────────────┘ └─────────────┘
 ```
+
+**処理フロー:**
+
+1. Parser: OpenAPI仕様をパース・バンドル
+2. Transformer: OpenAPIをIR（中間表現）に変換
+3. Generator: IRから各言語のコードを生成
 
 ## 処理フロー
 
@@ -51,11 +56,19 @@ TypeSpec(.tsp) → OpenAPI(.yaml) → Generated Code(.ts/.dart)
 ```
 openapi-xcgen/
 ├── packages/
-│   ├── core/                 # パーサー、バリデーター
-│   ├── generator-typescript/ # TS生成器
-│   ├── generator-dart/       # Dart生成器
-│   └── cli/                  # CLIインターフェース
+│   ├── core/      # パーサー、トランスフォーマー、バリデーター
+│   │              # (@openapi-xcgen/core)
+│   ├── xcgen-ts/  # TypeScript生成器（CLI統合）
+│   │              # (@openapi-xcgen/xcgen-ts)
+│   └── xcgen-dart/# Dart生成器（Phase 2、未実装）
+│                  # (@openapi-xcgen/xcgen-dart)
 ```
+
+**パッケージ設計:**
+
+- 各言語の生成器は独立したパッケージとして公開
+- CLI は各生成器パッケージに統合（`xcgen-ts`, `xcgen-dart`コマンド）
+- ユーザーは必要な言語のパッケージのみインストール可能
 
 ### 生成コード構成（TypeScript）
 
@@ -65,7 +78,7 @@ generated/
 │   ├── User.ts
 │   ├── Post.ts
 │   └── index.ts
-├── schemas/      # Valibotスキーマ  
+├── schemas/      # Valibotスキーマ
 │   ├── UserSchema.ts
 │   ├── PostSchema.ts
 │   └── index.ts
@@ -125,7 +138,7 @@ generated/
 
 ```typescript
 // client.ts - 最小限の共通処理
-export function createApiConfig(config: ClientConfig) { }
+export function setConfig(config: ApiConfig): void { }
 export async function request<T>(method, path, options?): Promise<T> { }
 
 // services/users.ts - 個別エクスポート可能
@@ -135,8 +148,8 @@ export async function getUser(id: string): Promise<User> {
 }
 
 // 使用例
-import { createApiConfig, users } from './generated';
-createApiConfig({ baseUrl: 'https://api.example.com' });
+import { setConfig, users } from './generated';
+setConfig({ baseUrl: 'https://api.example.com' });
 const user = await users.getUser('123');
 ```
 
@@ -172,29 +185,80 @@ class UserService {
 ### データフロー
 
 ```
-OpenAPI Schema
+OpenAPI Schema (YAML/JSON)
      ↓
-[Schema Parser] → AST
+[Parser] parse & bundle
      ↓
-[Language Router]
+OpenAPI Document (with internal $refs)
+     ↓
+[Transformer] Visitor pattern
+     ↓
+XcgenIR (Intermediate Representation)
+  ├── metadata (API info)
+  ├── models (schemas)
+  ├── endpoints (paths/operations)
+  ├── security
+  └── servers
+     ↓
+[Language Generators]
      ├── [TypeScript Generator] → TS/Valibot Code
      └── [Dart Generator] → Dart/JsonSerializable Code
 ```
 
-### エラーハンドリング
+**処理の3段階:**
+
+1. **Parser**: OpenAPI仕様を読み込み、$refを解決（bundle）
+2. **Transformer**: OpenAPIをIR（中間表現）に変換（Visitorパターン）
+3. **Generator**: IRから各言語のコードを生成
+
+**IRの役割:**
+
+- 言語に依存しない統一的なデータ構造
+- コード生成ロジックの明確な分離
+- 多言語対応時のTransformer再利用
+
+### エラーハンドリング（生成するTypeScriptクライアントコード）
 
 - HTTPステータスごとの型定義を生成
-- エラーは単純なオブジェクトとして扱う
-- カスタムエラー処理は`errorHandler`で拡張可能
+- Errorクラスを継承したカスタムエラーを使用
+- try-catchで自然に扱える設計
 
 ```typescript
-type ApiErrorResponse<T = unknown> = {
-  status: number;
-  statusText: string;
-  body: T;
-  headers: Record<string, string>;
-};
+export class XcgenApiError extends Error {
+  readonly response: Response;
+  readonly body?: unknown;
+  readonly status: number;
+  readonly statusText: string;
+  readonly url: string;
+
+  constructor(response: Response, body?: unknown) {
+    super(`API Error: ${response.status} ${response.statusText}`);
+    this.name = "XcgenApiError";
+    this.response = response;
+    this.body = body;
+    this.status = response.status;
+    this.statusText = response.statusText;
+    this.url = response.url;
+  }
+}
 ```
+
+**設計方針:**
+
+- **Errorクラス継承**: 標準的なエラーハンドリングが可能
+- **型ガード**: `instanceof XcgenApiError` で型安全に判定
+- **スタックトレース**: 自動的に記録され、デバッグが容易
+- **豊富な情報**: status, body, url など詳細情報にアクセス可能
+- **Response オブジェクト保持**: `response.headers` から追加情報を取得可能
+
+**例外的なクラス使用:**
+
+本ライブラリは「関数ベース、クラス不使用」を設計原則としていますが、エラーハンドリングは例外として Errorクラスの継承を許可します。理由：
+
+- TypeScriptのエラーハンドリングのベストプラクティスに準拠
+- スタックトレースによるデバッグ性の向上
+- エラー監視ツール（Sentry等）との統合が容易
+- Tree-shakingへの影響は軽微（クラス1つのみ）
 
 ### ファイルアップロード
 
@@ -265,6 +329,7 @@ type ApiErrorResponse<T = unknown> = {
 ```
 
 - Zodバリデーター選択オプション
+- カスタムfetch関数の差し替え対応（インターセプター、認証ヘッダー等）
 - OpenAPI拡張フック機能
 - カスタムフォーマット対応（`x-format: ulid`等）
 - ストリーミングレスポンス対応
@@ -274,32 +339,40 @@ type ApiErrorResponse<T = unknown> = {
 
 ```bash
 # TypeScript生成
-openapi-xcgen generate --input api.yaml --output ./src/api --lang ts
-
-# Dart生成
-openapi-xcgen generate --input api.yaml --output ./lib/api --lang dart
+xcgen-ts --input api.yaml --output ./src/api
 
 # 設定ファイル使用
-openapi-xcgen generate --config xcgen.config.ts
+xcgen-ts --config xcgen.config.ts
+
+# Dart生成（Phase 2）
+xcgen-dart --input api.yaml --output ./lib/api
 ```
 
 ## 設定ファイル
 
+**TypeScript生成器の設定:**
+
 ```typescript
 // xcgen.config.ts
-export default {
+import { defineConfig } from '@openapi-xcgen/xcgen-ts';
+
+export default defineConfig({
   input: './openapi.yaml',
-  output: {
-    typescript: './generated/ts',
-    dart: './generated/dart',
-  },
-  typescript: {
-    validator: 'valibot', // 将来: 'zod'
-    fetch: globalThis.fetch,
-  },
-  dart: {
-    serialization: 'json_serializable', // 将来: 'freezed'
-    httpClient: 'http', // or 'dio'
-  },
-}
+  output: './generated',
+  validator: 'valibot', // 将来: 'zod'
+});
+```
+
+**Dart生成器の設定（Phase 2）:**
+
+```typescript
+// xcgen.config.ts
+import { defineConfig } from '@openapi-xcgen/xcgen-dart';
+
+export default defineConfig({
+  input: './openapi.yaml',
+  output: './lib/generated',
+  serialization: 'json_serializable', // 将来: 'freezed'
+  httpClient: 'dio', // or 'http'
+});
 ```
