@@ -1,9 +1,9 @@
 name: Release Canary
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
   workflow_dispatch:
     inputs:
       dry_run:
@@ -15,8 +15,8 @@ on:
 jobs:
   release-canary:
     runs-on: ubuntu-latest
-    # Publishコミット（lerna release）を除外
-    if: "!startsWith(github.event.head_commit.message, 'Publish')"
+    # PRがマージされた場合のみ実行
+    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
         with:
