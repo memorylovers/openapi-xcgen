@@ -256,107 +256,43 @@ export { setConfig, XcgenApiError, type ApiConfig } from "./client.js";
 
 ## 実装計画
 
-### Phase 1: ファイル分割ロジックの実装
+### Phase 2: 生成器の修正（ディレクトリベース構造への変更）
 
-#### 1.1 新しいヘルパー関数の作成
+#### Step 1: 型定義の追加
 
-`packages/xcgen-ts/src/helpers/file-organizer.ts` を新規作成：
-
-```typescript
-import type { XcgenIR, IRModel } from '@openapi-xcgen/core';
-
-export interface FileGroup {
-  filename: string;
-  content: string;
-  path: string; // 相対パス（例: "models/Pet.ts"）
-}
-
-/**
- * IRモデルをファイルごとにグループ化
- */
-export function groupModelsByFile(models: IRModel[]): FileGroup[] {
-  return models.map(model => ({
-    filename: `${model.name}.ts`,
-    content: '', // 後で生成
-    path: `models/${model.name}.ts`,
-  }));
-}
-
-/**
- * インデックスファイルの内容を生成
- */
-export function generateIndexFile(filenames: string[]): string {
-  const lines = [
-    '/**',
-    ' * Auto-generated from OpenAPI specification',
-    ' */',
-    '',
-  ];
-
-  for (const filename of filenames) {
-    const importPath = `./${filename.replace('.ts', '.js')}`;
-    lines.push(`export * from '${importPath}';`);
-  }
-
-  return lines.join('\n');
-}
-```
-
-#### 1.2 ディレクトリ作成ユーティリティ
-
-`packages/xcgen-ts/src/helpers/file-writer.ts` を新規作成：
+`packages/xcgen-ts/src/types.ts` に `FileToWrite` インターフェースを追加：
 
 ```typescript
-import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-
+/**
+ * 書き込むファイルの情報
+ */
 export interface FileToWrite {
-  path: string; // 相対パス
+  /** 相対パス（例: "models/Pet.ts", "schemas/PetSchema.ts"） */
+  path: string;
+  /** ファイルの内容 */
   content: string;
-}
-
-/**
- * ディレクトリ構造を作成してファイルを書き込む
- */
-export async function writeFiles(
-  outputDir: string,
-  files: FileToWrite[],
-): Promise<void> {
-  for (const file of files) {
-    const fullPath = join(outputDir, file.path);
-    const dir = dirname(fullPath);
-
-    // ディレクトリ作成（再帰的）
-    await mkdir(dir, { recursive: true });
-
-    // ファイル書き込み
-    await writeFile(fullPath, file.content, 'utf-8');
-  }
 }
 ```
 
-### Phase 2: 生成器の修正
+既存の `GeneratedTypes`、`GeneratedSchemas`、`GeneratedServices` インターフェースは削除（後方互換性不要）。
 
-#### 2.1 型定義生成器の分割
+#### Step 2: Types生成器の修正
 
 `packages/xcgen-ts/src/generators/types/types.ts` を修正：
 
-**変更前:**
+**変更内容:**
+
+1. **戻り値の型変更:** `GeneratedTypes` → `FileToWrite[]`
+2. **新関数追加:**
+   - `generateModelFile(model: IRModel): string` - 個別モデルファイル生成
+   - `generateModelsIndex(models: IRModel[]): string` - models/index.ts生成
+3. **ファイル構成:**
+   - 各モデル → `models/{ModelName}.ts`
+   - インデックス → `models/index.ts`
+   - types.ts は削除（Task 015で空のため不要）
+4. **インポートパス:** 拡張子なし（例: `export * from './Pet'`）
 
 ```typescript
-export function generateTypes(ir: XcgenIR): string {
-  // 単一ファイルの文字列を返す
-  const lines: string[] = [];
-  // ...すべての型をlinesに追加
-  return lines.join('\n');
-}
-```
-
-**変更後:**
-
-```typescript
-import type { FileToWrite } from '../../helpers/file-writer.js';
-
 export function generateTypes(ir: XcgenIR): FileToWrite[] {
   const files: FileToWrite[] = [];
 
@@ -369,48 +305,40 @@ export function generateTypes(ir: XcgenIR): FileToWrite[] {
     });
   }
 
-  // インデックスファイル生成
+  // models/index.ts 生成
   const indexContent = generateModelsIndex(ir.models);
   files.push({
     path: 'models/index.ts',
     content: indexContent,
   });
 
-  // 共通型定義ファイル生成
-  const typesContent = generateCommonTypes(ir);
-  files.push({
-    path: 'types.ts',
-    content: typesContent,
-  });
-
   return files;
 }
 
-/**
- * 単一モデルのファイル内容を生成
- */
 function generateModelFile(model: IRModel): string {
   const lines: string[] = [];
-
   lines.push('/**');
   lines.push(` * ${model.name} model`);
   lines.push(' * Auto-generated from OpenAPI specification');
   lines.push(' */');
   lines.push('');
 
-  // モデルの型定義を生成
-  const typeCode = generateModelType(model);
-  lines.push(typeCode);
+  // 依存する他のモデルがあればimport追加
+  // const imports = extractModelImports(model);
+  // if (imports.length > 0) {
+  //   for (const imp of imports) {
+  //     lines.push(`import type { ${imp} } from "./${imp}";`);
+  //   }
+  //   lines.push('');
+  // }
 
+  const typeCode = generateModel(model);
+  lines.push(typeCode);
   return lines.join('\n');
 }
 
-/**
- * models/index.ts の内容を生成
- */
 function generateModelsIndex(models: IRModel[]): string {
   const lines: string[] = [];
-
   lines.push('/**');
   lines.push(' * Model type definitions');
   lines.push(' * Auto-generated from OpenAPI specification');
@@ -418,22 +346,33 @@ function generateModelsIndex(models: IRModel[]): string {
   lines.push('');
 
   for (const model of models) {
-    lines.push(`export * from './${model.name}.js';`);
+    lines.push(`export * from './${model.name}';`);
   }
 
   return lines.join('\n');
 }
 ```
 
-#### 2.2 スキーマ生成器の分割
+#### Step 3: Schemas生成器の修正
 
-`packages/xcgen-ts/src/generators/schemas/schemas.ts` を同様に修正：
+`packages/xcgen-ts/src/generators/schemas/schemas.ts` を修正：
+
+**変更内容:**
+
+1. **戻り値の型変更:** `GeneratedSchemas` → `FileToWrite[]`
+2. **新関数追加:**
+   - `generateSchemaFile(model: IRModel): string` - 個別スキーマファイル生成
+   - `generateSchemasIndex(models: IRModel[]): string` - schemas/index.ts生成
+3. **ファイル構成:**
+   - 各スキーマ → `schemas/{ModelName}Schema.ts`
+   - インデックス → `schemas/index.ts`
+4. **依存関係:** `sortModelsByDependencies()` を維持
 
 ```typescript
 export function generateSchemas(ir: XcgenIR): FileToWrite[] {
   const files: FileToWrite[] = [];
 
-  // 依存関係順にソート（既存ロジック活用）
+  // 依存関係順にソート
   const sortedModels = sortModelsByDependencies(ir.models);
 
   // 各スキーマを個別ファイルとして生成
@@ -445,7 +384,7 @@ export function generateSchemas(ir: XcgenIR): FileToWrite[] {
     });
   }
 
-  // インデックスファイル生成
+  // schemas/index.ts 生成
   const indexContent = generateSchemasIndex(sortedModels);
   files.push({
     path: 'schemas/index.ts',
@@ -454,17 +393,67 @@ export function generateSchemas(ir: XcgenIR): FileToWrite[] {
 
   return files;
 }
+
+function generateSchemaFile(model: IRModel): string {
+  const lines: string[] = [];
+  lines.push('/**');
+  lines.push(` * Valibot validation schema for ${model.name}`);
+  lines.push(' * Auto-generated from OpenAPI specification');
+  lines.push(' */');
+  lines.push('');
+  lines.push('import * as v from "valibot";');
+
+  // 他のスキーマへの依存があればimport追加
+  // const deps = extractSchemaDependencies(model);
+  // if (deps.length > 0) {
+  //   for (const dep of deps) {
+  //     lines.push(`import { ${dep}Schema } from "./${dep}Schema";`);
+  //   }
+  // }
+
+  lines.push('');
+  const schemaCode = generateSchemaModel(model);
+  lines.push(schemaCode);
+  return lines.join('\n');
+}
+
+function generateSchemasIndex(models: IRModel[]): string {
+  const lines: string[] = [];
+  lines.push('/**');
+  lines.push(' * Valibot validation schemas');
+  lines.push(' * Auto-generated from OpenAPI specification');
+  lines.push(' */');
+  lines.push('');
+
+  for (const model of models) {
+    lines.push(`export * from './${model.name}Schema';`);
+  }
+
+  return lines.join('\n');
+}
 ```
 
-#### 2.3 サービス生成器の修正
+#### Step 4: Services生成器の修正
 
 `packages/xcgen-ts/src/generators/services/services.ts` を修正：
+
+**変更内容:**
+
+1. **戻り値の型変更:** `GeneratedServices` → `FileToWrite[]`
+2. **新関数追加:**
+   - `groupEndpointsByTag(endpoints): Record<string, IREndpoint[]>` - タグ別グループ化
+   - `generateServiceFile(tag, endpoints): string` - タグ別サービスファイル生成
+   - `generateServicesIndex(tags): string` - services/index.ts生成
+3. **ファイル構成:**
+   - タグ別 → `services/{tag-name}.ts`（kebab-case）
+   - タグなし → `services/default.ts`
+   - インデックス → `services/index.ts`
 
 ```typescript
 export function generateServices(ir: XcgenIR): FileToWrite[] {
   const files: FileToWrite[] = [];
 
-  // タグごとにサービスをグループ化
+  // タグごとにグループ化
   const servicesByTag = groupEndpointsByTag(ir.endpoints);
 
   for (const [tag, endpoints] of Object.entries(servicesByTag)) {
@@ -476,8 +465,9 @@ export function generateServices(ir: XcgenIR): FileToWrite[] {
     });
   }
 
-  // インデックスファイル生成
-  const indexContent = generateServicesIndex(Object.keys(servicesByTag));
+  // services/index.ts 生成
+  const tags = Object.keys(servicesByTag);
+  const indexContent = generateServicesIndex(tags);
   files.push({
     path: 'services/index.ts',
     content: indexContent,
@@ -486,9 +476,6 @@ export function generateServices(ir: XcgenIR): FileToWrite[] {
   return files;
 }
 
-/**
- * タグごとにエンドポイントをグループ化
- */
 function groupEndpointsByTag(endpoints: IREndpoint[]): Record<string, IREndpoint[]> {
   const groups: Record<string, IREndpoint[]> = {};
 
@@ -502,61 +489,90 @@ function groupEndpointsByTag(endpoints: IREndpoint[]): Record<string, IREndpoint
 
   return groups;
 }
-```
 
-#### 2.4 メインジェネレーターの修正
+function generateServiceFile(tag: string, endpoints: IREndpoint[]): string {
+  const lines: string[] = [];
+  lines.push('/**');
+  lines.push(` * ${tag} service functions`);
+  lines.push(' * Auto-generated from OpenAPI specification');
+  lines.push(' */');
+  lines.push('');
 
-`packages/xcgen-ts/src/generator.ts` を修正：
+  // imports生成（既存ロジック活用）
+  lines.push(generateServicesImports(endpoints));
+  lines.push('');
 
-**変更前:**
+  // 各エンドポイントを関数に変換
+  for (const endpoint of endpoints) {
+    if (endpoint.operationId) {
+      const functionCode = generateServiceFunction(endpoint);
+      lines.push(functionCode);
+      lines.push('');
+    }
+  }
 
-```typescript
-export async function generate(options: GeneratorOptions): Promise<void> {
-  // ...parse & transform
+  return lines.join('\n');
+}
 
-  // 4つのファイルを生成
-  const typesCode = generateTypes(ir);
-  await writeFile(join(outputDir, 'types.ts'), typesCode);
+function generateServicesIndex(tags: string[]): string {
+  const lines: string[] = [];
+  lines.push('/**');
+  lines.push(' * API service functions');
+  lines.push(' * Auto-generated from OpenAPI specification');
+  lines.push(' */');
+  lines.push('');
 
-  const schemasCode = generateSchemas(ir);
-  await writeFile(join(outputDir, 'schemas.ts'), schemasCode);
+  for (const tag of tags) {
+    const filename = toKebabCase(tag || 'default');
+    lines.push(`export * from './${filename}';`);
+  }
 
-  // ...
+  return lines.join('\n');
 }
 ```
 
-**変更後:**
+#### Step 5: メインジェネレーターの修正
+
+`packages/xcgen-ts/src/generator.ts` を修正：
+
+**変更内容:**
+
+1. **FileToWrite配列を集約**
+2. **ディレクトリ作成 + ファイル書き込み** を一括処理
+3. **トップレベルindex.ts生成**
 
 ```typescript
-import { writeFiles } from './helpers/file-writer.js';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import type { FileToWrite } from './types.js';
 
-export async function generate(options: GeneratorOptions): Promise<void> {
+export async function generate(options: GeneratorOptions): Promise<GenerationResult> {
   // ...parse & transform
 
   const filesToWrite: FileToWrite[] = [];
 
-  // 型定義ファイル群を生成
+  // 型定義ファイル群
   const typeFiles = generateTypes(ir);
   filesToWrite.push(...typeFiles);
 
-  // スキーマファイル群を生成
+  // スキーマファイル群（オプション）
   if (options.validator === 'valibot') {
     const schemaFiles = generateSchemas(ir);
     filesToWrite.push(...schemaFiles);
   }
 
-  // サービスファイル群を生成
+  // サービスファイル群
   const serviceFiles = generateServices(ir);
   filesToWrite.push(...serviceFiles);
 
-  // クライアントファイル生成
+  // クライアントファイル
   const clientCode = generateClient(ir);
   filesToWrite.push({
     path: 'client.ts',
-    content: clientCode,
+    content: clientCode.code,
   });
 
-  // トップレベルインデックス生成
+  // トップレベルindex.ts
   const indexCode = generateTopLevelIndex(ir, options);
   filesToWrite.push({
     path: 'index.ts',
@@ -564,86 +580,53 @@ export async function generate(options: GeneratorOptions): Promise<void> {
   });
 
   // 一括書き込み
-  await writeFiles(options.output, filesToWrite);
+  for (const file of filesToWrite) {
+    const fullPath = join(options.output, file.path);
+    await mkdir(dirname(fullPath), { recursive: true });
+    await writeFile(fullPath, file.content, 'utf-8');
+  }
 
-  // package.json, tsconfig.json は従来通り
-  await writePackageJson(options.output);
-  await writeTsConfig(options.output);
+  return {
+    files: filesToWrite.map(f => join(options.output, f.path)),
+    typesCount: typeFiles.length,
+    schemasCount: options.validator === 'valibot' ? schemaFiles.length : undefined,
+    servicesCount: serviceFiles.length,
+  };
 }
-```
 
-### Phase 3: インデックスファイル生成
-
-#### 3.1 トップレベルインデックスの生成
-
-```typescript
-function generateTopLevelIndex(
-  ir: XcgenIR,
-  options: GeneratorOptions,
-): string {
+function generateTopLevelIndex(ir: XcgenIR, options: GeneratorOptions): string {
   const lines: string[] = [];
-
   lines.push('/**');
-  lines.push(` * ${ir.metadata.title}`);
-  lines.push(` * Version: ${ir.metadata.version}`);
-  lines.push(' * Auto-generated from OpenAPI specification');
+  lines.push(` * API Client`);
+  lines.push(` * Generated from: ${ir.metadata.title} ${ir.metadata.version}`);
+  lines.push(' * DO NOT EDIT - This file is auto-generated');
   lines.push(' */');
   lines.push('');
 
-  // 共通型
-  lines.push("export * from './types.js';");
+  lines.push("export * from './models/index';");
 
-  // モデル型
-  lines.push("export * from './models/index.js';");
-
-  // スキーマ（オプション）
   if (options.validator === 'valibot') {
-    lines.push("export * from './schemas/index.js';");
+    lines.push("export * from './schemas/index';");
   }
 
-  // サービス関数
-  lines.push("export * from './services/index.js';");
-
-  // クライアント（選択的エクスポート）
-  lines.push("export { setConfig, XcgenApiError, type ApiConfig } from './client.js';");
+  lines.push("export * from './services/index';");
+  lines.push("export { setConfig, XcgenApiError, type ApiConfig } from './client';");
 
   return lines.join('\n');
 }
 ```
 
-### Phase 4: E2Eテスト更新
+### Phase 3: E2Eテスト実行と検証
 
-#### 4.1 期待値再生成スクリプトの実行
+#### テスト実行
 
 ```bash
 cd packages/xcgen-ts
-pnpm regenerate:expected
-```
 
-このスクリプトは `tests/e2e/generate-expected.ts` を実行し、すべてのフィクスチャの期待値を再生成します。
-
-#### 4.2 テスト実行ロジックの確認
-
-`tests/e2e/index.test.ts` で、ディレクトリ構造の比較ロジックが正しく動作するか確認：
-
-- 単一ファイルの比較から、ディレクトリツリーの比較に変更
-- すべてのファイルを再帰的に比較
-- ファイル数の一致も確認
-
-#### 4.3 新しいテストケースの追加（オプション）
-
-- ディレクトリ構造が正しいことを検証するテスト
-- インデックスファイルのエクスポートが正しいことを検証するテスト
-
-### Phase 5: 検証とドキュメント更新
-
-#### 5.1 動作検証
-
-```bash
 # ビルド
 pnpm build
 
-# テスト実行
+# E2Eテスト実行（TDD Green状態確認）
 pnpm test
 
 # 型チェック
@@ -653,64 +636,43 @@ pnpm typecheck
 pnpm lint
 ```
 
-#### 5.2 E2Eテストの実行
+**期待結果:**
 
-```bash
-cd packages/xcgen-ts
-pnpm test
-```
-
-すべてのE2Eテストがパスすることを確認。
-
-#### 5.3 実際のOpenAPIでの動作確認
-
-```bash
-# Petstore APIで生成テスト
-pnpm xcgen-ts \
-  --input tests/e2e/fixtures/general/petstore/openapi.yaml \
-  --output /tmp/test-output
-
-# 生成されたコードの確認
-tree /tmp/test-output
-cat /tmp/test-output/index.ts
-cat /tmp/test-output/models/index.ts
-```
-
-#### 5.4 ドキュメント更新
-
-以下のドキュメントを更新：
-
-1. **要件定義書** (`_docs/001-requirements.md`)
-   - Section 2 の生成コード構成を確認（既に正しい構造が記載されている）
-   - 実装が要件に一致したことを記載
-
-2. **README** (該当する場合)
-   - 生成されるファイル構造の説明を更新
+- Task 015で作成した期待値と一致（31件のテスト失敗 → 全テストパス）
+- TDD Red → Green 達成
 
 ## 技術的な詳細
 
 ### インポートパスの解決
 
-#### 相対インポートの使用
+#### 拡張子なし（バンドラー前提）
+
+生成されるコードは拡張子なしのインポートを使用（Task 015準拠）：
 
 ```typescript
-// models/Pet.ts から schemas/PetSchema.ts を参照する場合
-import type { Pet } from '../models/Pet.js';
+// models/GetPets200Response.ts から Pet を参照
+import type { Pet } from "./Pet";
 
-// services/pets.ts から models/ を参照する場合
-import type { GetPetsParams } from '../models/index.js';
+// services/pets.ts から models/ を参照
+import type { GetPetsParams } from "../models/index";
+
+// services/pets.ts から client を参照
+import { request } from "../client";
 ```
 
-#### `.js` 拡張子の使用
+**理由:**
 
-- TypeScriptのソースコードでは `.js` 拡張子を使用（ESM要件）
-- `tsconfig.json` の `moduleResolution: "NodeNext"` により正しく解決される
+- 業界標準（Orval、openapi-ts）に準拠
+- ユーザー環境はバンドラー使用を前提
+- CLAUDE.mdの「生成されるコード：拡張子なし（バンドラー前提）」に従う
+
+**注:** 生成器のソースコード（`packages/xcgen-ts/src/`）は `.js` 拡張子を使用（ESM対応）
 
 ### 依存関係の順序
 
 #### スキーマの依存関係
 
-現在の実装では `sortModelsByDependencies()` が依存関係を解決していますが、ファイル分割後も同じロジックを使用：
+現在の実装では `sortModelsByDependencies()` が依存関係を解決しており、ファイル分割後も同じロジックを使用：
 
 ```typescript
 // 依存関係: UserSchema → AddressSchema
@@ -720,15 +682,15 @@ import type { GetPetsParams } from '../models/index.js';
 export const AddressSchema = v.object({ ... });
 
 // schemas/UserSchema.ts
-import { AddressSchema } from './AddressSchema.js';
+import { AddressSchema } from './AddressSchema';
 export const UserSchema = v.object({
   address: AddressSchema,
   ...
 });
 
 // schemas/index.ts
-export * from './AddressSchema.js';
-export * from './UserSchema.js';
+export * from './AddressSchema';
+export * from './UserSchema';
 ```
 
 ### ファイル命名規則
@@ -742,240 +704,80 @@ export * from './UserSchema.js';
 | サービス | kebab-case（タグ名） | `pets.ts`, `user-profile.ts` |
 | インデックス | 常に `index.ts` | `models/index.ts` |
 
-### Tree-shaking の維持
+### Tree-shaking
 
-#### 個別インポートが可能
+個別インポートが可能で、Tree-shakingの効果を最大化：
 
 ```typescript
-// ✅ 必要な型のみインポート（Tree-shaking効果大）
+// 必要な型のみインポート
 import { Pet, User } from '@example/api-client/models';
 
-// ✅ 必要なサービスのみインポート
+// 必要なサービスのみインポート
 import { listPets, createPet } from '@example/api-client/services/pets';
 
-// ✅ トップレベルからもインポート可能（後方互換性）
+// トップレベルからもインポート可能
 import { Pet, listPets } from '@example/api-client';
-```
-
-## 互換性の考慮
-
-### パブリックAPIの変更なし
-
-#### 使用例（変更なし）
-
-```typescript
-// 従来通りの使い方が可能
-import { setConfig, listPets, type Pet } from './generated';
-
-setConfig({ baseUrl: 'https://api.example.com' });
-const pets = await listPets({ query: { limit: 10 } });
-```
-
-### マイグレーションパス
-
-ユーザーは段階的に移行可能：
-
-```typescript
-// Step 1: トップレベルから全てインポート（変更なし）
-import { Pet, listPets } from './generated';
-
-// Step 2: 個別ディレクトリからインポート（最適化）
-import { Pet } from './generated/models';
-import { listPets } from './generated/services/pets';
-```
-
-## テスト戦略
-
-### E2Eテストの更新
-
-#### フィクスチャの構造変更
-
-**変更前:**
-
-```
-tests/e2e/fixtures/general/petstore/expected/
-├── types.ts
-├── schemas.ts
-├── services.ts
-├── client.ts
-├── package.json
-└── tsconfig.json
-```
-
-**変更後:**
-
-```
-tests/e2e/fixtures/general/petstore/expected/
-├── index.ts
-├── types.ts
-├── models/
-│   ├── Pet.ts
-│   ├── Pets.ts
-│   ├── Error.ts
-│   ├── GetPetsParams.ts
-│   └── index.ts
-├── schemas/
-│   ├── PetSchema.ts
-│   ├── PetsSchema.ts
-│   ├── ErrorSchema.ts
-│   └── index.ts
-├── services/
-│   ├── pets.ts
-│   └── index.ts
-├── client.ts
-├── package.json
-└── tsconfig.json
-```
-
-#### テスト実行の確認
-
-```bash
-# すべてのE2Eテストを実行
-pnpm test
-
-# 特定のフィクスチャのみテスト
-pnpm test petstore
-```
-
-### 回帰テストの追加
-
-新しいテストケースを追加して、ディレクトリ構造が正しいことを検証：
-
-```typescript
-// tests/e2e/directory-structure.test.ts
-import { describe, it, expect } from 'vitest';
-import { readdir } from 'node:fs/promises';
-
-describe('Generated directory structure', () => {
-  it('should create models/ directory', async () => {
-    const files = await readdir('path/to/generated/models');
-    expect(files).toContain('index.ts');
-    expect(files).toContain('Pet.ts');
-  });
-
-  it('should create schemas/ directory', async () => {
-    const files = await readdir('path/to/generated/schemas');
-    expect(files).toContain('index.ts');
-    expect(files).toContain('PetSchema.ts');
-  });
-
-  // ...
-});
 ```
 
 ## リスクと対策
 
-### リスク1: 大規模な変更による不具合
+### リスク: 実装ミスによる不具合
 
 **リスク:**
 
-- 多数のファイルを修正するため、予期しない不具合が発生する可能性
-- E2Eテスト全体の更新が必要
+- 複数の生成器を同時に修正するため、不具合が発生する可能性
+- インポートパスの誤りによる型解決失敗
 
 **対策:**
 
-- Phase ごとに段階的に実装・テスト
-- 各 Phase 完了時に全テストを実行
-- Git で細かくコミット、問題があれば revert 可能に
-
-### リスク2: テストフィクスチャの更新漏れ
-
-**リスク:**
-
-- 14+個のフィクスチャすべてを手動更新すると、漏れが発生する可能性
-
-**対策:**
-
-- `pnpm regenerate:expected` スクリプトで自動再生成
-- スクリプト実行前後で diff を確認
-- CI/CD で期待値との一致を検証
-
-### リスク3: パフォーマンスの低下
-
-**リスク:**
-
-- ファイル数が増えることで、生成速度が低下する可能性
-
-**対策:**
-
-- 並列書き込みの導入（Promise.all）
-- ベンチマークテストで性能を測定
-- 大規模APIでのパフォーマンステスト
-
-### リスク4: インポートパスの問題
-
-**リスク:**
-
-- 相対パスの誤りにより、型解決やバンドルに失敗する可能性
-
-**対策:**
-
-- TypeScript の型チェックで検証（`pnpm typecheck`）
-- E2Eテストで実際にインポートできるか確認
-- 生成されたコードを実際にビルドして動作確認
+- TDD手法（Task 015で期待値作成済み）
+- ステップごとにテスト実行
+- TypeScript型チェック（`pnpm typecheck`）でインポートパス検証
+- Git で細かくコミット、問題があれば revert 可能
 
 ## 実装チェックリスト
 
-### 1. ファイル分割ロジック（Phase 1）
+### Phase 2: 生成器の修正
 
-- [ ] `src/helpers/file-organizer.ts` を作成
-  - [ ] `groupModelsByFile()` 実装
-  - [ ] `generateIndexFile()` 実装
-- [ ] `src/helpers/file-writer.ts` を作成
-  - [ ] `writeFiles()` 実装
-  - [ ] ディレクトリ作成ロジック実装
-- [ ] In-source テスト追加
+- [ ] **Step 1: 型定義の追加**
+  - [ ] `src/types.ts` に `FileToWrite` インターフェース追加
+  - [ ] 旧インターフェース削除（`GeneratedTypes`, `GeneratedSchemas`, `GeneratedServices`）
 
-### 2. 生成器の修正（Phase 2）
-
-- [ ] `src/generators/types/types.ts` を修正
-  - [ ] `generateTypes()` を複数ファイル返却に変更
+- [ ] **Step 2: Types生成器の修正**
+  - [ ] `generateTypes()` 戻り値を `FileToWrite[]` に変更
   - [ ] `generateModelFile()` 実装
   - [ ] `generateModelsIndex()` 実装
-  - [ ] `generateCommonTypes()` 実装
-- [ ] `src/generators/schemas/schemas.ts` を修正
-  - [ ] `generateSchemas()` を複数ファイル返却に変更
+  - [ ] インポートパス: 拡張子なし
+
+- [ ] **Step 3: Schemas生成器の修正**
+  - [ ] `generateSchemas()` 戻り値を `FileToWrite[]` に変更
   - [ ] `generateSchemaFile()` 実装
   - [ ] `generateSchemasIndex()` 実装
-- [ ] `src/generators/services/services.ts` を修正
-  - [ ] `generateServices()` を複数ファイル返却に変更
+  - [ ] 依存関係ソート維持
+
+- [ ] **Step 4: Services生成器の修正**
+  - [ ] `generateServices()` 戻り値を `FileToWrite[]` に変更
   - [ ] `groupEndpointsByTag()` 実装
   - [ ] `generateServiceFile()` 実装
   - [ ] `generateServicesIndex()` 実装
-- [ ] `src/generator.ts` を修正
-  - [ ] 複数ファイル生成に対応
-  - [ ] `writeFiles()` を使用
+
+- [ ] **Step 5: メインジェネレーターの修正**
+  - [ ] `FileToWrite[]` 集約ロジック実装
+  - [ ] ディレクトリ作成 + ファイル書き込み実装
   - [ ] `generateTopLevelIndex()` 実装
 
-### 3. インデックスファイル生成（Phase 3）
-
-- [ ] トップレベル `index.ts` 生成ロジック実装
-- [ ] 各ディレクトリの `index.ts` 生成ロジック実装
-- [ ] インポートパスが正しいか検証
-
-### 4. E2Eテスト更新（Phase 4）
-
-- [ ] `pnpm regenerate:expected` で期待値再生成
-- [ ] diff を確認し、意図通りの変更か検証
-- [ ] すべてのE2Eテストがパスすることを確認
-- [ ] 新しいテストケースを追加（ディレクトリ構造検証）
-
-### 5. 検証とドキュメント更新（Phase 5）
+### Phase 3: E2Eテスト実行と検証
 
 - [ ] `pnpm build` が成功することを確認
-- [ ] `pnpm test` が成功することを確認
+- [ ] `pnpm test` が成功することを確認（TDD Green）
 - [ ] `pnpm typecheck` が成功することを確認
 - [ ] `pnpm lint` が成功することを確認
-- [ ] 実際のOpenAPIで動作確認
-- [ ] `_docs/001-requirements.md` を確認（既に正しい構造が記載されている）
-- [ ] このタスクファイルを `_done/` に移動
 
 ## 完了条件
 
-- [ ] すべてのE2Eテストがパス
+- [ ] 全E2Eテストがパス（TDD Red → Green 達成）
 - [ ] 型チェック・Lintがエラーなし
-- [ ] 実際のOpenAPIでの動作確認完了
-- [ ] ドキュメントが更新されている
+- [ ] タスクファイルを `_done/` に移動
 
 ## 参考資料
 
@@ -985,27 +787,14 @@ describe('Generated directory structure', () => {
 
 ## 注意事項
 
-### 破壊的変更ではない
-
-- パブリックAPIは変更なし
-- トップレベルからのインポートは引き続き可能
-- 既存のユーザーコードに影響なし
-
-### 段階的な実装
-
-- 一度にすべて変更せず、Phase ごとに進める
-- 各 Phase 完了時にテストを実行
-- 問題があれば前の Phase に戻れるようにする
-
-### コミット戦略
-
-- Phase ごとにコミット
-- コミットメッセージは明確に（例: `refactor(xcgen-ts): implement Phase 1 - file organizer helpers`）
-- 必要に応じて feature ブランチで作業
+- **TDD手法:** Task 015で期待値作成済み（Red状態）→ 実装でGreen状態を目指す
+- **インポートパス:** 拡張子なし（Task 015準拠、業界標準）
+- **コミット:** ステップごとに細かくコミット、問題があればrevert可能に
+- **後方互換性:** 不要（0.x.x開発版のため）
 
 ## 次のアクション
 
-1. このタスクファイルをレビュー
-2. 実装方針に問題がなければ、Phase 1 から着手
-3. 各 Phase 完了時にチェックリストを更新
-4. すべて完了したら、Gap Analysis タスクを更新
+1. Step 1から順に実装
+2. 各ステップ完了時にチェックリスト更新
+3. Phase 3でTDD Green達成確認
+4. タスク完了後、`_done/` に移動
