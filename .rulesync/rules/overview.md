@@ -272,24 +272,63 @@ pnpm sync:rules        # ルールファイルを各AIツールに同期
 pnpm sync:rules:watch  # watchモードで自動同期
 
 # このプロジェクトではrulesyncを使用してAI設定を管理しています
-# .rulesync/rules/project.md が唯一の真実のソース（Single Source of Truth）
+# .rulesync/rules/overview.md が唯一の真実のソース（Single Source of Truth）
 # 以下のファイルは自動生成されます（手動編集しないでください）:
 #   - .claude/memories/project.md (Claude Code用)
 #   - .codex/memories/project.md (Codex CLI用)
 #   - .agents/memories/project.md (AGENTS.md形式)
 #   - .mcp.json (Model Context Protocol設定)
 
-# リリース（タグベース自動化）
-pnpm release    # バージョンアップ＆タグpush（→GitHub Actionsで自動npm公開）
-
-# 実行フロー:
-# 1. ローカルで `pnpm release` 実行
-# 2. 対話式でバージョン選択（Patch/Minor/Major）
-# 3. CHANGELOG自動生成、git commit & tag作成
-# 4. タグをpush → GitHub Actionsがnpm公開 & GitHub Release作成
-
 # パッケージ別実行
 cd packages/core && pnpm test
+```
+
+## リリース
+
+### バージョニング戦略
+
+- **0.x.x**: 開発版（破壊的変更あり）
+  - 初回リリースは **0.1.0** からスタート
+  - 1.0.0 まで安定性を重視せず積極的に改善
+- **1.0.0-rc.x**: リリース候補版（1.0.0 前のみ使用）
+- **1.0.0**: 初の安定版（API安定化）
+
+## リリース手順
+
+### 通常リリース（0.x.x および 1.0.0 以降）
+
+```bash
+pnpm release
+# → 対話式でバージョン選択
+#    - Patch: 0.1.0 → 0.1.1（バグ修正）
+#    - Minor: 0.1.0 → 0.2.0（新機能）
+#    - Major: 0.9.0 → 1.0.0（安定版）
+```
+
+### 1.0.0 前のプレリリース版（必要な場合のみ）
+
+```bash
+# RC版（1.0.0 直前のテスト用）
+pnpm lerna version premajor --preid rc && git push --follow-tags
+# → 0.9.0 → 1.0.0-rc.0
+```
+
+### 自動処理
+
+GitHub Actions（release-latest.yml）が以下を自動実行：
+
+- プレリリース識別子を自動検出（alpha/beta/rc）
+- 適切な dist-tag で npm 公開
+- GitHub Release 作成
+
+### インストール
+
+```bash
+# 通常（最新の安定版または開発版）
+npm install @openapi-xcgen/core
+
+# プレリリース版（1.0.0 前のテスト時のみ）
+npm install @openapi-xcgen/core@rc
 ```
 
 ## コミット規約
