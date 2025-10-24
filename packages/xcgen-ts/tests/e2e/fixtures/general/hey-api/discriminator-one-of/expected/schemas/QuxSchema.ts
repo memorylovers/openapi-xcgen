@@ -1,7 +1,6 @@
 /**
- * Valibot validation schemas
- * Generated from: OpenAPI 3.1.0 discriminator one of example 1.0.0
- * DO NOT EDIT - This file is auto-generated
+ * Valibot validation schema for Qux
+ * Auto-generated from OpenAPI specification
  */
 
 import * as v from "valibot";

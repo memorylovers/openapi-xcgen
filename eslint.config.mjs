@@ -23,4 +23,15 @@ export default [
       },
     },
   },
+  {
+    // Ignore generated expected files (they contain intentional issues for testing)
+    ignores: [
+      "**/tests/e2e/fixtures/*/expected/**",
+      "**/tests/e2e/fixtures/*/*/expected/**",
+      "**/tests/e2e/fixtures/*/*/*/expected/**",
+      "**/tests/e2e/fixtures/*/expected-valibot/**",
+      "**/tests/e2e/fixtures/*/*/expected-valibot/**",
+      "**/tests/e2e/fixtures/*/*/*/expected-valibot/**",
+    ],
+  },
 ];

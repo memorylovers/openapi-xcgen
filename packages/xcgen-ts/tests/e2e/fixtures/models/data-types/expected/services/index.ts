@@ -3,5 +3,4 @@
  * Auto-generated from OpenAPI specification
  */
 
-// No services defined for this API
-export {};
+export * from './default';

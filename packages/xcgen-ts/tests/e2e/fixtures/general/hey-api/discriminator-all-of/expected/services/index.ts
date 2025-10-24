@@ -1,8 +1,6 @@
 /**
  * API service functions
- * Generated from: OpenAPI 3.1.0 discriminator all of example 1.0.0
- * DO NOT EDIT - This file is auto-generated
+ * Auto-generated from OpenAPI specification
  */
 
-import { request } from '../client';
-import type { XcgenApiError as _XcgenApiError } from '../client';
+export * from './default';

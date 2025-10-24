@@ -1,107 +1,69 @@
 /**
- * API関数生成器
+ * API サービス関数生成器（Orchestrator）
  *
  * IREndpointからTypeScriptのAPI関数を生成する
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
-import { generateServiceFunction } from "./services-function";
-import { generateServicesHeader } from "./services-header";
-import { generateServicesImports } from "./services-imports";
+import type { IFileWriter } from "../../helpers/file-writer";
+import type { GeneratorResult } from "../../types";
+import { kebabCase } from "es-toolkit";
+import { runInParallel } from "../../helpers/parallel";
+import { groupEndpointsByTag } from "./helpers/group-by-tag";
+import { generateServiceFile } from "./helpers/generate-service-file";
+import { generateServicesIndex } from "./helpers/generate-index";
 
 /**
- * 生成されたAPI関数コード
- */
-export interface GeneratedServices {
-  /** 生成されたTypeScriptコード */
-  code: string;
-  /** 生成されたAPI関数の数 */
-  count: number;
-}
-
-/**
- * XcgenIRからAPI関数を生成
+ * XcgenIRからAPI関数を生成（ディレクトリベース構造）
+ *
+ * services/ディレクトリにタグ別のファイルとして生成し、並列書き込みを行う
+ *
  * @param ir - 中間表現
- * @returns 生成されたTypeScriptコード
+ * @param writer - ファイル書き込みインターフェース
+ * @returns 生成結果（ファイルパス配列とカウント）
+ *
+ * @example
+ * ```typescript
+ * const ir: XcgenIR = { ... };
+ * const writer = new FileWriter('./output');
+ * const result = await generateServices(ir, writer);
+ * console.log(result.files); // ['services/pets.ts', 'services/users.ts', 'services/index.ts']
+ * console.log(result.count); // 2 (services)
+ * ```
  */
-export function generateServices(ir: XcgenIR): GeneratedServices {
-  const parts: string[] = [];
+export async function generateServices(
+  ir: XcgenIR,
+  writer: IFileWriter,
+): Promise<GeneratorResult> {
+  const files: string[] = [];
 
-  // ファイルヘッダー
-  parts.push(generateServicesHeader(ir.metadata));
-  parts.push("");
+  // タグごとにグループ化
+  const servicesByTag = groupEndpointsByTag(ir.endpoints);
 
-  // インポート文
-  parts.push(generateServicesImports(ir.endpoints));
-  parts.push("");
+  // Step 1: IR → Code (純粋関数による変換)
+  const serviceFiles = Object.entries(servicesByTag).map(([tag, endpoints]) => {
+    const filename = kebabCase(tag);
+    return {
+      path: `services/${filename}.ts`,
+      content: generateServiceFile(tag, endpoints),
+    };
+  });
 
-  let count = 0;
+  // Step 2: Code → Write (並列書き込み、並列数制限あり)
+  await runInParallel(serviceFiles, (file) =>
+    writer.write(file.path, file.content),
+  );
 
-  // 各エンドポイントを関数に変換
-  for (const endpoint of ir.endpoints) {
-    if (endpoint.operationId) {
-      const functionCode = generateServiceFunction(endpoint);
-      if (functionCode) {
-        parts.push(functionCode);
-        parts.push("");
-        count++;
-      }
-    }
-  }
+  files.push(...serviceFiles.map((f) => f.path));
+
+  // Step 3: services/index.ts 生成・書き込み
+  const tags = Object.keys(servicesByTag);
+  const indexContent = generateServicesIndex(tags);
+  await writer.write("services/index.ts", indexContent);
+  files.push("services/index.ts");
 
   return {
-    code: parts.join("\n"),
-    count,
+    files,
+    count: serviceFiles.length,
   };
-}
-
-// === in-source testing ===
-if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
-
-  describe("services generator", () => {
-    describe("generateServices", () => {
-      it("should generate service functions from XcgenIR", () => {
-        const ir: XcgenIR = {
-          metadata: {
-            title: "Pet Store API",
-            version: "1.0.0",
-          },
-          models: [],
-          tags: [],
-          endpoints: [
-            {
-              path: "/pets/{petId}",
-              method: "get",
-              operationId: "getPet",
-              summary: "Get a pet by ID",
-              tags: [],
-              parameters: [],
-              responses: [
-                {
-                  kind: "content",
-                  statusCode: "200",
-                  description: "Success",
-                  content: [
-                    {
-                      mimeType: "application/json",
-                      schema: { kind: "ref", name: "Pet" },
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        };
-
-        const result = generateServices(ir);
-
-        expect(result.count).toBe(1);
-        expect(result.code).toContain("export async function getPet");
-        expect(result.code).toContain("init?: RequestInit");
-        expect(result.code).toContain("options: {}");
-        expect(result.code).toContain("Promise<Pet>");
-      });
-    });
-  });
 }

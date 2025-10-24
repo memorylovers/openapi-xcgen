@@ -1,7 +1,6 @@
 /**
- * TypeScript type definitions
- * Generated from: OpenAPI 3.1.0 discriminator one of example 1.0.0
- * DO NOT EDIT - This file is auto-generated
+ * Bar model
+ * Auto-generated from OpenAPI specification
  */
 
 import type { Qux } from './Qux';

@@ -1,7 +1,6 @@
 /**
- * TypeScript type definitions
- * Generated from: OpenAPI 3.1.0 discriminator one of example 1.0.0
- * DO NOT EDIT - This file is auto-generated
+ * Quux model
+ * Auto-generated from OpenAPI specification
  */
 
 export type Quux = "Bar" | "Baz";

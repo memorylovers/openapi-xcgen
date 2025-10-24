@@ -3,4 +3,4 @@
  * Auto-generated from OpenAPI specification
  */
 
-export * from './users';
+export * from './default';

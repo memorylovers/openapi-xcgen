@@ -1,7 +1,6 @@
 /**
  * API service functions
- * Generated from: Validation Model Test 1.0.0
- * DO NOT EDIT - This file is auto-generated
+ * Auto-generated from OpenAPI specification
  */
 
-import type { XcgenApiError as _XcgenApiError } from '../client';
+export * from './default';

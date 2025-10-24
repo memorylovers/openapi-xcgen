@@ -1,13 +1,12 @@
 /**
  * Valibot validation schemas
- * Generated from: OpenAPI 3.1.0 discriminator one of example 1.0.0
- * DO NOT EDIT - This file is auto-generated
+ * Auto-generated from OpenAPI specification
  */
 
-export { BarSchema } from './BarSchema';
-export { BazSchema } from './BazSchema';
-export { FooSchema } from './FooSchema';
-export { QuxSchema } from './QuxSchema';
-export { QuuxSchema } from './QuuxSchema';
-export { QuuzSchema } from './QuuzSchema';
-export { SpæcialSchema } from './SpæcialSchema';
+export * from './QuuxSchema';
+export * from './QuxSchema';
+export * from './BarSchema';
+export * from './BazSchema';
+export * from './FooSchema';
+export * from './SpæcialSchema';
+export * from './QuuzSchema';

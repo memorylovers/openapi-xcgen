@@ -16,6 +16,9 @@ export default [
       "tests/e2e/fixtures/*/expected/**",
       "tests/e2e/fixtures/*/*/expected/**",
       "tests/e2e/fixtures/*/*/*/expected/**",
+      "tests/e2e/fixtures/*/expected-valibot/**",
+      "tests/e2e/fixtures/*/*/expected-valibot/**",
+      "tests/e2e/fixtures/*/*/*/expected-valibot/**",
     ],
   },
 ];

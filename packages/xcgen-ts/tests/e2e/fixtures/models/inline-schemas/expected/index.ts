@@ -5,6 +5,5 @@
  */
 
 export * from './models/index';
-export * from './schemas/index';
 export * from './services/index';
 export { setConfig, XcgenApiError, type ApiConfig } from './client';

@@ -24,10 +24,24 @@ export interface GeneratorOptions {
 export type GeneratedFileType = "types" | "schemas" | "services" | "client";
 
 /**
- * 生成結果
+ * 個別生成器の生成結果
+ *
+ * Types/Schemas/Services生成器が返す結果
+ */
+export interface GeneratorResult {
+  /** 書き込まれたファイルパスの配列（相対パス） */
+  files: string[];
+  /** 生成されたモデル/スキーマ/サービスの数 */
+  count: number;
+}
+
+/**
+ * 全体の生成結果
+ *
+ * メインのgenerate()関数が返す結果
  */
 export interface GenerationResult {
-  /** 生成されたファイルパスの配列 */
+  /** 生成されたファイルパスの配列（絶対パス） */
   files: string[];
   /** 生成された型定義の数 */
   typesCount: number;
