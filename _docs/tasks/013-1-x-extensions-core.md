@@ -8,7 +8,7 @@ OpenAPI の拡張構文（x-プレフィックス）を IR（中間表現）で�
 
 ## ステータス
 
-- 状態: 未実施
+- 状態: 完了
 
 ## 前提条件
 
@@ -943,14 +943,14 @@ components:
 
 ## 検証項目
 
-- [ ] `extractExtensions()` のin-sourceテストがすべてパス
-- [ ] IR 型定義に `extensions` フィールドが追加されている
-- [ ] 各 visitor が `extensions` を正しく設定している
-- [ ] E2E テストで x-* フィールドが IR に保持されている
-- [ ] ビルドが成功すること（`pnpm build`）
-- [ ] 型チェックが通ること（`pnpm typecheck`）
-- [ ] 全テストがパスすること（`pnpm test`）
-- [ ] Lintエラーがないこと（`pnpm lint`）
+- [x] `extractExtensions()` のin-sourceテストがすべてパス
+- [x] IR 型定義に `extensions` フィールドが追加されている
+- [x] 各 visitor が `extensions` を正しく設定している
+- [x] E2E テストで x-* フィールドが IR に保持されている
+- [x] ビルドが成功すること（`pnpm build`）
+- [x] 型チェックが通ること（`pnpm typecheck`）
+- [x] 全テストがパスすること（`pnpm test`）
+- [x] Lintエラーがないこと（`pnpm lint`）
 
 ## 非機能要件
 
@@ -1101,3 +1101,32 @@ if (property.extensions?.["x-type"]) {
 - [OpenAPI Specification 3.1.0 - Specification Extensions](https://spec.openapis.org/oas/v3.1.0#specification-extensions)
 - [OpenAPI 3.1.0 変更点](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0)
 - 親タスク: [013-x-extensions-support.md](./013-x-extensions-support.md)
+
+## 完了サマリー
+
+### 実装内容
+
+- **Extensions型定義**: `ExtensionValue` (再帰型) と `Extensions` 型を作成
+- **IR型への追加**: 10種類のIR型に `extensions?: Extensions` フィールドを追加
+- **extractExtensionsヘルパー**: 13個のin-sourceテストで検証済み
+- **Visitor更新**: 全visitorで x-extensions 抽出を実装
+  - property-visitor, parameter-visitor, schema-visitor
+  - operation-visitor (Path Item + Operation 統合実装)
+  - path-item-visitor, request-body-visitor, response-visitor
+- **Parameter伝播**: parameterからpropertyへextensionsを伝播
+- **E2Eテスト**: 3ケース追加 (basic, merge, types)
+- **型安全性向上**: `ExtensibleOpenAPIObject` ユニオン型の導入
+
+### 検証結果
+
+- ✅ typecheck: pass
+- ✅ build: pass (245 kB)
+- ✅ lint: pass
+- ✅ test: 434/434 pass
+- ✅ coverage: 93.86%
+
+### コミット
+
+- コミットハッシュ: 27746a9
+- ブランチ: feat/issue-6-x-extensions
+- 変更ファイル: 30 files, 1358 insertions(+)

@@ -8,7 +8,7 @@ OpenAPIの拡張構文（x-プレフィックス）をサポートし、言語�
 
 ## ステータス
 
-- 状態: 実装中
+- 状態: Phase 1完了、Phase 2準備中
 
 ## 前提条件
 
@@ -111,11 +111,13 @@ components:
 
 #### 実装タスク
 
-- [ ] IR型定義に `extensions?: Record<string, unknown>` を追加
-- [ ] Transformer の visitor で OpenAPI の `x-*` フィールドを抽出
-- [ ] In-source テストで extensions の保持を検証
+- [x] IR型定義に `extensions?: Record<string, unknown>` を追加
+- [x] Transformer の visitor で OpenAPI の `x-*` フィールドを抽出
+- [x] In-source テストで extensions の保持を検証
 
 ### Phase 2: xcgen-ts - Hook 機構の導入
+
+詳細: [013-2-x-extensions-xcgen-ts-hooks.md](./013-2-x-extensions-xcgen-ts-hooks.md)
 
 #### Phase 2 - 対象ファイル
 
@@ -192,10 +194,10 @@ components:
 
 ## 検証
 
-- [ ] ビルドが正常に完了すること（`pnpm build`）
-- [ ] 型チェックが通ること（`pnpm typecheck`）
-- [ ] 全テストがパスすること（`pnpm test`）
-- [ ] Lintエラーがないこと（`pnpm lint`）
+- [x] ビルドが正常に完了すること（`pnpm build`）
+- [x] 型チェックが通ること（`pnpm typecheck`）
+- [x] 全テストがパスすること（`pnpm test`）
+- [x] Lintエラーがないこと（`pnpm lint`）
 - [ ] E2Eテストで x-extensions を含む OpenAPI からコード生成できること
 - [ ] 生成されたコードが期待通りの型・バリデーションを含むこと
 
