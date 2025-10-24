@@ -1,5 +1,5 @@
 import { consola } from "consola";
-import type { IRUnionModel, XcgenIR } from "../../types/index.js";
+import type { IRUnionModel, XcgenIR } from "../../types/index";
 
 /**
  * discriminator.mappingを自動生成（Phase 2 post-processing）

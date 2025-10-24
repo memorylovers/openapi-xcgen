@@ -2,12 +2,12 @@
  * request関数生成
  */
 
-import { generateRequestSignature } from "./client-request-signature.js";
-import { generateUrlBuildingCode } from "./client-request-url.js";
-import { generateHeaderBuildingCode } from "./client-request-headers.js";
-import { generateFetchCode } from "./client-request-fetch.js";
-import { generateErrorHandlingCode } from "./client-request-error.js";
-import { generateResponseParseCode } from "./client-request-response.js";
+import { generateRequestSignature } from "./client-request-signature";
+import { generateUrlBuildingCode } from "./client-request-url";
+import { generateHeaderBuildingCode } from "./client-request-headers";
+import { generateFetchCode } from "./client-request-fetch";
+import { generateErrorHandlingCode } from "./client-request-error";
+import { generateResponseParseCode } from "./client-request-response";
 
 /**
  * request関数のTypeScriptコードを生成

@@ -8,7 +8,7 @@ import type {
   RequestBodyContext,
   ResponseContext,
   VisitorContext,
-} from "../transformer/types.js";
+} from "../transformer/types";
 import type { IRAllOfModel, IRModel, ReferenceObject } from "./index";
 
 /**

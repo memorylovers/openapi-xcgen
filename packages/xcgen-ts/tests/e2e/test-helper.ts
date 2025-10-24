@@ -37,12 +37,12 @@
  */
 
 import { consola } from "consola";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir, readdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "vitest";
-import { generate } from "../../src/generator.js";
-import type { GeneratorOptions } from "../../src/types.js";
+import { generate } from "../../src/generator";
+import type { GeneratorOptions } from "../../src/types";
 import { tmpdir } from "node:os";
 
 // Get the directory of this file
@@ -51,21 +51,33 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageDir = join(__dirname, "..", "..");
 
 /**
- * デバッグ用定数: trueに設定すると実際の生成結果を.actual.tsファイルに出力
- * テスト失敗時のデバッグに使用（通常はfalse）
- *
- * 使い方:
- * 1. この定数をtrueに変更
- * 2. テストを実行（pnpm test）
- * 3. 生成された.actual.tsと.expected.tsを比較
- * 4. デバッグ完了後、falseに戻す
+ * Recursively compare two directories
  */
-const WRITE_ACTUAL_FILES = false;
+async function compareDirectories(
+  expectedDir: string,
+  actualDir: string,
+  relativePath: string = "",
+): Promise<void> {
+  const expectedEntries = await readdir(expectedDir, { withFileTypes: true });
 
-/**
- * 生成ファイルの種類
- */
-type GeneratedFileType = "types" | "schemas" | "services" | "client";
+  for (const entry of expectedEntries) {
+    const expectedPath = join(expectedDir, entry.name);
+    const actualPath = join(actualDir, entry.name);
+    const currentRelativePath = relativePath
+      ? `${relativePath}/${entry.name}`
+      : entry.name;
+
+    if (entry.isDirectory()) {
+      // Recursively compare subdirectories
+      await compareDirectories(expectedPath, actualPath, currentRelativePath);
+    } else {
+      // Compare files
+      const expected = await readFile(expectedPath, "utf-8");
+      const actual = await readFile(actualPath, "utf-8");
+      expect(actual.trim()).toEqual(expected.trim());
+    }
+  }
+}
 
 /**
  * OpenAPI仕様書からTypeScriptコードを生成し、期待値と比較するテスト実行関数
@@ -106,131 +118,46 @@ export async function compareWithExpected(
       ...options,
     });
 
-    // 生成されたファイルを検証
-    const fileTypes: GeneratedFileType[] = ["types", "services", "client"];
+    // Use expected-valibot/ directory when validator is specified
+    const expectedDirName =
+      options?.validator === "valibot" ? "expected-valibot" : "expected";
+    const expectedDir = join(fixtureDir, expectedDirName);
+
+    // 1. Compare models/ directory (replaces old types.ts)
+    await compareDirectories(
+      join(expectedDir, "models"),
+      join(outputDir, "models"),
+      "models",
+    );
+
+    // 2. Compare schemas/ directory if validator is enabled (replaces old schemas.ts)
     if (options?.validator === "valibot") {
-      // validator指定時はschemas.tsも検証
-      fileTypes.splice(1, 0, "schemas");
+      await compareDirectories(
+        join(expectedDir, "schemas"),
+        join(outputDir, "schemas"),
+        "schemas",
+      );
     }
 
-    for (const fileType of fileTypes) {
-      await compareFile(fixtureDir, outputDir, fileType);
+    // 3. Compare services/ directory (replaces old services.ts)
+    await compareDirectories(
+      join(expectedDir, "services"),
+      join(outputDir, "services"),
+      "services",
+    );
+
+    // 4. Compare individual files (client.ts, index.ts)
+    const individualFiles = ["client.ts", "index.ts"];
+    for (const fileName of individualFiles) {
+      const expectedPath = join(expectedDir, fileName);
+      const actualPath = join(outputDir, fileName);
+      const expected = await readFile(expectedPath, "utf-8");
+      const actual = await readFile(actualPath, "utf-8");
+      expect(actual.trim()).toEqual(expected.trim());
     }
 
     consola.success(`✅ ${testCase}: All files match expected output`);
   } finally {
     // クリーンアップ（一時ディレクトリは自動削除される）
-  }
-}
-
-/**
- * 単一ファイルの比較
- */
-async function compareFile(
-  fixtureDir: string,
-  outputDir: string,
-  fileType: GeneratedFileType,
-): Promise<void> {
-  const fileName = `${fileType}.ts`;
-  const expectedPath = join(fixtureDir, "expected", fileName);
-  const actualPath = join(outputDir, fileName);
-
-  // 生成されたファイルを読み込み
-  const actual = await readFile(actualPath, "utf-8");
-
-  // デバッグ用: 実際の生成結果をファイルに出力
-  if (WRITE_ACTUAL_FILES) {
-    const actualOutputPath = join(fixtureDir, `${fileType}.actual.ts`);
-    await writeFile(actualOutputPath, actual, "utf-8");
-    consola.info(
-      `✍️  Wrote actual output to: ${actualOutputPath.replace(packageDir, ".")}`,
-    );
-  }
-
-  // 期待値ファイルの読み込み
-  const expected = await readFile(expectedPath, "utf-8");
-
-  // 実際の生成結果と期待値を比較
-  expect(actual.trim()).toEqual(expected.trim());
-}
-
-/**
- * 現在の生成実装から期待値ファイルを生成する関数
- *
- * 使用場面:
- * 1. 新しいテストケースの初期セットアップ時
- * 2. 生成ロジックの意図的な変更後の期待値更新
- * 3. TDDのGreenフェーズで実装が完成した時点での期待値記録
- *
- * 注意事項:
- * - この関数は現在の実装の出力をそのまま期待値として保存します
- * - バグのある出力も期待値として保存されるため、生成後は必ず内容を確認してください
- * - 生成された期待値はGitで管理され、変更履歴が追跡されます
- *
- * @param testCase - fixturesディレクトリからの相対パス（例: "petstore"）
- * @param options - 生成オプション（validator等）
- *
- * @example
- * ```typescript
- * // generate-expected.tsスクリプトで使用
- * await generateExpected("petstore", { validator: "valibot" });
- * // → fixtures/petstore/openapi.yaml を生成し、
- * //   fixtures/petstore/expected/*.ts に保存
- * ```
- */
-export async function generateExpected(
-  testCase: string,
-  options?: Partial<Omit<GeneratorOptions, "input" | "output">>,
-): Promise<void> {
-  const fixtureDir = join(packageDir, "tests", "e2e", "fixtures", testCase);
-  const inputPath = join(fixtureDir, "openapi.yaml");
-
-  // 一時ディレクトリに生成
-  const outputDir = join(tmpdir(), `xcgen-expected-${Date.now()}`);
-  await mkdir(outputDir, { recursive: true });
-
-  // 現在の実装で生成処理を実行
-  await generate({
-    input: inputPath,
-    output: outputDir,
-    ...options,
-  });
-
-  // 生成されたファイルを期待値として保存
-  const fileTypes: GeneratedFileType[] = ["types", "services", "client"];
-  if (options?.validator === "valibot") {
-    fileTypes.splice(1, 0, "schemas");
-  }
-
-  // expected/ディレクトリを作成
-  const expectedDir = join(fixtureDir, "expected");
-  await mkdir(expectedDir, { recursive: true });
-
-  // Copy generated TypeScript files
-  for (const fileType of fileTypes) {
-    const fileName = `${fileType}.ts`;
-    const sourcePath = join(outputDir, fileName);
-    const targetPath = join(expectedDir, fileName);
-
-    const content = await readFile(sourcePath, "utf-8");
-    await writeFile(targetPath, content, "utf-8");
-    consola.success(`Generated: ${targetPath.replace(packageDir, ".")}`);
-  }
-
-  // Copy configuration files
-  const fixturesDir = join(packageDir, "tests", "e2e", "fixtures");
-
-  // Copy tsconfig.json
-  const tsconfigTemplate = join(fixturesDir, "tsconfig.template.json");
-  const tsconfigTarget = join(expectedDir, "tsconfig.json");
-  const tsconfigContent = await readFile(tsconfigTemplate, "utf-8");
-  await writeFile(tsconfigTarget, tsconfigContent, "utf-8");
-
-  // Copy package.json (only when schemas.ts is generated)
-  if (options?.validator === "valibot") {
-    const packageTemplate = join(fixturesDir, "package.template.json");
-    const packageTarget = join(expectedDir, "package.json");
-    const packageContent = await readFile(packageTemplate, "utf-8");
-    await writeFile(packageTarget, packageContent, "utf-8");
   }
 }

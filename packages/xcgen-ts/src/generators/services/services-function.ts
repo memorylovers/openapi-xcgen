@@ -3,9 +3,9 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
-import { toFunctionName } from "../../helpers/naming.js";
-import { getResponseType } from "./services-response-type.js";
-import { getEndpointDataTypes } from "./services-data-types.js";
+import { toFunctionName } from "../../helpers/naming";
+import { getResponseType } from "./services-response-type";
+import { getEndpointDataTypes } from "./services-data-types";
 
 /**
  * IREndpointからAPI関数を生成

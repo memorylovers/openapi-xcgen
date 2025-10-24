@@ -3,8 +3,8 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { getEndpointDataTypes } from "./services-data-types.js";
+import { toTypeName } from "../../helpers/naming";
+import { getEndpointDataTypes } from "./services-data-types";
 
 /**
  * サービスファイルのインポート文を生成
@@ -14,10 +14,10 @@ import { getEndpointDataTypes } from "./services-data-types.js";
 export function generateServicesImports(endpoints: IREndpoint[]): string {
   const lines: string[] = [];
 
-  // clientのインポート
-  lines.push('import { request } from "./client";');
+  // clientのインポート（servicesはservices/ディレクトリ内なので相対パス）
+  lines.push('import { request } from "../client";');
   lines.push(
-    'import type { XcgenApiError as _XcgenApiError } from "./client";',
+    'import type { XcgenApiError as _XcgenApiError } from "../client";',
   );
 
   // 型定義のインポート（必要な型のみ）
@@ -63,10 +63,10 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
 
   if (importedTypes.size > 0) {
     const types = Array.from(importedTypes).join(", ");
-    // Import types for use in this file
-    lines.push(`import type { ${types} } from "./types";`);
+    // Import types for use in this file（型定義はmodels/index.tsから）
+    lines.push(`import type { ${types} } from "../models/index";`);
     // Re-export types for user convenience
-    lines.push(`export type { ${types} } from "./types";`);
+    lines.push(`export type { ${types} } from "../models/index";`);
   }
 
   return lines.join("\n");
@@ -85,8 +85,8 @@ if (import.meta.vitest) {
 
         expect(result).toEqual(
           `
-import { request } from "./client";
-import type { XcgenApiError as _XcgenApiError } from "./client";
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
 `.trim(),
         );
       });
@@ -119,10 +119,10 @@ import type { XcgenApiError as _XcgenApiError } from "./client";
 
         expect(result).toEqual(
           `
-import { request } from "./client";
-import type { XcgenApiError as _XcgenApiError } from "./client";
-import type { Pet } from "./types";
-export type { Pet } from "./types";
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
+import type { Pet } from "../models/index";
+export type { Pet } from "../models/index";
 `.trim(),
         );
       });
@@ -142,8 +142,8 @@ export type { Pet } from "./types";
 
         expect(result).toEqual(
           `
-import { request } from "./client";
-import type { XcgenApiError as _XcgenApiError } from "./client";
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
 `.trim(),
         );
       });
@@ -188,10 +188,10 @@ import type { XcgenApiError as _XcgenApiError } from "./client";
         // Should only import GetBookings200Response, not Problem
         expect(result).toEqual(
           `
-import { request } from "./client";
-import type { XcgenApiError as _XcgenApiError } from "./client";
-import type { GetBookings200Response } from "./types";
-export type { GetBookings200Response } from "./types";
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
+import type { GetBookings200Response } from "../models/index";
+export type { GetBookings200Response } from "../models/index";
 `.trim(),
         );
       });

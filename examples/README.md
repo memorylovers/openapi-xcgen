@@ -125,7 +125,7 @@ examples/
 All API calls are fully type-safe with TypeScript:
 
 ```typescript
-import { listPets, type Pet } from "./generated/services.js";
+import { listPets, type Pet } from "./generated/services";
 
 // Response is typed as Pet[]
 const pets: Pet[] = await listPets();
@@ -136,7 +136,7 @@ const pets: Pet[] = await listPets();
 Comprehensive error handling with detailed response information:
 
 ```typescript
-import { XcgenApiError } from "./generated/client.js";
+import { XcgenApiError } from "./generated/client";
 
 try {
   const pet = await getPetById({ path: { petId: "123" } });
@@ -153,7 +153,7 @@ try {
 Configure base URL, headers, and custom fetch:
 
 ```typescript
-import { setConfig } from "./generated/client.js";
+import { setConfig } from "./generated/client";
 
 setConfig({
   baseUrl: "https://api.example.com",
@@ -169,7 +169,7 @@ Use Valibot schemas for runtime validation:
 
 ```typescript
 import { parse } from "valibot";
-import { PetSchema } from "./generated/schemas.js";
+import { PetSchema } from "./generated/schemas";
 
 // Validate response data at runtime
 const validatedPet = parse(PetSchema, responseData);

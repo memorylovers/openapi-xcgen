@@ -4,255 +4,73 @@
  * IRModelからTypeScriptの型定義（interface, type, enum）を生成する
  */
 
-import type { IRModel, XcgenIR } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { generateObjectType } from "./types-object.js";
-import { generateEnumType } from "./types-enum.js";
-import { generateArrayType } from "./types-array.js";
-import { generateMapType } from "./types-map.js";
-import { generateAllOfType } from "./types-allof.js";
-import { generateAnyOfType } from "./types-anyof.js";
-import { generateUnionType } from "./types-union.js";
-import {
-  generateParameterType,
-  generateUnifiedParameterType,
-} from "./types-parameter.js";
+import type { XcgenIR } from "@openapi-xcgen/core";
+import type { IFileWriter } from "../../helpers/file-writer";
+import type { GeneratorResult } from "../../types";
+import { runInParallel } from "../../helpers/parallel";
+import { buildUnifiedParameterTypesMap } from "./helpers/build-unified-parameter-map";
+import { generateModelFile } from "./helpers/generate-model-file";
+import { generateModelsIndex } from "./helpers/generate-index";
 
 /**
- * 生成されたTypeScriptコード
- */
-export interface GeneratedTypes {
-  /** 生成されたTypeScriptコード */
-  code: string;
-  /** 生成された型定義の数 */
-  count: number;
-}
-
-/**
- * XcgenIRからTypeScript型定義を生成
+ * XcgenIRからTypeScript型定義を生成（ディレクトリベース構造）
+ *
+ * models/ディレクトリに個別のファイルとして生成し、並列書き込みを行う
+ *
  * @param ir - 中間表現
- * @returns 生成されたTypeScriptコード
+ * @param writer - ファイル書き込みインターフェース
+ * @returns 生成結果（ファイルパス配列とカウント）
  *
  * @example
  * ```typescript
  * const ir: XcgenIR = { ... };
- * const result = generateTypes(ir);
- * console.log(result.code); // TypeScript型定義
- * console.log(result.count); // 5 (型の数)
+ * const writer = new FileWriter('./output');
+ * const result = await generateTypes(ir, writer);
+ * console.log(result.files); // ['models/Pet.ts', 'models/User.ts', 'models/index.ts']
+ * console.log(result.count); // 2 (Pet, User)
  * ```
  */
-export function generateTypes(ir: XcgenIR): GeneratedTypes {
-  const lines: string[] = [];
-
-  // ファイルヘッダー
-  lines.push("/**");
-  lines.push(" * TypeScript type definitions");
-  lines.push(` * Generated from: ${ir.metadata.title} ${ir.metadata.version}`);
-  lines.push(" * DO NOT EDIT - This file is auto-generated");
-  lines.push(" */");
-  lines.push("");
-
-  let count = 0;
+export async function generateTypes(
+  ir: XcgenIR,
+  writer: IFileWriter,
+): Promise<GeneratorResult> {
+  const files: string[] = [];
 
   // endpointsを走査して、統合型が必要なparameterモデルを検出
-  // Map<parameterReferencePath, requestBodyTypeName>
-  const unifiedParameterTypes = new Map<string, string>();
+  const unifiedParameterTypes = buildUnifiedParameterTypesMap(ir);
 
-  for (const endpoint of ir.endpoints) {
-    // parametersとrequestBodyの両方がある場合
-    if (
-      !Array.isArray(endpoint.parameters) &&
-      typeof endpoint.parameters !== "string" &&
-      endpoint.parameters?.kind === "ref" &&
-      endpoint.requestBody?.kind === "content"
-    ) {
-      const parameterPath = endpoint.parameters.name;
+  // Step 1: IR → Code (純粋関数による変換)
+  const modelFiles = ir.models
+    .map((model) => {
+      const isUnified = unifiedParameterTypes.has(model.referencePath);
+      const requestBodyTypeName = isUnified
+        ? unifiedParameterTypes.get(model.referencePath)!
+        : undefined;
 
-      // requestBodyの型名を抽出
-      for (const content of endpoint.requestBody.content) {
-        if (
-          typeof content.schema !== "string" &&
-          content.schema.kind === "ref"
-        ) {
-          const requestBodyModelName =
-            content.schema.name.split("/").at(-1) ?? content.schema.name;
-          const requestBodyTypeName = toTypeName(requestBodyModelName);
-          unifiedParameterTypes.set(parameterPath, requestBodyTypeName);
-          break; // 最初のスキーマのみ使用
-        }
-      }
-    }
-  }
+      return {
+        path: `models/${model.name}.ts`,
+        content: generateModelFile(model, requestBodyTypeName),
+      };
+    })
+    .filter((f) => f.content !== null) as Array<{
+    path: string;
+    content: string;
+  }>;
 
-  // 各モデルを変換
-  for (const model of ir.models) {
-    let typeCode: string | null = null;
+  // Step 2: Code → Write (並列書き込み、並列数制限あり)
+  await runInParallel(modelFiles, (file) =>
+    writer.write(file.path, file.content),
+  );
 
-    // parameterモデルで統合型が必要な場合
-    if (
-      model.kind === "parameter" &&
-      unifiedParameterTypes.has(model.referencePath)
-    ) {
-      const requestBodyTypeName = unifiedParameterTypes.get(
-        model.referencePath,
-      )!;
-      typeCode = generateUnifiedParameterType(model, requestBodyTypeName);
-    } else {
-      typeCode = generateModel(model);
-    }
+  files.push(...modelFiles.map((f) => f.path));
 
-    if (typeCode) {
-      lines.push(typeCode);
-      lines.push("");
-      count++;
-    }
-  }
+  // Step 3: models/index.ts 生成・書き込み
+  const indexContent = generateModelsIndex(ir.models);
+  await writer.write("models/index.ts", indexContent);
+  files.push("models/index.ts");
 
   return {
-    code: lines.join("\n"),
-    count,
+    files,
+    count: modelFiles.length,
   };
-}
-
-/**
- * IRModelをTypeScript型定義に変換
- * @param model - IRモデル
- * @returns TypeScript型定義コード
- */
-export function generateModel(model: IRModel): string | null {
-  switch (model.kind) {
-    case "object":
-    case "requestBody":
-    case "response":
-      return generateObjectType(model);
-
-    case "enum":
-      return generateEnumType(model);
-
-    case "array":
-      return generateArrayType(model);
-
-    case "map":
-      return generateMapType(model);
-
-    case "allOf":
-      return generateAllOfType(model);
-
-    case "anyOf":
-      return generateAnyOfType(model);
-
-    case "union":
-      return generateUnionType(model);
-
-    case "parameter":
-      return generateParameterType(model);
-
-    default: {
-      // Exhaustive check
-      const _: never = model;
-      void _;
-      return null;
-    }
-  }
-}
-
-// === in-source testing ===
-if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
-
-  describe("types generator", () => {
-    describe("generateTypes", () => {
-      it("should generate types from XcgenIR", () => {
-        const ir: XcgenIR = {
-          metadata: {
-            title: "Pet Store API",
-            version: "1.0.0",
-          },
-          models: [
-            {
-              kind: "object",
-              name: "Pet",
-              referencePath: "#/components/schemas/Pet",
-              properties: [
-                {
-                  name: "id",
-                  type: "int",
-                  required: true,
-                },
-                {
-                  name: "name",
-                  type: "string",
-                  required: true,
-                },
-              ],
-            },
-          ],
-          tags: [],
-          endpoints: [],
-        };
-
-        const result = generateTypes(ir);
-
-        expect(result.count).toBe(1);
-        expect(result.code.trim()).toEqual(
-          `
-/**
- * TypeScript type definitions
- * Generated from: Pet Store API 1.0.0
- * DO NOT EDIT - This file is auto-generated
- */
-
-export interface Pet {
-  id: number;
-  name: string;
-}
-`.trim(),
-        );
-      });
-    });
-
-    describe("generateModel", () => {
-      it("should generate object type", () => {
-        const model: IRModel = {
-          kind: "object",
-          name: "User",
-          referencePath: "#/components/schemas/User",
-          properties: [
-            {
-              name: "email",
-              type: "string",
-              required: true,
-            },
-          ],
-        };
-
-        const result = generateModel(model);
-
-        expect(result).toEqual(
-          `
-export interface User {
-  email: string;
-}
-`.trim(),
-        );
-      });
-
-      it("should generate enum type", () => {
-        const model: IRModel = {
-          kind: "enum",
-          name: "Status",
-          referencePath: "#/components/schemas/Status",
-          type: "string",
-          values: [
-            { value: "active", name: "ACTIVE" },
-            { value: "inactive", name: "INACTIVE" },
-          ],
-        };
-
-        const result = generateModel(model);
-
-        expect(result).toEqual('export type Status = "active" | "inactive";');
-      });
-    });
-  });
 }

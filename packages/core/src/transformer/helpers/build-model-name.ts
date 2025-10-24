@@ -1,4 +1,4 @@
-import type { VisitorContextKind } from "../types.js";
+import type { VisitorContextKind } from "../types";
 
 /**
  * インラインスキーマのモデル名を生成

@@ -23,8 +23,8 @@ import type {
   SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { isPathsResponseContext } from "../../../types/guards.js";
-import { getModelName } from "../../helpers/get-model-name.js";
+import { isPathsResponseContext } from "../../../types/guards";
+import { getModelName } from "../../helpers/get-model-name";
 import type { ResponseContext } from "../../types";
 import { visitResponseObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";

@@ -5,7 +5,7 @@
  */
 
 import type { IRType } from "@openapi-xcgen/core";
-import { toTypeName } from "./naming.js";
+import { toTypeName } from "./naming";
 
 /**
  * IRTypeをTypeScript型文字列に変換

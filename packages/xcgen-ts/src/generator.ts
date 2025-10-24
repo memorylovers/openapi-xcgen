@@ -7,16 +7,16 @@
 import type { XcgenIR } from "@openapi-xcgen/core";
 import { parse, transform } from "@openapi-xcgen/core";
 import { consola } from "consola";
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { generateClient } from "./generators/client/client.js";
-import { generateSchemas } from "./generators/schemas/schemas.js";
-import { generateServices } from "./generators/services/services.js";
-import { generateTypes } from "./generators/types/types.js";
-import type { GenerationResult, GeneratorOptions } from "./types.js";
+import { join } from "node:path";
+import { generateClient } from "./generators/client/client";
+import { generateSchemas } from "./generators/schemas/schemas";
+import { generateServices } from "./generators/services/services";
+import { generateTypes } from "./generators/types/types";
+import { FileWriter } from "./helpers/file-writer";
+import type { GenerationResult, GeneratorOptions } from "./types";
 
 /**
- * TypeScriptコードを生成する
+ * TypeScriptコードを生成する（ディレクトリベース構造）
  * @param options - 生成器オプション
  * @returns 生成結果
  *
@@ -46,65 +46,83 @@ export async function generate(
     `Found ${ir.models.length} models, ${ir.endpoints.length} endpoints`,
   );
 
-  // 3. Generate code
-  const files: string[] = [];
+  // 3. Generate code with directory-based structure
+  consola.info("Generating code...");
+  const writer = new FileWriter(options.output);
+  const allFiles: string[] = [];
 
-  // 3.1 Generate types.ts
+  // 3.1 Types生成（内部でrunInParallel()使用、並列数制限あり）
   consola.info("Generating types...");
-  const typesResult = generateTypes(ir);
-  const typesPath = join(options.output, "types.ts");
-  await ensureDir(dirname(typesPath));
-  await writeFile(typesPath, typesResult.code, "utf-8");
-  files.push(typesPath);
-  consola.success(`Generated ${typesResult.count} types → ${typesPath}`);
+  const typesResult = await generateTypes(ir, writer);
+  allFiles.push(...typesResult.files);
+  consola.success(`Generated ${typesResult.count} types → models/ directory`);
 
-  // 3.2 Generate services.ts
-  consola.info("Generating services...");
-  const servicesResult = generateServices(ir);
-  const servicesPath = join(options.output, "services.ts");
-  await writeFile(servicesPath, servicesResult.code, "utf-8");
-  files.push(servicesPath);
-  consola.success(
-    `Generated ${servicesResult.count} services → ${servicesPath}`,
-  );
-
-  // 3.3 Generate client.ts
-  consola.info("Generating client...");
-  const clientResult = generateClient(ir);
-  const clientPath = join(options.output, "client.ts");
-  await writeFile(clientPath, clientResult.code, "utf-8");
-  files.push(clientPath);
-  consola.success(`Generated client → ${clientPath}`);
-
-  // 3.4 Generate schemas.ts (if validator is specified)
-  let schemasCount: number | undefined;
+  // 3.2 Schemas生成（内部でrunInParallel()使用、並列数制限あり）
+  let schemasResult;
   if (options.validator === "valibot") {
     consola.info("Generating Valibot schemas...");
-    const schemasResult = generateSchemas(ir);
-    const schemasPath = join(options.output, "schemas.ts");
-    await writeFile(schemasPath, schemasResult.code, "utf-8");
-    files.push(schemasPath);
-    schemasCount = schemasResult.count;
+    schemasResult = await generateSchemas(ir, writer);
+    allFiles.push(...schemasResult.files);
     consola.success(
-      `Generated ${schemasResult.count} schemas → ${schemasPath}`,
+      `Generated ${schemasResult.count} schemas → schemas/ directory`,
     );
   }
 
+  // 3.3 Services生成（内部でrunInParallel()使用、並列数制限あり）
+  consola.info("Generating services...");
+  const servicesResult = await generateServices(ir, writer);
+  allFiles.push(...servicesResult.files);
   consola.success(
-    `✅ Successfully generated ${files.length} files in ${options.output}`,
+    `Generated ${servicesResult.count} services → services/ directory`,
+  );
+
+  // 3.4 client.ts と index.ts を並列書き込み
+  consola.info("Generating client and index...");
+  const clientCode = generateClient(ir);
+  const indexCode = generateTopLevelIndex(ir, options);
+
+  await Promise.all([
+    writer.write("client.ts", clientCode.code),
+    writer.write("index.ts", indexCode),
+  ]);
+
+  allFiles.push("client.ts", "index.ts");
+  consola.success("Generated client.ts and index.ts");
+
+  consola.success(
+    `✅ Successfully generated ${allFiles.length} files in ${options.output}`,
   );
 
   return {
-    files,
+    files: allFiles.map((f) => join(options.output, f)),
     typesCount: typesResult.count,
-    schemasCount,
+    schemasCount: schemasResult?.count,
     servicesCount: servicesResult.count,
   };
 }
 
 /**
- * ディレクトリが存在しない場合は作成する
+ * 純粋関数: トップレベルindex.ts コード生成
  */
-async function ensureDir(dir: string): Promise<void> {
-  await mkdir(dir, { recursive: true });
+function generateTopLevelIndex(ir: XcgenIR, options: GeneratorOptions): string {
+  const lines: string[] = [];
+  lines.push("/**");
+  lines.push(" * API Client");
+  lines.push(` * Generated from: ${ir.metadata.title} ${ir.metadata.version}`);
+  lines.push(" * DO NOT EDIT - This file is auto-generated");
+  lines.push(" */");
+  lines.push("");
+
+  lines.push("export * from './models/index';");
+
+  if (options.validator === "valibot") {
+    lines.push("export * from './schemas/index';");
+  }
+
+  lines.push("export * from './services/index';");
+  lines.push(
+    "export { setConfig, XcgenApiError, type ApiConfig } from './client';",
+  );
+
+  return lines.join("\n");
 }

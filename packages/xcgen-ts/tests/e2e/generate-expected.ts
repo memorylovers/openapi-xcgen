@@ -16,19 +16,42 @@
  */
 
 import { consola } from "consola";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import {
+  readFile,
+  writeFile,
+  mkdir,
+  readdir,
+  copyFile,
+} from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
-import { generate } from "../../src/generator.js";
-import type { GeneratorOptions } from "../../src/types.js";
+import { generate } from "../../src/generator";
+import type { GeneratorOptions } from "../../src/types";
 
 // Get the directory of this file
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // Get the packages/generator-typescript directory
 const packageDir = join(__dirname, "..", "..");
 
-type GeneratedFileType = "types" | "schemas" | "services" | "client";
+/**
+ * Recursively copy a directory
+ */
+async function copyDir(src: string, dest: string): Promise<void> {
+  await mkdir(dest, { recursive: true });
+  const entries = await readdir(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = join(src, entry.name);
+    const destPath = join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDir(srcPath, destPath);
+    } else {
+      await copyFile(srcPath, destPath);
+    }
+  }
+}
 
 async function generateExpectedForFixture(
   testCase: string,
@@ -48,25 +71,41 @@ async function generateExpectedForFixture(
     ...options,
   });
 
-  // 生成されたファイルを期待値として保存
-  const fileTypes: GeneratedFileType[] = ["types", "services", "client"];
-  if (options?.validator === "valibot") {
-    fileTypes.splice(1, 0, "schemas");
-  }
-
-  // expected/ディレクトリを作成
-  const expectedDir = join(fixtureDir, "expected");
+  // expected/ディレクトリを作成 (validator指定時は expected-valibot/)
+  const expectedDirName =
+    options?.validator === "valibot" ? "expected-valibot" : "expected";
+  const expectedDir = join(fixtureDir, expectedDirName);
   await mkdir(expectedDir, { recursive: true });
 
-  // Copy generated TypeScript files
-  for (const fileType of fileTypes) {
-    const fileName = `${fileType}.ts`;
+  // Copy generated directories and files
+  // 1. Copy models/ directory (replaces old types.ts)
+  const modelsSourceDir = join(outputDir, "models");
+  const modelsTargetDir = join(expectedDir, "models");
+  await copyDir(modelsSourceDir, modelsTargetDir);
+  consola.success(`Generated: models/ directory`);
+
+  // 2. Copy schemas/ directory if validator is enabled (replaces old schemas.ts)
+  if (options?.validator === "valibot") {
+    const schemasSourceDir = join(outputDir, "schemas");
+    const schemasTargetDir = join(expectedDir, "schemas");
+    await copyDir(schemasSourceDir, schemasTargetDir);
+    consola.success(`Generated: schemas/ directory`);
+  }
+
+  // 3. Copy services/ directory (replaces old services.ts)
+  const servicesSourceDir = join(outputDir, "services");
+  const servicesTargetDir = join(expectedDir, "services");
+  await copyDir(servicesSourceDir, servicesTargetDir);
+  consola.success(`Generated: services/ directory`);
+
+  // 4. Copy individual files (client.ts, index.ts)
+  const individualFiles = ["client.ts", "index.ts"];
+  for (const fileName of individualFiles) {
     const sourcePath = join(outputDir, fileName);
     const targetPath = join(expectedDir, fileName);
-
     const content = await readFile(sourcePath, "utf-8");
     await writeFile(targetPath, content, "utf-8");
-    consola.success(`Generated: ${targetPath.replace(packageDir, ".")}`);
+    consola.success(`Generated: ${fileName}`);
   }
 
   // Copy configuration files

@@ -5,12 +5,12 @@
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
-import { generateApiConfigInterface } from "./client-api-config-interface.js";
-import { generateClientHeader } from "./client-header.js";
-import { generateErrorClass } from "./client-error.js";
-import { generateGlobalConfig } from "./client-global-config.js";
-import { generateRequestFunction } from "./client-request.js";
-import { generateSetConfigFunction } from "./client-set-config.js";
+import { generateApiConfigInterface } from "./client-api-config-interface";
+import { generateClientHeader } from "./client-header";
+import { generateErrorClass } from "./client-error";
+import { generateGlobalConfig } from "./client-global-config";
+import { generateRequestFunction } from "./client-request";
+import { generateSetConfigFunction } from "./client-set-config";
 
 /**
  * 生成されたクライアントコード

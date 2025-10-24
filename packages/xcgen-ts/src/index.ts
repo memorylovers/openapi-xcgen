@@ -5,20 +5,20 @@
  */
 
 // Main generator
-export { generate } from "./generator.js";
+export { generate } from "./generator";
 
 // CLI
-export { runCli } from "./cli.js";
+export { runCli } from "./cli";
 
 // Types
-export { defineConfig } from "./types.js";
+export { defineConfig } from "./types";
 export type {
   GeneratedFileType,
   GenerationResult,
   GeneratorOptions,
-} from "./types.js";
+} from "./types";
 
 // Generators (for advanced usage)
-export { generateClient } from "./generators/client/client.js";
-export { generateServices } from "./generators/services/services.js";
-export { generateTypes } from "./generators/types/types.js";
+export { generateClient } from "./generators/client/client";
+export { generateServices } from "./generators/services/services";
+export { generateTypes } from "./generators/types/types";

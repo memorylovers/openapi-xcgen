@@ -5,124 +5,65 @@
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
-import { generateSchemasHeader } from "./schemas-header.js";
-import { generateSchemasImports } from "./schemas-imports.js";
-import { generateSchemaModel } from "./schemas-model.js";
-import { sortModelsByDependencies } from "./schemas-sort.js";
+import { sortModelsByDependencies } from "./schemas-sort";
+import type { IFileWriter } from "../../helpers/file-writer";
+import type { GeneratorResult } from "../../types";
+import { runInParallel } from "../../helpers/parallel";
+import { generateSchemaFile } from "./helpers/generate-schema-file";
+import { generateSchemasIndex } from "./helpers/generate-index";
 
 /**
- * 生成されたValibotスキーマコード
- */
-export interface GeneratedSchemas {
-  /** 生成されたTypeScriptコード */
-  code: string;
-  /** 生成されたスキーマの数 */
-  count: number;
-}
-
-/**
- * XcgenIRからValibotスキーマを生成
+ * XcgenIRからValibotスキーマを生成（ディレクトリベース構造）
+ *
+ * schemas/ディレクトリに個別のファイルとして生成し、並列書き込みを行う
+ *
  * @param ir - 中間表現
- * @returns 生成されたTypeScriptコード
+ * @param writer - ファイル書き込みインターフェース
+ * @returns 生成結果（ファイルパス配列とカウント）
  *
  * @example
  * ```typescript
  * const ir: XcgenIR = { ... };
- * const result = generateSchemas(ir);
- * console.log(result.code); // Valibotスキーマ定義
- * console.log(result.count); // 5 (スキーマの数)
+ * const writer = new FileWriter('./output');
+ * const result = await generateSchemas(ir, writer);
+ * console.log(result.files); // ['schemas/PetSchema.ts', 'schemas/UserSchema.ts', 'schemas/index.ts']
+ * console.log(result.count); // 2 (Pet, User)
  * ```
  */
-export function generateSchemas(ir: XcgenIR): GeneratedSchemas {
-  const parts: string[] = [];
+export async function generateSchemas(
+  ir: XcgenIR,
+  writer: IFileWriter,
+): Promise<GeneratorResult> {
+  const files: string[] = [];
 
-  // ファイルヘッダー
-  parts.push(generateSchemasHeader(ir.metadata));
-  parts.push("");
-
-  // インポート文
-  parts.push(generateSchemasImports());
-  parts.push("");
-
-  let count = 0;
-
-  // モデルを依存関係順にソート（依存先が先に来るように）
+  // 依存関係順にソート
   const sortedModels = sortModelsByDependencies(ir.models);
 
-  // 各モデルをスキーマに変換
-  for (const model of sortedModels) {
-    const schemaCode = generateSchemaModel(model);
-    if (schemaCode) {
-      parts.push(schemaCode);
-      parts.push("");
-      count++;
-    }
-  }
+  // Step 1: IR → Code (純粋関数による変換)
+  const schemaFiles = sortedModels
+    .map((model) => ({
+      path: `schemas/${model.name}Schema.ts`,
+      content: generateSchemaFile(model),
+    }))
+    .filter((f) => f.content !== null) as Array<{
+    path: string;
+    content: string;
+  }>;
+
+  // Step 2: Code → Write (並列書き込み、並列数制限あり)
+  await runInParallel(schemaFiles, (file) =>
+    writer.write(file.path, file.content),
+  );
+
+  files.push(...schemaFiles.map((f) => f.path));
+
+  // Step 3: schemas/index.ts 生成・書き込み
+  const indexContent = generateSchemasIndex(sortedModels);
+  await writer.write("schemas/index.ts", indexContent);
+  files.push("schemas/index.ts");
 
   return {
-    code: parts.join("\n"),
-    count,
+    files,
+    count: schemaFiles.length,
   };
-}
-
-// === in-source testing ===
-if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
-
-  describe("schemas generator", () => {
-    describe("generateSchemas", () => {
-      it("should generate schemas from XcgenIR", () => {
-        const ir: XcgenIR = {
-          metadata: {
-            title: "Pet Store API",
-            version: "1.0.0",
-          },
-          models: [
-            {
-              kind: "object",
-              name: "Pet",
-              referencePath: "#/components/schemas/Pet",
-              properties: [
-                {
-                  name: "id",
-                  type: "int",
-                  required: true,
-                },
-                {
-                  name: "name",
-                  type: "string",
-                  required: true,
-                },
-              ],
-            },
-          ],
-          tags: [],
-          endpoints: [],
-        };
-
-        const result = generateSchemas(ir);
-
-        expect(result.count).toBe(1);
-        expect(result.code.trim()).toEqual(
-          `
-/**
- * Valibot validation schemas
- * Generated from: Pet Store API 1.0.0
- * DO NOT EDIT - This file is auto-generated
- */
-
-import * as v from "valibot";
-
-/**
- * Schema for Pet
- */
-export const PetSchema = v.object({
-  id: v.number(),
-  name: v.string(),
-});
-`.trim(),
-        );
-      });
-    });
-  });
 }

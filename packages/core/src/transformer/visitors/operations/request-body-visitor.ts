@@ -21,8 +21,8 @@ import type {
   SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { isPathsRequestBodyContext } from "../../../types/guards.js";
-import { getModelName } from "../../helpers/get-model-name.js";
+import { isPathsRequestBodyContext } from "../../../types/guards";
+import { getModelName } from "../../helpers/get-model-name";
 import type { RequestBodyContext } from "../../types";
 import { visitRequestBodyObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";
