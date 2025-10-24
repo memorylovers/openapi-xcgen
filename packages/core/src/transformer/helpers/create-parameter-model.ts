@@ -156,6 +156,7 @@ function parameterToParameterProperty(
     }),
     ...(parameter.deprecated && { deprecated: parameter.deprecated }),
     ...(parameter.validation && { validation: parameter.validation }),
+    ...(parameter.extensions && { extensions: parameter.extensions }),
   };
 
   return property;

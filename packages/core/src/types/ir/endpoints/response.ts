@@ -2,6 +2,7 @@
  * レスポンス関連のIR型定義
  */
 
+import type { Extensions } from "../common/extensions";
 import type { MimeType } from "../common/mime-type";
 import type { IRRef, IRType } from "../common/type";
 
@@ -13,6 +14,8 @@ export interface IRResponseContent {
   mimeType: MimeType;
   /** スキーマ */
   schema: IRType;
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: Extensions;
 }
 
 /**
@@ -42,6 +45,8 @@ export interface IRResponseHeader {
   defaultValue?: unknown;
   /** 非推奨フラグ */
   deprecated?: true;
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: Extensions;
 }
 
 /**
@@ -108,6 +113,8 @@ export interface IRResponseWithContent {
   content?: IRResponseContent[];
   /** レスポンスヘッダー */
   headers?: IRResponseHeader[];
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: Extensions;
 }
 
 /**

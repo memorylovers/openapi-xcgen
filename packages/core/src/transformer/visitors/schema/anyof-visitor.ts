@@ -24,6 +24,7 @@ import {
   buildInlineModelName,
   buildInlineSchemaPath,
   buildReferencePath,
+  extractExtensions,
   getModelName,
 } from "../../helpers";
 import type { AnyOfContext, VisitorContext } from "../../types";
@@ -173,6 +174,9 @@ export function visitAnyOf(
     }
   }
 
+  // 拡張フィールドを抽出
+  const extensions = extractExtensions(schema);
+
   // anyOfモデルを作成
   const anyOfModel: IRAnyOfModel = {
     kind: "anyOf",
@@ -181,6 +185,7 @@ export function visitAnyOf(
     ...(schema.description && { description: schema.description }),
     ...(isNullable && { nullable: true }),
     schemas,
+    ...(extensions && { extensions }),
   };
 
   // anyOfモデルへの参照を作成

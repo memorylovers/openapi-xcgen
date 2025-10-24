@@ -11,6 +11,7 @@
  */
 
 import type { IREndpoint, IRModel, PathItemObject } from "../../../types";
+import { extractExtensions } from "../../helpers";
 import type { OperationContext, PathItemContext } from "../../types";
 import { visitOperation } from "../operations/operation-visitor";
 
@@ -72,6 +73,10 @@ export function visitPathItem(
   // PathItemレベルの共通パラメータを取得
   const commonParameters = pathItem.parameters || undefined;
 
+  // PathItemレベルの x-extensions を抽出
+  // これは Operation に渡されて統合される
+  const pathItemExtensions = extractExtensions(pathItem);
+
   // 各HTTPメソッドを処理
   for (const method of HTTP_METHODS) {
     const operation = pathItem[method];
@@ -83,6 +88,7 @@ export function visitPathItem(
         pathTemplate: context.pathTemplate,
         rootSegment: "paths",
         commonParameters, // 共通パラメータを渡す
+        pathItemExtensions, // Path Item の x-extensions を渡す
       };
 
       const operationResult = visitOperation(operation, operationContext);

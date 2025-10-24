@@ -117,14 +117,14 @@ components:
 
 ### Phase 2: xcgen-ts - Hook 機構の導入
 
-#### 対象ファイル
+#### Phase 2 - 対象ファイル
 
 - `packages/xcgen-ts/src/hooks/types.ts` - Hook 型定義
 - `packages/xcgen-ts/src/hooks/hookable.ts` - hookable 統合
 - `packages/xcgen-ts/src/config.ts` - c12 設定読み込み
 - `packages/xcgen-ts/src/generator.ts` - Hook 呼び出しポイント統合
 
-#### 実装タスク
+#### Phase 2 - 実装タスク
 
 - [ ] `hookable` と `c12` の依存関係を追加
 - [ ] Hook 定義と型を作成
@@ -133,14 +133,14 @@ components:
 
 ### Phase 3: xcgen-ts - デフォルト Hooks 実装
 
-#### 対象ファイル
+#### Phase 3 - 対象ファイル
 
 - `packages/xcgen-ts/src/hooks/default/x-type.ts` - x-type 処理
 - `packages/xcgen-ts/src/hooks/default/x-format.ts` - x-format 処理
 - `packages/xcgen-ts/src/hooks/default/x-validation.ts` - x-validation 処理
 - `packages/xcgen-ts/tests/e2e/x-extensions/` - E2E テスト
 
-#### 実装タスク
+#### Phase 3 - 実装タスク
 
 - [ ] `x-type` のデフォルト処理（カスタム型名での生成）
 - [ ] `x-format` のデフォルト処理（カスタムフォーマットバリデーション）
