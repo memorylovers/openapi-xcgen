@@ -97,30 +97,7 @@ The following table shows the mapping between OpenAPI types, IR types, and TypeS
 
 ## Unsupported Features
 
-The following OpenAPI features are currently not supported:
-
-### Schema Features
-
-- ❌ **not**: Negation schema
-- ❌ **if/then/else**: Conditional schemas
-- ❌ **Empty schemas `{}`**: Schema that accepts any type
-
-### Validation Features
-
-- ❌ **multipleOf**: Number multiple constraint
-- ❌ **contentMediaType/contentEncoding**: Content encoding
-- ❌ **patternProperties**: Pattern-based properties
-- ❌ **$id/$anchor**: Schema identifiers
-
-### Operation Features
-
-- ❌ **Response headers**: Rate-Limit information, etc.
-- ❌ **Common parameters**: Path-level common parameters
-- ❌ **Security definitions**: security/securitySchemes
-- ❌ **Callbacks**: Asynchronous callbacks
-- ❌ **Links**: Hypermedia links
-
-These features represent a small portion (<10%) of typical API usage. Basic type handling (object, array, primitive, enum, $ref, oneOf/anyOf/allOf) covers 90%+ of APIs.
+See [_docs/tasks/012-unsupported-features.md](../_docs/tasks/012-unsupported-features.md) for details.
 
 ## Related Documentation
 
