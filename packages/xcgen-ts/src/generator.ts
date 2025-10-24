@@ -9,11 +9,11 @@ import { parse, transform } from "@openapi-xcgen/core";
 import { consola } from "consola";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { generateClient } from "./generators/client/client.js";
-import { generateSchemas } from "./generators/schemas/schemas.js";
-import { generateServices } from "./generators/services/services.js";
-import { generateTypes } from "./generators/types/types.js";
-import type { GenerationResult, GeneratorOptions } from "./types.js";
+import { generateClient } from "./generators/client/client";
+import { generateSchemas } from "./generators/schemas/schemas";
+import { generateServices } from "./generators/services/services";
+import { generateTypes } from "./generators/types/types";
+import type { GenerationResult, GeneratorOptions } from "./types";
 
 /**
  * TypeScriptコードを生成する

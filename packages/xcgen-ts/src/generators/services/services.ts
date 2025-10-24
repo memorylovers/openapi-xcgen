@@ -5,9 +5,9 @@
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
-import { generateServiceFunction } from "./services-function.js";
-import { generateServicesHeader } from "./services-header.js";
-import { generateServicesImports } from "./services-imports.js";
+import { generateServiceFunction } from "./services-function";
+import { generateServicesHeader } from "./services-header";
+import { generateServicesImports } from "./services-imports";
 
 /**
  * 生成されたAPI関数コード

@@ -5,18 +5,18 @@
  */
 
 import type { IRModel, XcgenIR } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { generateObjectType } from "./types-object.js";
-import { generateEnumType } from "./types-enum.js";
-import { generateArrayType } from "./types-array.js";
-import { generateMapType } from "./types-map.js";
-import { generateAllOfType } from "./types-allof.js";
-import { generateAnyOfType } from "./types-anyof.js";
-import { generateUnionType } from "./types-union.js";
+import { toTypeName } from "../../helpers/naming";
+import { generateObjectType } from "./types-object";
+import { generateEnumType } from "./types-enum";
+import { generateArrayType } from "./types-array";
+import { generateMapType } from "./types-map";
+import { generateAllOfType } from "./types-allof";
+import { generateAnyOfType } from "./types-anyof";
+import { generateUnionType } from "./types-union";
 import {
   generateParameterType,
   generateUnifiedParameterType,
-} from "./types-parameter.js";
+} from "./types-parameter";
 
 /**
  * 生成されたTypeScriptコード

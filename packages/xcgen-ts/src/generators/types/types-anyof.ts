@@ -5,8 +5,8 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { irTypeToTsType } from "../../helpers/type-mapper.js";
+import { toTypeName } from "../../helpers/naming";
+import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
  * IRAnyOfModelからTypeScript union typeを生成

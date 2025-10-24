@@ -5,10 +5,10 @@
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
-import { generateSchemasHeader } from "./schemas-header.js";
-import { generateSchemasImports } from "./schemas-imports.js";
-import { generateSchemaModel } from "./schemas-model.js";
-import { sortModelsByDependencies } from "./schemas-sort.js";
+import { generateSchemasHeader } from "./schemas-header";
+import { generateSchemasImports } from "./schemas-imports";
+import { generateSchemaModel } from "./schemas-model";
+import { sortModelsByDependencies } from "./schemas-sort";
 
 /**
  * 生成されたValibotスキーマコード

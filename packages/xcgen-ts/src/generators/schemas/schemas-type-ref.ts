@@ -5,8 +5,8 @@
  */
 
 import type { IRType } from "@openapi-xcgen/core";
-import { generatePrimitiveSchema } from "./schemas-primitive.js";
-import { toTypeName } from "../../helpers/naming.js";
+import { generatePrimitiveSchema } from "./schemas-primitive";
+import { toTypeName } from "../../helpers/naming";
 
 /**
  * IRTypeをValibotスキーマ参照に変換（allOf/anyOf用）

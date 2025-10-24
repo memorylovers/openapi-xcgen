@@ -40,9 +40,10 @@ generated/
 
 #### 1. パフォーマンス最適化
 
-- **並列ファイル書き込み**: `Promise.all()` で複数ファイルを同時書き込み
+- **並列ファイル書き込み**: `runInParallel()` で並列数制限付き書き込み（デフォルト50並列）
+- **リソース保護**: p-limitによる並列数制御で、大規模API（1000+モデル）でもメモリ・I/O圧迫を防止
 - **ストリーミング方式**: IR→Code→書き込みを一連の処理として実行（メモリ効率向上）
-- **メモリ効率**: 大規模APIでも全ファイル内容をメモリに保持せず、生成後即座に書き込み
+- **メモリ効率**: 全ファイル内容を保持せず、生成→即書き込み
 
 #### 2. 関数型設計
 
@@ -75,15 +76,16 @@ IFileWriter.write() ← 並列実行
 
 #### 1. パフォーマンス
 
-- **並列書き込み**: 100モデルの場合、並列処理で大幅な時間短縮
+- **並列書き込み**: p-limitで並列数制限（デフォルト50）、リソース圧迫を防止
 - **メモリ効率**: 全ファイル内容を保持せず、生成→即書き込み
 - **ストリーミング**: 大規模API（1000+ モデル）でもメモリ使用量が一定
+- **リソース保護**: 1000+モデルの場合でもメモリ・I/Oを制御
 
 **例:** 100モデルの場合
 
 ```
-旧設計（逐次処理）:  100 × 10ms = 1000ms
-新設計（並列処理）:  max(10ms) ≈ 10ms  （100倍高速化）
+旧設計（逐次処理）:    100 × 10ms = 1000ms
+新設計（並列50制限）:  (100/50) × 10ms = 20ms  （50倍高速化、リソース安全）
 ```
 
 #### 2. テスタビリティ
@@ -105,7 +107,36 @@ IFileWriter.write() ← 並列実行
 
 ### Phase 2: 生成器の修正（ディレクトリベース構造への変更）
 
-#### Step 1: FileWriterの実装
+#### Step 1: ヘルパー関数の実装
+
+**1-1. 並列処理ヘルパー**
+
+`packages/xcgen-ts/src/helpers/parallel.ts` を新規作成：
+
+```typescript
+import pLimit from 'p-limit';
+
+const DEFAULT_CONCURRENCY = 50;
+
+/**
+ * 配列の各要素に対して非同期関数を並列実行（並列数制限あり）
+ *
+ * p-limitを使用して並列数を制限し、大規模処理でのリソース圧迫を防止。
+ * ライブラリへの依存を一箇所に集約し、将来の差し替えを容易にする。
+ */
+export async function runInParallel<T>(
+  items: T[],
+  fn: (item: T) => Promise<void>,
+  concurrency = DEFAULT_CONCURRENCY,
+): Promise<void> {
+  const limit = pLimit(concurrency);
+  await Promise.all(items.map(item => limit(() => fn(item))));
+}
+```
+
+**注:** p-limit依存を追加 (`pnpm add p-limit`)
+
+**1-2. FileWriterヘルパー**
 
 `packages/xcgen-ts/src/helpers/file-writer.ts` を新規作成：
 
@@ -207,8 +238,9 @@ export interface GenerationResult {
 
 ```typescript
 import type { XcgenIR, IRModel } from '@openapi-xcgen/core';
-import type { IFileWriter } from '../../helpers/file-writer.js';
-import type { GenerationResult } from '../../types.js';
+import type { IFileWriter } from '../../helpers/file-writer';
+import type { GenerationResult } from '../../types';
+import { runInParallel } from '../../helpers/parallel';
 
 export async function generateTypes(
   ir: XcgenIR,
@@ -222,9 +254,10 @@ export async function generateTypes(
     content: generateModelFile(model),
   }));
 
-  // Step 2: Code → Write (並列書き込み)
-  await Promise.all(
-    modelFiles.map(file => writer.write(file.path, file.content))
+  // Step 2: Code → Write (並列書き込み、並列数制限あり)
+  await runInParallel(
+    modelFiles,
+    file => writer.write(file.path, file.content)
   );
 
   files.push(...modelFiles.map(f => f.path));
@@ -300,9 +333,10 @@ function generateModelsIndex(models: IRModel[]): string {
 
 ```typescript
 import type { XcgenIR, IRModel } from '@openapi-xcgen/core';
-import type { IFileWriter } from '../../helpers/file-writer.js';
-import type { GenerationResult } from '../../types.js';
-import { sortModelsByDependencies } from './helpers/sort-models.js';
+import type { IFileWriter } from '../../helpers/file-writer';
+import type { GenerationResult } from '../../types';
+import { sortModelsByDependencies } from './helpers/sort-models';
+import { runInParallel } from '../../helpers/parallel';
 
 export async function generateSchemas(
   ir: XcgenIR,
@@ -319,9 +353,10 @@ export async function generateSchemas(
     content: generateSchemaFile(model),
   }));
 
-  // Step 2: Code → Write (並列書き込み)
-  await Promise.all(
-    schemaFiles.map(file => writer.write(file.path, file.content))
+  // Step 2: Code → Write (並列書き込み、並列数制限あり)
+  await runInParallel(
+    schemaFiles,
+    file => writer.write(file.path, file.content)
   );
 
   files.push(...schemaFiles.map(f => f.path));
@@ -402,9 +437,10 @@ function generateSchemasIndex(models: IRModel[]): string {
 
 ```typescript
 import type { XcgenIR, IREndpoint } from '@openapi-xcgen/core';
-import type { IFileWriter } from '../../helpers/file-writer.js';
-import type { GenerationResult } from '../../types.js';
-import { toKebabCase } from '../../helpers/case-conversion.js';
+import type { IFileWriter } from '../../helpers/file-writer';
+import type { GenerationResult } from '../../types';
+import { toKebabCase } from '../../helpers/case-conversion';
+import { runInParallel } from '../../helpers/parallel';
 
 export async function generateServices(
   ir: XcgenIR,
@@ -424,9 +460,10 @@ export async function generateServices(
     };
   });
 
-  // Step 2: Code → Write (並列書き込み)
-  await Promise.all(
-    serviceFiles.map(file => writer.write(file.path, file.content))
+  // Step 2: Code → Write (並列書き込み、並列数制限あり)
+  await runInParallel(
+    serviceFiles,
+    file => writer.write(file.path, file.content)
   );
 
   files.push(...serviceFiles.map(f => f.path));
@@ -528,14 +565,14 @@ function generateServicesIndex(tags: string[]): string {
 ```typescript
 import consola from 'consola';
 import { join } from 'node:path';
-import { parse } from './parser/parser.js';
-import { transform } from './transformer/transformer.js';
-import { generateTypes } from './generators/types/types.js';
-import { generateSchemas } from './generators/schemas/schemas.js';
-import { generateServices } from './generators/services/services.js';
-import { generateClient } from './generators/client/client.js';
-import { FileWriter } from './helpers/file-writer.js';
-import type { GeneratorOptions, GenerationResult } from './types.js';
+import { parse } from './parser/parser';
+import { transform } from './transformer/transformer';
+import { generateTypes } from './generators/types/types';
+import { generateSchemas } from './generators/schemas/schemas';
+import { generateServices } from './generators/services/services';
+import { generateClient } from './generators/client/client';
+import { FileWriter } from './helpers/file-writer';
+import type { GeneratorOptions, GenerationResult } from './types';
 
 export async function generate(options: GeneratorOptions): Promise<GenerationResult> {
   consola.start('Parsing OpenAPI specification...');
@@ -548,12 +585,12 @@ export async function generate(options: GeneratorOptions): Promise<GenerationRes
   const writer = new FileWriter(options.output);
   const allFiles: string[] = [];
 
-  // Types生成（内部で並列書き込み）
+  // Types生成（内部でrunInParallel()使用、並列数制限あり）
   consola.info('Generating types...');
   const typesResult = await generateTypes(ir, writer);
   allFiles.push(...typesResult.files);
 
-  // Schemas生成（内部で並列書き込み）
+  // Schemas生成（内部でrunInParallel()使用、並列数制限あり）
   let schemasResult;
   if (options.validator === 'valibot') {
     consola.info('Generating schemas...');
@@ -561,7 +598,7 @@ export async function generate(options: GeneratorOptions): Promise<GenerationRes
     allFiles.push(...schemasResult.files);
   }
 
-  // Services生成（内部で並列書き込み）
+  // Services生成（内部でrunInParallel()使用、並列数制限あり）
   consola.info('Generating services...');
   const servicesResult = await generateServices(ir, writer);
   allFiles.push(...servicesResult.files);
@@ -742,12 +779,16 @@ import type { Pet } from "./Pet.js";           // ❌
 
 ### ステップ1〜6: 生成器の修正
 
-- [ ] **Step 1: FileWriterの実装**
+- [ ] **Step 1: ヘルパー関数の実装**
+  - [ ] `pnpm add p-limit` で依存追加
+  - [ ] `src/helpers/parallel.ts` 新規作成
+    - [ ] `runInParallel()` 実装（p-limitで並列数制限）
+    - [ ] in-sourceテスト追加
   - [ ] `src/helpers/file-writer.ts` 新規作成
-  - [ ] `IFileWriter` インターフェース実装
-  - [ ] `FileWriter` クラス実装（実ファイルシステム）
-  - [ ] `MockFileWriter` クラス実装（テスト用）
-  - [ ] in-source テスト追加（`MockFileWriter`の動作確認）
+    - [ ] `IFileWriter` インターフェース実装
+    - [ ] `FileWriter` クラス実装（実ファイルシステム）
+    - [ ] `MockFileWriter` クラス実装（テスト用）
+    - [ ] in-sourceテスト追加
 
 - [ ] **Step 2: 型定義の追加**
   - [ ] `src/types.ts` に `GenerationResult` インターフェース追加
@@ -758,7 +799,7 @@ import type { Pet } from "./Pet.js";           // ❌
   - [ ] 戻り値を `Promise<GenerationResult>` に変更
   - [ ] `generateModelFile()` 実装（純粋関数: IR→Code）
   - [ ] `generateModelsIndex()` 実装（純粋関数: IR→Code）
-  - [ ] 並列書き込み実装（`Promise.all()`）
+  - [ ] 並列書き込み実装（`runInParallel()`使用）
   - [ ] インポートパス: 拡張子なし
 
 - [ ] **Step 4: Schemas生成器の修正**
@@ -766,7 +807,7 @@ import type { Pet } from "./Pet.js";           // ❌
   - [ ] 戻り値を `Promise<GenerationResult>` に変更
   - [ ] `generateSchemaFile()` 実装（純粋関数: IR→Code）
   - [ ] `generateSchemasIndex()` 実装（純粋関数: IR→Code）
-  - [ ] 並列書き込み実装（`Promise.all()`）
+  - [ ] 並列書き込み実装（`runInParallel()`使用）
   - [ ] 依存関係ソート維持
 
 - [ ] **Step 5: Services生成器の修正**
@@ -775,7 +816,7 @@ import type { Pet } from "./Pet.js";           // ❌
   - [ ] `groupEndpointsByTag()` 実装（純粋関数）
   - [ ] `generateServiceFile()` 実装（純粋関数: IR→Code）
   - [ ] `generateServicesIndex()` 実装（純粋関数: IR→Code）
-  - [ ] 並列書き込み実装（`Promise.all()`）
+  - [ ] 並列書き込み実装（`runInParallel()`使用）
   - [ ] エンドポイントがない場合の処理（`export {}`）
 
 - [ ] **Step 6: メインジェネレーターの修正**
@@ -807,7 +848,9 @@ import type { Pet } from "./Pet.js";           // ❌
 ## 注意事項
 
 - **TDD手法:** Task 015で期待値作成済み（Red状態）→ 実装でGreen状態を目指す
-- **インポートパス:** 拡張子なし（Task 015準拠、業界標準）
+- **インポートパス:** 拡張子なし（バンドラー前提、既存コードから.js削除済み）
+- **並列数制限:** p-limitで50並列（デフォルト）、大規模APIでもリソース圧迫なし
+- **ライブラリ抽象化:** p-limitへの依存は`parallel.ts`のみ、将来の差し替えが容易
 - **コミット:** ステップごとに細かくコミット、問題があればrevert可能に
 - **後方互換性:** 不要（0.x.x開発版のため）
 

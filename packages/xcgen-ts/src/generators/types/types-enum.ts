@@ -5,7 +5,7 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
+import { toTypeName } from "../../helpers/naming";
 
 /**
  * IREnumModelからTypeScript enum/union typeを生成

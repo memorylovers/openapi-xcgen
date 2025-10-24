@@ -5,11 +5,8 @@
  */
 
 import type { IRProperty } from "@openapi-xcgen/core";
-import { toPropertyName } from "../../helpers/naming.js";
-import {
-  applyTypeModifiers,
-  irTypeToTsType,
-} from "../../helpers/type-mapper.js";
+import { toPropertyName } from "../../helpers/naming";
+import { applyTypeModifiers, irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
  * IRPropertyからTypeScriptプロパティ定義を生成

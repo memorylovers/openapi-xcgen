@@ -3,8 +3,8 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { irTypeToTsType } from "../../helpers/type-mapper.js";
+import { toTypeName } from "../../helpers/naming";
+import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
  * エンドポイントからレスポンス型を取得

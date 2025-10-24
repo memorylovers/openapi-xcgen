@@ -6,8 +6,8 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { generateProperty } from "./types-property.js";
+import { toTypeName } from "../../helpers/naming";
+import { generateProperty } from "./types-property";
 
 /**
  * IRParameterModelからTypeScript interfaceを生成

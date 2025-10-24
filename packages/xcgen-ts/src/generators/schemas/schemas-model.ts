@@ -5,15 +5,15 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { generateAllOfSchema } from "./schemas-allof.js";
-import { generateAnyOfSchema } from "./schemas-anyof.js";
-import { generateArraySchema } from "./schemas-array.js";
-import { generateEnumSchema } from "./schemas-enum.js";
-import { generateObjectSchema, type PropertySchema } from "./schemas-object.js";
-import { irTypeToValibotSchema } from "./schemas-type-mapper.js";
-import { irTypeToValibotSchemaRef } from "./schemas-type-ref.js";
-import { generateUnionSchema } from "./schemas-union.js";
+import { toTypeName } from "../../helpers/naming";
+import { generateAllOfSchema } from "./schemas-allof";
+import { generateAnyOfSchema } from "./schemas-anyof";
+import { generateArraySchema } from "./schemas-array";
+import { generateEnumSchema } from "./schemas-enum";
+import { generateObjectSchema, type PropertySchema } from "./schemas-object";
+import { irTypeToValibotSchema } from "./schemas-type-mapper";
+import { irTypeToValibotSchemaRef } from "./schemas-type-ref";
+import { generateUnionSchema } from "./schemas-union";
 
 /**
  * IRModelをValibotスキーマ定義に変換

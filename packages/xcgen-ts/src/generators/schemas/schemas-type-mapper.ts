@@ -5,9 +5,9 @@
  */
 
 import type { IRType, IRValidation } from "@openapi-xcgen/core";
-import { generatePrimitiveSchema } from "./schemas-primitive.js";
-import { generateValidationPipes } from "./schemas-validation.js";
-import { toTypeName } from "../../helpers/naming.js";
+import { generatePrimitiveSchema } from "./schemas-primitive";
+import { generateValidationPipes } from "./schemas-validation";
+import { toTypeName } from "../../helpers/naming";
 
 /**
  * IRTypeをValibotスキーマ文字列に変換

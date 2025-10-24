@@ -3,7 +3,7 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
+import { toTypeName } from "../../helpers/naming";
 
 /**
  * エンドポイントのデータ型情報

@@ -3,7 +3,7 @@
  */
 
 import type { IRValidation } from "@openapi-xcgen/core";
-import { generateValidationPipes } from "./schemas-validation.js";
+import { generateValidationPipes } from "./schemas-validation";
 
 /**
  * Array型のValibotスキーマを生成

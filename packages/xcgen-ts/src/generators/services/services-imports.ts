@@ -3,8 +3,8 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming.js";
-import { getEndpointDataTypes } from "./services-data-types.js";
+import { toTypeName } from "../../helpers/naming";
+import { getEndpointDataTypes } from "./services-data-types";
 
 /**
  * サービスファイルのインポート文を生成
