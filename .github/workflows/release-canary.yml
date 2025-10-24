@@ -1,9 +1,10 @@
 name: Release Canary
 
 on:
-  pull_request:
-    types:
-      - closed
+  # 一時的に無効化: PRマージ時の自動実行
+  # pull_request:
+  #   types:
+  #     - closed
   workflow_dispatch:
     inputs:
       dry_run:
@@ -15,8 +16,8 @@ on:
 jobs:
   release-canary:
     runs-on: ubuntu-latest
-    # PRがマージされた場合のみ実行
-    if: github.event.pull_request.merged == true
+    # PRがマージされた場合または手動実行の場合に実行
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
         with:
