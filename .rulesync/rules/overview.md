@@ -371,42 +371,7 @@ Conventional Commitsに従う：
 
 ## 現在の制限事項
 
-### 未対応のOpenAPI機能
-
-以下の機能は現バージョンでは未対応です（基本機能の安定化を優先）：
-
-#### Union型とスキーママージ
-
-- **oneOf**: 排他的Union（exactly one）
-- **anyOf**: 包含的Union（one or more）
-- **allOf**: スキーママージ
-- **discriminator**: ポリモーフィズムのヒント
-
-#### 高度なバリデーション
-
-- **not**: 否定スキーマ
-- **additionalProperties**: 追加プロパティ制約
-- **patternProperties**: パターンプロパティ
-- **if/then/else**: 条件付きスキーマ
-
-#### その他
-
-- **multipleOf**: 数値の倍数制約
-- **contentMediaType/contentEncoding**: コンテンツエンコーディング
-- **$id/$anchor**: スキーマ識別子
-- **空のスキーマ `{}`**: any型相当（すべての型を許可）
-- **typeプロパティなし**: 暗黙的なany型
-
-#### Paths/Operations機能
-
-- **レスポンスヘッダー**: headers処理（Rate-Limit情報等）
-- **共通パラメータ**: PathItemレベルの共通parameters
-- **セキュリティ定義**: security/securitySchemes処理
-- **パラメータバリデーション**: minimum/maximum等の詳細なバリデーション情報
-
-これらの機能は使用頻度が低く（全体の5-10%）、基本的な型処理（object、array、primitive、enum、$ref）で90%以上のAPIに対応可能です。また、基本的なコード生成には不要であり、実装優先度を下げています。
-
-注: any型のサポートは意図的に除外しています。型安全性を重視し、明示的な型定義を推奨します。
+詳細は [_docs/tasks/012-unsupported-features.md](_docs/tasks/012-unsupported-features.md) を参照してください。
 
 ## トラブルシューティング
 
