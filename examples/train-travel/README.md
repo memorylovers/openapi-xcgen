@@ -80,7 +80,7 @@ pnpm start
 ### 1. Search Stations
 
 ```typescript
-import { getStations } from "./generated/services.js";
+import { getStations } from "./generated/services";
 
 // Search by coordinates (London)
 const stations = await getStations({
@@ -102,7 +102,7 @@ const ukStations = await getStations({
 ### 2. Find Trips
 
 ```typescript
-import { getTrips } from "./generated/services.js";
+import { getTrips } from "./generated/services";
 
 const trips = await getTrips({
   query: {
@@ -125,8 +125,8 @@ trips.data.forEach((trip) => {
 ### 3. Create a Booking
 
 ```typescript
-import { createBooking } from "./generated/services.js";
-import type { BookingRequest } from "./generated/types.js";
+import { createBooking } from "./generated/services";
+import type { BookingRequest } from "./generated/types";
 
 const bookingRequest: BookingRequest = {
   trip_id: "c0f8a9b2-3456-7890-bcde-f01234567890",
@@ -152,8 +152,8 @@ console.log("Total price:", booking.total_price);
 ### 4. Pay for Booking (oneOf Discriminator)
 
 ```typescript
-import { payForBooking } from "./generated/services.js";
-import type { CardPayment, BankTransferPayment } from "./generated/types.js";
+import { payForBooking } from "./generated/services";
+import type { CardPayment, BankTransferPayment } from "./generated/types";
 
 // Option 1: Card payment
 const cardPayment: CardPayment = {
@@ -188,7 +188,7 @@ const confirmation2 = await payForBooking({
 
 ```typescript
 import { parse } from "valibot";
-import { StationSchema, TripSchema } from "./generated/schemas.js";
+import { StationSchema, TripSchema } from "./generated/schemas";
 
 // Validate API response at runtime
 const validatedStation = parse(StationSchema, responseData);
@@ -294,7 +294,7 @@ interface Booking {
 The API uses RFC 7807 Problem Details format:
 
 ```typescript
-import { XcgenApiError } from "./generated/client.js";
+import { XcgenApiError } from "./generated/client";
 
 try {
   await createBooking({ body: invalidData });

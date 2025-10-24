@@ -12,6 +12,6 @@ export type {
   IROAuthFlows,
   IROpenIdConnectSecurityScheme,
   IRSecurityScheme,
-} from "./security-scheme.js";
+} from "./security-scheme";
 
-export type { IRSecurityRequirement } from "./security-requirement.js";
+export type { IRSecurityRequirement } from "./security-requirement";

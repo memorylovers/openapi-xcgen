@@ -6,7 +6,7 @@
  */
 
 import { describe, it } from "vitest";
-import { compareWithExpected } from "./test-helper.js";
+import { compareWithExpected } from "./test-helper";
 
 describe("E2E: TypeScript Generator", () => {
   describe("General - Basic Code Generation", () => {

@@ -26,8 +26,8 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
-import { generate } from "../../src/generator.js";
-import type { GeneratorOptions } from "../../src/types.js";
+import { generate } from "../../src/generator";
+import type { GeneratorOptions } from "../../src/types";
 
 // Get the directory of this file
 const __dirname = dirname(fileURLToPath(import.meta.url));

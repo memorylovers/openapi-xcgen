@@ -16,7 +16,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { generate } from "../../src/generator.js";
+import { generate } from "../../src/generator";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

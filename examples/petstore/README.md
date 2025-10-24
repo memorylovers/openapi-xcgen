@@ -57,8 +57,8 @@ pnpm start
 ### Basic API Calls
 
 ```typescript
-import { listPets, createPet, getPetById } from "./generated/services.js";
-import { setConfig } from "./generated/client.js";
+import { listPets, createPet, getPetById } from "./generated/services";
+import { setConfig } from "./generated/client";
 
 // Configure the client
 setConfig({
@@ -93,7 +93,7 @@ console.log("Pet details:", pet);
 ### Error Handling
 
 ```typescript
-import { XcgenApiError } from "./generated/client.js";
+import { XcgenApiError } from "./generated/client";
 
 try {
   const pet = await getPetById({
@@ -113,7 +113,7 @@ try {
 ### Client Configuration
 
 ```typescript
-import { setConfig } from "./generated/client.js";
+import { setConfig } from "./generated/client";
 
 // Set base URL and headers
 setConfig({
@@ -140,7 +140,7 @@ setConfig({
 All requests and responses are fully type-safe:
 
 ```typescript
-import type { Pet, NewPet } from "./generated/types.js";
+import type { Pet, NewPet } from "./generated/types";
 
 // TypeScript knows the exact shape of the request
 const newPetData: NewPet = {

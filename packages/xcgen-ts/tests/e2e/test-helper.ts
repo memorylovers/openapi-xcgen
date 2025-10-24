@@ -41,8 +41,8 @@ import { readFile, mkdir, readdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "vitest";
-import { generate } from "../../src/generator.js";
-import type { GeneratorOptions } from "../../src/types.js";
+import { generate } from "../../src/generator";
+import type { GeneratorOptions } from "../../src/types";
 import { tmpdir } from "node:os";
 
 // Get the directory of this file

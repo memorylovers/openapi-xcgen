@@ -46,8 +46,8 @@ xcgen-ts -i openapi.yaml -o ./generated --validator=valibot
 ### 生成されたクライアントの使用
 
 ```typescript
-import { listUsers } from "./generated/services.js";
-import { setConfig } from "./generated/client.js";
+import { listUsers } from "./generated/services";
+import { setConfig } from "./generated/client";
 
 setConfig({ baseUrl: "https://api.example.com" });
 

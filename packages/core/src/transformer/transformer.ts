@@ -25,7 +25,7 @@ import type {
   PathsObject,
   XcgenIR,
 } from "../types";
-import { enrichDiscriminatorMappings } from "./helpers/enrich-discriminator-mappings.js";
+import { enrichDiscriminatorMappings } from "./helpers/enrich-discriminator-mappings";
 import {
   visitComponents,
   visitMetadata,

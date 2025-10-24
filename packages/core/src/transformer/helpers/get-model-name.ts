@@ -6,7 +6,7 @@ import {
   isPathsResponseContext,
   isRequestBodyContext,
   isResponseContext,
-} from "../../types/guards.js";
+} from "../../types/guards";
 import type {
   AllOfContext,
   AnyOfContext,
@@ -15,9 +15,9 @@ import type {
   RequestBodyContext,
   ResponseContext,
   VisitorContext,
-} from "../types.js";
-import { buildInlineModelName } from "./build-model-name.js";
-import { getMediaTypeSuffix } from "./media-type-suffix.js";
+} from "../types";
+import { buildInlineModelName } from "./build-model-name";
+import { getMediaTypeSuffix } from "./media-type-suffix";
 
 /**
  * パステンプレートをコンポーネント名の基本部分に変換
