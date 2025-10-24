@@ -7,7 +7,7 @@
  * Note: This example uses mock data and won't make real API calls.
  */
 
-import { setConfig, type XcgenApiError } from "../generated/client.js";
+import { setConfig, type XcgenApiError } from "../generated/client";
 import {
   createBooking,
   getBooking,
@@ -15,7 +15,7 @@ import {
   getStations,
   getTrips,
   payForBooking,
-} from "../generated/services.js";
+} from "../generated/index";
 import type {
   BankTransferPayment,
   Booking,
@@ -23,7 +23,7 @@ import type {
   CardPayment,
   Station,
   Trip,
-} from "../generated/types.js";
+} from "../generated/index";
 
 // ============================================================================
 // Configuration

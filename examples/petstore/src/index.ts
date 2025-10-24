@@ -5,9 +5,9 @@
  * Note: This example uses mock data and won't make real API calls.
  */
 
-import { setConfig, type XcgenApiError } from "../generated/client.js";
-import { listPets, createPet, getPetById } from "../generated/services.js";
-import type { Pet, NewPet } from "../generated/types.js";
+import { setConfig, type XcgenApiError } from "../generated/client";
+import { listPets, createPet, getPetById } from "../generated/index";
+import type { Pet, NewPet } from "../generated/index";
 
 // ============================================================================
 // Configuration
