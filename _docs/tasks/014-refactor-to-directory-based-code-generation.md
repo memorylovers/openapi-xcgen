@@ -10,248 +10,26 @@ TypeScript生成器（xcgen-ts）の出力構造を、現在の単一ファイ�
 - 保守性・可読性の向上
 - 大規模API対応の準備
 
-**優先度:** 中 - Phase 1の基本機能は動作しているが、要件定義との乖離を解消
-
-## 背景
-
-### 要件定義書の記載（本来あるべき姿）
-
-```
-generated/
-├── models/       # 型定義（個別ファイル）
-│   ├── User.ts
-│   ├── Post.ts
-│   └── index.ts
-├── schemas/      # Valibotスキーマ
-│   ├── UserSchema.ts
-│   ├── PostSchema.ts
-│   └── index.ts
-├── services/     # API関数
-│   ├── users.ts
-│   ├── posts.ts
-│   └── index.ts
-├── client.ts     # 基本リクエスト関数
-├── types.ts      # 共通型定義
-└── index.ts      # エクスポート
-```
-
-### 現在の実装（暫定的な単一ファイル構造）
-
-```
-generated/
-├── types.ts      # すべての型定義（単一ファイル）
-├── schemas.ts    # すべてのValibotスキーマ（単一ファイル）
-├── services.ts   # すべてのAPI関数（単一ファイル）
-├── client.ts     # 基本リクエスト関数
-├── package.json
-└── tsconfig.json
-```
-
-### 判断の経緯
-
-要件定義書と実装の差異を検討した結果、以下の理由により要件定義に合わせることを決定：
-
-- 初期実装では単純化のため単一ファイル構造を採用していた
-- 要件定義で示されたディレクトリ構造の方が、長期的な保守性が高い
-- ファイル分割により、コードの可読性と管理が向上
-- 大規模API（100+エンドポイント）への対応が容易
-
-## 現状分析
-
-### コード生成の流れ
-
-```
-generate(options)
-├── parse(openapi.yaml) → OpenAPI Document
-├── transform(document) → XcgenIR
-└── Code Generation (4 files):
-    ├── generateTypes(ir) → types.ts
-    ├── generateSchemas(ir) → schemas.ts
-    ├── generateServices(ir) → services.ts
-    └── generateClient(ir) → client.ts
-```
-
-### 主要な実装ファイル
-
-| ファイル | 役割 | 変更の必要性 |
-|---------|------|------------|
-| `packages/xcgen-ts/src/generator.ts` | メインオーケストレーター | ⭐ 大幅修正 |
-| `packages/xcgen-ts/src/generators/types/types.ts` | 型定義生成 | ⭐ 大幅修正 |
-| `packages/xcgen-ts/src/generators/schemas/schemas.ts` | スキーマ生成 | ⭐ 大幅修正 |
-| `packages/xcgen-ts/src/generators/services/services.ts` | サービス関数生成 | ⭐ 修正 |
-| `packages/xcgen-ts/src/generators/client/client.ts` | クライアント生成 | 変更なし |
-| `packages/xcgen-ts/tests/e2e/fixtures/*/expected/` | E2Eテスト期待値 | ⭐ 全更新 |
-
-### 影響を受けるテストフィクスチャ
-
-以下の14+個のE2Eテストフィクスチャの期待値を更新する必要があります：
-
-```
-tests/e2e/fixtures/
-├── general/
-│   ├── petstore/
-│   ├── complex-schema/
-│   ├── allof/
-│   ├── readonly-writeonly/
-│   └── hey-api/
-│       ├── discriminator-all-of/
-│       ├── discriminator-any-of/
-│       └── discriminator-one-of/
-└── models/
-    ├── complex-structures/
-    ├── data-types/
-    ├── inline-schemas/
-    ├── metadata-model/
-    ├── nullable-model/
-    ├── ref-model/
-    └── validation-model/
-```
-
-## 目標構造（詳細）
-
-### ディレクトリレイアウト
+## 目標構造
 
 ```
 generated/
 ├── index.ts                   # トップレベルのエクスポート
-│
-├── types.ts                   # 共通型定義（RequestInit等）
-│
 ├── models/                    # データモデルの型定義
-│   ├── Pet.ts                 # export interface Pet { ... }
-│   ├── User.ts                # export interface User { ... }
-│   ├── Error.ts               # export interface Error { ... }
+│   ├── Pet.ts
+│   ├── User.ts
 │   ├── GetPetsParams.ts       # パラメータ型
 │   ├── GetPets200Response.ts  # レスポンス型
-│   └── index.ts               # export * from './Pet.ts'
-│
+│   └── index.ts
 ├── schemas/                   # Valibotバリデーションスキーマ
-│   ├── PetSchema.ts           # export const PetSchema = v.object({ ... })
-│   ├── UserSchema.ts          # export const UserSchema = v.object({ ... })
-│   ├── GetPets200ResponseSchema.ts
-│   └── index.ts               # export * from './PetSchema.ts'
-│
-├── services/                  # API関数（エンドポイント別）
-│   ├── pets.ts                # listPets, createPet, ...
-│   ├── users.ts               # getUser, updateUser, ...
-│   └── index.ts               # export * from './pets.ts'
-│
+│   ├── PetSchema.ts
+│   ├── UserSchema.ts
+│   └── index.ts
+├── services/                  # API関数（タグ別）
+│   ├── pets.ts
+│   ├── users.ts
+│   └── index.ts
 └── client.ts                  # HTTPクライアントユーティリティ
-    ├── XcgenApiError クラス
-    ├── ApiConfig インターフェース
-    ├── setConfig 関数
-    └── request 関数
-```
-
-### ファイルの内容例
-
-#### `models/Pet.ts`
-
-```typescript
-/**
- * Pet model
- * Auto-generated from OpenAPI specification
- */
-
-export interface Pet {
-  id: number;
-  name: string;
-  tag?: string | undefined;
-}
-```
-
-#### `models/index.ts`
-
-```typescript
-/**
- * Model type definitions
- * Auto-generated from OpenAPI specification
- */
-
-export * from './Pet.js';
-export * from './User.js';
-export * from './Error.js';
-export * from './GetPetsParams.js';
-export * from './GetPets200Response.js';
-```
-
-#### `schemas/PetSchema.ts`
-
-```typescript
-/**
- * Valibot validation schema for Pet
- * Auto-generated from OpenAPI specification
- */
-
-import * as v from "valibot";
-
-export const PetSchema = v.object({
-  id: v.number(),
-  name: v.string(),
-  tag: v.optional(v.string()),
-});
-```
-
-#### `services/pets.ts`
-
-```typescript
-/**
- * Pet service functions
- * Auto-generated from OpenAPI specification
- */
-
-import type {
-  GetPetsParams,
-  GetPets200Response,
-  CreatePetRequestBody,
-  CreatePet201Response,
-} from "../models/index.js";
-import { request } from "../client.js";
-
-/**
- * List all pets
- */
-export async function listPets(
-  options: GetPetsParams,
-  init?: RequestInit,
-): Promise<GetPets200Response> {
-  return request({
-    method: "GET",
-    path: "/pets",
-    options,
-    init,
-  });
-}
-
-/**
- * Create a pet
- */
-export async function createPet(
-  body: CreatePetRequestBody,
-  init?: RequestInit,
-): Promise<CreatePet201Response> {
-  return request({
-    method: "POST",
-    path: "/pets",
-    body,
-    init,
-  });
-}
-```
-
-#### `index.ts` (トップレベル)
-
-```typescript
-/**
- * API Client
- * Auto-generated from OpenAPI specification
- */
-
-export * from "./types.js";
-export * from "./models/index.js";
-export * from "./schemas/index.js";
-export * from "./services/index.js";
-export { setConfig, XcgenApiError, type ApiConfig } from "./client.js";
 ```
 
 ## 実装計画
@@ -641,103 +419,33 @@ pnpm lint
 - Task 015で作成した期待値と一致（31件のテスト失敗 → 全テストパス）
 - TDD Red → Green 達成
 
-## 技術的な詳細
+## 実装上の注意点
 
-### インポートパスの解決
+### インポートパス
 
-#### 拡張子なし（バンドラー前提）
-
-生成されるコードは拡張子なしのインポートを使用（Task 015準拠）：
+拡張子なし（Task 015準拠、業界標準）：
 
 ```typescript
-// models/GetPets200Response.ts から Pet を参照
-import type { Pet } from "./Pet";
-
-// services/pets.ts から models/ を参照
-import type { GetPetsParams } from "../models/index";
-
-// services/pets.ts から client を参照
-import { request } from "../client";
+import type { Pet } from "./Pet";              // ✅
+import type { Pet } from "./Pet.js";           // ❌
 ```
 
-**理由:**
+### 命名規則
 
-- 業界標準（Orval、openapi-ts）に準拠
-- ユーザー環境はバンドラー使用を前提
-- CLAUDE.mdの「生成されるコード：拡張子なし（バンドラー前提）」に従う
-
-**注:** 生成器のソースコード（`packages/xcgen-ts/src/`）は `.js` 拡張子を使用（ESM対応）
-
-### 依存関係の順序
-
-#### スキーマの依存関係
-
-現在の実装では `sortModelsByDependencies()` が依存関係を解決しており、ファイル分割後も同じロジックを使用：
-
-```typescript
-// 依存関係: UserSchema → AddressSchema
-// 生成順序: AddressSchema.ts → UserSchema.ts → index.ts
-
-// schemas/AddressSchema.ts
-export const AddressSchema = v.object({ ... });
-
-// schemas/UserSchema.ts
-import { AddressSchema } from './AddressSchema';
-export const UserSchema = v.object({
-  address: AddressSchema,
-  ...
-});
-
-// schemas/index.ts
-export * from './AddressSchema';
-export * from './UserSchema';
-```
-
-### ファイル命名規則
-
-| 種類 | 命名規則 | 例 |
-|------|----------|-----|
-| モデル型 | PascalCase | `Pet.ts`, `User.ts` |
-| パラメータ型 | PascalCase + Params | `GetPetsParams.ts` |
-| レスポンス型 | PascalCase + Response | `GetPets200Response.ts` |
+| 種類 | 規則 | 例 |
+|------|------|-----|
+| モデル | PascalCase | `Pet.ts` |
 | スキーマ | PascalCase + Schema | `PetSchema.ts` |
-| サービス | kebab-case（タグ名） | `pets.ts`, `user-profile.ts` |
-| インデックス | 常に `index.ts` | `models/index.ts` |
+| サービス | kebab-case（タグ名） | `pets.ts` |
+| インデックス | `index.ts` | `models/index.ts` |
 
-### Tree-shaking
+### 依存関係
 
-個別インポートが可能で、Tree-shakingの効果を最大化：
-
-```typescript
-// 必要な型のみインポート
-import { Pet, User } from '@example/api-client/models';
-
-// 必要なサービスのみインポート
-import { listPets, createPet } from '@example/api-client/services/pets';
-
-// トップレベルからもインポート可能
-import { Pet, listPets } from '@example/api-client';
-```
-
-## リスクと対策
-
-### リスク: 実装ミスによる不具合
-
-**リスク:**
-
-- 複数の生成器を同時に修正するため、不具合が発生する可能性
-- インポートパスの誤りによる型解決失敗
-
-**対策:**
-
-- TDD手法（Task 015で期待値作成済み）
-- ステップごとにテスト実行
-- TypeScript型チェック（`pnpm typecheck`）でインポートパス検証
-- Git で細かくコミット、問題があれば revert 可能
+スキーマの依存関係は `sortModelsByDependencies()` で解決済み
 
 ## 実装チェックリスト
 
-### Phase 2: 生成器の修正
+### ステップ1〜5: 生成器の修正
 
 - [ ] **Step 1: 型定義の追加**
   - [ ] `src/types.ts` に `FileToWrite` インターフェース追加
@@ -766,7 +474,7 @@ import { Pet, listPets } from '@example/api-client';
   - [ ] ディレクトリ作成 + ファイル書き込み実装
   - [ ] `generateTopLevelIndex()` 実装
 
-### Phase 3: E2Eテスト実行と検証
+### テスト実行と検証
 
 - [ ] `pnpm build` が成功することを確認
 - [ ] `pnpm test` が成功することを確認（TDD Green）
