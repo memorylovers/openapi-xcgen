@@ -9,7 +9,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 ## ステータス
 
 - **状態**: 実装中（基盤完了、Hookテスト追加中）
-- **進捗**: 70% (6/6 Hook types定義完了、1/6 Hookテスト完了)
+- **進捗**: 75% (6/6 Hook types定義完了、2/6 Hookテスト完了)
 
 ## 実装状況
 
@@ -48,7 +48,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 #### Hookテスト追加（優先）
 
 - [x] `parameter:generate` Hook のテスト追加
-- [ ] `model:generate` Hook のテスト追加
+- [x] `model:generate` Hook のテスト追加
 - [ ] `endpoint:generate` Hook のテスト追加
 - [ ] `type:transform` Hook のテスト追加
 - [ ] `validation:transform` Hook のテスト追加
@@ -82,7 +82,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 |--------|-----------|------|
 | `property:generate` | プロパティ生成時 | 型名のカスタマイズ、プロパティレベルの拡張 |
 | `parameter:generate` | パラメータ生成時 | パラメータ型のカスタマイズ |
-| `model:generate` | モデル生成時 | モデルレベルの拡張、インポート追加 |
+| `modelFile:generate` | モデルファイル生成時 | ファイルレベルの拡張、インポート追加 |
 | `endpoint:generate` | エンドポイント生成時 | API関数のカスタマイズ |
 | `type:transform` | 型変換時 | IR型 → TypeScript型への変換カスタマイズ |
 | `validation:transform` | バリデーション変換時 | IRValidation → Valibot schemaへの変換カスタマイズ |
@@ -141,15 +141,20 @@ export default defineConfig({
    - コメント追加
    - 例外処理
 
-2. **parameter-generate.test.ts** ⬜
+2. **parameter-generate.test.ts** ✅ (18テスト)
    - パラメータ名のカスタマイズ
    - 型変換
    - デフォルト値制御
+   - 複数Hook実行
+   - optional/nullable制御
 
-3. **model-generate.test.ts** ⬜
+3. **model-generate.test.ts** ✅ (16テスト)
    - モデル名のカスタマイズ
    - インポート追加
    - コード変更
+   - コメント変更
+   - 複数Hook実行
+   - 各モデル種別対応
 
 4. **endpoint-generate.test.ts** ⬜
    - 関数名のカスタマイズ

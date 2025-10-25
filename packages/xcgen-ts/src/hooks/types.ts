@@ -264,8 +264,6 @@ export type ValidationTransformHandler =
 export interface Hooks {
   /**
    * プロパティ生成時に呼び出される Hook
-   *
-   * 単一または配列で複数の Handler を登録可能
    */
   "property:generate"?: PropertyGenerateHandler | PropertyGenerateHandler[];
 
@@ -275,9 +273,9 @@ export interface Hooks {
   "parameter:generate"?: ParameterGenerateHandler | ParameterGenerateHandler[];
 
   /**
-   * モデル生成時に呼び出される Hook
+   * モデルファイル生成時に呼び出される Hook
    */
-  "model:generate"?: ModelGenerateHandler | ModelGenerateHandler[];
+  "modelFile:generate"?: ModelGenerateHandler | ModelGenerateHandler[];
 
   /**
    * エンドポイント生成時に呼び出される Hook
