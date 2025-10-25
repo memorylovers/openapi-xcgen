@@ -126,8 +126,10 @@ export interface TsCodeModel {
   name: string;
   /** 生成される型定義コード */
   code: string;
-  /** 追加インポート（Hookで追加可能） */
+  /** 追加インポート（Hookで追加可能、モデル型ファイル用） */
   imports: string[];
+  /** スキーマファイル用の追加インポート（Hookで追加可能、オプショナル） */
+  schemaImports?: string[];
   /** コメント（JSDoc） */
   comment?: string;
 }

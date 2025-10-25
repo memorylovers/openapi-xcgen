@@ -68,8 +68,8 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 
 #### 最終検証
 
-- [ ] E2E期待値の生成（`pnpm regenerate:expected`）
-- [ ] 全テスト実行（`pnpm test`）
+- [x] E2E期待値の生成（`pnpm regenerate:expected`）- 差分なし ✅
+- [x] 全テスト実行（`pnpm test`）- 406テスト成功 ✅
 - [ ] ビルド（`pnpm build`）
 - [ ] 型チェック（`pnpm typecheck`）
 - [ ] Lint（`pnpm lint`）

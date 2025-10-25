@@ -5,6 +5,10 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
+import {
+  processImports,
+  generateTypeImports,
+} from "../../../helpers/import-handler";
 import { toTypeName } from "../../../helpers/naming";
 import type { HookableInstance, TsCodeModel } from "../../../hooks";
 import { generateModel } from "../types-model";
@@ -102,14 +106,27 @@ export function generateModelFile(
   // 自分自身への参照は除外
   dependencies.delete(tsCode.name);
 
-  // Hookで追加されたインポートもマージ
-  const allImports = new Set([...dependencies, ...tsCode.imports]);
+  // Hookで追加されたインポートを処理
+  const { typeNames, rawImports } = processImports(tsCode.imports);
 
-  if (allImports.size > 0) {
-    const sortedDeps = Array.from(allImports).sort();
-    for (const dep of sortedDeps) {
-      lines.push(`import type { ${dep} } from './${dep}';`);
+  // 完全なimport文を先に出力
+  if (rawImports.length > 0) {
+    for (const rawImport of rawImports) {
+      lines.push(rawImport);
     }
+  }
+
+  // 型名インポート（依存型 + Hook追加型）をマージ
+  const allTypeImports = new Set([...dependencies, ...typeNames]);
+  if (allTypeImports.size > 0) {
+    const importLines = generateTypeImports(Array.from(allTypeImports));
+    for (const importLine of importLines) {
+      lines.push(importLine);
+    }
+  }
+
+  // import文があれば空行を追加
+  if (rawImports.length > 0 || allTypeImports.size > 0) {
     lines.push("");
   }
 

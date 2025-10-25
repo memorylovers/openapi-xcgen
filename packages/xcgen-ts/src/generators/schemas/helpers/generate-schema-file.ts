@@ -5,6 +5,10 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
+import {
+  generateTypeImports,
+  processImports,
+} from "../../../helpers/import-handler";
 import { toTypeName } from "../../../helpers/naming";
 import type { HookableInstance } from "../../../hooks";
 import { generateSchemaModel } from "../schemas-model";
@@ -17,6 +21,7 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  *
  * @param model - IRModel
  * @param hooks - Hook instance（オプション）
+ * @param schemaImports - Hook経由で追加されたimport（オプション）
  * @returns Valibotスキーマコード（null: 生成スキップ）
  *
  * @example
@@ -33,6 +38,7 @@ import { extractSchemaDependencies } from "./extract-dependencies";
 export function generateSchemaFile(
   model: IRModel,
   hooks?: HookableInstance,
+  schemaImports?: string[],
 ): string | null {
   const schemaCode = generateSchemaModel(model, hooks);
 
@@ -48,22 +54,46 @@ export function generateSchemaFile(
   lines.push("");
   lines.push('import * as v from "valibot";');
 
-  // 依存する他のスキーマのインポート文を生成
-  const dependencies = extractSchemaDependencies(model);
-  if (dependencies.size > 0) {
-    // 自分自身への参照は除外
-    const currentSchemaName = `${toTypeName(model.name)}Schema`;
-    dependencies.delete(currentSchemaName);
+  // Hookで追加されたインポートを処理
+  let rawImports: string[] = [];
+  let typeNames: string[] = [];
+  if (schemaImports && schemaImports.length > 0) {
+    const processed = processImports(schemaImports);
+    rawImports = processed.rawImports;
+    typeNames = processed.typeNames;
+  }
 
-    if (dependencies.size > 0) {
-      const sortedDeps = Array.from(dependencies).sort();
-      for (const dep of sortedDeps) {
-        lines.push(`import { ${dep} } from './${dep}';`);
-      }
+  // 完全なimport文を先に出力
+  if (rawImports.length > 0) {
+    for (const rawImport of rawImports) {
+      lines.push(rawImport);
     }
   }
 
+  // 依存する他のスキーマのインポート文を生成
+  const dependencies = extractSchemaDependencies(model);
+  // 自分自身への参照は除外
+  const currentSchemaName = `${toTypeName(model.name)}Schema`;
+  dependencies.delete(currentSchemaName);
+
+  // 型名インポート（依存スキーマ + Hook追加型名）をマージ
+  const allTypeImports = new Set([...dependencies, ...typeNames]);
+  if (allTypeImports.size > 0) {
+    // スキーマは値として使用されるため、'import type' ではなく 'import' を使用
+    const importLines = generateTypeImports(
+      Array.from(allTypeImports),
+      ".",
+      false,
+    );
+    for (const importLine of importLines) {
+      lines.push(importLine);
+    }
+  }
+
+  // import文があれば空行を追加
+  // if (rawImports.length > 0 || allTypeImports.size > 0) {
   lines.push("");
+  // }
   lines.push(schemaCode);
 
   return lines.join("\n");

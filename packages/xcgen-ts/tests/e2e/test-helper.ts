@@ -37,7 +37,7 @@
  */
 
 import { consola } from "consola";
-import { readFile, mkdir, readdir } from "node:fs/promises";
+import { readFile, mkdir, readdir, access } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "vitest";
@@ -49,6 +49,18 @@ import { tmpdir } from "node:os";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // Get the packages/generator-typescript directory
 const packageDir = join(__dirname, "..", "..");
+
+/**
+ * Check if a file exists
+ */
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Recursively compare two directories
@@ -110,14 +122,32 @@ export async function compareWithExpected(
   const outputDir = join(tmpdir(), `xcgen-test-${Date.now()}`);
   await mkdir(outputDir, { recursive: true });
 
+  // xcgen.config.ts の有無をチェック
+  const configPath = join(fixtureDir, "xcgen.config.ts");
+  const hasConfig = await fileExists(configPath);
+
+  // xcgen.config.ts がある場合、ディレクトリを移動してから生成
+  // （c12 が config を見つけるため）
+  // eslint-disable-next-line no-undef
+  const originalCwd = process.cwd();
   try {
+    if (hasConfig) {
+      // eslint-disable-next-line no-undef
+      process.chdir(fixtureDir);
+    }
+
     // TypeScriptコード生成
     await generate({
       input: inputPath,
       output: outputDir,
       ...options,
     });
+  } finally {
+    // eslint-disable-next-line no-undef
+    process.chdir(originalCwd);
+  }
 
+  try {
     // Use expected-valibot/ directory when validator is specified
     const expectedDirName =
       options?.validator === "valibot" ? "expected-valibot" : "expected";
