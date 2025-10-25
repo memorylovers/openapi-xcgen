@@ -47,7 +47,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 
 #### Hookテスト追加（優先）
 
-- [ ] `parameter:generate` Hook のテスト追加
+- [x] `parameter:generate` Hook のテスト追加
 - [ ] `model:generate` Hook のテスト追加
 - [ ] `endpoint:generate` Hook のテスト追加
 - [ ] `type:transform` Hook のテスト追加

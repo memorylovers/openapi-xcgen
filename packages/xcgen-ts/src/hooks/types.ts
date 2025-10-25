@@ -71,12 +71,17 @@ export interface TsCodeProperty {
 
 /**
  * パラメータ生成Hook の Context
+ *
+ * @remarks
+ * `endpoint` はオプショナルです。
+ * - パラメータモデル生成時（`generateParameterType()`）: endpoint なし
+ * - エンドポイント固有のパラメータ生成時: endpoint あり
  */
 export interface ParameterGenerateContext {
   /** IR パラメータ定義 */
   parameter: IRParameter;
-  /** 所属エンドポイント */
-  endpoint: IREndpoint;
+  /** 所属エンドポイント（オプショナル） */
+  endpoint?: IREndpoint;
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeParameter;
   /** x-extensions（存在する場合） */
@@ -93,8 +98,12 @@ export interface TsCodeParameter {
   typeName: string;
   /** オプショナルかどうか */
   optional: boolean;
+  /** nullable かどうか */
+  nullable: boolean;
   /** デフォルト値（存在する場合） */
   defaultValue?: string;
+  /** コメント（JSDoc） */
+  comment?: string;
 }
 
 /**

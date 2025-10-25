@@ -8,7 +8,7 @@ import type { IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../../helpers/naming";
 import type { HookableInstance } from "../../../hooks";
 import { generateModel } from "../types-model";
-import { generateUnifiedParameterType } from "../types-parameter";
+import { generateUnifiedParameterType } from "../types-parameter-unified";
 import { extractTypeDependencies } from "./extract-dependencies";
 
 /**
