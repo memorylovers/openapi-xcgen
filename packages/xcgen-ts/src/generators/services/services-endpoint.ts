@@ -4,24 +4,99 @@
 
 import type { IREndpoint } from "@openapi-xcgen/core";
 import { toFunctionName } from "../../helpers/naming";
+import type { HookableInstance, TsCodeEndpoint } from "../../hooks";
 import { getResponseType } from "./services-response-type";
 import { getEndpointDataTypes } from "./services-data-types";
 
 /**
  * IREndpointからAPI関数を生成
  * @param endpoint - IRエンドポイント
- * @returns TypeScript関数コード
+ * @param hooks - Hook instance（オプション）
+ * @returns TypeScript関数コード（null: 生成スキップ）
  */
-export function generateEndpoint(endpoint: IREndpoint): string | null {
+export function generateEndpoint(
+  endpoint: IREndpoint,
+  hooks?: HookableInstance,
+): string | null {
   if (!endpoint.operationId) {
     return null;
   }
 
-  const lines: string[] = [];
+  // 1. 関数コードを生成
   const functionName = toFunctionName(endpoint.operationId);
+  const functionCode = generateFunctionCode(endpoint, functionName);
 
-  // エンドポイントのデータ型情報を取得
+  // 2. TsCodeEndpoint を初期化（Hookが変更可能）
+  const tsCode: TsCodeEndpoint = {
+    functionName,
+    code: functionCode,
+    imports: [],
+    comment: generateJSDocComment(endpoint),
+  };
+
+  // 3. endpoint:generate Hook を呼び出し
+  if (hooks) {
+    hooks.callHook("endpoint:generate", {
+      endpoint,
+      tsCode,
+      extensions: "extensions" in endpoint ? endpoint.extensions : undefined,
+    });
+
+    // Hook で関数名が変更された場合、コード内の関数名も置換
+    if (tsCode.functionName !== functionName) {
+      tsCode.code = tsCode.code.replace(
+        new RegExp(`\\bfunction ${functionName}\\b`, "g"),
+        `function ${tsCode.functionName}`,
+      );
+    }
+  }
+
+  // 4. 最終的なコードを返す（コメントは不要、関数コード自体にJSDocが含まれる）
+  return tsCode.code;
+}
+
+/**
+ * JSDocコメントを生成
+ */
+function generateJSDocComment(endpoint: IREndpoint): string {
+  const lines: string[] = [];
   const dataTypes = getEndpointDataTypes(endpoint);
+  const responseType = getResponseType(endpoint);
+
+  if (endpoint.summary) {
+    lines.push(endpoint.summary);
+  }
+  if (endpoint.description) {
+    lines.push(endpoint.description);
+  }
+
+  // パラメータ情報
+  if (dataTypes.needsDataType) {
+    lines.push("@param options - Request parameters");
+  }
+  lines.push("@param init - Additional fetch options");
+  lines.push(`@returns ${responseType}`);
+  lines.push(
+    "@throws {_XcgenApiError} API error with status and response details",
+  );
+
+  if (endpoint.deprecated) {
+    lines.push("@deprecated");
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * 関数コード本体を生成
+ */
+function generateFunctionCode(
+  endpoint: IREndpoint,
+  functionName: string,
+): string {
+  const lines: string[] = [];
+  const dataTypes = getEndpointDataTypes(endpoint);
+  const responseType = getResponseType(endpoint);
 
   // JSDocコメント
   lines.push("/**");
@@ -32,14 +107,10 @@ export function generateEndpoint(endpoint: IREndpoint): string | null {
     lines.push(` * ${endpoint.description}`);
   }
 
-  // データ型が必要な場合のみ@paramを追加
   if (dataTypes.needsDataType) {
     lines.push(` * @param options - Request parameters`);
   }
   lines.push(` * @param init - Additional fetch options`);
-
-  // レスポンスの型を取得
-  const responseType = getResponseType(endpoint);
   lines.push(` * @returns ${responseType}`);
   lines.push(
     ` * @throws {_XcgenApiError} API error with status and response details`,
@@ -54,13 +125,9 @@ export function generateEndpoint(endpoint: IREndpoint): string | null {
   // 関数シグネチャ
   lines.push(`export async function ${functionName}(`);
 
-  // データ型に応じて適切なパラメータを生成
   if (dataTypes.needsDataType) {
-    // パラメータまたはリクエストボディがある場合
-    // 両方ある場合は統合型（parameterType名で生成済み）、片方の場合はその型を使用
     let dataTypeName: string;
     if (dataTypes.parameterType && dataTypes.requestBodyType) {
-      // 両方ある場合: types.tsで統合型として生成済み（path/query/header + body）
       dataTypeName = dataTypes.parameterType;
     } else if (dataTypes.parameterType) {
       dataTypeName = dataTypes.parameterType;
@@ -79,7 +146,6 @@ export function generateEndpoint(endpoint: IREndpoint): string | null {
   lines.push(`    method: "${endpoint.method.toUpperCase()}",`);
   lines.push(`    path: "${endpoint.path}",`);
 
-  // データ型がない場合は空オブジェクトを渡す
   if (dataTypes.needsDataType) {
     lines.push(`    options,`);
   } else {

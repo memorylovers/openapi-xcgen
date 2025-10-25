@@ -9,7 +9,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 ## ステータス
 
 - **状態**: 実装中（基盤完了、Hookテスト追加中）
-- **進捗**: 75% (6/6 Hook types定義完了、2/6 Hookテスト完了)
+- **進捗**: 80% (6/6 Hook types定義完了、4/6 Hookテスト完了)
 
 ## 実装状況
 
@@ -36,11 +36,18 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 
 - `src/generators/types/types.ts` - `generateTypes(ir, writer, hooks?)`
 - `src/generators/types/types-property.ts` - `property:generate` Hook呼び出し実装
+- `src/generators/types/types-parameter-property.ts` - `parameter:generate` Hook呼び出し実装
+- `src/generators/types/helpers/generate-model-file.ts` - `modelFile:generate` Hook呼び出し実装
+- `src/generators/services/services-endpoint.ts` - `endpoint:generate` Hook呼び出し実装（旧 services-function.ts）
+- `src/generators/services/services.ts` - hooks パラメータ対応
 - その他の生成器も hooks パラメータ対応済み
 
 #### テスト
 
-- `tests/unit/hooks/property-generate.test.ts` - 13個のテスト（パラメータ化テスト含む）
+- `tests/unit/hooks/property-generate.test.ts` - 13個のテスト
+- `tests/unit/hooks/parameter-generate.test.ts` - 18個のテスト
+- `tests/unit/hooks/model-generate.test.ts` - 16個のテスト
+- `tests/unit/hooks/endpoint-generate.test.ts` - 12個のテスト
 - E2Eフィクスチャ準備: `tests/e2e/fixtures/hooks/`
 
 ### 🔄 残り作業
@@ -48,8 +55,8 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 #### Hookテスト追加（優先）
 
 - [x] `parameter:generate` Hook のテスト追加
-- [x] `model:generate` Hook のテスト追加
-- [ ] `endpoint:generate` Hook のテスト追加
+- [x] `modelFile:generate` Hook のテスト追加
+- [x] `endpoint:generate` Hook のテスト追加
 - [ ] `type:transform` Hook のテスト追加
 - [ ] `validation:transform` Hook のテスト追加
 
@@ -156,10 +163,12 @@ export default defineConfig({
    - 複数Hook実行
    - 各モデル種別対応
 
-4. **endpoint-generate.test.ts** ⬜
-   - 関数名のカスタマイズ
-   - コード変更
-   - インポート追加
+4. **endpoint-generate.test.ts** ✅ (12テスト)
+   - 関数名のカスタマイズ（x-function-name）
+   - コード変更（部分・完全置換）
+   - 複数Hook実行
+   - 異なるHTTPメソッド対応
+   - 複雑なシナリオ（description/summary、deprecated）
 
 5. **type-transform.test.ts** ⬜
    - IR型 → TypeScript型変換のカスタマイズ

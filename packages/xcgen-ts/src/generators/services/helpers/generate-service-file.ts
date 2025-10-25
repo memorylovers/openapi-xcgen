@@ -5,6 +5,7 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
+import type { HookableInstance } from "../../../hooks";
 import { generateServicesImports } from "../services-imports";
 import { generateEndpoint } from "../services-endpoint";
 
@@ -13,6 +14,7 @@ import { generateEndpoint } from "../services-endpoint";
  *
  * @param tag - タグ名
  * @param endpoints - そのタグに属するエンドポイント配列
+ * @param hooks - Hook instance（オプション）
  * @returns サービスファイルのコード
  *
  * @example
@@ -28,6 +30,7 @@ import { generateEndpoint } from "../services-endpoint";
 export function generateServiceFile(
   tag: string,
   endpoints: IREndpoint[],
+  hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
 
@@ -44,7 +47,7 @@ export function generateServiceFile(
   // 各エンドポイントを関数に変換
   for (const endpoint of endpoints) {
     if (endpoint.operationId) {
-      const functionCode = generateEndpoint(endpoint);
+      const functionCode = generateEndpoint(endpoint, hooks);
       if (functionCode) {
         lines.push(functionCode);
         lines.push("");

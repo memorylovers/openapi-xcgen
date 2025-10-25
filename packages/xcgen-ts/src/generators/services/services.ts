@@ -37,7 +37,7 @@ import { generateServicesIndex } from "./helpers/generate-index";
 export async function generateServices(
   ir: XcgenIR,
   writer: IFileWriter,
-  _hooks?: HookableInstance,
+  hooks?: HookableInstance,
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 
@@ -49,7 +49,7 @@ export async function generateServices(
     const filename = kebabCase(tag);
     return {
       path: `services/${filename}.ts`,
-      content: generateServiceFile(tag, endpoints),
+      content: generateServiceFile(tag, endpoints, hooks),
     };
   });
 
