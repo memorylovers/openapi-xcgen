@@ -6,7 +6,7 @@
 
 import type { IREndpoint } from "@openapi-xcgen/core";
 import { generateServicesImports } from "../services-imports";
-import { generateServiceFunction } from "../services-function";
+import { generateEndpoint } from "../services-endpoint";
 
 /**
  * タグ別のサービスファイルを生成
@@ -44,7 +44,7 @@ export function generateServiceFile(
   // 各エンドポイントを関数に変換
   for (const endpoint of endpoints) {
     if (endpoint.operationId) {
-      const functionCode = generateServiceFunction(endpoint);
+      const functionCode = generateEndpoint(endpoint);
       if (functionCode) {
         lines.push(functionCode);
         lines.push("");

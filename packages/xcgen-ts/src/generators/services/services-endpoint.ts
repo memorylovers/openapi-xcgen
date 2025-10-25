@@ -12,7 +12,7 @@ import { getEndpointDataTypes } from "./services-data-types";
  * @param endpoint - IRエンドポイント
  * @returns TypeScript関数コード
  */
-export function generateServiceFunction(endpoint: IREndpoint): string | null {
+export function generateEndpoint(endpoint: IREndpoint): string | null {
   if (!endpoint.operationId) {
     return null;
   }
@@ -97,8 +97,8 @@ export function generateServiceFunction(endpoint: IREndpoint): string | null {
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("services-function", () => {
-    describe("generateServiceFunction", () => {
+  describe("services-endpoint", () => {
+    describe("generateEndpoint", () => {
       it("should generate function with operationId", () => {
         const endpoint: IREndpoint = {
           path: "/users",
@@ -125,7 +125,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateServiceFunction(endpoint);
+        const result = generateEndpoint(endpoint);
 
         expect(result).toEqual(
           `
@@ -158,7 +158,7 @@ export async function getUsers(
           responses: [],
         };
 
-        const result = generateServiceFunction(endpoint);
+        const result = generateEndpoint(endpoint);
 
         expect(result).toBeNull();
       });
@@ -179,7 +179,7 @@ export async function getUsers(
           ],
         };
 
-        const result = generateServiceFunction(endpoint);
+        const result = generateEndpoint(endpoint);
 
         expect(result).toEqual(
           `
