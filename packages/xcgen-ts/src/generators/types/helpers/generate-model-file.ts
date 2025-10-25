@@ -6,6 +6,7 @@
 
 import type { IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../../helpers/naming";
+import type { HookableInstance } from "../../../hooks";
 import { generateModel } from "../types-model";
 import { generateUnifiedParameterType } from "../types-parameter";
 import { extractTypeDependencies } from "./extract-dependencies";
@@ -17,6 +18,7 @@ import { extractTypeDependencies } from "./extract-dependencies";
  *
  * @param model - IRModel
  * @param requestBodyTypeName - 統合パラメータ型の場合のrequestBody型名（オプション）
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
@@ -33,14 +35,15 @@ import { extractTypeDependencies } from "./extract-dependencies";
 export function generateModelFile(
   model: IRModel,
   requestBodyTypeName?: string,
+  hooks?: HookableInstance,
 ): string | null {
   let typeCode: string | null = null;
 
   // parameterモデルで統合型が必要な場合
   if (model.kind === "parameter" && requestBodyTypeName) {
-    typeCode = generateUnifiedParameterType(model, requestBodyTypeName);
+    typeCode = generateUnifiedParameterType(model, requestBodyTypeName, hooks);
   } else {
-    typeCode = generateModel(model);
+    typeCode = generateModel(model, hooks);
   }
 
   if (!typeCode) {

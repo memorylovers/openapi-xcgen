@@ -4,13 +4,16 @@
  * IRPropertyからTypeScriptのプロパティ定義を生成する
  */
 
-import type { IRProperty } from "@openapi-xcgen/core";
+import type { IRModel, IRProperty } from "@openapi-xcgen/core";
 import { toPropertyName } from "../../helpers/naming";
 import { applyTypeModifiers, irTypeToTsType } from "../../helpers/type-mapper";
+import type { HookableInstance } from "../../hooks/create-hooks";
 
 /**
  * IRPropertyからTypeScriptプロパティ定義を生成
  * @param prop - IRProperty
+ * @param model - 親モデル（Hook用のコンテキスト）
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScriptプロパティ定義文字列
  *
  * @example
@@ -20,30 +23,58 @@ import { applyTypeModifiers, irTypeToTsType } from "../../helpers/type-mapper";
  *   type: "string",
  *   required: true,
  * };
- * generateProperty(prop);
+ * const model: IRModel = {
+ *   kind: "object",
+ *   name: "User",
+ *   referencePath: "#/components/schemas/User",
+ *   properties: []
+ * };
+ * generateProperty(prop, model);
  * // => "email: string;"
  * ```
  */
-export function generateProperty(prop: IRProperty): string {
+export function generateProperty(
+  prop: IRProperty,
+  model: IRModel,
+  hooks?: HookableInstance,
+): string {
   const propName = toPropertyName(prop.name);
   const baseType = irTypeToTsType(prop.type);
 
-  // 型修飾子を適用
-  const fullType = applyTypeModifiers(baseType, {
-    nullable: prop.nullable,
+  // 1. TsCodeProperty を初期化（Hookが変更可能）
+  const tsCode = {
+    typeName: baseType,
     optional: !prop.required,
+    nullable: prop.nullable ?? false,
+    comment: prop.description,
+  };
+
+  // 2. Hook を呼び出し（同期、純粋関数）
+  if (hooks) {
+    hooks.callHook("property:generate", {
+      property: prop,
+      model,
+      tsCode,
+      extensions: prop.extensions,
+    });
+  }
+
+  // 3. 最終的な tsCode から TypeScript コードを生成
+  const fullType = applyTypeModifiers(tsCode.typeName, {
+    nullable: tsCode.nullable,
+    optional: tsCode.optional,
   });
 
   // readonly修飾子
   const readonly = prop.readOnly ? "readonly " : "";
 
   // optional演算子
-  const optional = !prop.required ? "?" : "";
+  const optional = tsCode.optional ? "?" : "";
 
   // JSDocコメント（inline）
   let jsdoc = "";
-  if (prop.description) {
-    jsdoc = `/** ${prop.description} */ `;
+  if (tsCode.comment) {
+    jsdoc = `/** ${tsCode.comment} */ `;
   }
 
   return `${jsdoc}${readonly}${propName}${optional}: ${fullType};`;
@@ -52,6 +83,13 @@ export function generateProperty(prop: IRProperty): string {
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
+
+  const mockModel: IRModel = {
+    kind: "object",
+    name: "TestModel",
+    referencePath: "#/components/schemas/TestModel",
+    properties: [],
+  };
 
   describe("types-property", () => {
     describe("generateProperty", () => {
@@ -62,7 +100,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateProperty(prop);
+        const result = generateProperty(prop, mockModel);
 
         expect(result).toBe("email: string;");
       });
@@ -73,7 +111,7 @@ if (import.meta.vitest) {
           type: "string",
         };
 
-        const result = generateProperty(prop);
+        const result = generateProperty(prop, mockModel);
 
         expect(result).toBe("phone?: string | undefined;");
       });
@@ -86,7 +124,7 @@ if (import.meta.vitest) {
           readOnly: true,
         };
 
-        const result = generateProperty(prop);
+        const result = generateProperty(prop, mockModel);
 
         expect(result).toBe("readonly id: number;");
       });
@@ -99,7 +137,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateProperty(prop);
+        const result = generateProperty(prop, mockModel);
 
         expect(result).toBe("deletedAt: string | null;");
       });
@@ -112,7 +150,7 @@ if (import.meta.vitest) {
           description: "User name",
         };
 
-        const result = generateProperty(prop);
+        const result = generateProperty(prop, mockModel);
 
         expect(result).toBe("/** User name */ name: string;");
       });

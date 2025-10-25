@@ -4,6 +4,8 @@
  * @module @openapi-xcgen/generator-typescript/types
  */
 
+import type { Hooks } from "./hooks";
+
 /**
  * 生成器設定オプション
  */
@@ -16,6 +18,8 @@ export interface GeneratorOptions {
   validator?: "valibot";
   /** カスタムテンプレートディレクトリ（オプション） */
   templatesDir?: string;
+  /** コード生成をカスタマイズするHook（オプション） */
+  hooks?: Hooks;
 }
 
 /**
@@ -67,7 +71,12 @@ export interface GenerationResult {
  * export default defineConfig({
  *   input: './openapi.yaml',
  *   output: './generated',
- *   validator: 'valibot'
+ *   validator: 'valibot',
+ *   hooks: {
+ *     'property:generate': async (ctx) => {
+ *       // カスタム処理
+ *     }
+ *   }
  * });
  * ```
  */

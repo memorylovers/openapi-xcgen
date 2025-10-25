@@ -7,11 +7,13 @@
 
 import type { IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
+import type { HookableInstance } from "../../hooks";
 import { generateProperty } from "./types-property";
 
 /**
  * IRParameterModelからTypeScript interfaceを生成
  * @param model - IRParameterModel
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript interface定義文字列
  *
  * @example
@@ -25,12 +27,13 @@ import { generateProperty } from "./types-property";
  *     { name: "include", type: "string", required: false, in: "query" }
  *   ],
  * };
- * generateParameterType(model);
+ * await generateParameterType(model);
  * // => "export interface GetUserData { path: { id: number; }; query: { include?: string; }; }"
  * ```
  */
 export function generateParameterType(
   model: IRModel & { kind: "parameter" },
+  hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
@@ -57,7 +60,7 @@ export function generateParameterType(
   for (const [inType, params] of Object.entries(grouped)) {
     lines.push(`  ${inType}: {`);
     for (const param of params) {
-      const propertyCode = generateProperty(param);
+      const propertyCode = generateProperty(param, model, hooks);
       lines.push(`    ${propertyCode}`);
     }
     lines.push(`  };`);
@@ -72,6 +75,7 @@ export function generateParameterType(
  * パラメータとリクエストボディを統合したTypeScript interfaceを生成
  * @param parameterModel - IRParameterModel
  * @param requestBodyTypeName - リクエストボディの型名
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript interface定義文字列
  *
  * @example
@@ -91,6 +95,7 @@ export function generateParameterType(
 export function generateUnifiedParameterType(
   parameterModel: IRModel & { kind: "parameter" },
   requestBodyTypeName: string,
+  hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(parameterModel.name);
@@ -117,7 +122,7 @@ export function generateUnifiedParameterType(
   for (const [inType, params] of Object.entries(grouped)) {
     lines.push(`  ${inType}: {`);
     for (const param of params) {
-      const propertyCode = generateProperty(param);
+      const propertyCode = generateProperty(param, parameterModel, hooks);
       lines.push(`    ${propertyCode}`);
     }
     lines.push(`  };`);

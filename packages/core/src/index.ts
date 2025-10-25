@@ -2,6 +2,9 @@
 export type {
   ComponentsObject,
   ContactObject,
+  // IR types - Extensions
+  Extensions,
+  ExtensionValue,
   InfoObject,
   // IR types
   IRArray,

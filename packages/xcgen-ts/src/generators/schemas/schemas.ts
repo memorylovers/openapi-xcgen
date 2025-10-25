@@ -7,6 +7,7 @@
 import type { XcgenIR } from "@openapi-xcgen/core";
 import { sortModelsByDependencies } from "./schemas-sort";
 import type { IFileWriter } from "../../helpers/file-writer";
+import type { HookableInstance } from "../../hooks";
 import type { GeneratorResult } from "../../types";
 import { runInParallel } from "../../helpers/parallel";
 import { generateSchemaFile } from "./helpers/generate-schema-file";
@@ -19,13 +20,15 @@ import { generateSchemasIndex } from "./helpers/generate-index";
  *
  * @param ir - 中間表現
  * @param writer - ファイル書き込みインターフェース
+ * @param hooks - Hookインスタンス（オプショナル）
  * @returns 生成結果（ファイルパス配列とカウント）
  *
  * @example
  * ```typescript
  * const ir: XcgenIR = { ... };
  * const writer = new FileWriter('./output');
- * const result = await generateSchemas(ir, writer);
+ * const hooks = createHooks();
+ * const result = await generateSchemas(ir, writer, hooks);
  * console.log(result.files); // ['schemas/PetSchema.ts', 'schemas/UserSchema.ts', 'schemas/index.ts']
  * console.log(result.count); // 2 (Pet, User)
  * ```
@@ -33,6 +36,7 @@ import { generateSchemasIndex } from "./helpers/generate-index";
 export async function generateSchemas(
   ir: XcgenIR,
   writer: IFileWriter,
+  _hooks?: HookableInstance,
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 

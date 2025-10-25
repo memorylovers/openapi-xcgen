@@ -6,11 +6,20 @@
 
 import type { XcgenIR } from "@openapi-xcgen/core";
 import type { IFileWriter } from "../../helpers/file-writer";
-import type { GeneratorResult } from "../../types";
 import { runInParallel } from "../../helpers/parallel";
+import type { HookableInstance } from "../../hooks";
+import type { GeneratorResult } from "../../types";
 import { buildUnifiedParameterTypesMap } from "./helpers/build-unified-parameter-map";
-import { generateModelFile } from "./helpers/generate-model-file";
 import { generateModelsIndex } from "./helpers/generate-index";
+import { generateModelFile } from "./helpers/generate-model-file";
+
+/**
+ * 生成されるモデルファイル情報
+ */
+type GeneratedModelFile = {
+  path: string;
+  content: string;
+};
 
 /**
  * XcgenIRからTypeScript型定義を生成（ディレクトリベース構造）
@@ -19,13 +28,15 @@ import { generateModelsIndex } from "./helpers/generate-index";
  *
  * @param ir - 中間表現
  * @param writer - ファイル書き込みインターフェース
+ * @param hooks - Hookインスタンス（オプショナル）
  * @returns 生成結果（ファイルパス配列とカウント）
  *
  * @example
  * ```typescript
  * const ir: XcgenIR = { ... };
  * const writer = new FileWriter('./output');
- * const result = await generateTypes(ir, writer);
+ * const hooks = createHooks();
+ * const result = await generateTypes(ir, writer, hooks);
  * console.log(result.files); // ['models/Pet.ts', 'models/User.ts', 'models/index.ts']
  * console.log(result.count); // 2 (Pet, User)
  * ```
@@ -33,6 +44,7 @@ import { generateModelsIndex } from "./helpers/generate-index";
 export async function generateTypes(
   ir: XcgenIR,
   writer: IFileWriter,
+  _hooks?: HookableInstance,
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 
@@ -49,13 +61,10 @@ export async function generateTypes(
 
       return {
         path: `models/${model.name}.ts`,
-        content: generateModelFile(model, requestBodyTypeName),
+        content: generateModelFile(model, requestBodyTypeName, _hooks),
       };
     })
-    .filter((f) => f.content !== null) as Array<{
-    path: string;
-    content: string;
-  }>;
+    .filter((f) => f.content !== null) as GeneratedModelFile[];
 
   // Step 2: Code → Write (並列書き込み、並列数制限あり)
   await runInParallel(modelFiles, (file) =>

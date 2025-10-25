@@ -8,15 +8,17 @@ import type { XcgenIR } from "@openapi-xcgen/core";
 import { parse, transform } from "@openapi-xcgen/core";
 import { consola } from "consola";
 import { join } from "node:path";
+import { loadGeneratorConfig } from "./config";
 import { generateClient } from "./generators/client/client";
 import { generateSchemas } from "./generators/schemas/schemas";
 import { generateServices } from "./generators/services/services";
 import { generateTypes } from "./generators/types/types";
 import { FileWriter } from "./helpers/file-writer";
+import { createHooks } from "./hooks";
 import type { GenerationResult, GeneratorOptions } from "./types";
 
 /**
- * TypeScriptコードを生成する（ディレクトリベース構造）
+ * TypeScriptコードを生成する
  * @param options - 生成器オプション
  * @returns 生成結果
  *
@@ -32,13 +34,19 @@ import type { GenerationResult, GeneratorOptions } from "./types";
 export async function generate(
   options: GeneratorOptions,
 ): Promise<GenerationResult> {
-  consola.start(`Generating TypeScript code from ${options.input}...`);
+  // 0. 設定ファイルを読み込み
+  const config = await loadGeneratorConfig(options);
 
-  // 1. Parse OpenAPI document
+  // 1. Hook システムを初期化
+  const hooks = createHooks(config.hooks);
+
+  consola.start(`Generating TypeScript code from ${config.input}...`);
+
+  // 2. Parse OpenAPI document
   consola.info("Parsing OpenAPI document...");
-  const document = await parse(options.input);
+  const document = await parse(config.input);
 
-  // 2. Transform to IR
+  // 3. Transform to IR
   consola.info("Transforming to intermediate representation...");
   const ir: XcgenIR = transform(document);
 
@@ -46,40 +54,40 @@ export async function generate(
     `Found ${ir.models.length} models, ${ir.endpoints.length} endpoints`,
   );
 
-  // 3. Generate code with directory-based structure
+  // 4. Generate code with directory-based structure
   consola.info("Generating code...");
-  const writer = new FileWriter(options.output);
+  const writer = new FileWriter(config.output);
   const allFiles: string[] = [];
 
-  // 3.1 Types生成（内部でrunInParallel()使用、並列数制限あり）
+  // 4.1 Types生成（Hookインスタンスを渡す）
   consola.info("Generating types...");
-  const typesResult = await generateTypes(ir, writer);
+  const typesResult = await generateTypes(ir, writer, hooks);
   allFiles.push(...typesResult.files);
   consola.success(`Generated ${typesResult.count} types → models/ directory`);
 
-  // 3.2 Schemas生成（内部でrunInParallel()使用、並列数制限あり）
+  // 4.2 Schemas生成（Hookインスタンスを渡す）
   let schemasResult;
-  if (options.validator === "valibot") {
+  if (config.validator === "valibot") {
     consola.info("Generating Valibot schemas...");
-    schemasResult = await generateSchemas(ir, writer);
+    schemasResult = await generateSchemas(ir, writer, hooks);
     allFiles.push(...schemasResult.files);
     consola.success(
       `Generated ${schemasResult.count} schemas → schemas/ directory`,
     );
   }
 
-  // 3.3 Services生成（内部でrunInParallel()使用、並列数制限あり）
+  // 4.3 Services生成（Hookインスタンスを渡す）
   consola.info("Generating services...");
-  const servicesResult = await generateServices(ir, writer);
+  const servicesResult = await generateServices(ir, writer, hooks);
   allFiles.push(...servicesResult.files);
   consola.success(
     `Generated ${servicesResult.count} services → services/ directory`,
   );
 
-  // 3.4 client.ts と index.ts を並列書き込み
+  // 4.4 client.ts と index.ts を並列書き込み
   consola.info("Generating client and index...");
   const clientCode = generateClient(ir);
-  const indexCode = generateTopLevelIndex(ir, options);
+  const indexCode = generateTopLevelIndex(ir, config);
 
   await Promise.all([
     writer.write("client.ts", clientCode.code),
@@ -90,11 +98,11 @@ export async function generate(
   consola.success("Generated client.ts and index.ts");
 
   consola.success(
-    `✅ Successfully generated ${allFiles.length} files in ${options.output}`,
+    `✅ Successfully generated ${allFiles.length} files in ${config.output}`,
   );
 
   return {
-    files: allFiles.map((f) => join(options.output, f)),
+    files: allFiles.map((f) => join(config.output, f)),
     typesCount: typesResult.count,
     schemasCount: schemasResult?.count,
     servicesCount: servicesResult.count,
