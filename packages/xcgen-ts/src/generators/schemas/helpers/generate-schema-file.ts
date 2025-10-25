@@ -6,6 +6,7 @@
 
 import type { IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../../helpers/naming";
+import type { HookableInstance } from "../../../hooks";
 import { generateSchemaModel } from "../schemas-model";
 import { extractSchemaDependencies } from "./extract-dependencies";
 
@@ -15,6 +16,7 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  * 個別のスキーマファイルを生成する。依存する他のスキーマのimport文も自動生成される。
  *
  * @param model - IRModel
+ * @param hooks - Hook instance（オプション）
  * @returns Valibotスキーマコード（null: 生成スキップ）
  *
  * @example
@@ -28,8 +30,11 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  * // => "/**\n * Valibot validation schema for User\n * ...\n *\/\n\nimport * as v from "valibot";\n\nexport const UserSchema = ..."
  * ```
  */
-export function generateSchemaFile(model: IRModel): string | null {
-  const schemaCode = generateSchemaModel(model);
+export function generateSchemaFile(
+  model: IRModel,
+  hooks?: HookableInstance,
+): string | null {
+  const schemaCode = generateSchemaModel(model, hooks);
 
   if (!schemaCode) {
     return null;

@@ -36,7 +36,7 @@ import { generateSchemasIndex } from "./helpers/generate-index";
 export async function generateSchemas(
   ir: XcgenIR,
   writer: IFileWriter,
-  _hooks?: HookableInstance,
+  hooks?: HookableInstance,
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 
@@ -47,7 +47,7 @@ export async function generateSchemas(
   const schemaFiles = sortedModels
     .map((model) => ({
       path: `schemas/${model.name}Schema.ts`,
-      content: generateSchemaFile(model),
+      content: generateSchemaFile(model, hooks),
     }))
     .filter((f) => f.content !== null) as Array<{
     path: string;

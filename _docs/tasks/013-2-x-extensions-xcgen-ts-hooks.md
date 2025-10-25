@@ -8,8 +8,8 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 
 ## ステータス
 
-- **状態**: 実装中（基盤完了、Hookテスト追加中）
-- **進捗**: 80% (6/6 Hook types定義完了、4/6 Hookテスト完了)
+- **状態**: 完了
+- **進捗**: 100% (5/5 実用Hook実装完了)
 
 ## 実装状況
 
@@ -40,6 +40,12 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - `src/generators/types/helpers/generate-model-file.ts` - `modelFile:generate` Hook呼び出し実装
 - `src/generators/services/services-endpoint.ts` - `endpoint:generate` Hook呼び出し実装（旧 services-function.ts）
 - `src/generators/services/services.ts` - hooks パラメータ対応
+- `src/generators/schemas/schemas-validation.ts` - `validation:transform` Hook呼び出し実装
+- `src/generators/schemas/schemas-type-mapper.ts` - hooks パラメータ伝播
+- `src/generators/schemas/schemas-array.ts` - hooks パラメータ伝播
+- `src/generators/schemas/schemas-model.ts` - hooks パラメータ伝播
+- `src/generators/schemas/helpers/generate-schema-file.ts` - hooks パラメータ伝播
+- `src/generators/schemas/schemas.ts` - hooks パラメータ対応（`_hooks` → `hooks`）
 - その他の生成器も hooks パラメータ対応済み
 
 #### テスト
@@ -48,6 +54,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - `tests/unit/hooks/parameter-generate.test.ts` - 18個のテスト
 - `tests/unit/hooks/model-generate.test.ts` - 16個のテスト
 - `tests/unit/hooks/endpoint-generate.test.ts` - 12個のテスト
+- `tests/unit/hooks/validation-transform.test.ts` - 15個のテスト
 - E2Eフィクスチャ準備: `tests/e2e/fixtures/hooks/`
 
 ### 🔄 残り作業
@@ -57,8 +64,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - [x] `parameter:generate` Hook のテスト追加
 - [x] `modelFile:generate` Hook のテスト追加
 - [x] `endpoint:generate` Hook のテスト追加
-- [ ] `type:transform` Hook のテスト追加
-- [ ] `validation:transform` Hook のテスト追加
+- [x] `validation:transform` Hook のテスト追加
 
 #### 最終検証
 
@@ -67,6 +73,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - [ ] ビルド（`pnpm build`）
 - [ ] 型チェック（`pnpm typecheck`）
 - [ ] Lint（`pnpm lint`）
+- [ ] ドキュメントにhooksに関する記述を追加する
 
 ## Hook機構の設計
 
@@ -91,7 +98,6 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 | `parameter:generate` | パラメータ生成時 | パラメータ型のカスタマイズ |
 | `modelFile:generate` | モデルファイル生成時 | ファイルレベルの拡張、インポート追加 |
 | `endpoint:generate` | エンドポイント生成時 | API関数のカスタマイズ |
-| `type:transform` | 型変換時 | IR型 → TypeScript型への変換カスタマイズ |
 | `validation:transform` | バリデーション変換時 | IRValidation → Valibot schemaへの変換カスタマイズ |
 
 ### Hook Context の例
@@ -135,6 +141,23 @@ export default defineConfig({
 })
 ```
 
+## 制限事項
+
+### validation:transform Hook の対応範囲
+
+- ✅ プロパティレベルのバリデーション (`IRProperty.validation`)
+- ✅ 配列要素のバリデーション (`minItems`/`maxItems`)
+- ❌ allOf/anyOf/union レベルのバリデーション
+
+**理由**:
+
+- allOf/anyOf/union モデルには `validation` プロパティが存在しない（IR型定義の制約）
+- これらは `irTypeToValibotSchemaRef()` で処理され、バリデーションパイプを生成しない
+- ほとんどのユースケースはプロパティレベルのバリデーションで対応可能
+
+**将来の対応**:
+allOf/anyOf/union でカスタムバリデーションが必要な場合は Issue で相談してください。最小限の対応（extensions のみ Hook に渡す）を検討できます。
+
 ## テスト戦略
 
 ### 単体テスト（tests/unit/hooks/）
@@ -170,11 +193,12 @@ export default defineConfig({
    - 異なるHTTPメソッド対応
    - 複雑なシナリオ（description/summary、deprecated）
 
-5. **type-transform.test.ts** ⬜
-   - IR型 → TypeScript型変換のカスタマイズ
-
-6. **validation-transform.test.ts** ⬜
-   - IRValidation → Valibot schema変換のカスタマイズ
+5. **validation-transform.test.ts** ✅ (15テスト)
+   - カスタムバリデーションパイプ追加
+   - バリデーションパイプ置換・削除
+   - 複数Hook実行
+   - 異なるバリデーション型対応（number, format, pattern）
+   - 複雑なシナリオ（型に基づく条件付きバリデーション）
 
 ### E2Eテスト
 

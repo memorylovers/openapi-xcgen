@@ -196,8 +196,8 @@ export interface ValidationTransformContext {
  * バリデーションのコード生成モデル
  */
 export interface TsCodeValidation {
-  /** Valibot schema 文字列 */
-  schemaString: string;
+  /** Valibot バリデーションパイプの配列 */
+  pipes: string[];
 }
 
 /**

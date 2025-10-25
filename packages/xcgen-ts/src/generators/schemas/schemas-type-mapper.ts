@@ -4,15 +4,18 @@
  * IRTypeをValibotのスキーマ表現に変換し、バリデーションパイプを適用する
  */
 
-import type { IRType, IRValidation } from "@openapi-xcgen/core";
+import type { Extensions, IRType, IRValidation } from "@openapi-xcgen/core";
 import { generatePrimitiveSchema } from "./schemas-primitive";
 import { generateValidationPipes } from "./schemas-validation";
 import { toTypeName } from "../../helpers/naming";
+import type { HookableInstance } from "../../hooks";
 
 /**
  * IRTypeをValibotスキーマ文字列に変換
  * @param type - IR型
  * @param validation - バリデーション制約（オプション）
+ * @param hooks - Hook instance（オプション）
+ * @param extensions - x-extensions（オプション）
  * @returns Valibotスキーマ文字列
  *
  * @example
@@ -37,6 +40,8 @@ import { toTypeName } from "../../helpers/naming";
 export function irTypeToValibotSchema(
   type: IRType,
   validation?: IRValidation,
+  hooks?: HookableInstance,
+  extensions?: Extensions,
 ): string {
   // const値がある場合はv.literal()を使用（discriminatorプロパティ用）
   if (validation?.const !== undefined) {
@@ -85,7 +90,9 @@ export function irTypeToValibotSchema(
   }
 
   // バリデーションパイプを追加
-  const pipes = validation ? generateValidationPipes(validation) : [];
+  const pipes = validation
+    ? generateValidationPipes(validation, type, hooks, extensions)
+    : [];
   if (pipes.length > 0) {
     return `v.pipe(${baseSchema}, ${pipes.join(", ")})`;
   }

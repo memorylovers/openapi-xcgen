@@ -4,7 +4,7 @@
  * 各IRModel型に応じたValibotスキーマ定義を生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { Extensions, IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { generateAllOfSchema } from "./schemas-allof";
 import { generateAnyOfSchema } from "./schemas-anyof";
@@ -14,10 +14,12 @@ import { generateObjectSchema, type PropertySchema } from "./schemas-object";
 import { irTypeToValibotSchema } from "./schemas-type-mapper";
 import { irTypeToValibotSchemaRef } from "./schemas-type-ref";
 import { generateUnionSchema } from "./schemas-union";
+import type { HookableInstance } from "../../hooks";
 
 /**
  * IRModelをValibotスキーマ定義に変換
  * @param model - IRモデル
+ * @param hooks - Hook instance（オプション）
  * @returns Valibotスキーマ定義コード
  *
  * @example
@@ -43,7 +45,10 @@ import { generateUnionSchema } from "./schemas-union";
  * // });
  * ```
  */
-export function generateSchemaModel(model: IRModel): string | null {
+export function generateSchemaModel(
+  model: IRModel,
+  hooks?: HookableInstance,
+): string | null {
   // スキーマ名: {ModelName}Schema
   const schemaName = `${toTypeName(model.name)}Schema`;
 
@@ -66,7 +71,12 @@ export function generateSchemaModel(model: IRModel): string | null {
       const propertySchemas: PropertySchema[] = model.properties.map(
         (prop) => ({
           name: prop.name,
-          schema: irTypeToValibotSchema(prop.type, prop.validation),
+          schema: irTypeToValibotSchema(
+            prop.type,
+            prop.validation,
+            hooks,
+            prop.extensions,
+          ),
           optional: !prop.required,
           nullable: !!prop.nullable,
           readOnly: prop.readOnly,
@@ -82,15 +92,36 @@ export function generateSchemaModel(model: IRModel): string | null {
     }
 
     case "array": {
-      const itemSchema = irTypeToValibotSchema(model.itemType);
+      const modelExtensions = (
+        "extensions" in model ? model.extensions : undefined
+      ) as Extensions | undefined;
+      const itemSchema = irTypeToValibotSchema(
+        model.itemType,
+        undefined,
+        hooks,
+        modelExtensions,
+      );
       // IRArrayModelにはvalidationプロパティがないため、undefinedを渡す
-      schemaExpression = generateArraySchema(itemSchema, undefined);
+      schemaExpression = generateArraySchema(
+        itemSchema,
+        undefined,
+        hooks,
+        modelExtensions,
+      );
       break;
     }
 
     case "map": {
+      const modelExtensions = (
+        "extensions" in model ? model.extensions : undefined
+      ) as Extensions | undefined;
       // Record<string, T> → v.record(v.string(), valueSchema)
-      const valueSchema = irTypeToValibotSchema(model.valueType);
+      const valueSchema = irTypeToValibotSchema(
+        model.valueType,
+        undefined,
+        hooks,
+        modelExtensions,
+      );
       schemaExpression = `v.record(v.string(), ${valueSchema})`;
       break;
     }
