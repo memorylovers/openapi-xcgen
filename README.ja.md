@@ -96,6 +96,36 @@ export default defineConfig({
 
 実行: `xcgen-ts`（設定ファイルを自動的に使用）
 
+## Hooks（拡張機能）
+
+xcgen.config.ts で Hooks を定義することで、コード生成をカスタマイズできます。
+
+**例: x-type でカスタム型を使用**
+
+```typescript
+// xcgen.config.ts
+export default defineConfig({
+  input: "./openapi.yaml",
+  output: "./generated",
+  hooks: {
+    "property:generate": (ctx) => {
+      if (ctx.extensions?.["x-type"]) {
+        ctx.tsCode.typeName = ctx.extensions["x-type"];
+      }
+    },
+  },
+});
+```
+
+**利用可能な Hook:**
+
+- `property:generate` - プロパティの型をカスタマイズ
+- `endpoint:generate` - API関数をカスタマイズ
+- `modelFile:generate` - インポート追加、ファイルレベルの拡張
+- `validation:transform` - バリデーションロジックをカスタマイズ
+
+詳細は [Hooks ガイド](./_guides/hooks.ja.md) を参照してください。
+
 ## ドキュメント
 
 - **[仕様書](./_guides/spec.ja.md)** - 型システムと制限事項

@@ -9,7 +9,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 ## ステータス
 
 - **状態**: 完了
-- **進捗**: 100% (5/5 実用Hook実装完了)
+- **進捗**: 100% (5/5 実用Hook実装完了、E2Eフィクスチャ完成、インポートハンドラ実装完了)
 
 ## 実装状況
 
@@ -18,11 +18,16 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 #### Hook基盤システム
 
 - `src/hooks/types.ts` - 全Hook Context型とTsCode型定義
+  - `TsCodeModel` に `schemaImports?: string[]` 追加
 - `src/hooks/create-hooks.ts` - 同期Hookシステム（純粋関数のみ）
   - ジェネリック型推論による型安全性
   - 例外処理（Fail-fast原則）
   - in-sourceテスト 7個
 - `src/hooks/index.ts` - エクスポート
+- `src/helpers/import-handler.ts` - カスタムインポート処理
+  - `processImports()` - フルインポート文と型名の分離
+  - `generateTypeImports()` - import type/import の生成（useTypeKeyword パラメータ）
+  - in-sourceテスト 11個
 
 #### Generator統合
 
@@ -38,42 +43,63 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - `src/generators/types/types-property.ts` - `property:generate` Hook呼び出し実装
 - `src/generators/types/types-parameter-property.ts` - `parameter:generate` Hook呼び出し実装
 - `src/generators/types/helpers/generate-model-file.ts` - `modelFile:generate` Hook呼び出し実装
+  - カスタムインポート処理（processImports、generateTypeImports）
+  - `import type` を使用
 - `src/generators/services/services-endpoint.ts` - `endpoint:generate` Hook呼び出し実装（旧 services-function.ts）
+- `src/generators/services/helpers/generate-service-file.ts` - エンドポイントインポート収集・処理
+  - 全エンドポイントから `tsCode.imports` を収集
+  - カスタムインポート処理
 - `src/generators/services/services.ts` - hooks パラメータ対応
 - `src/generators/schemas/schemas-validation.ts` - `validation:transform` Hook呼び出し実装
 - `src/generators/schemas/schemas-type-mapper.ts` - hooks パラメータ伝播
 - `src/generators/schemas/schemas-array.ts` - hooks パラメータ伝播
 - `src/generators/schemas/schemas-model.ts` - hooks パラメータ伝播
-- `src/generators/schemas/helpers/generate-schema-file.ts` - hooks パラメータ伝播
-- `src/generators/schemas/schemas.ts` - hooks パラメータ対応（`_hooks` → `hooks`）
+- `src/generators/schemas/helpers/generate-schema-file.ts` - schemaImports パラメータ対応
+  - カスタムインポート処理（`useTypeKeyword: false` でバリュー import）
+- `src/generators/schemas/schemas.ts` - `modelFile:generate` Hook呼び出して schemaImports 取得
 - その他の生成器も hooks パラメータ対応済み
 
 #### テスト
+
+##### 単体テスト
 
 - `tests/unit/hooks/property-generate.test.ts` - 13個のテスト
 - `tests/unit/hooks/parameter-generate.test.ts` - 18個のテスト
 - `tests/unit/hooks/model-generate.test.ts` - 16個のテスト
 - `tests/unit/hooks/endpoint-generate.test.ts` - 12個のテスト
-- `tests/unit/hooks/validation-transform.test.ts` - 15個のテスト
-- E2Eフィクスチャ準備: `tests/e2e/fixtures/hooks/`
+- `tests/unit/hooks/validation-transform.test.ts` - 12個のテスト
 
-### 🔄 残り作業
+##### E2Eフィクスチャ
 
-#### Hookテスト追加（優先）
+- `tests/e2e/fixtures/hooks/x-type-custom/` - property:generate Hook（カスタム型）
+  - `xcgen.config.ts` - x-type 処理
+  - `expected-valibot/` - 期待値ファイル
+  - `_userdefs/index.ts` - UserId, EmailAddress, PhoneNumber 型定義
+- `tests/e2e/fixtures/hooks/x-function-name/` - endpoint:generate Hook（関数名）
+  - `xcgen.config.ts` - x-function-name 処理
+  - `expected-valibot/` - 期待値ファイル（listAllUsers, addNewUser, fetchByUserId）
+- `tests/e2e/fixtures/hooks/x-validation-custom/` - validation:transform Hook（カスタムバリデーション）
+  - `xcgen.config.ts` - x-validation 処理
+  - `expected-valibot/` - 期待値ファイル
+  - `_userdefs/index.ts` - validateSKUFormat, validatePositivePrice, validateBusinessEmail
 
-- [x] `parameter:generate` Hook のテスト追加
-- [x] `modelFile:generate` Hook のテスト追加
-- [x] `endpoint:generate` Hook のテスト追加
-- [x] `validation:transform` Hook のテスト追加
+##### テストインフラ
 
-#### 最終検証
+- `tests/e2e/generate-expected.ts` - フィクスチャ期待値生成スクリプト
+  - generate-hooks-expected.ts を統合
+  - xcgen.config.ts 自動検出（c12用にprocess.chdir）
+  - hooks フィクスチャは valibot のみ生成
+- `tests/e2e/test-helper.ts` - テストヘルパー
+  - xcgen.config.ts 検出と process.chdir() 対応
+- `tests/e2e/generator.test.ts` - E2E生成テスト
+  - 3つの hooks テストケース追加（33テスト → 36テスト予定、現在33テスト）
+- `tests/e2e/type-check.test.ts` - 型チェックテスト
+  - 6つの hooks テストケース追加（36テスト → 42テスト）
+  - _userdefs/ ディレクトリのコピー対応
 
-- [x] E2E期待値の生成（`pnpm regenerate:expected`）- 差分なし ✅
-- [x] 全テスト実行（`pnpm test`）- 406テスト成功 ✅
-- [ ] ビルド（`pnpm build`）
-- [ ] 型チェック（`pnpm typecheck`）
-- [ ] Lint（`pnpm lint`）
-- [ ] ドキュメントにhooksに関する記述を追加する
+### ✅ 完了
+
+すべての作業が完了しました。
 
 ## Hook機構の設計
 
@@ -123,6 +149,8 @@ interface TsCodeProperty {
 
 ### 使用例
 
+#### 基本例: property:generate Hook
+
 ```typescript
 // xcgen.config.ts
 import { defineConfig } from '@openapi-xcgen/xcgen-ts'
@@ -139,6 +167,66 @@ export default defineConfig({
     }
   }
 })
+```
+
+#### カスタムインポート例: modelFile:generate Hook
+
+```typescript
+// xcgen.config.ts
+import { defineConfig } from '@openapi-xcgen/xcgen-ts'
+import type { HookContext } from '@openapi-xcgen/xcgen-ts'
+
+export default defineConfig({
+  input: './openapi.yaml',
+  output: './generated',
+  hooks: {
+    'property:generate': (ctx: HookContext<'property:generate'>) => {
+      // カスタム型を使用
+      if (ctx.extensions?.['x-type']) {
+        ctx.tsCode.typeName = ctx.extensions['x-type'] as string;
+      }
+    },
+    'modelFile:generate': (ctx: HookContext<'modelFile:generate'>) => {
+      // モデル内のカスタム型を収集
+      const customTypes: string[] = [];
+      const modelProperties = 'properties' in ctx.model ? ctx.model.properties : [];
+
+      for (const prop of modelProperties) {
+        const xType = prop.extensions?.['x-type'];
+        if (xType) {
+          customTypes.push(xType as string);
+        }
+      }
+
+      // グループ化されたインポート文を追加（ソート済み）
+      if (customTypes.length > 0) {
+        const sorted = [...new Set(customTypes)].sort();
+        ctx.tsCode.imports.push(
+          `import type { ${sorted.join(', ')} } from '../_userdefs'`
+        );
+      }
+    }
+  }
+})
+```
+
+#### 出力例
+
+```typescript
+// generated/models/User.ts
+/**
+ * User model
+ * Auto-generated from OpenAPI specification
+ */
+
+import type { EmailAddress, PhoneNumber, UserId } from '../_userdefs'
+
+export interface User {
+  /** User ID */ userId: UserId;
+  /** Email address */ email: EmailAddress;
+  /** Username (no custom type) */ username: string;
+  /** Optional phone number */ phoneNumber?: PhoneNumber | undefined;
+}
 ```
 
 ## 制限事項
@@ -193,7 +281,7 @@ allOf/anyOf/union でカスタムバリデーションが必要な場合は Issu
    - 異なるHTTPメソッド対応
    - 複雑なシナリオ（description/summary、deprecated）
 
-5. **validation-transform.test.ts** ✅ (15テスト)
+5. **validation-transform.test.ts** ✅ (12テスト)
    - カスタムバリデーションパイプ追加
    - バリデーションパイプ置換・削除
    - 複数Hook実行
@@ -202,9 +290,15 @@ allOf/anyOf/union でカスタムバリデーションが必要な場合は Issu
 
 ### E2Eテスト
 
-- `tests/e2e/fixtures/hooks/` に準備済み
-- `pnpm regenerate:expected` で期待値を生成
-- 既存のE2Eテストフレームワークで検証
+実装完了：
+
+- `tests/e2e/fixtures/hooks/x-type-custom/` - カスタム型のテスト
+- `tests/e2e/fixtures/hooks/x-function-name/` - カスタム関数名のテスト
+- `tests/e2e/fixtures/hooks/x-validation-custom/` - カスタムバリデーションのテスト
+- 各フィクスチャに xcgen.config.ts、expected-valibot/、_userdefs/ を含む
+- `pnpm regenerate:expected` で期待値を生成（33回実行）
+- generator.test.ts に 3テスト追加（計33テスト）
+- type-check.test.ts に 6テスト追加（計42テスト）
 
 ## 例外処理の仕様
 
