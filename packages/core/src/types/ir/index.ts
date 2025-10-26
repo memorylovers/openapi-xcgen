@@ -42,8 +42,8 @@ export interface XcgenIR {
 // Re-export all types from sub-modules
 // common
 export type {
-  Extensions,
-  ExtensionValue,
+  IRExtensions,
+  IRExtensionValue,
   IRArray,
   IRMap,
   IRRef,

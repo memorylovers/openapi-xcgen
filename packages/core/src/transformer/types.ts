@@ -1,5 +1,5 @@
 import type {
-  Extensions,
+  IRExtensions,
   IRHttpMethod,
   IRModel,
   IRType,
@@ -146,7 +146,7 @@ export interface OperationContext extends VisitorContext {
   /** PathItemレベルの共通パラメータ（継承用） */
   commonParameters?: Array<ParameterObject | ReferenceObject>;
   /** PathItemレベルの x-extensions（Operation と統合される） */
-  pathItemExtensions?: Extensions;
+  pathItemExtensions?: IRExtensions;
 }
 
 /**

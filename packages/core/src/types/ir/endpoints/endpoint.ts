@@ -2,7 +2,7 @@
  * エンドポイント関連のIR型定義
  */
 
-import type { Extensions } from "../common/extensions";
+import type { IRExtensions } from "../common/extensions";
 import type { IRType } from "../common/type";
 import type { IRSecurityRequirement } from "../security";
 import type { IRParameter } from "./parameter";
@@ -73,5 +73,5 @@ export interface IREndpoint {
   /** エンドポイントで必要な認証 */
   security?: IRSecurityRequirement[];
   /** OpenAPI拡張フィールド（Path Item + Operation の統合、Operation優先） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }

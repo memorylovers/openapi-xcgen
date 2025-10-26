@@ -2,7 +2,7 @@
  * パラメータ関連のIR型定義
  */
 
-import type { Extensions } from "../common/extensions";
+import type { IRExtensions } from "../common/extensions";
 import type { IRType } from "../common/type";
 import type { IRValidation } from "../models/validation";
 
@@ -52,5 +52,5 @@ export interface IRParameter {
   /** バリデーション制約 */
   validation?: IRValidation;
   /** OpenAPI拡張フィールド（x-プレフィックス） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }

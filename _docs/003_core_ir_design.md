@@ -37,7 +37,7 @@ IR型システムは、以下の4つのレイヤーで構成されています�
   - `IRType`（4種類の判別共用体）
 - **Layer 4: 基底型・補助型**
   - `IRScalarType`、`IRRef`
-  - `IRValidation`、`Extensions`
+  - `IRValidation`、`IRExtensions`
 
 ## Layer 1: XcgenIR
 
@@ -93,7 +93,7 @@ IRObjectModel
 │   └── description
 ├── validation?: IRValidation
 ├── additionalProperties?: IRType
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: User、Post、Commentなどのエンティティモデル
@@ -108,7 +108,7 @@ IREnumModel
 │   ├── value
 │   └── description
 ├── scalarType: IRScalarType
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: Status、Role、CategoryなどのEnum型
@@ -121,7 +121,7 @@ OpenAPIの`type: array`から生成されます。
 IRArrayModel
 ├── items: IRType
 ├── validation?: IRValidation
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: Users[]、Tags[]などの配列型
@@ -134,7 +134,7 @@ OpenAPIの`type: object` + `additionalProperties`から生成されます。
 IRMapModel
 ├── valueType: IRType
 ├── validation?: IRValidation
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: Record<string, User>のようなMap型
@@ -150,7 +150,7 @@ IRParameterModel
 ├── type: IRType
 ├── in: IRParameterInType
 │   └── "query" | "path" | "header" | "cookie"
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: クエリパラメータ、パスパラメータの型
@@ -164,7 +164,7 @@ IRRequestBodyModel
 ├── contents: IRRequestContent[]
 │   ├── mimeType
 │   └── type: IRType
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: POSTリクエストのボディ型
@@ -179,7 +179,7 @@ IRResponseModel
 │   ├── mimeType
 │   └── type: IRType
 ├── headers?: IRResponseHeader[]
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: レスポンスボディ型
@@ -193,7 +193,7 @@ OpenAPIの`allOf`から生成されます。
 ```
 IRAllOfModel
 ├── schemas: IRType[]
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: スキーママージ、継承の表現
@@ -205,7 +205,7 @@ OpenAPIの`anyOf`から生成されます。
 ```
 IRAnyOfModel
 ├── schemas: IRType[]
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 **用途**: Union型、ポリモーフィズムの表現
@@ -232,7 +232,7 @@ IREndpoint
 ├── requestBody?: IRRequestBody
 ├── responses: IRResponse[]
 ├── security
-└── extensions?: Extensions
+└── extensions?: IRExtensions
 ```
 
 ## Layer 3: IRType（型表現）
@@ -317,9 +317,9 @@ IRValidation
     └── maxProperties
 ```
 
-### Extensions（拡張フィールド）
+### IRExtensions（拡張フィールド）
 
-Extensions型は、OpenAPIの`x-`拡張フィールドを保持するための汎用的なキー・バリュー構造です。全IR型から参照可能です。
+IRExtensions型は、OpenAPIの`x-`拡張フィールドを保持するための汎用的なキー・バリュー構造です。全IR型から参照可能です。
 
 **活用例**:
 

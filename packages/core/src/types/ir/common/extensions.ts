@@ -28,13 +28,13 @@
  *   maxLength: 255
  * ```
  */
-export type ExtensionValue =
+export type IRExtensionValue =
   | string
   | number
   | boolean
   | null
-  | ExtensionValue[]
-  | { [key: string]: ExtensionValue };
+  | IRExtensionValue[]
+  | { [key: string]: IRExtensionValue };
 
 /**
  * OpenAPI Specification Extensions
@@ -71,4 +71,4 @@ export type ExtensionValue =
  * }
  * ```
  */
-export type Extensions = Record<string, ExtensionValue>;
+export type IRExtensions = Record<string, IRExtensionValue>;

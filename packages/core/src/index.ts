@@ -3,8 +3,8 @@ export type {
   ComponentsObject,
   ContactObject,
   // IR types - Extensions
-  Extensions,
-  ExtensionValue,
+  IRExtensions,
+  IRExtensionValue,
   InfoObject,
   // IR types
   IRArray,

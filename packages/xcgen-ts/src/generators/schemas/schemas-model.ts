@@ -4,7 +4,7 @@
  * 各IRModel型に応じたValibotスキーマ定義を生成する
  */
 
-import type { Extensions, IRModel } from "@openapi-xcgen/core";
+import type { IRExtensions, IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { generateAllOfSchema } from "./schemas-allof";
 import { generateAnyOfSchema } from "./schemas-anyof";
@@ -94,7 +94,7 @@ export function generateSchemaModel(
     case "array": {
       const modelExtensions = (
         "extensions" in model ? model.extensions : undefined
-      ) as Extensions | undefined;
+      ) as IRExtensions | undefined;
       const itemSchema = irTypeToValibotSchema(
         model.itemType,
         undefined,
@@ -114,7 +114,7 @@ export function generateSchemaModel(
     case "map": {
       const modelExtensions = (
         "extensions" in model ? model.extensions : undefined
-      ) as Extensions | undefined;
+      ) as IRExtensions | undefined;
       // Record<string, T> → v.record(v.string(), valueSchema)
       const valueSchema = irTypeToValibotSchema(
         model.valueType,

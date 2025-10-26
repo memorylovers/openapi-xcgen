@@ -1,5 +1,5 @@
 import type {
-  Extensions,
+  IRExtensions,
   OperationObject,
   ParameterObject,
   PathItemObject,
@@ -58,18 +58,18 @@ type ExtensibleOpenAPIObject =
  */
 export function extractExtensions(
   obj: ExtensibleOpenAPIObject,
-): Extensions | undefined {
+): IRExtensions | undefined {
   // objがnullやundefinedの場合はundefinedを返す
   if (!obj) {
     return undefined;
   }
 
-  const extensions: Extensions = {};
+  const extensions: IRExtensions = {};
 
   // x- プレフィックスを持つフィールドを抽出
   for (const [key, value] of Object.entries(obj)) {
     if (key.startsWith("x-")) {
-      extensions[key] = value as Extensions[string];
+      extensions[key] = value as IRExtensions[string];
     }
   }
 

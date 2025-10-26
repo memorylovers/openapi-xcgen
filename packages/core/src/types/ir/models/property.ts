@@ -2,7 +2,7 @@
  * プロパティ関連のIR型定義
  */
 
-import type { Extensions } from "../common/extensions";
+import type { IRExtensions } from "../common/extensions";
 import type { IRType } from "../common/type";
 import type { IRParameterInType } from "../endpoints/parameter";
 import type { IRValidation } from "./validation";
@@ -52,7 +52,7 @@ export interface IRProperty {
   /** バリデーション制約 */
   validation?: IRValidation;
   /** OpenAPI拡張フィールド（x-プレフィックス） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**

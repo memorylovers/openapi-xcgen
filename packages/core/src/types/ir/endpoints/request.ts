@@ -2,7 +2,7 @@
  * リクエスト関連のIR型定義
  */
 
-import type { Extensions } from "../common/extensions";
+import type { IRExtensions } from "../common/extensions";
 import type { MimeType } from "../common/mime-type";
 import type { IRRef, IRType } from "../common/type";
 
@@ -15,7 +15,7 @@ export interface IRRequestContent {
   /** スキーマ */
   schema: IRType;
   /** OpenAPI拡張フィールド（x-プレフィックス） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**
@@ -31,7 +31,7 @@ export interface IRRequestBodyWithContent {
   /** コンテンツ配列（MIMEタイプとスキーマの組み合わせ） */
   content: IRRequestContent[];
   /** OpenAPI拡張フィールド（x-プレフィックス） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**

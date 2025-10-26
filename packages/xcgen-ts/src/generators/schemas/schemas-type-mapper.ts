@@ -4,7 +4,7 @@
  * IRTypeをValibotのスキーマ表現に変換し、バリデーションパイプを適用する
  */
 
-import type { Extensions, IRType, IRValidation } from "@openapi-xcgen/core";
+import type { IRExtensions, IRType, IRValidation } from "@openapi-xcgen/core";
 import { generatePrimitiveSchema } from "./schemas-primitive";
 import { generateValidationPipes } from "./schemas-validation";
 import { toTypeName } from "../../helpers/naming";
@@ -41,7 +41,7 @@ export function irTypeToValibotSchema(
   type: IRType,
   validation?: IRValidation,
   hooks?: HookableInstance,
-  extensions?: Extensions,
+  extensions?: IRExtensions,
 ): string {
   // const値がある場合はv.literal()を使用（discriminatorプロパティ用）
   if (validation?.const !== undefined) {

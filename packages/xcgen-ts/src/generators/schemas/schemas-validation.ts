@@ -2,7 +2,7 @@
  * バリデーションpipe生成
  */
 
-import type { Extensions, IRType, IRValidation } from "@openapi-xcgen/core";
+import type { IRExtensions, IRType, IRValidation } from "@openapi-xcgen/core";
 import type { HookableInstance, TsCodeValidation } from "../../hooks";
 
 /**
@@ -27,7 +27,7 @@ export function generateValidationPipes(
   validation: IRValidation | undefined,
   type: IRType,
   hooks?: HookableInstance,
-  extensions?: Extensions,
+  extensions?: IRExtensions,
 ): string[] {
   if (!validation) {
     return [];

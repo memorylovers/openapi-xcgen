@@ -6,7 +6,7 @@
  */
 
 import type {
-  Extensions,
+  IRExtensions,
   IREndpoint,
   IRModel,
   IRParameter,
@@ -48,7 +48,7 @@ export interface PropertyGenerateContext {
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeProperty;
   /** x-extensions（存在する場合） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**
@@ -85,7 +85,7 @@ export interface ParameterGenerateContext {
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeParameter;
   /** x-extensions（存在する場合） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**
@@ -115,7 +115,7 @@ export interface ModelGenerateContext {
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeModel;
   /** x-extensions（存在する場合） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**
@@ -143,7 +143,7 @@ export interface EndpointGenerateContext {
   /** 生成される API 関数（Hookで変更可能） */
   tsCode: TsCodeEndpoint;
   /** x-extensions（存在する場合） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**
@@ -169,7 +169,7 @@ export interface TypeTransformContext {
   /** 生成される TypeScript 型文字列（Hookで変更可能） */
   tsCode: TsCodeType;
   /** x-extensions（存在する場合） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**
@@ -191,7 +191,7 @@ export interface ValidationTransformContext {
   /** 生成される Valibot schema 文字列（Hookで変更可能） */
   tsCode: TsCodeValidation;
   /** x-extensions（存在する場合） */
-  extensions?: Extensions;
+  extensions?: IRExtensions;
 }
 
 /**

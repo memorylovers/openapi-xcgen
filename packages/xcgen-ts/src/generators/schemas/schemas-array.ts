@@ -2,7 +2,7 @@
  * Arrayスキーマ生成
  */
 
-import type { Extensions, IRValidation } from "@openapi-xcgen/core";
+import type { IRExtensions, IRValidation } from "@openapi-xcgen/core";
 import { generateValidationPipes } from "./schemas-validation";
 import type { HookableInstance } from "../../hooks";
 
@@ -24,7 +24,7 @@ export function generateArraySchema(
   itemSchemaRef: string,
   validation?: IRValidation,
   hooks?: HookableInstance,
-  extensions?: Extensions,
+  extensions?: IRExtensions,
 ): string {
   const baseSchema = `v.array(${itemSchemaRef})`;
 
