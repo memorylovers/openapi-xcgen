@@ -1224,27 +1224,30 @@ if (import.meta.vitest) {
       });
 
       // 配列型のadditionalPropertiesは独立したモデルとして抽出される
-      expect(result.models).toHaveLength(2);
-      expect(result.models[0]).toEqual({
-        kind: "object",
-        name: "MetricsData",
-        referencePath: "#/components/schemas/MetricsData",
-        properties: [
+      expect(result).toEqual({
+        models: [
           {
-            name: "name",
-            type: "string",
+            kind: "object",
+            name: "MetricsData",
+            referencePath: "#/components/schemas/MetricsData",
+            properties: [
+              {
+                name: "name",
+                type: "string",
+              },
+            ],
+            additionalProperties: {
+              kind: "ref",
+              name: "#/components/schemas/MetricsDataItem",
+            },
+          },
+          {
+            kind: "array",
+            name: "MetricsDataItem",
+            referencePath: "#/components/schemas/MetricsDataItem",
+            itemType: "double",
           },
         ],
-        additionalProperties: {
-          kind: "ref",
-          name: "#/components/schemas/MetricsData",
-        },
-      });
-      expect(result.models[1]).toEqual({
-        kind: "array",
-        name: "MetricsData",
-        referencePath: "#/components/schemas/MetricsData",
-        itemType: "double",
       });
     });
 

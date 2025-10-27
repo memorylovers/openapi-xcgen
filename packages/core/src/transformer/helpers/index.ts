@@ -2,6 +2,7 @@
  * Helper functions exports
  */
 
+export { buildAdditionalPropertiesModelName } from "./build-additional-properties-model-name";
 export { buildComponentSchemaPath } from "./build-component-schema-path";
 export { buildInlineModelName } from "./build-inline-model-name";
 export { buildInlineSchemaPath } from "./build-inline-schema-path";

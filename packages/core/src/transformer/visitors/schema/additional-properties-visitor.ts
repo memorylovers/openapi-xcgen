@@ -10,6 +10,11 @@ import type {
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../../types";
+import {
+  buildAdditionalPropertiesModelName,
+  buildInlineSchemaPath,
+  getModelName,
+} from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { visitSchema } from "./schema-visitor";
 
@@ -68,7 +73,17 @@ export function visitAdditionalProperties(
   // SchemaObject | ReferenceObjectの処理
   // visitSchemaを使って通常の型変換処理を行う（すべての型をサポート）
   const schemaObj = additionalProperties as SchemaObjectWithNullable;
-  const result = visitSchema(schemaObj, context);
+
+  // additionalProperties専用のdocumentPathを構築
+  // これにより、配列/マップ型が親モデルと異なる一意なreferencePathを持つ
+  const parentName = getModelName(context);
+  const inlineModelName = buildAdditionalPropertiesModelName(parentName);
+  const inlineContext: VisitorContext = {
+    documentPath: buildInlineSchemaPath(context, inlineModelName),
+    rootSegment: context.rootSegment,
+  };
+
+  const result = visitSchema(schemaObj, inlineContext);
 
   if (!result.type) {
     consola.warn(`Failed to convert additionalProperties to IRType`);
@@ -111,13 +126,13 @@ if (import.meta.vitest) {
       const result = visitAdditionalProperties(schema, context);
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Test",
+        name: "#/components/schemas/TestItem",
       });
       expect(result.models).toHaveLength(1);
       expect(result.models[0]).toEqual({
         kind: "array",
-        name: "Test",
-        referencePath: "#/components/schemas/Test",
+        name: "TestItem",
+        referencePath: "#/components/schemas/TestItem",
         itemType: "string",
       });
     });
