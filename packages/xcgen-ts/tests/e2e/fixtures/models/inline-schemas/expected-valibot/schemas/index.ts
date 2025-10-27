@@ -8,6 +8,8 @@ export * from './StatusEnumSchema';
 export * from './UserProfileSchema';
 export * from './UserResponseSchema';
 export * from './GetTest1ParametersId200ResponseSchema';
+export * from './GetTest1ParametersIdParamsCategorySchema';
+export * from './GetTest1ParametersIdParamsStatusSchema';
 export * from './PostTest2RequestRequestBodyNestedSchema';
 export * from './PostTest2RequestRequestBodySchema';
 export * from './PostTest2Request201ResponseSchema';

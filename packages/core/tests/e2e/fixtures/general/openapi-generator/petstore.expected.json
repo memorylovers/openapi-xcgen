@@ -289,6 +289,35 @@
       }
     },
     {
+      "kind": "array",
+      "name": "GetPetFindByStatusParamsStatus",
+      "referencePath": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParamsStatus",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParamsStatusItem"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "GetPetFindByStatusParamsStatusItem",
+      "referencePath": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParamsStatusItem",
+      "type": "string",
+      "values": [
+        {
+          "value": "available",
+          "name": "AVAILABLE"
+        },
+        {
+          "value": "pending",
+          "name": "PENDING"
+        },
+        {
+          "value": "sold",
+          "name": "SOLD"
+        }
+      ]
+    },
+    {
       "kind": "parameter",
       "name": "GetPetFindByStatusParams",
       "description": "Parameters for GET /pet/findByStatus\nstatus: Status values that need to be considered for filter",
@@ -296,8 +325,8 @@
         {
           "name": "status",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/paths/::pet::findByStatus/get/parameters/GetPetFindByStatusParamsStatus"
           },
           "in": "query",
           "required": true,
@@ -326,6 +355,12 @@
       }
     },
     {
+      "kind": "array",
+      "name": "GetPetFindByTagsParamsTags",
+      "referencePath": "#/paths/::pet::findByTags/get/parameters/GetPetFindByTagsParamsTags",
+      "itemType": "string"
+    },
+    {
       "kind": "parameter",
       "name": "GetPetFindByTagsParams",
       "description": "Parameters for GET /pet/findByTags\ntags: Tags to filter by",
@@ -333,8 +368,8 @@
         {
           "name": "tags",
           "type": {
-            "kind": "array",
-            "itemType": "string"
+            "kind": "ref",
+            "name": "#/paths/::pet::findByTags/get/parameters/GetPetFindByTagsParamsTags"
           },
           "in": "query",
           "required": true,

@@ -136,6 +136,9 @@ export function visitOperation(
   // 全てのモデルを収集（オブジェクト、列挙型、配列、マップを統一）
   models.push(...responsesResult.models);
 
+  // パラメータから抽出されたモデルを追加
+  models.push(...parametersResult.models);
+
   // パラメータ統合モデルを追加
   if (parametersResult.unifiedModel) {
     models.push(parametersResult.unifiedModel);

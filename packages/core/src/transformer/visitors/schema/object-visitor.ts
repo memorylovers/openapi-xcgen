@@ -25,13 +25,13 @@ import type {
   SchemaObjectWithNullable,
 } from "../../../types";
 import {
-  buildInlineSchemaPath,
   buildReferencePath,
   extractExtensions,
   extractValidation,
   getModelName,
   isNullable,
 } from "../../helpers";
+import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
 import type { VisitorContext } from "../../types";
 import { visitAdditionalProperties } from "./additional-properties-visitor";
 import { visitSchema } from "./schema-visitor";
@@ -178,13 +178,14 @@ export function visitObject(
   // additionalPropertiesの処理
   let additionalPropertiesType = undefined;
   if ("additionalProperties" in schema && schema.additionalProperties) {
-    const additionalType = visitAdditionalProperties(
+    const additionalResult = visitAdditionalProperties(
       schema.additionalProperties,
       context,
     );
-    if (additionalType) {
-      additionalPropertiesType = additionalType;
+    if (additionalResult.type) {
+      additionalPropertiesType = additionalResult.type;
     }
+    nestedModels.push(...additionalResult.models);
   }
 
   // モデルレベルの拡張フィールドを抽出
@@ -305,13 +306,14 @@ export function visitResponseObject(
   // additionalPropertiesの処理
   let additionalPropertiesType = undefined;
   if ("additionalProperties" in schema && schema.additionalProperties) {
-    const additionalType = visitAdditionalProperties(
+    const additionalResult = visitAdditionalProperties(
       schema.additionalProperties,
       context,
     );
-    if (additionalType) {
-      additionalPropertiesType = additionalType;
+    if (additionalResult.type) {
+      additionalPropertiesType = additionalResult.type;
     }
+    nestedModels.push(...additionalResult.models);
   }
 
   const responseModel: IRResponseModel = {
@@ -434,13 +436,14 @@ export function visitRequestBodyObject(
   // additionalPropertiesの処理
   let additionalPropertiesType = undefined;
   if ("additionalProperties" in schema && schema.additionalProperties) {
-    const additionalType = visitAdditionalProperties(
+    const additionalResult = visitAdditionalProperties(
       schema.additionalProperties,
       context,
     );
-    if (additionalType) {
-      additionalPropertiesType = additionalType;
+    if (additionalResult.type) {
+      additionalPropertiesType = additionalResult.type;
     }
+    nestedModels.push(...additionalResult.models);
   }
 
   const requestBodyModel: IRRequestBodyModel = {
@@ -1220,6 +1223,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
+      // 配列型のadditionalPropertiesは独立したモデルとして抽出される
       expect(result).toEqual({
         models: [
           {
@@ -1233,9 +1237,15 @@ if (import.meta.vitest) {
               },
             ],
             additionalProperties: {
-              kind: "array",
-              itemType: "double",
+              kind: "ref",
+              name: "#/components/schemas/MetricsDataItem",
             },
+          },
+          {
+            kind: "array",
+            name: "MetricsDataItem",
+            referencePath: "#/components/schemas/MetricsDataItem",
+            itemType: "double",
           },
         ],
       });

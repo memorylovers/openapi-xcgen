@@ -21,12 +21,12 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types/guards";
 import {
-  buildInlineModelName,
-  buildInlineSchemaPath,
   buildReferencePath,
   extractExtensions,
   getModelName,
 } from "../../helpers";
+import { buildInlineModelName } from "../../helpers/build-inline-model-name";
+import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
 import type { AnyOfContext, VisitorContext } from "../../types";
 import { type SchemaVisitorResult, visitSchema } from "./schema-visitor";
 

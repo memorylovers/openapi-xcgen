@@ -34,27 +34,11 @@ export function irTypeToValibotSchemaRef(type: IRType): string {
     return generatePrimitiveSchema(type);
   }
 
-  switch (type.kind) {
-    case "ref": {
-      // Core packageはreference path全体を保存: "#/components/schemas/Pet"
-      // 最後のセグメントを抽出: "Pet"
-      const modelName = type.name.split("/").at(-1) ?? type.name;
-      return `${toTypeName(modelName)}Schema`;
-    }
-    case "array": {
-      const itemSchema = irTypeToValibotSchemaRef(type.itemType);
-      return `v.array(${itemSchema})`;
-    }
-    case "map": {
-      const valueSchema = irTypeToValibotSchemaRef(type.valueType);
-      return `v.record(v.string(), ${valueSchema})`;
-    }
-    default: {
-      const _: never = type;
-      void _;
-      return "v.any()";
-    }
-  }
+  // この時点でIRRefのみが残る（IRScalarTypeは上でチェック済み）
+  // Core packageはreference path全体を保存: "#/components/schemas/Pet"
+  // 最後のセグメントを抽出: "Pet"
+  const modelName = type.name.split("/").at(-1) ?? type.name;
+  return `${toTypeName(modelName)}Schema`;
 }
 
 // === in-source testing ===
@@ -72,30 +56,6 @@ if (import.meta.vitest) {
       it("should convert ref type to schema reference", () => {
         const result = irTypeToValibotSchemaRef({ kind: "ref", name: "Pet" });
         expect(result).toBe("PetSchema");
-      });
-
-      it("should convert array type to array schema", () => {
-        const result = irTypeToValibotSchemaRef({
-          kind: "array",
-          itemType: "string",
-        });
-        expect(result).toBe("v.array(v.string())");
-      });
-
-      it("should convert nested array type", () => {
-        const result = irTypeToValibotSchemaRef({
-          kind: "array",
-          itemType: { kind: "ref", name: "User" },
-        });
-        expect(result).toBe("v.array(UserSchema)");
-      });
-
-      it("should convert map type to record schema", () => {
-        const result = irTypeToValibotSchemaRef({
-          kind: "map",
-          valueType: "int",
-        });
-        expect(result).toBe("v.record(v.string(), v.number())");
       });
     });
   });

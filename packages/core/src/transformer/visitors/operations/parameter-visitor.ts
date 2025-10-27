@@ -13,6 +13,7 @@
 
 import { consola } from "consola";
 import type {
+  IRModel,
   IRParameter,
   ParameterObject,
   SchemaObject,
@@ -24,15 +25,27 @@ import {
   isNullable,
   toIRParameterInType,
 } from "../../helpers";
+import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
+import { buildParameterSchemaModelName } from "../../helpers/build-parameter-schema-model-name";
 import type { ParameterContext } from "../../types";
-import { visitType } from "../schema";
+import { visitSchema } from "../schema";
 
 /**
- * ParameterObjectをIRParameterに変換
+ * Parameter処理の結果
+ */
+export interface ParameterResult {
+  /** パラメータ情報 */
+  parameter: IRParameter;
+  /** 配列型から抽出されたモデル */
+  models: IRModel[];
+}
+
+/**
+ * ParameterObjectをIRParameterとモデルに変換
  *
  * @param parameter - OpenAPIのParameterObject
  * @param context - Visitorコンテキスト
- * @returns IRParameter、または変換できない場合はnull
+ * @returns ParameterResult、または変換できない場合はnull
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -57,7 +70,7 @@ import { visitType } from "../schema";
 export function visitParameter(
   parameter: ParameterObject,
   context: ParameterContext,
-): IRParameter | null {
+): ParameterResult | null {
   // schemaが必須
   if (!parameter.schema) {
     consola.warn(`Parameter without schema: ${parameter.name}`);
@@ -84,15 +97,21 @@ export function visitParameter(
     return null;
   }
 
-  // visitTypeでschemaから型情報を取得
-  const type = visitType(schema, {
-    documentPath: [...context.documentPath, "schema"],
+  // すべての型をvisitSchemaで処理（中央ディスパッチャーとして）
+  const models: IRModel[] = [];
+  const inlineModelName = buildParameterSchemaModelName(context);
+  const schemaResult = visitSchema(schema, {
+    documentPath: buildInlineSchemaPath(context, inlineModelName),
     rootSegment: context.rootSegment,
   });
-  if (!type) {
+
+  if (!schemaResult.type) {
     consola.warn(`Invalid parameter type for: ${parameter.name}`);
     return null;
   }
+
+  const type = schemaResult.type;
+  models.push(...schemaResult.models);
 
   // バリデーション情報を抽出
   const validation = extractValidation(schema);
@@ -120,7 +139,10 @@ export function visitParameter(
     ...(extensions && { extensions }),
   };
 
-  return irParameter;
+  return {
+    parameter: irParameter,
+    models,
+  };
 }
 
 // === in-source testing ===
@@ -148,11 +170,14 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "id",
-        in: "path",
-        description: "User ID",
-        required: true,
-        type: "string",
+        parameter: {
+          name: "id",
+          in: "path",
+          description: "User ID",
+          required: true,
+          type: "string",
+        },
+        models: [],
       });
     });
 
@@ -179,14 +204,17 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "limit",
-        in: "query",
-        type: "int",
-        defaultValue: 10,
-        validation: {
-          minimum: 1,
-          maximum: 100,
+        parameter: {
+          name: "limit",
+          in: "query",
+          type: "int",
+          defaultValue: 10,
+          validation: {
+            minimum: 1,
+            maximum: 100,
+          },
         },
+        models: [],
       });
     });
 
@@ -209,10 +237,13 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "X-API-Version",
-        in: "header",
-        type: "string",
-        deprecated: true,
+        parameter: {
+          name: "X-API-Version",
+          in: "header",
+          type: "string",
+          deprecated: true,
+        },
+        models: [],
       });
     });
 
@@ -235,9 +266,12 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "session",
-        in: "cookie",
-        type: "string",
+        parameter: {
+          name: "session",
+          in: "cookie",
+          type: "string",
+        },
+        models: [],
       });
     });
 
@@ -344,14 +378,21 @@ if (import.meta.vitest) {
         pathTemplate: "/users/{id}",
       });
 
-      expect(result).toEqual({
-        name: "tags",
-        in: "query",
-        type: {
-          kind: "array",
-          itemType: "string",
-        },
+      // Array parameters now create models
+      expect(result?.parameter.name).toBe("tags");
+      expect(result?.parameter.in).toBe("query");
+      expect(result?.parameter.type).toEqual({
+        kind: "ref",
+        name: "#/paths/::users::{id}/get/parameters/GetUsersIdParamsTags",
       });
+      expect(result?.models).toHaveLength(1);
+      expect(result?.models[0].kind).toBe("array");
+      if (result?.models[0].kind === "array") {
+        expect(result.models[0].itemType).toBe("string");
+        expect(result.models[0].referencePath).toBe(
+          "#/paths/::users::{id}/get/parameters/GetUsersIdParamsTags",
+        );
+      }
     });
 
     it("should handle nullable parameter with OpenAPI 3.0 format", () => {
@@ -375,10 +416,13 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "filter",
-        in: "query",
-        type: "string",
-        nullable: true,
+        parameter: {
+          name: "filter",
+          in: "query",
+          type: "string",
+          nullable: true,
+        },
+        models: [],
       });
     });
 
@@ -402,10 +446,13 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "category",
-        in: "query",
-        type: "string",
-        nullable: true,
+        parameter: {
+          name: "category",
+          in: "query",
+          type: "string",
+          nullable: true,
+        },
+        models: [],
       });
     });
 
@@ -432,14 +479,17 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "username",
-        in: "query",
-        type: "string",
-        validation: {
-          minLength: 3,
-          maxLength: 20,
-          pattern: "^[a-zA-Z0-9_]+$",
+        parameter: {
+          name: "username",
+          in: "query",
+          type: "string",
+          validation: {
+            minLength: 3,
+            maxLength: 20,
+            pattern: "^[a-zA-Z0-9_]+$",
+          },
         },
+        models: [],
       });
     });
 
@@ -466,19 +516,25 @@ if (import.meta.vitest) {
         pathTemplate: "/posts",
       });
 
-      expect(result).toEqual({
-        name: "tags",
-        in: "query",
-        type: {
-          kind: "array",
-          itemType: "string",
-        },
-        validation: {
-          minItems: 1,
-          maxItems: 10,
-          uniqueItems: true,
-        },
+      // Array parameters now create models, but validation is on the parameter
+      expect(result?.parameter.name).toBe("tags");
+      expect(result?.parameter.in).toBe("query");
+      expect(result?.parameter.type).toEqual({
+        kind: "ref",
+        name: "#/paths/::posts/get/parameters/GetPostsParamsTags",
       });
+      expect(result?.parameter.validation).toEqual({
+        minItems: 1,
+        maxItems: 10,
+        uniqueItems: true,
+      });
+      expect(result?.models).toHaveLength(1);
+      expect(result?.models[0].kind).toBe("array");
+      if (result?.models[0].kind === "array") {
+        expect(result.models[0].referencePath).toBe(
+          "#/paths/::posts/get/parameters/GetPostsParamsTags",
+        );
+      }
     });
   });
 }

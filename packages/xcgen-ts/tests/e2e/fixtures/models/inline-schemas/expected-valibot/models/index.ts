@@ -8,6 +8,8 @@ export * from './StatusEnum';
 export * from './UserResponse';
 export * from './UserProfile';
 export * from './GetTest1ParametersId200Response';
+export * from './GetTest1ParametersIdParamsCategory';
+export * from './GetTest1ParametersIdParamsStatus';
 export * from './GetTest1ParametersIdParams';
 export * from './PostTest2RequestRequestBody';
 export * from './PostTest2RequestRequestBodyNested';

@@ -36,15 +36,11 @@ export function generateArraySchema(
       }
     : undefined;
 
-  // Array type を表現（型チェック用のダミー）
-  const arrayType: { kind: "array"; itemType: "string" } = {
-    kind: "array",
-    itemType: "string",
-  };
-
+  // 配列バリデーション用のIRType（Hook context用プレースホルダー）
+  // 実際のvalidation生成には型情報は不要だが、Hookが型情報を参照する可能性があるため"string"を渡す
   const pipes = generateValidationPipes(
     arrayValidation,
-    arrayType,
+    "string",
     hooks,
     extensions,
   );

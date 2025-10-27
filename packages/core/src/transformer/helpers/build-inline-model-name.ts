@@ -1,3 +1,10 @@
+/**
+ * インラインスキーマのモデル名を生成
+ *
+ * コンテキストの種類に応じて適切な命名戦略を適用します。
+ * 現在はComposition型（allOf/anyOf/oneOf）に対応しています。
+ */
+
 import type { VisitorContextKind } from "../types";
 
 /**

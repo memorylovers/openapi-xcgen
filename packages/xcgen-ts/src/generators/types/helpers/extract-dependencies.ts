@@ -40,12 +40,6 @@ export function extractTypeDependencies(model: IRModel): Set<string> {
         dependencies.add(toTypeName(modelName));
         break;
       }
-      case "array":
-        visitType(irType.itemType);
-        break;
-      case "map":
-        visitType(irType.valueType);
-        break;
     }
   }
 
@@ -123,21 +117,12 @@ if (import.meta.vitest) {
       expect(result).toEqual(new Set(["User", "Product"]));
     });
 
-    it("should extract dependencies from nested arrays", () => {
+    it("should extract dependencies from IRArrayModel itself", () => {
       const model: IRModel = {
-        kind: "object",
-        name: "Cart",
-        referencePath: "#/components/schemas/Cart",
-        properties: [
-          {
-            name: "items",
-            type: {
-              kind: "array",
-              itemType: { kind: "ref", name: "#/components/schemas/Item" },
-            },
-            required: true,
-          },
-        ],
+        kind: "array",
+        name: "Items",
+        referencePath: "#/components/schemas/Items",
+        itemType: { kind: "ref", name: "#/components/schemas/Item" },
       };
 
       const result = extractTypeDependencies(model);
@@ -145,18 +130,28 @@ if (import.meta.vitest) {
       expect(result).toEqual(new Set(["Item"]));
     });
 
-    it("should extract dependencies from maps", () => {
+    it("should extract dependencies from IRMapModel itself", () => {
       const model: IRModel = {
-        kind: "object",
+        kind: "map",
         name: "UserMap",
         referencePath: "#/components/schemas/UserMap",
+        valueType: { kind: "ref", name: "#/components/schemas/User" },
+      };
+
+      const result = extractTypeDependencies(model);
+
+      expect(result).toEqual(new Set(["User"]));
+    });
+
+    it("should extract dependencies from object with array ref property", () => {
+      const model: IRModel = {
+        kind: "object",
+        name: "Cart",
+        referencePath: "#/components/schemas/Cart",
         properties: [
           {
-            name: "users",
-            type: {
-              kind: "map",
-              valueType: { kind: "ref", name: "#/components/schemas/User" },
-            },
+            name: "items",
+            type: { kind: "ref", name: "#/components/schemas/CartItems" },
             required: true,
           },
         ],
@@ -164,7 +159,7 @@ if (import.meta.vitest) {
 
       const result = extractTypeDependencies(model);
 
-      expect(result).toEqual(new Set(["User"]));
+      expect(result).toEqual(new Set(["CartItems"]));
     });
 
     it("should extract dependencies from allOf schemas", () => {

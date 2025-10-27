@@ -170,8 +170,8 @@ if (import.meta.vitest) {
           {
             name: "children",
             type: {
-              kind: "array",
-              itemType: { kind: "ref", name: "#/components/schemas/TreeNode" },
+              kind: "ref",
+              name: "#/components/schemas/TreeNodeChildren", // 配列は独立したモデルとして抽出される
             },
           },
         ],

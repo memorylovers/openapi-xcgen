@@ -220,8 +220,8 @@ export interface Order {
           {
             name: "children",
             type: {
-              kind: "array",
-              itemType: { kind: "ref", name: "#/components/schemas/TreeNode" },
+              kind: "ref",
+              name: "#/components/schemas/TreeNodeChildren",
             },
           },
         ],
@@ -235,9 +235,11 @@ export interface Order {
  * Auto-generated from OpenAPI specification
  */
 
+import type { TreeNodeChildren } from './TreeNodeChildren';
+
 export interface TreeNode {
   value: string;
-  children?: Array<TreeNode> | undefined;
+  children?: TreeNodeChildren | undefined;
 }`,
       );
     });

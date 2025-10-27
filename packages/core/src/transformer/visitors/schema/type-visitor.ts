@@ -7,7 +7,6 @@
 
 import { consola } from "consola";
 import type {
-  IRArray,
   IRType,
   ReferenceObject,
   SchemaObjectWithNullable,
@@ -62,7 +61,7 @@ import type { VisitorContext } from "../../types";
  */
 export function visitType(
   schema: SchemaObjectWithNullable | ReferenceObject,
-  context: VisitorContext,
+  _context: VisitorContext,
 ): IRType | null {
   // $ref参照の場合
   if (isReferenceObject(schema)) {
@@ -94,18 +93,6 @@ export function visitType(
     if (schema.type.length === 1 && schema.type[0] === "null") {
       return "null";
     }
-  }
-
-  // 配列型
-  if (schema.type === "array" && schema.items) {
-    const itemType = visitType(schema.items, {
-      documentPath: [...context.documentPath, "items"],
-      rootSegment: context.rootSegment,
-    });
-    // 配列の要素型が無効な場合はnullを返す
-    if (itemType === null) return null;
-
-    return { kind: "array", itemType } as IRArray;
   }
 
   // その他の型は無効として扱う
@@ -163,7 +150,8 @@ if (import.meta.vitest) {
       expect(result).toEqual("datetime");
     });
 
-    it("should resolve array types", () => {
+    it("should return null for array types (should use visitSchema)", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema: SchemaObjectWithNullable = {
         type: "array",
         items: { type: "string" },
@@ -178,13 +166,15 @@ if (import.meta.vitest) {
         ],
         rootSegment: "components",
       });
-      expect(result).toEqual({
-        kind: "array",
-        itemType: "string",
-      });
+      expect(result).toEqual(null);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Invalid or unsupported schema type: array",
+      );
+      warnSpy.mockRestore();
     });
 
-    it("should resolve nested array types", () => {
+    it("should return null for nested array types (should use visitSchema)", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema: SchemaObjectWithNullable = {
         type: "array",
         items: {
@@ -196,13 +186,11 @@ if (import.meta.vitest) {
         documentPath: ["components", "schemas", "Matrix", "properties", "data"],
         rootSegment: "components",
       });
-      expect(result).toEqual({
-        kind: "array",
-        itemType: {
-          kind: "array",
-          itemType: "double",
-        },
-      });
+      expect(result).toEqual(null);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Invalid or unsupported schema type: array",
+      );
+      warnSpy.mockRestore();
     });
 
     it("should resolve $ref types", () => {
@@ -243,7 +231,7 @@ if (import.meta.vitest) {
       warnSpy.mockRestore();
     });
 
-    it("should return null for object types", () => {
+    it("should return null for object types (should use visitSchema)", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const schema: SchemaObjectWithNullable = { type: "object" };
       const result = visitType(schema, {

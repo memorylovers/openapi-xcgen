@@ -124,7 +124,7 @@ Transformerは、OpenAPI仕様の構造に合わせてトップダウンで処�
 | enum（プロパティ由来） | `<ParentName><Property>Enum` | `GetPets200Response` 内 `status` → `GetPets200ResponseStatusEnum` | `enum-visitor.ts`（`generateEnumComponentName`） |
 
 - 配列のインライン要素は `array-visitor.ts` が `{配列モデル名}Item` を `documentPath` 末尾に設定して処理するため、`BlogPostsItemAuthor` のように必ず `Item` サフィックス付きで抽出されます。
-- マップ (additionalProperties) の値スキーマは `map-visitor.ts` が `{マップモデル名}Value` を採用するため、値オブジェクトは `SettingsValue` のように `Value` サフィックスで命名されます。
+- マップ (additionalProperties) の値スキーマは `additional-properties-visitor.ts` が `{マップモデル名}Item` を採用するため、値オブジェクトは `SettingsItem` のように `Item` サフィックスで命名されます。
 
 - `pathToComponentBase` が `/users/{id}` → `UsersId` のようにパスを PascalCase 化し、HTTP メソッドを付けて基礎名を構築します。
 - コンテキストごとにサフィックスやステータスコードを付加し、レスポンスやリクエストボディごとに一意の名前を作ります。
@@ -393,7 +393,7 @@ components:
         name:
           type: string
 
-    # map-visitor.ts: SchemaContext -> IRMapModel（LocalizedSettings / LocalizedSettingsValue）
+    # additional-properties-visitor.ts: SchemaContext -> IRMapModel（LocalizedSettings / LocalizedSettingsItem）
     LocalizedSettings:
       type: object
       additionalProperties:

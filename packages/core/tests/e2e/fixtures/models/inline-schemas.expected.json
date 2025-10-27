@@ -87,6 +87,46 @@
       "statusCode": "200"
     },
     {
+      "kind": "enum",
+      "name": "GetTest1ParametersIdParamsCategory",
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParamsCategory",
+      "type": "string",
+      "values": [
+        {
+          "value": "electronics",
+          "name": "ELECTRONICS"
+        },
+        {
+          "value": "books",
+          "name": "BOOKS"
+        },
+        {
+          "value": "clothing",
+          "name": "CLOTHING"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "GetTest1ParametersIdParamsStatus",
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParamsStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "active",
+          "name": "ACTIVE"
+        },
+        {
+          "value": "inactive",
+          "name": "INACTIVE"
+        },
+        {
+          "value": "pending",
+          "name": "PENDING"
+        }
+      ]
+    },
+    {
       "kind": "parameter",
       "name": "GetTest1ParametersIdParams",
       "description": "Parameters for GET /test-1-parameters/{id}\nid: Path parameter - always required\ncategory: Optional enum query parameter\nstatus: Required enum query parameter\nlimit: Optional integer parameter with default value\nincludeDetails: Optional boolean parameter with default value\nAuthorization: Optional header parameter\nsessionId: Optional cookie parameter",
@@ -100,13 +140,19 @@
         },
         {
           "name": "category",
-          "type": "string",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParamsCategory"
+          },
           "in": "query",
           "description": "Optional enum query parameter"
         },
         {
           "name": "status",
-          "type": "string",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::test-1-parameters::{id}/get/parameters/GetTest1ParametersIdParamsStatus"
+          },
           "in": "query",
           "required": true,
           "description": "Required enum query parameter"

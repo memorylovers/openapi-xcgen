@@ -1081,6 +1081,38 @@
       }
     },
     {
+      "kind": "enum",
+      "name": "GetSpecialEventsParamsCategory",
+      "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParamsCategory",
+      "type": "string",
+      "values": [
+        {
+          "value": "exhibition",
+          "name": "EXHIBITION"
+        },
+        {
+          "value": "workshop",
+          "name": "WORKSHOP"
+        },
+        {
+          "value": "tour",
+          "name": "TOUR"
+        },
+        {
+          "value": "lecture",
+          "name": "LECTURE"
+        },
+        {
+          "value": "family",
+          "name": "FAMILY"
+        },
+        {
+          "value": "members-only",
+          "name": "MEMBERS_ONLY"
+        }
+      ]
+    },
+    {
       "kind": "parameter",
       "name": "GetSpecialEventsParams",
       "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)",
@@ -1099,7 +1131,10 @@
         },
         {
           "name": "category",
-          "type": "string",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParamsCategory"
+          },
           "in": "query",
           "description": "Filter by event category"
         },
@@ -1210,6 +1245,22 @@
       "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
     },
     {
+      "kind": "enum",
+      "name": "GetTicketsConfirmationIdQrCodeParamsFormat",
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParamsFormat",
+      "type": "string",
+      "values": [
+        {
+          "value": "png",
+          "name": "PNG"
+        },
+        {
+          "value": "svg",
+          "name": "SVG"
+        }
+      ]
+    },
+    {
       "kind": "parameter",
       "name": "GetTicketsConfirmationIdQrCodeParams",
       "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase\nformat: QR code format",
@@ -1236,7 +1287,10 @@
         },
         {
           "name": "format",
-          "type": "string",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParamsFormat"
+          },
           "in": "query",
           "description": "QR code format",
           "defaultValue": "png"
