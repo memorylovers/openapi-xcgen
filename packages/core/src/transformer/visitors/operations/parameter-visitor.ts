@@ -20,13 +20,13 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import {
+  buildInlineSchemaPath,
+  buildParameterSchemaModelName,
   extractExtensions,
   extractValidation,
   isNullable,
   toIRParameterInType,
 } from "../../helpers";
-import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
-import { buildParameterSchemaModelName } from "../../helpers/build-parameter-schema-model-name";
 import type { ParameterContext } from "../../types";
 import { visitSchema } from "../schema";
 
@@ -165,8 +165,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "id",
         in: "path",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -199,8 +197,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "limit",
         in: "query",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -232,8 +228,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "X-API-Version",
         in: "header",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -261,8 +255,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "session",
         in: "cookie",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -290,8 +282,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "invalid",
         in: "query",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual(null);
@@ -317,8 +307,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "userId",
         in: "path",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual(null);
@@ -344,8 +332,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "body",
         in: "body" as "path" | "query" | "header" | "cookie", // 型アサーションでParameterContextの型に合わせる
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual(null);
@@ -374,8 +360,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "tags",
         in: "query",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       // Array parameters now create models
@@ -411,8 +395,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "filter",
         in: "query",
-        method: "get",
-        pathTemplate: "/users",
       });
 
       expect(result).toEqual({
@@ -441,8 +423,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "category",
         in: "query",
-        method: "get",
-        pathTemplate: "/products",
       });
 
       expect(result).toEqual({
@@ -474,8 +454,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "username",
         in: "query",
-        method: "post",
-        pathTemplate: "/users",
       });
 
       expect(result).toEqual({
@@ -512,8 +490,6 @@ if (import.meta.vitest) {
         rootSegment: "paths",
         parameterName: "tags",
         in: "query",
-        method: "get",
-        pathTemplate: "/posts",
       });
 
       // Array parameters now create models, but validation is on the parameter

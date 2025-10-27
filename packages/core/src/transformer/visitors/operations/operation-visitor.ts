@@ -79,8 +79,6 @@ export function visitOperation(
   const parametersContext: ParametersContext = {
     kind: "parameters",
     documentPath: [...context.documentPath, "parameters"],
-    method: context.method,
-    pathTemplate: context.pathTemplate,
     rootSegment: "paths",
     commonParameters: context.commonParameters, // 共通パラメータを渡す
   };
@@ -98,8 +96,6 @@ export function visitOperation(
     const requestBodyContext: RequestBodyContext = {
       kind: "requestBody",
       documentPath: [...context.documentPath, "requestBody"],
-      method: context.method,
-      pathTemplate: context.pathTemplate,
       rootSegment: "paths",
     };
 
@@ -123,8 +119,6 @@ export function visitOperation(
   const responsesContext: ResponsesContext = {
     kind: "responses",
     documentPath: [...context.documentPath, "responses"],
-    method: context.method,
-    pathTemplate: context.pathTemplate,
     rootSegment: "paths",
   };
 

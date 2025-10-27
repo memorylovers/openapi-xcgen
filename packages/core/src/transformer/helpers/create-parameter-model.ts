@@ -16,7 +16,7 @@ import type {
   IRParameterModel,
   IRParameterProperty,
 } from "../../types";
-import { buildReferencePath } from "./build-reference-path";
+import { buildReferencePath } from "./path/build-reference-path";
 
 /**
  * 複数のパラメータから統合モデルを生成

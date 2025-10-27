@@ -376,7 +376,6 @@ if (import.meta.vitest) {
             "additionalProperties",
           ],
           rootSegment: "components",
-          parentSchemaName: "Test",
         };
         expect(isAdditionalPropertiesContext(context)).toBe(true);
       });
@@ -398,8 +397,6 @@ if (import.meta.vitest) {
           rootSegment: "paths",
           parameterName: "limit",
           in: "query",
-          method: "get",
-          pathTemplate: "/users",
         };
         expect(isParameterContext(parameterContext)).toBe(true);
       });
@@ -419,8 +416,6 @@ if (import.meta.vitest) {
           kind: "requestBody",
           documentPath: ["paths", "/users", "post", "requestBody"],
           rootSegment: "paths",
-          method: "post",
-          pathTemplate: "/users",
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
@@ -442,9 +437,6 @@ if (import.meta.vitest) {
           kind: "response",
           documentPath: ["paths", "/users", "get", "responses", "200"],
           rootSegment: "paths",
-          method: "get",
-          pathTemplate: "/users",
-          statusCode: "200",
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };

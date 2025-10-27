@@ -6,7 +6,7 @@
  */
 
 import { pascalCase } from "es-toolkit/string";
-import type { ParameterContext } from "../types";
+import type { ParameterContext } from "../../types";
 import { buildParameterModelName } from "./build-parameter-model-name";
 
 /**
@@ -20,11 +20,9 @@ import { buildParameterModelName } from "./build-parameter-model-name";
  *
  * @example
  * ```typescript
- * // context = { method: "get", pathTemplate: "/users/{id}", parameterName: "category" }
  * buildParameterSchemaModelName(context)
  * // => "GetUsersIdParamsCategory"
  *
- * // context = { method: "post", pathTemplate: "/users", parameterName: "limit" }
  * buildParameterSchemaModelName(context)
  * // => "PostUsersParamsLimit"
  * ```
@@ -48,8 +46,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users/{id}", "get", "parameters"],
         parameterName: "id",
         in: "path",
-        method: "get",
-        pathTemplate: "/users/{id}",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe("GetUsersIdParamsId");
@@ -61,8 +57,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users", "get", "parameters"],
         parameterName: "category",
         in: "query",
-        method: "get",
-        pathTemplate: "/users",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(
@@ -81,8 +75,6 @@ if (import.meta.vitest) {
         ],
         parameterName: "limit",
         in: "query",
-        method: "post",
-        pathTemplate: "/api/v2/users/{userId}/posts",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(
@@ -96,8 +88,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/posts", "get", "parameters"],
         parameterName: "x-api-key",
         in: "header",
-        method: "get",
-        pathTemplate: "/posts",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(
@@ -111,8 +101,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/session", "get", "parameters"],
         parameterName: "session_id",
         in: "cookie",
-        method: "get",
-        pathTemplate: "/session",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(

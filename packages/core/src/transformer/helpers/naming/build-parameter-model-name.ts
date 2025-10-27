@@ -1,6 +1,7 @@
 import { pascalCase } from "es-toolkit/string";
-import type { ParameterContext } from "../types";
+import type { ParameterContext } from "../../types";
 import { pathToComponentBase } from "./path-to-component-base";
+import { parseParameterPath } from "../path/parse-document-path";
 
 /**
  * パラメータのモデル名を生成
@@ -10,13 +11,20 @@ import { pathToComponentBase } from "./path-to-component-base";
  *
  * @example
  * ```typescript
- * // context = { method: "get", pathTemplate: "/users/{id}", ... }
+ * // context = { documentPath: ["paths", "/users/{id}", "get", "parameters"], ... }
  * buildParameterModelName(context)  // => "GetUsersIdParams"
  * ```
  */
 export function buildParameterModelName(context: ParameterContext): string {
-  const methodPascal = pascalCase(context.method ?? "");
-  const pathBase = pathToComponentBase(context.pathTemplate ?? "");
+  const parsed = parseParameterPath(context.documentPath);
+  if (!parsed) {
+    throw new Error(
+      `Failed to parse parameter path: ${context.documentPath.join("/")}`,
+    );
+  }
+
+  const methodPascal = pascalCase(parsed.method);
+  const pathBase = pathToComponentBase(parsed.pathTemplate);
   return `${methodPascal}${pathBase}Params`;
 }
 
@@ -31,8 +39,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users/{id}", "get", "parameters"],
         parameterName: "id",
         in: "path",
-        method: "get",
-        pathTemplate: "/users/{id}",
         rootSegment: "paths",
       };
       expect(buildParameterModelName(context)).toBe("GetUsersIdParams");
@@ -44,8 +50,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users", "get", "parameters"],
         parameterName: "limit",
         in: "query",
-        method: "get",
-        pathTemplate: "/users",
         rootSegment: "paths",
       };
       expect(buildParameterModelName(context)).toBe("GetUsersParams");

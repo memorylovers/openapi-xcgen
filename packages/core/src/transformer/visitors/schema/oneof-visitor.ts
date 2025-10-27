@@ -22,12 +22,11 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types/guards";
 import {
+  buildInlineModelName,
   buildReferencePath,
   extractExtensions,
   getModelName,
 } from "../../helpers";
-import { buildInlineModelName } from "../../helpers/build-inline-model-name";
-import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
 import type { OneOfContext, VisitorContext } from "../../types";
 import { type SchemaVisitorResult, visitSchema } from "./schema-visitor";
 
@@ -165,10 +164,8 @@ export function visitOneOf(
     const inlineModelName = buildInlineModelName(name, "oneOf", i);
     const inlineContext: OneOfContext = {
       kind: "oneOf",
-      documentPath: buildInlineSchemaPath(context, inlineModelName),
+      documentPath: [...context.documentPath.slice(0, -1), inlineModelName],
       rootSegment: "components",
-      parentSchemaName: name,
-      index: i,
     };
 
     // visitSchemaで処理（getModelNameが自動的に適切な名前を生成）

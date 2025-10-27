@@ -20,7 +20,7 @@ import type {
   ReferenceObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { createParameterModel } from "../../helpers";
+import { createParameterModel, parseParameterPath } from "../../helpers";
 import type { ParameterContext, ParametersContext } from "../../types";
 import { visitParameter } from "./parameter-visitor";
 
@@ -129,8 +129,6 @@ export function visitParameters(
       documentPath: [...context.documentPath, param.name],
       parameterName: param.name,
       in: param.in as "path" | "query" | "header" | "cookie",
-      method: context.method,
-      pathTemplate: context.pathTemplate,
       rootSegment: "paths",
     };
     const paramResult = visitParameter(param, paramContext);
@@ -142,10 +140,18 @@ export function visitParameters(
   }
 
   // パラメータ統合モデル生成
+  const parsed = parseParameterPath(context.documentPath);
+  if (!parsed) {
+    consola.warn(
+      `Failed to parse parameter path: ${context.documentPath.join("/")}`,
+    );
+    return { parameters: irParameters, unifiedModel: null, models };
+  }
+
   const unifiedModel = createParameterModel(
     irParameters,
-    context.pathTemplate,
-    context.method,
+    parsed.pathTemplate,
+    parsed.method,
     context.documentPath,
   );
 
@@ -232,8 +238,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({
@@ -248,8 +252,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({
@@ -274,8 +276,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/users/{id}", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result.parameters).toEqual([
@@ -331,8 +331,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/users/{id}/posts", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users/{id}/posts",
       });
 
       expect(result.parameters).toHaveLength(3);
@@ -361,8 +359,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/ref/{id}", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/ref/{id}",
       });
 
       expect(result.parameters).toEqual([
@@ -400,8 +396,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result.parameters).toEqual([
@@ -434,8 +428,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/test", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({
@@ -463,8 +455,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/api/test", "post"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/api/test",
       });
 
       expect(result.parameters).toHaveLength(2);
@@ -487,8 +477,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/users/{id}", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users/{id}",
         commonParameters: [
           {
             name: "id",
@@ -521,8 +509,6 @@ if (import.meta.vitest) {
         kind: "parameters",
         documentPath: ["paths", "/users/{id}", "get"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users/{id}",
         commonParameters: [
           {
             name: "id",

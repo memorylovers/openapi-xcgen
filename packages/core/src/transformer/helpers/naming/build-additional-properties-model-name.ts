@@ -7,8 +7,9 @@
  * - REST APIの文脈で自然な命名（各アイテムを表す）
  */
 
-import type { AdditionalPropertiesContext, VisitorContext } from "../types";
-import { isAdditionalPropertiesContext } from "../../types/guards";
+import type { AdditionalPropertiesContext, VisitorContext } from "../../types";
+import { isAdditionalPropertiesContext } from "../../../types/guards";
+import { parseAdditionalPropertiesPath } from "../path/parse-document-path";
 
 /**
  * additionalPropertiesの値型モデル名を生成
@@ -37,11 +38,19 @@ export function buildAdditionalPropertiesModelName(
   let parentName: string;
 
   if (typeof contextOrParentName === "string") {
-    // 後方互換性: 文字列を直接受け取る
+    // 後方互換性: 文字列を直接受け取る（Visitor構築時に使用）
     parentName = contextOrParentName;
   } else if (isAdditionalPropertiesContext(contextOrParentName)) {
-    // AdditionalPropertiesContext
-    parentName = contextOrParentName.parentSchemaName;
+    // AdditionalPropertiesContext（documentPathからパース）
+    const parsed = parseAdditionalPropertiesPath(
+      contextOrParentName.documentPath,
+    );
+    if (!parsed) {
+      throw new Error(
+        `Failed to parse additional properties path: ${contextOrParentName.documentPath.join("/")}`,
+      );
+    }
+    parentName = parsed.parentSchemaName;
   } else {
     // その他のVisitorContext（循環依存回避のため、親名を外部から渡す想定）
     throw new Error(
@@ -64,11 +73,10 @@ if (import.meta.vitest) {
           documentPath: [
             "components",
             "schemas",
-            "Test",
+            "MetricsData",
             "additionalProperties",
           ],
           rootSegment: "components",
-          parentSchemaName: "MetricsData",
         };
         expect(buildAdditionalPropertiesModelName(context)).toBe(
           "MetricsDataItem",

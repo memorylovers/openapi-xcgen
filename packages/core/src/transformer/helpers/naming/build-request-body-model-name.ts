@@ -1,6 +1,7 @@
 import { pascalCase } from "es-toolkit/string";
-import type { PathsRequestBodyContext } from "../types";
+import type { PathsRequestBodyContext } from "../../types";
 import { getMediaTypeSuffix } from "./media-type-suffix";
+import { parseRequestBodyPath } from "../path/parse-document-path";
 import { pathToComponentBase } from "./path-to-component-base";
 
 /**
@@ -11,15 +12,22 @@ import { pathToComponentBase } from "./path-to-component-base";
  *
  * @example
  * ```typescript
- * // context = { method: "post", pathTemplate: "/users", ... }
+ * // context = { documentPath: ["paths", "/users", "post", "requestBody"], ... }
  * buildRequestBodyModelName(context)  // => "PostUsersRequestBody"
  * ```
  */
 export function buildRequestBodyModelName(
   context: PathsRequestBodyContext,
 ): string {
-  const methodPascal = pascalCase(context.method ?? "");
-  const pathBase = pathToComponentBase(context.pathTemplate ?? "");
+  const parsed = parseRequestBodyPath(context.documentPath);
+  if (!parsed) {
+    throw new Error(
+      `Failed to parse request body path: ${context.documentPath.join("/")}`,
+    );
+  }
+
+  const methodPascal = pascalCase(parsed.method);
+  const pathBase = pathToComponentBase(parsed.pathTemplate);
   const mediaSuffix = getMediaTypeSuffix(context.contentType ?? undefined);
   return `${methodPascal}${pathBase}${mediaSuffix}RequestBody`;
 }
@@ -34,8 +42,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/users", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/users",
         contentType: "application/json",
         schemaPath: ["content", "application/json", "schema"],
       };
@@ -47,8 +53,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/files", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/files",
         contentType: "multipart/form-data",
         schemaPath: ["content", "multipart/form-data", "schema"],
       };

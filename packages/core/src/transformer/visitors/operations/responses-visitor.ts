@@ -77,9 +77,6 @@ export function visitResponses(
     const responseContext: ResponseContext = {
       kind: "response",
       documentPath: [...context.documentPath, statusCode],
-      method: context.method,
-      pathTemplate: context.pathTemplate,
-      statusCode,
       rootSegment: "paths",
     };
 
@@ -111,8 +108,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/test", "get", "responses"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({
@@ -128,8 +123,6 @@ if (import.meta.vitest) {
           kind: "responses",
           documentPath: ["paths", "/test", "get", "responses"],
           rootSegment: "paths",
-          method: "get",
-          pathTemplate: "/test",
         },
       );
 
@@ -150,8 +143,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/test", "get", "responses"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({
@@ -183,8 +174,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/api/users/{id}", "get", "responses"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/api/users/{id}",
       });
 
       expect(result).toEqual({
@@ -245,8 +234,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/users", "post", "responses"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/users",
       });
 
       expect(result).toEqual({
@@ -354,8 +341,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/api/resource/{id}", "delete", "responses"],
         rootSegment: "paths",
-        method: "delete",
-        pathTemplate: "/api/resource/{id}",
       });
 
       expect(result).toEqual({
@@ -426,8 +411,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/complex/api/endpoint", "patch", "responses"],
         rootSegment: "paths",
-        method: "patch",
-        pathTemplate: "/complex/api/endpoint",
       });
 
       expect(result).toEqual({
@@ -460,8 +443,6 @@ if (import.meta.vitest) {
         kind: "responses",
         documentPath: ["paths", "/test", "get", "responses"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({

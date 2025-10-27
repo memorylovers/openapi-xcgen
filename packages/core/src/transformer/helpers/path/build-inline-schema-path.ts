@@ -6,7 +6,7 @@
  * - これにより referencePath.split('/').pop() === modelName が保証される
  */
 
-import type { VisitorContext } from "../types";
+import type { VisitorContext } from "../../types";
 
 /**
  * インラインスキーマ用のdocumentPathを構築

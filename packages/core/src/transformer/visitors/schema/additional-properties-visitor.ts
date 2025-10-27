@@ -10,7 +10,10 @@ import type {
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../../types";
-import { buildInlineSchemaPath, getModelName } from "../../helpers";
+import {
+  buildAdditionalPropertiesModelName,
+  getModelName,
+} from "../../helpers";
 import type { AdditionalPropertiesContext, VisitorContext } from "../../types";
 import { visitSchema } from "./schema-visitor";
 
@@ -70,14 +73,15 @@ export function visitAdditionalProperties(
   // visitSchemaを使って通常の型変換処理を行う（すべての型をサポート）
   const schemaObj = additionalProperties as SchemaObjectWithNullable;
 
-  // additionalProperties専用のコンテキストを構築
+  // 親モデル名を取得してadditionalPropertiesモデル名を生成
   const parentName = getModelName(context);
+  const inlineModelName = buildAdditionalPropertiesModelName(parentName);
 
+  // additionalProperties専用のコンテキストを構築
   const inlineContext: AdditionalPropertiesContext = {
     kind: "additionalProperties",
-    documentPath: buildInlineSchemaPath(context, `${parentName}Item`),
+    documentPath: [...context.documentPath.slice(0, -1), inlineModelName],
     rootSegment: context.rootSegment,
-    parentSchemaName: parentName,
   };
 
   const result = visitSchema(schemaObj, inlineContext);

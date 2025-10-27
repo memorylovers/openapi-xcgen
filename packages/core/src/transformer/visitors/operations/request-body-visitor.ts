@@ -22,7 +22,7 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import { isPathsRequestBodyContext } from "../../../types/guards";
-import { getModelName } from "../../helpers/get-model-name";
+import { getModelName } from "../../helpers";
 import type { RequestBodyContext } from "../../types";
 import { visitRequestBodyObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";
@@ -129,8 +129,6 @@ export function visitRequestBody(
               componentName,
             ],
             rootSegment: context.rootSegment,
-            method: context.method,
-            pathTemplate: context.pathTemplate,
             contentType: mimeType,
             schemaPath: ["content", mimeType, "schema"],
           }
@@ -242,8 +240,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/users", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/users",
       });
 
       expect(result).toEqual({
@@ -318,8 +314,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/files", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/files",
       });
 
       expect(result).toEqual({
@@ -403,8 +397,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual(null);
@@ -426,8 +418,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual(null);
@@ -447,8 +437,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/users/{id}", "put", "requestBody"],
         rootSegment: "paths",
-        method: "put",
-        pathTemplate: "/users/{id}",
       });
 
       expect(result).toEqual({
@@ -481,8 +469,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({
@@ -519,8 +505,6 @@ if (import.meta.vitest) {
         kind: "requestBody",
         documentPath: ["paths", "/test", "post", "requestBody"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/test",
       });
 
       expect(result).toEqual({

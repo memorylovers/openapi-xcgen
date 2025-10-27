@@ -5,8 +5,9 @@
  * 現在はComposition型（allOf/anyOf/oneOf）に対応しています。
  */
 
-import { isCompositionContext } from "../../types/guards";
-import type { CompositionContext, VisitorContextKind } from "../types";
+import { isCompositionContext } from "../../../types/guards";
+import type { CompositionContext, VisitorContextKind } from "../../types";
+import { parseCompositionPath } from "../path/parse-document-path";
 
 /**
  * インラインスキーマのモデル名を生成（Composition型専用）
@@ -51,7 +52,7 @@ export function buildInlineModelName(
   let contextIndex: number;
 
   if (typeof contextOrParentName === "string") {
-    // 後方互換性: 旧シグネチャ
+    // 後方互換性: 旧シグネチャ（Visitor構築時に使用）
     if (!kind || index === undefined) {
       throw new Error(
         "kind and index are required when using string parentName",
@@ -66,13 +67,21 @@ export function buildInlineModelName(
     contextKind = kind;
     contextIndex = index;
   } else {
-    // 新シグネチャ: Context対応
+    // 新シグネチャ: Context対応（documentPathからパース）
     if (!isCompositionContext(contextOrParentName)) {
       throw new Error("Invalid context: not a CompositionContext");
     }
-    parentSchemaName = contextOrParentName.parentSchemaName;
-    contextKind = contextOrParentName.kind;
-    contextIndex = contextOrParentName.index;
+
+    const parsed = parseCompositionPath(contextOrParentName.documentPath);
+    if (!parsed) {
+      throw new Error(
+        `Failed to parse composition path: ${contextOrParentName.documentPath.join("/")}`,
+      );
+    }
+
+    parentSchemaName = parsed.parentSchemaName;
+    contextKind = parsed.kind;
+    contextIndex = parsed.index;
   }
 
   const kindSuffix =
@@ -94,10 +103,8 @@ if (import.meta.vitest) {
       it("should generate allOf model names from context", () => {
         const context: CompositionContext = {
           kind: "allOf",
-          documentPath: ["components", "schemas", "Extended", "allOf", "0"],
+          documentPath: ["components", "schemas", "User", "allOf", "0"],
           rootSegment: "components",
-          parentSchemaName: "User",
-          index: 0,
         };
         expect(buildInlineModelName(context)).toBe("UserAllOf0");
       });
@@ -105,10 +112,8 @@ if (import.meta.vitest) {
       it("should generate oneOf model names from context", () => {
         const context: CompositionContext = {
           kind: "oneOf",
-          documentPath: ["components", "schemas", "Item", "oneOf", "1"],
+          documentPath: ["components", "schemas", "Shape", "oneOf", "1"],
           rootSegment: "components",
-          parentSchemaName: "Shape",
-          index: 1,
         };
         expect(buildInlineModelName(context)).toBe("ShapeOneOf1");
       });
@@ -116,10 +121,8 @@ if (import.meta.vitest) {
       it("should generate anyOf model names from context", () => {
         const context: CompositionContext = {
           kind: "anyOf",
-          documentPath: ["components", "schemas", "Pet", "anyOf", "2"],
+          documentPath: ["components", "schemas", "Animal", "anyOf", "2"],
           rootSegment: "components",
-          parentSchemaName: "Animal",
-          index: 2,
         };
         expect(buildInlineModelName(context)).toBe("AnimalAnyOf2");
       });

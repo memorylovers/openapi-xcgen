@@ -6,7 +6,7 @@
  */
 
 import { consola } from "consola";
-import { buildComponentSchemaPath } from "../../helpers/build-component-schema-path";
+import { buildComponentSchemaPath } from "../../helpers";
 import type {
   ComponentsObject,
   IRModel,
@@ -111,7 +111,6 @@ export function visitComponents(
       const schemaContext: SchemaContext = {
         kind: "schema",
         documentPath: buildComponentSchemaPath(context, name),
-        schemaName: name,
         rootSegment: "components",
       };
       const schemaResult = visitSchema(
