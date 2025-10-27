@@ -77,6 +77,7 @@ IRModelは以下の種類がある
 - IRResponseModel
 - IRAllOfModel
 - IRAnyOfModel
+- IRUnionModel
 
 ### components/schemasから生成（schema系）
 
@@ -91,7 +92,6 @@ IRObjectModel
 │   ├── type: IRType
 │   ├── required
 │   └── description
-├── validation?: IRValidation
 ├── additionalProperties?: IRType
 └── extensions?: IRExtensions
 ```
@@ -107,7 +107,7 @@ IREnumModel
 ├── values: IREnumValue[]
 │   ├── value
 │   └── description
-├── scalarType: IRScalarType
+├── type: IRScalarType
 └── extensions?: IRExtensions
 ```
 
@@ -119,9 +119,7 @@ OpenAPIの`type: array`から生成されます。
 
 ```
 IRArrayModel
-├── items: IRType
-├── validation?: IRValidation
-└── extensions?: IRExtensions
+└── items: IRType
 ```
 
 **用途**: Users[]、Tags[]などの配列型
@@ -132,9 +130,7 @@ OpenAPIの`type: object` + `additionalProperties`から生成されます。
 
 ```
 IRMapModel
-├── valueType: IRType
-├── validation?: IRValidation
-└── extensions?: IRExtensions
+└── valueType: IRType
 ```
 
 **用途**: Record<string, User>のようなMap型
@@ -143,46 +139,45 @@ IRMapModel
 
 #### IRParameterModel - parameters配下
 
-pathsのparameters配下のインラインスキーマから生成されます。
+pathsのparameters配下から生成される統合パラメータモデル。
+複数のパラメータを1つのモデルに統合します（例: GetUsersParams）。
 
 ```
 IRParameterModel
-├── type: IRType
-├── in: IRParameterInType
-│   └── "query" | "path" | "header" | "cookie"
-└── extensions?: IRExtensions
+└── properties: IRParameterProperty[]
+    └── IRProperty + in: IRParameterInType
+        └── "query" | "path" | "header" | "cookie"
 ```
 
-**用途**: クエリパラメータ、パスパラメータの型
+**用途**: エンドポイントの全パラメータを統合した型（GetUsersParams等）
 
 #### IRRequestBodyModel - requestBody配下
 
 pathsのrequestBody配下のインラインスキーマから生成されます。
+IRObjectModelの性質を継承し、リクエストボディ固有の情報を追加します。
 
 ```
 IRRequestBodyModel
-├── contents: IRRequestContent[]
-│   ├── mimeType
-│   └── type: IRType
-└── extensions?: IRExtensions
+├── properties: IRProperty[]
+└── additionalProperties?: IRType
 ```
 
-**用途**: POSTリクエストのボディ型
+**用途**: インラインrequestBodyスキーマのモデル化（PostUsersRequestBody等）
 
 #### IRResponseModel - responses配下
 
 pathsのresponses配下のインラインスキーマから生成されます。
+IRObjectModelの性質を継承し、レスポンス固有の情報を追加します。
 
 ```
 IRResponseModel
-├── contents: IRResponseContent[]
-│   ├── mimeType
-│   └── type: IRType
+├── properties: IRProperty[]
+├── statusCode: string
 ├── headers?: IRResponseHeader[]
-└── extensions?: IRExtensions
+└── additionalProperties?: IRType
 ```
 
-**用途**: レスポンスボディ型
+**用途**: インラインresponseスキーマのモデル化（GetUsers200Response等）
 
 ### スキーマ合成（composition系）
 
@@ -208,7 +203,31 @@ IRAnyOfModel
 └── extensions?: IRExtensions
 ```
 
+**セマンティクス**: 1つ以上のスキーマにマッチ（包含的Union）
+
 **用途**: Union型、ポリモーフィズムの表現
+
+#### IRUnionModel - oneOf
+
+OpenAPIの`oneOf`から生成されます。
+
+```
+IRUnionModel
+├── types: IRType[]
+├── discriminator?: IRDiscriminator
+│   ├── propertyName: string
+│   └── mapping?: Record<string, string>
+└── extensions?: IRExtensions
+```
+
+**セマンティクス**: 正確に1つのスキーマにマッチ（排他的Union、XOR）
+
+**用途**: discriminated union、排他的な型選択、ポリモーフィズムの表現
+
+**anyOfとの違い**:
+
+- anyOf: 1つ以上にマッチ（OR）
+- oneOf: 正確に1つにマッチ（XOR）
 
 ## Layer 2-B: IREndpoint
 

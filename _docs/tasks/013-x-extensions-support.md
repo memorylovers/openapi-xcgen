@@ -135,19 +135,14 @@ components:
 
 ### Phase 3: xcgen-ts - デフォルト Hooks 実装
 
-#### Phase 3 - 対象ファイル
-
-- `packages/xcgen-ts/src/hooks/default/x-type.ts` - x-type 処理
-- `packages/xcgen-ts/src/hooks/default/x-format.ts` - x-format 処理
-- `packages/xcgen-ts/src/hooks/default/x-validation.ts` - x-validation 処理
-- `packages/xcgen-ts/tests/e2e/x-extensions/` - E2E テスト
+詳細: [013-3-x-extensions-default-hooks.md](./013-3-x-extensions-default-hooks.md)
 
 #### Phase 3 - 実装タスク
 
-- [ ] `x-type` のデフォルト処理（カスタム型名での生成）
-- [ ] `x-format` のデフォルト処理（カスタムフォーマットバリデーション）
-- [ ] `x-validation` のデフォルト処理（追加バリデーションロジック）
+- [ ] デフォルトHooksの実装（x-type, x-format, x-validation）
+- [ ] Generator統合（自動登録）
 - [ ] E2E テストで動作確認
+- [ ] ドキュメント更新（ユーザーガイド、README）
 
 ## 実装方針
 
