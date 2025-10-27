@@ -1,10 +1,10 @@
-# Task 020: Model Name Generation Unification with Context
+# Task 022: Model Name Generation Unification with Context
 
 **Status**: 📋 Planning
 **Priority**: High
 **Complexity**: Medium
 **Estimated Effort**: 1.5-2 days
-**Prerequisite for**: Task 018 (Visitor Architecture Refactoring)
+**Prerequisite for**: Task 023 (Visitor Architecture Refactoring)
 
 ## 概要
 
@@ -1293,8 +1293,8 @@ packages/core/src/transformer/
 
 ## 関連タスク
 
-- **Task 018**: Visitor Architecture Refactoring（このタスク完了後に実施）
-- **Task 019**: Type-Safe Schema Definitions（並行して実施可能）
+- **Task 023**: Visitor Architecture Refactoring（このタスク完了後に実施）
+- **Task 021**: Type-Safe Schema Definitions（並行して実施可能）
 
 ---
 

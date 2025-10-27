@@ -1,4 +1,4 @@
-# Task 018: Visitor Architecture Refactoring
+# Task 023: Visitor Architecture Refactoring
 
 **Status**: 📋 Planning
 **Priority**: High
@@ -690,8 +690,8 @@ export function isErrorResult(result: TransformResult): boolean {
 
 ## 関連タスク
 
-- Task 016: IRComponent Architecture Redesign（アーキテクチャ全体の見直し）
-- Task 017: Barrel Files Reduction（エクスポート構造の整理）
+- Task 025: IRComponent Architecture Redesign（アーキテクチャ全体の見直し）
+- Task 024: Barrel Files Reduction（エクスポート構造の整理）
 
 ---
 

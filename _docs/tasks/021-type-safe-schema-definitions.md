@@ -1,10 +1,10 @@
-# Task 019: Type-Safe Schema Definitions
+# Task 021: Type-Safe Schema Definitions
 
 **Status**: 📋 Planning
 **Priority**: High
 **Complexity**: Low
 **Estimated Effort**: 0.5 day (45分程度)
-**Prerequisite for**: Task 018 (Visitor Architecture Refactoring)
+**Prerequisite for**: Task 023 (Visitor Architecture Refactoring)
 
 ## 概要
 
@@ -593,7 +593,7 @@ export function transformEnum(
 
 ## 関連タスク
 
-- **Task 018**: Visitor Architecture Refactoring（この成果物を使用）
+- **Task 023**: Visitor Architecture Refactoring（この成果物を使用）
 
 ---
 
