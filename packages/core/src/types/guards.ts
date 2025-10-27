@@ -121,6 +121,7 @@ export function isArraySchemaObject(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     schema.type === "array"
   );
 }
@@ -134,6 +135,7 @@ export function isNonArraySchemaObject(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     typeof schema.type === "string" &&
     schema.type !== "array"
   );
@@ -154,6 +156,7 @@ export function isObjectSchemaObject(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     schema.type === "object"
   );
 }
@@ -173,6 +176,7 @@ export function isEnumSchema(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     "enum" in schema &&
     Array.isArray(schema.enum) &&
     schema.enum.length > 0
@@ -193,6 +197,7 @@ export function isCompositionSchema(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     (("allOf" in schema && Array.isArray(schema.allOf)) ||
       ("oneOf" in schema && Array.isArray(schema.oneOf)) ||
       ("anyOf" in schema && Array.isArray(schema.anyOf)))
@@ -210,6 +215,7 @@ export function isMapSchema(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     "additionalProperties" in schema &&
     schema.additionalProperties !== undefined &&
     schema.additionalProperties !== false &&
@@ -230,6 +236,7 @@ export function isPrimitiveSchema(
   return (
     !isReferenceObject(schema) &&
     typeof schema === "object" &&
+    schema !== null &&
     typeof schema.type === "string" &&
     ["string", "number", "integer", "boolean"].includes(schema.type)
   );
@@ -441,6 +448,12 @@ if (import.meta.vitest) {
           };
           expect(isArraySchemaObject(ref)).toBe(false);
         });
+
+        it("should return false for null", () => {
+          expect(isArraySchemaObject(null as unknown as SchemaObject)).toBe(
+            false,
+          );
+        });
       });
 
       describe("isNonArraySchemaObject", () => {
@@ -474,6 +487,12 @@ if (import.meta.vitest) {
           };
           expect(isNonArraySchemaObject(noTypeSchema)).toBe(false);
         });
+
+        it("should return false for null", () => {
+          expect(isNonArraySchemaObject(null as unknown as SchemaObject)).toBe(
+            false,
+          );
+        });
       });
 
       describe("isObjectSchemaObject", () => {
@@ -493,6 +512,12 @@ if (import.meta.vitest) {
             items: { type: "string" },
           };
           expect(isObjectSchemaObject(arraySchema)).toBe(false);
+        });
+
+        it("should return false for null", () => {
+          expect(isObjectSchemaObject(null as unknown as SchemaObject)).toBe(
+            false,
+          );
         });
       });
 
@@ -518,6 +543,10 @@ if (import.meta.vitest) {
             type: "string",
           };
           expect(isEnumSchema(stringSchema)).toBe(false);
+        });
+
+        it("should return false for null", () => {
+          expect(isEnumSchema(null as unknown as SchemaObject)).toBe(false);
         });
       });
 
@@ -576,6 +605,12 @@ if (import.meta.vitest) {
             isCompositionSchema(invalidSchema as unknown as SchemaObject),
           ).toBe(false);
         });
+
+        it("should return false for null", () => {
+          expect(isCompositionSchema(null as unknown as SchemaObject)).toBe(
+            false,
+          );
+        });
       });
 
       describe("isMapSchema", () => {
@@ -618,6 +653,10 @@ if (import.meta.vitest) {
           };
           expect(isMapSchema(mapSchema)).toBe(true);
         });
+
+        it("should return false for null", () => {
+          expect(isMapSchema(null as unknown as SchemaObject)).toBe(false);
+        });
       });
 
       describe("isPrimitiveSchema", () => {
@@ -633,6 +672,12 @@ if (import.meta.vitest) {
           expect(
             isPrimitiveSchema({ type: "array", items: { type: "string" } }),
           ).toBe(false);
+        });
+
+        it("should return false for null", () => {
+          expect(isPrimitiveSchema(null as unknown as SchemaObject)).toBe(
+            false,
+          );
         });
       });
     });
