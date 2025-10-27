@@ -4,20 +4,31 @@
 
 import { consola } from "consola";
 import type {
+  IRModel,
   IRType,
   ReferenceObject,
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../../types";
 import type { VisitorContext } from "../../types";
-import { visitType } from "./type-visitor";
+import { visitSchema } from "./schema-visitor";
+
+/**
+ * additionalProperties処理の結果
+ */
+export interface AdditionalPropertiesResult {
+  /** additionalPropertiesの型 */
+  type: IRType | null;
+  /** 抽出されたモデル（配列型の場合など） */
+  models: IRModel[];
+}
 
 /**
  * additionalPropertiesをIRTypeに変換
  *
  * @param additionalProperties - OpenAPIのadditionalProperties値
  * @param context - Visitorコンテキスト
- * @returns IRType型の結果、無効な場合はnull
+ * @returns AdditionalPropertiesResult型の結果
  *
  * @example
  * ```yaml
@@ -43,7 +54,7 @@ import { visitType } from "./type-visitor";
 export function visitAdditionalProperties(
   additionalProperties: SchemaObject | ReferenceObject | boolean,
   context: VisitorContext,
-): IRType | null {
+): AdditionalPropertiesResult {
   // boolean値の処理
   if (typeof additionalProperties === "boolean") {
     if (additionalProperties === true) {
@@ -51,19 +62,19 @@ export function visitAdditionalProperties(
         "additionalProperties: true (any type) is not supported; specify a schema for map values",
       );
     }
-    return null;
+    return { type: null, models: [] };
   }
 
   // SchemaObject | ReferenceObjectの処理
-  // visitTypeを使って通常の型変換処理を行う
+  // visitSchemaを使って通常の型変換処理を行う（すべての型をサポート）
   const schemaObj = additionalProperties as SchemaObjectWithNullable;
-  const result = visitType(schemaObj, context);
+  const result = visitSchema(schemaObj, context);
 
-  if (!result) {
+  if (!result.type) {
     consola.warn(`Failed to convert additionalProperties to IRType`);
   }
 
-  return result;
+  return { type: result.type, models: result.models };
 }
 
 // === in-source testing ===
@@ -81,10 +92,13 @@ if (import.meta.vitest) {
       };
 
       const result = visitAdditionalProperties(schema, context);
-      expect(result).toBe("string");
+      expect(result).toEqual({
+        type: "string",
+        models: [],
+      });
     });
 
-    it("should convert array type", () => {
+    it("should convert array type and extract model", () => {
       const schema: SchemaObjectWithNullable = {
         type: "array",
         items: { type: "string" },
@@ -95,8 +109,15 @@ if (import.meta.vitest) {
       };
 
       const result = visitAdditionalProperties(schema, context);
-      expect(result).toEqual({
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/Test",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
         kind: "array",
+        name: "Test",
+        referencePath: "#/components/schemas/Test",
         itemType: "string",
       });
     });
@@ -112,8 +133,11 @@ if (import.meta.vitest) {
 
       const result = visitAdditionalProperties(schema, context);
       expect(result).toEqual({
-        kind: "ref",
-        name: "#/components/schemas/MetadataValue",
+        type: {
+          kind: "ref",
+          name: "#/components/schemas/MetadataValue",
+        },
+        models: [],
       });
     });
 
@@ -124,7 +148,10 @@ if (import.meta.vitest) {
       };
 
       const result = visitAdditionalProperties(false, context);
-      expect(result).toBeNull();
+      expect(result).toEqual({
+        type: null,
+        models: [],
+      });
     });
 
     it("should warn and return null for boolean true", () => {
@@ -135,7 +162,10 @@ if (import.meta.vitest) {
       };
 
       const result = visitAdditionalProperties(true, context);
-      expect(result).toBeNull();
+      expect(result).toEqual({
+        type: null,
+        models: [],
+      });
       expect(warnSpy).toHaveBeenCalledWith(
         "additionalProperties: true (any type) is not supported; specify a schema for map values",
       );

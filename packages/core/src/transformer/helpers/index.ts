@@ -2,11 +2,10 @@
  * Helper functions exports
  */
 
-export {
-  buildComponentSchemaPath,
-  buildInlineSchemaPath,
-} from "./build-document-path";
-export { buildInlineModelName } from "./build-model-name";
+export { buildComponentSchemaPath } from "./build-component-schema-path";
+export { buildInlineModelName } from "./build-inline-model-name";
+export { buildInlineSchemaPath } from "./build-inline-schema-path";
+export { buildParameterSchemaModelName } from "./build-parameter-schema-model-name";
 export { buildReferencePath } from "./build-reference-path";
 export { createParameterModel } from "./create-parameter-model";
 export { extractExtensions } from "./extract-extensions";

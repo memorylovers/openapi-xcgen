@@ -182,8 +182,8 @@ if (import.meta.vitest) {
                 {
                   mimeType: "application/json",
                   schema: {
-                    kind: "array",
-                    itemType: { kind: "ref", name: "User" },
+                    kind: "ref",
+                    name: "#/paths/::users/get/responses/200/GetUsers200Response",
                   },
                 },
               ],
@@ -198,12 +198,12 @@ if (import.meta.vitest) {
 /**
  * Get all users
  * @param init - Additional fetch options
- * @returns Array<User>
+ * @returns GetUsers200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getUsers(
   init?: RequestInit,
-): Promise<Array<User>> {
+): Promise<GetUsers200Response> {
   return request({
     method: "GET",
     path: "/users",

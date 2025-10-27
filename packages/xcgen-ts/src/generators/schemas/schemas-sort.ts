@@ -24,14 +24,6 @@ function extractTypeReferences(type: IRType): string[] {
       references.push(modelName);
       break;
     }
-
-    case "array":
-      references.push(...extractTypeReferences(type.itemType));
-      break;
-
-    case "map":
-      references.push(...extractTypeReferences(type.valueType));
-      break;
   }
 
   return references;

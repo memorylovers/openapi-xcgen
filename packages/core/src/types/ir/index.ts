@@ -44,8 +44,6 @@ export interface XcgenIR {
 export type {
   IRExtensions,
   IRExtensionValue,
-  IRArray,
-  IRMap,
   IRRef,
   IRScalarType,
   IRType,

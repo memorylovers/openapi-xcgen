@@ -112,7 +112,7 @@ if (import.meta.vitest) {
         expect(result).toBe("User");
       });
 
-      it("should return array type", () => {
+      it("should return type name for array model ref", () => {
         const endpoint: IREndpoint = {
           path: "/users",
           method: "get",
@@ -128,8 +128,8 @@ if (import.meta.vitest) {
                 {
                   mimeType: "application/json",
                   schema: {
-                    kind: "array",
-                    itemType: { kind: "ref", name: "User" },
+                    kind: "ref",
+                    name: "#/paths/::users/get/responses/200/GetUsers200Response",
                   },
                 },
               ],
@@ -139,7 +139,9 @@ if (import.meta.vitest) {
 
         const result = getResponseType(endpoint);
 
-        expect(result).toBe("Array<User>");
+        // IRRef to IRArrayModel returns the model name (not "Array<T>")
+        // Array formatting should be done at a higher level that has access to models
+        expect(result).toBe("GetUsers200Response");
       });
     });
   });

@@ -6,7 +6,7 @@
  */
 
 import { consola } from "consola";
-import { buildComponentSchemaPath } from "../../helpers/build-document-path";
+import { buildComponentSchemaPath } from "../../helpers/build-component-schema-path";
 import type {
   ComponentsObject,
   IRModel,

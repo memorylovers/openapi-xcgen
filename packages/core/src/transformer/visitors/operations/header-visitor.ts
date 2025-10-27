@@ -13,19 +13,30 @@
 import { consola } from "consola";
 import type {
   HeaderObject,
+  IRModel,
   IRResponseHeader,
   SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import type { HeaderContext } from "../../types";
-import { visitType } from "../schema";
+import { visitSchema } from "../schema";
 
 /**
- * HeaderObjectをIRResponseHeaderに変換
+ * Header処理の結果
+ */
+export interface HeaderResult {
+  /** ヘッダー情報 */
+  header: IRResponseHeader;
+  /** 配列型から抽出されたモデル */
+  models: IRModel[];
+}
+
+/**
+ * HeaderObjectをIRResponseHeaderとモデルに変換
  *
  * @param headerObj - OpenAPIのHeaderObject
  * @param context - Visitorコンテキスト
- * @returns IRResponseHeader、または変換できない場合はnull
+ * @returns HeaderResult、または変換できない場合はnull
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -45,7 +56,7 @@ import { visitType } from "../schema";
 export function visitHeader(
   headerObj: HeaderObject,
   context: HeaderContext,
-): IRResponseHeader | null {
+): HeaderResult | null {
   // schemaが必須
   if (!headerObj.schema) {
     consola.warn(`Header without schema: ${context.headerName}`);
@@ -63,15 +74,20 @@ export function visitHeader(
   // SchemaObjectとして扱う
   const schema = headerObj.schema as SchemaObject;
 
-  // visitTypeでschemaから型情報を取得
-  const type = visitType(schema, {
+  // すべての型をvisitSchemaで処理（中央ディスパッチャーとして）
+  const models: IRModel[] = [];
+  const schemaResult = visitSchema(schema, {
     documentPath: [...context.documentPath, "schema"],
     rootSegment: context.rootSegment,
   });
-  if (!type) {
+
+  if (!schemaResult.type) {
     consola.warn(`Invalid header type for: ${context.headerName}`);
     return null;
   }
+
+  const type = schemaResult.type;
+  models.push(...schemaResult.models);
 
   // IRResponseHeaderを構築
   const irHeader: IRResponseHeader = {
@@ -82,7 +98,10 @@ export function visitHeader(
     ...(headerObj.deprecated && { deprecated: headerObj.deprecated }),
   };
 
-  return irHeader;
+  return {
+    header: irHeader,
+    models,
+  };
 }
 
 // === in-source testing ===
@@ -115,9 +134,12 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "Location",
-        description: "Redirect URL",
-        type: "string",
+        header: {
+          name: "Location",
+          description: "Redirect URL",
+          type: "string",
+        },
+        models: [],
       });
     });
 
@@ -146,9 +168,12 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "X-Rate-Limit",
-        description: "Rate limit",
-        type: "int",
+        header: {
+          name: "X-Rate-Limit",
+          description: "Rate limit",
+          type: "int",
+        },
+        models: [],
       });
     });
 
@@ -178,10 +203,13 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "X-API-Version",
-        description: "Legacy API version",
-        type: "string",
-        deprecated: true,
+        header: {
+          name: "X-API-Version",
+          description: "Legacy API version",
+          type: "string",
+          deprecated: true,
+        },
+        models: [],
       });
     });
 
@@ -210,10 +238,13 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "Content-Type",
-        description: "Content type",
-        type: "string",
-        defaultValue: "application/json",
+        header: {
+          name: "Content-Type",
+          description: "Content type",
+          type: "string",
+          defaultValue: "application/json",
+        },
+        models: [],
       });
     });
 
@@ -302,9 +333,12 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        name: "Retry-After",
-        description: "Retry after seconds",
-        type: "int",
+        header: {
+          name: "Retry-After",
+          description: "Retry after seconds",
+          type: "int",
+        },
+        models: [],
       });
     });
   });

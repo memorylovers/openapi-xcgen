@@ -204,7 +204,7 @@ export function visitResponse(
       }
 
       // visitHeaderで処理
-      const header = visitHeader(headerDef, {
+      const headerResult = visitHeader(headerDef, {
         kind: "header",
         documentPath: [...context.documentPath, "headers", headerName],
         rootSegment: context.rootSegment,
@@ -218,8 +218,9 @@ export function visitResponse(
           : "200",
       });
 
-      if (header) {
-        headers.push(header);
+      if (headerResult) {
+        headers.push(headerResult.header);
+        models.push(...headerResult.models);
       }
     }
     // 空配列は undefined にする

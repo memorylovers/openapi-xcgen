@@ -41,37 +41,8 @@ export interface IRRef {
 }
 
 /**
- * IRArray - 配列型
- * @example
- * ```yaml
- * # OpenAPI
- * type: array
- * items:
- *   $ref: "#/components/schemas/User"
- * ```
- */
-export interface IRArray {
-  kind: "array";
-  itemType: IRType;
-}
-
-/**
- * IRMap - マップ型（additionalProperties）
- * @example
- * ```yaml
- * # OpenAPI
- * type: object
- * additionalProperties:
- *   type: string
- * ```
- */
-export interface IRMap {
-  kind: "map";
-  valueType: IRType;
-}
-
-/**
  * IRType - 型情報の判別共用体
  * プロパティやパラメータの型として使用される
+ * 配列型やマップ型は常にモデルとして抽出され、IRRefで参照される
  */
-export type IRType = IRScalarType | IRRef | IRArray | IRMap;
+export type IRType = IRScalarType | IRRef;

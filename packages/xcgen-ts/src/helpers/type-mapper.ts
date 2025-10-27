@@ -56,19 +56,8 @@ export function irTypeToTsType(irType: IRType): string {
       return toTypeName(modelName);
     }
 
-    case "array": {
-      const itemType = irTypeToTsType(irType.itemType);
-      return `Array<${itemType}>`;
-    }
-
-    case "map": {
-      const valueType = irTypeToTsType(irType.valueType);
-      return `Record<string, ${valueType}>`;
-    }
-
     default: {
       // TypeScriptはデフォルトケースでexhaustiveチェックを行う
-      const _exhaustiveCheck: never = irType;
       return "unknown";
     }
   }
@@ -141,31 +130,6 @@ if (import.meta.vitest) {
         expect(irTypeToTsType({ kind: "ref", name: "user_profile" })).toBe(
           "UserProfile",
         );
-      });
-
-      it("should convert array types", () => {
-        expect(
-          irTypeToTsType({
-            kind: "array",
-            itemType: "string",
-          }),
-        ).toBe("Array<string>");
-
-        expect(
-          irTypeToTsType({
-            kind: "array",
-            itemType: { kind: "ref", name: "Pet" },
-          }),
-        ).toBe("Array<Pet>");
-      });
-
-      it("should convert map types", () => {
-        expect(
-          irTypeToTsType({
-            kind: "map",
-            valueType: "int",
-          }),
-        ).toBe("Record<string, number>");
       });
     });
 

@@ -7,12 +7,10 @@ export type {
   IRExtensionValue,
   InfoObject,
   // IR types
-  IRArray,
   IREndpoint,
   IREnumModel,
   IREnumValue,
   IRHttpMethod,
-  IRMap,
   IRMetadata,
   IRModel,
   IRParameter,

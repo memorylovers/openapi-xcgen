@@ -5,10 +5,10 @@
  */
 
 import type { IRExtensions, IRType, IRValidation } from "@openapi-xcgen/core";
-import { generatePrimitiveSchema } from "./schemas-primitive";
-import { generateValidationPipes } from "./schemas-validation";
 import { toTypeName } from "../../helpers/naming";
 import type { HookableInstance } from "../../hooks";
+import { generatePrimitiveSchema } from "./schemas-primitive";
+import { generateValidationPipes } from "./schemas-validation";
 
 /**
  * IRTypeをValibotスキーマ文字列に変換
@@ -69,21 +69,7 @@ export function irTypeToValibotSchema(
         break;
       }
 
-      case "array": {
-        const itemSchema = irTypeToValibotSchema(type.itemType);
-        baseSchema = `v.array(${itemSchema})`;
-        break;
-      }
-
-      case "map": {
-        const valueSchema = irTypeToValibotSchema(type.valueType);
-        baseSchema = `v.record(v.string(), ${valueSchema})`;
-        break;
-      }
-
       default: {
-        const _: never = type;
-        void _;
         baseSchema = "v.any()";
       }
     }
@@ -115,30 +101,6 @@ if (import.meta.vitest) {
       it("should convert ref type to schema reference", () => {
         const result = irTypeToValibotSchema({ kind: "ref", name: "Pet" });
         expect(result).toBe("PetSchema");
-      });
-
-      it("should convert array type to array schema", () => {
-        const result = irTypeToValibotSchema({
-          kind: "array",
-          itemType: "string",
-        });
-        expect(result).toBe("v.array(v.string())");
-      });
-
-      it("should convert nested array type", () => {
-        const result = irTypeToValibotSchema({
-          kind: "array",
-          itemType: { kind: "ref", name: "User" },
-        });
-        expect(result).toBe("v.array(UserSchema)");
-      });
-
-      it("should convert map type to record schema", () => {
-        const result = irTypeToValibotSchema({
-          kind: "map",
-          valueType: "int",
-        });
-        expect(result).toBe("v.record(v.string(), v.number())");
       });
 
       it("should apply validation pipes", () => {

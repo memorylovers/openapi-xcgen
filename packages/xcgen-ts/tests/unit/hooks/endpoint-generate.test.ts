@@ -31,8 +31,8 @@ describe("endpoint:generate hook", () => {
                 {
                   mimeType: "application/json",
                   schema: {
-                    kind: "array",
-                    itemType: { kind: "ref", name: "User" },
+                    kind: "ref",
+                    name: "#/paths/::users/get/responses/200/GetUsers200Response",
                   },
                 },
               ],
@@ -43,12 +43,12 @@ describe("endpoint:generate hook", () => {
         expected: `/**
  * Get all users
  * @param init - Additional fetch options
- * @returns Array<User>
+ * @returns GetUsers200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function listAllUsers(
   init?: RequestInit,
-): Promise<Array<User>> {
+): Promise<GetUsers200Response> {
   return request({
     method: "GET",
     path: "/users",
@@ -288,8 +288,8 @@ export async function listUsers(
               {
                 mimeType: "application/json",
                 schema: {
-                  kind: "array",
-                  itemType: { kind: "ref", name: "User" },
+                  kind: "ref",
+                  name: "#/paths/::users/get/responses/200/GetUsers200Response",
                 },
               },
             ],
@@ -303,12 +303,12 @@ export async function listUsers(
       expect(result).toEqual(`/**
  * Get all users
  * @param init - Additional fetch options
- * @returns Array<User>
+ * @returns GetUsers200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getUsers(
   init?: RequestInit,
-): Promise<Array<User>> {
+): Promise<GetUsers200Response> {
   return request({
     method: "GET",
     path: "/users",
@@ -423,8 +423,8 @@ export async function getUsers(
               {
                 mimeType: "application/json",
                 schema: {
-                  kind: "array",
-                  itemType: { kind: "ref", name: "User" },
+                  kind: "ref",
+                  name: "#/paths/::users/get/responses/200/GetUsers200Response",
                 },
               },
             ],
@@ -439,12 +439,12 @@ export async function getUsers(
  * Get all users
  * Retrieve a list of all users in the system
  * @param init - Additional fetch options
- * @returns Array<User>
+ * @returns GetUsers200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function listAllUsers(
   init?: RequestInit,
-): Promise<Array<User>> {
+): Promise<GetUsers200Response> {
   return request({
     method: "GET",
     path: "/users",
