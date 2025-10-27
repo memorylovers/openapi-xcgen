@@ -37,3 +37,88 @@ export function buildParameterSchemaModelName(
   const paramNamePascal = pascalCase(context.parameterName);
   return `${methodPascal}${pathBase}Params${paramNamePascal}`;
 }
+
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+
+  describe("buildParameterSchemaModelName", () => {
+    it("should build model name for path parameter", () => {
+      const context: ParameterContext = {
+        kind: "parameter",
+        documentPath: ["paths", "/users/{id}", "get", "parameters"],
+        parameterName: "id",
+        in: "path",
+        method: "get",
+        pathTemplate: "/users/{id}",
+        rootSegment: "paths",
+      };
+      expect(buildParameterSchemaModelName(context)).toBe("GetUsersIdParamsId");
+    });
+
+    it("should build model name for query parameter", () => {
+      const context: ParameterContext = {
+        kind: "parameter",
+        documentPath: ["paths", "/users", "get", "parameters"],
+        parameterName: "category",
+        in: "query",
+        method: "get",
+        pathTemplate: "/users",
+        rootSegment: "paths",
+      };
+      expect(buildParameterSchemaModelName(context)).toBe(
+        "GetUsersParamsCategory",
+      );
+    });
+
+    it("should build model name for complex path template", () => {
+      const context: ParameterContext = {
+        kind: "parameter",
+        documentPath: [
+          "paths",
+          "/api/v2/users/{userId}/posts",
+          "post",
+          "parameters",
+        ],
+        parameterName: "limit",
+        in: "query",
+        method: "post",
+        pathTemplate: "/api/v2/users/{userId}/posts",
+        rootSegment: "paths",
+      };
+      expect(buildParameterSchemaModelName(context)).toBe(
+        "PostApiV2UsersUserIdPostsParamsLimit",
+      );
+    });
+
+    it("should handle header parameter", () => {
+      const context: ParameterContext = {
+        kind: "parameter",
+        documentPath: ["paths", "/posts", "get", "parameters"],
+        parameterName: "x-api-key",
+        in: "header",
+        method: "get",
+        pathTemplate: "/posts",
+        rootSegment: "paths",
+      };
+      expect(buildParameterSchemaModelName(context)).toBe(
+        "GetPostsParamsXApiKey",
+      );
+    });
+
+    it("should handle cookie parameter", () => {
+      const context: ParameterContext = {
+        kind: "parameter",
+        documentPath: ["paths", "/session", "get", "parameters"],
+        parameterName: "session_id",
+        in: "cookie",
+        method: "get",
+        pathTemplate: "/session",
+        rootSegment: "paths",
+      };
+      expect(buildParameterSchemaModelName(context)).toBe(
+        "GetSessionParamsSessionId",
+      );
+    });
+  });
+}
