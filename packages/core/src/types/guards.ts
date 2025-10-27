@@ -1,4 +1,5 @@
 import type {
+  AdditionalPropertiesContext,
   AllOfContext,
   AnyOfContext,
   OneOfContext,
@@ -57,6 +58,15 @@ export function isCompositionContext(
     context.kind === "oneOf" ||
     context.kind === "anyOf"
   );
+}
+
+/**
+ * VisitorContextがAdditionalPropertiesContextかどうかを判定
+ */
+export function isAdditionalPropertiesContext(
+  context: VisitorContext,
+): context is AdditionalPropertiesContext {
+  return context.kind === "additionalProperties";
 }
 
 /**
@@ -352,6 +362,31 @@ if (import.meta.vitest) {
           rootSegment: "components",
         };
         expect(isCompositionContext(schemaContext)).toBe(false);
+      });
+    });
+
+    describe("isAdditionalPropertiesContext", () => {
+      it("should identify additionalProperties contexts", () => {
+        const context: AdditionalPropertiesContext = {
+          kind: "additionalProperties",
+          documentPath: [
+            "components",
+            "schemas",
+            "Test",
+            "additionalProperties",
+          ],
+          rootSegment: "components",
+          parentSchemaName: "Test",
+        };
+        expect(isAdditionalPropertiesContext(context)).toBe(true);
+      });
+
+      it("should return false for non-additionalProperties contexts", () => {
+        const baseContext: VisitorContext = {
+          documentPath: ["components", "schemas", "User"],
+          rootSegment: "components",
+        };
+        expect(isAdditionalPropertiesContext(baseContext)).toBe(false);
       });
     });
 

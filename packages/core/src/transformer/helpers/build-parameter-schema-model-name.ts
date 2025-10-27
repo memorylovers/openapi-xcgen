@@ -7,7 +7,7 @@
 
 import { pascalCase } from "es-toolkit/string";
 import type { ParameterContext } from "../types";
-import { pathToComponentBase } from "./path-to-component-base";
+import { buildParameterModelName } from "./build-parameter-model-name";
 
 /**
  * パラメータinline schema用のモデル名を生成
@@ -32,10 +32,9 @@ import { pathToComponentBase } from "./path-to-component-base";
 export function buildParameterSchemaModelName(
   context: ParameterContext,
 ): string {
-  const methodPascal = pascalCase(context.method ?? "");
-  const pathBase = pathToComponentBase(context.pathTemplate ?? "");
+  const paramBase = buildParameterModelName(context);
   const paramNamePascal = pascalCase(context.parameterName);
-  return `${methodPascal}${pathBase}Params${paramNamePascal}`;
+  return `${paramBase}${paramNamePascal}`;
 }
 
 // === in-source testing ===

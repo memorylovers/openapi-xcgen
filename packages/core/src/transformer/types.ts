@@ -19,6 +19,7 @@ export type VisitorContextKind =
   | "allOf"
   | "oneOf"
   | "anyOf"
+  | "additionalProperties"
   | "parameter"
   | "pathItem"
   | "operation"
@@ -100,6 +101,18 @@ export interface AnyOfContext extends VisitorContext {
  * Composition用コンテキストのUnion型
  */
 export type CompositionContext = AllOfContext | OneOfContext | AnyOfContext;
+
+/**
+ * AdditionalProperties処理用のコンテキスト
+ */
+export interface AdditionalPropertiesContext extends VisitorContext {
+  /** コンテキストの種類 */
+  kind: "additionalProperties";
+  /** ルートセグメント */
+  rootSegment: "components" | "paths";
+  /** 親スキーマ名 */
+  parentSchemaName: string;
+}
 
 /**
  * Parameter処理用のコンテキスト

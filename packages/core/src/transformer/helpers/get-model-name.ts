@@ -1,5 +1,5 @@
-import { pascalCase } from "es-toolkit/string";
 import {
+  isAdditionalPropertiesContext,
   isCompositionContext,
   isParameterContext,
   isPathsRequestBodyContext,
@@ -16,17 +16,16 @@ import type {
   ResponseContext,
   VisitorContext,
 } from "../types";
+import { buildAdditionalPropertiesModelName } from "./build-additional-properties-model-name";
 import { buildInlineModelName } from "./build-inline-model-name";
-import { getMediaTypeSuffix } from "./media-type-suffix";
-import { pathToComponentBase } from "./path-to-component-base";
+import { buildParameterModelName } from "./build-parameter-model-name";
+import { buildRequestBodyModelName } from "./build-request-body-model-name";
+import { buildResponseModelName } from "./build-response-model-name";
 
 /**
- * VisitorContextからモデル名を取得
+ * VisitorContextからモデル名を取得（中央ディスパッチャー）
  *
- * コンテキストの種類に応じて適切な命名戦略を適用します：
- * - paths配下のインラインスキーマ（Parameter/RequestBody/Response）: {Method}{Path}{Suffix}形式
- * - Composition型（allOf/oneOf/anyOf）: {ParentName}{Type}{Index}
- * - components配下の通常スキーマ: documentPathの最後の要素
+ * コンテキストの種類に応じて適切なビルダー関数を呼び出します。
  *
  * @param context - Visitorコンテキスト
  * @returns モデル名
@@ -35,22 +34,19 @@ import { pathToComponentBase } from "./path-to-component-base";
  * ```typescript
  * // ParameterContext
  * const paramCtx: ParameterContext = {
- *   documentPath: ["paths", "/users", "get", "parameters"],
- *   rootSegment: "paths",
  *   method: "get",
  *   pathTemplate: "/users",
  *   parameterName: "limit",
- *   in: "query"
+ *   ...
  * };
  * getModelName(paramCtx); // => "GetUsersParams"
  *
  * // AllOfContext
  * const allOfCtx: AllOfContext = {
  *   kind: "allOf",
- *   documentPath: ["components", "schemas", "Extended", "allOf", "0"],
- *   rootSegment: "components",
  *   parentSchemaName: "Extended",
  *   index: 0,
+ *   ...
  * };
  * getModelName(allOfCtx); // => "ExtendedAllOf0"
  *
@@ -65,18 +61,13 @@ import { pathToComponentBase } from "./path-to-component-base";
 export function getModelName(context: VisitorContext): string {
   // paths配下のParameter
   if (isParameterContext(context)) {
-    const methodPascal = pascalCase(context.method ?? "");
-    const pathBase = pathToComponentBase(context.pathTemplate ?? "");
-    return `${methodPascal}${pathBase}Params`;
+    return buildParameterModelName(context);
   }
 
-  // paths配下のResponse（RequestBodyより先にチェック、statusCodeがユニーク）
+  // paths配下のResponse
   if (isResponseContext(context)) {
     if (isPathsResponseContext(context)) {
-      const methodPascal = pascalCase(context.method ?? "");
-      const pathBase = pathToComponentBase(context.pathTemplate ?? "");
-      const mediaSuffix = getMediaTypeSuffix(context.contentType ?? undefined);
-      return `${methodPascal}${pathBase}${context.statusCode}${mediaSuffix}Response`;
+      return buildResponseModelName(context);
     }
     // components.responsesの場合はdocumentPathの最後の要素を返す
     return context.documentPath.at(-1) ?? "";
@@ -85,10 +76,7 @@ export function getModelName(context: VisitorContext): string {
   // paths配下のRequestBody
   if (isRequestBodyContext(context)) {
     if (isPathsRequestBodyContext(context)) {
-      const methodPascal = pascalCase(context.method ?? "");
-      const pathBase = pathToComponentBase(context.pathTemplate ?? "");
-      const mediaSuffix = getMediaTypeSuffix(context.contentType ?? undefined);
-      return `${methodPascal}${pathBase}${mediaSuffix}RequestBody`;
+      return buildRequestBodyModelName(context);
     }
     // components.requestBodiesの場合はdocumentPathの最後の要素を返す
     return context.documentPath.at(-1) ?? "";
@@ -96,8 +84,12 @@ export function getModelName(context: VisitorContext): string {
 
   // Composition型（allOf/oneOf/anyOf）
   if (isCompositionContext(context)) {
-    const ctx = context as AllOfContext | AnyOfContext | OneOfContext;
-    return buildInlineModelName(ctx.parentSchemaName, ctx.kind, ctx.index);
+    return buildInlineModelName(context);
+  }
+
+  // AdditionalProperties
+  if (isAdditionalPropertiesContext(context)) {
+    return buildAdditionalPropertiesModelName(context);
   }
 
   // components配下の通常スキーマ
