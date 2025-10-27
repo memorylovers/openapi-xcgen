@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: X-Extensions Types Test API
+  version: 1.0.0
+  description: API for testing various x-extension value types
+
+paths:
+  /test:
+    get:
+      operationId: testExtensionTypes
+      summary: Test various extension value types
+      # String value
+      x-string-extension: "simple string"
+      x-string-empty: ""
+
+      # Number values
+      x-number-integer: 42
+      x-number-float: 3.14
+      x-number-negative: -100
+      x-number-zero: 0
+
+      # Boolean values
+      x-boolean-true: true
+      x-boolean-false: false
+
+      # Null value
+      x-null-value: null
+
+      # Array values
+      x-array-strings: ["one", "two", "three"]
+      x-array-numbers: [1, 2, 3, 4, 5]
+      x-array-mixed: [1, "two", true, null]
+      x-array-empty: []
+      x-array-nested: [[1, 2], [3, 4]]
+
+      # Object values
+      x-object-simple:
+        key1: "value1"
+        key2: "value2"
+      x-object-nested:
+        level1:
+          level2:
+            level3: "deep value"
+      x-object-mixed:
+        string: "text"
+        number: 123
+        boolean: true
+        null: null
+        array: [1, 2, 3]
+        nested:
+          key: "value"
+      x-object-empty: {}
+
+      # Complex nested structures
+      x-complex-structure:
+        metadata:
+          version: "1.0.0"
+          author: "Test"
+        config:
+          enabled: true
+          limits:
+            max: 100
+            min: 0
+          tags: ["api", "test", "v1"]
+        items:
+          - id: 1
+            name: "First"
+          - id: 2
+            name: "Second"
+
+      responses:
+        "200":
+          description: Success
+
+components:
+  schemas:
+    TypesTest:
+      type: object
+      # Testing x-extensions on model with various types
+      x-string: "model extension"
+      x-number: 999
+      x-boolean: false
+      x-null: null
+      x-array: ["a", "b", "c"]
+      x-object:
+        nested: "value"
+      properties:
+        field:
+          type: string
+          # Testing x-extensions on property with various types
+          x-string: "property extension"
+          x-number: 123
+          x-boolean: true
+          x-array: [1, 2, 3]
+          x-object:
+            key: "value"

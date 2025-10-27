@@ -20,6 +20,7 @@ import type {
   OperationObject,
   ReferenceObject,
 } from "../../../types";
+import { extractExtensions } from "../../helpers";
 import type {
   OperationContext,
   ParametersContext,
@@ -162,6 +163,14 @@ export function visitOperation(
     });
   }
 
+  // x-extensions の統合：Path Item + Operation（Operation が優先）
+  const pathItemExt = context.pathItemExtensions;
+  const operationExt = extractExtensions(operation);
+  const extensions =
+    pathItemExt || operationExt
+      ? { ...pathItemExt, ...operationExt }
+      : undefined;
+
   const endpoint: IREndpoint = {
     method: context.method as IRHttpMethod,
     path: context.pathTemplate,
@@ -174,6 +183,7 @@ export function visitOperation(
     ...(requestBody && { requestBody }),
     ...(operation.deprecated && { deprecated: operation.deprecated }),
     ...(security && { security }),
+    ...(extensions && { extensions }),
   };
 
   return {

@@ -60,6 +60,10 @@ const testCases = [
   // general/orval/
   "general/orval/petstore-basic",
   "general/orval/petstore-react",
+  // general/x-extensions/
+  "general/x-extensions-basic",
+  "general/x-extensions-merge",
+  "general/x-extensions-types",
   // services/
   "services/single-tag",
   "services/multi-tags",

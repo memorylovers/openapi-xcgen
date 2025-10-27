@@ -15,6 +15,7 @@ import type {
 } from "../../../types";
 import {
   buildReferencePath,
+  extractExtensions,
   generateEnumName,
   getModelName,
   toIRScalarType,
@@ -114,6 +115,9 @@ export function visitEnum(
     return { value, name: enumName };
   });
 
+  // 拡張フィールドを抽出
+  const extensions = extractExtensions(schema);
+
   // IREnumModelを作成
   const enumModel: IREnumModel = {
     kind: "enum",
@@ -122,6 +126,7 @@ export function visitEnum(
     type,
     values,
     ...(schema.description && { description: schema.description }),
+    ...(extensions && { extensions }),
   };
 
   return { models: [enumModel] };

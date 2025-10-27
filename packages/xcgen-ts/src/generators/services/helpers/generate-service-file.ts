@@ -5,14 +5,17 @@
  */
 
 import type { IREndpoint } from "@openapi-xcgen/core";
+import { processImports } from "../../../helpers/import-handler";
+import type { HookableInstance } from "../../../hooks";
 import { generateServicesImports } from "../services-imports";
-import { generateServiceFunction } from "../services-function";
+import { generateEndpoint } from "../services-endpoint";
 
 /**
  * タグ別のサービスファイルを生成
  *
  * @param tag - タグ名
  * @param endpoints - そのタグに属するエンドポイント配列
+ * @param hooks - Hook instance（オプション）
  * @returns サービスファイルのコード
  *
  * @example
@@ -28,6 +31,7 @@ import { generateServiceFunction } from "../services-function";
 export function generateServiceFile(
   tag: string,
   endpoints: IREndpoint[],
+  hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
 
@@ -37,14 +41,44 @@ export function generateServiceFile(
   lines.push(" */");
   lines.push("");
 
-  // インポート文
+  // インポート文（自動検出）
   lines.push(generateServicesImports(endpoints));
+
+  // Hookで追加されたimportを収集
+  const customImports = new Set<string>();
+  if (hooks) {
+    for (const endpoint of endpoints) {
+      const tsCode = {
+        functionName: endpoint.operationId || "",
+        code: "",
+        imports: [],
+      };
+      hooks.callHook("endpoint:generate", {
+        endpoint,
+        tsCode,
+        extensions: endpoint.extensions,
+      });
+      // importsを収集
+      for (const imp of tsCode.imports) {
+        customImports.add(imp);
+      }
+    }
+  }
+
+  // Hook経由のimportを処理して出力
+  if (customImports.size > 0) {
+    const { rawImports } = processImports(Array.from(customImports));
+    for (const rawImport of rawImports) {
+      lines.push(rawImport);
+    }
+  }
+
   lines.push("");
 
   // 各エンドポイントを関数に変換
   for (const endpoint of endpoints) {
     if (endpoint.operationId) {
-      const functionCode = generateServiceFunction(endpoint);
+      const functionCode = generateEndpoint(endpoint, hooks);
       if (functionCode) {
         lines.push(functionCode);
         lines.push("");

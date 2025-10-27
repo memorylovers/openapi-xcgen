@@ -7,11 +7,13 @@
 import type { IRModel, IRProperty } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
+import type { HookableInstance } from "../../hooks";
 import { generateProperty } from "./types-property";
 
 /**
  * IRObjectModelからTypeScript interfaceを生成
  * @param model - IRObjectModel (properties を持つモデル)
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript interface定義文字列
  *
  * @example
@@ -30,6 +32,7 @@ import { generateProperty } from "./types-property";
  */
 export function generateObjectType(
   model: IRModel & { properties: IRProperty[] },
+  hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
@@ -46,7 +49,7 @@ export function generateObjectType(
 
   // プロパティ生成
   for (const prop of model.properties) {
-    const propertyCode = generateProperty(prop);
+    const propertyCode = generateProperty(prop, model, hooks);
     lines.push(`  ${propertyCode}`);
   }
 

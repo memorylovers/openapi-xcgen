@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: X-Extensions Basic Test API
+  version: 1.0.0
+  description: API for testing x-extensions support at various levels
+
+paths:
+  /users/{id}:
+    x-path-item-extension: "Path Item Level"
+    x-path-custom: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        x-parameter-extension: "path-parameter"
+        x-validation-rule: "uuid-v4"
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      x-operation-extension: "Operation Level"
+      x-rate-limit: 100
+      parameters:
+        - name: include
+          in: query
+          schema:
+            type: string
+          x-parameter-extension: "query-parameter"
+          x-allowed-values: ["profile", "settings"]
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+
+  /posts:
+    post:
+      operationId: createPost
+      summary: Create a new post
+      x-auth-required: true
+      x-scopes: ["write:posts"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              x-model-extension: "inline-request-body"
+              x-validation-level: "strict"
+              properties:
+                title:
+                  type: string
+                  x-property-extension: "title-field"
+                  x-min-length: 1
+                  x-max-length: 200
+                content:
+                  type: string
+                  x-property-extension: "content-field"
+                  x-format: "markdown"
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  x-property-extension: "tags-field"
+                  x-max-items: 10
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+components:
+  schemas:
+    User:
+      type: object
+      x-model-extension: "User-model"
+      x-table-name: "users"
+      x-primary-key: "id"
+      properties:
+        id:
+          type: string
+          x-property-extension: "id-field"
+          x-db-type: "uuid"
+        name:
+          type: string
+          x-property-extension: "name-field"
+          x-searchable: true
+        email:
+          type: string
+          format: email
+          x-property-extension: "email-field"
+          x-unique: true
+        age:
+          type: integer
+          x-property-extension: "age-field"
+          x-min: 0
+          x-max: 150
+
+    Post:
+      type: object
+      x-model-extension: "Post-model"
+      x-table-name: "posts"
+      properties:
+        id:
+          type: string
+          x-db-type: "uuid"
+        title:
+          type: string
+        content:
+          type: string
+        authorId:
+          type: string
+          x-foreign-key: "users.id"
+
+    Status:
+      type: string
+      enum:
+        - active
+        - inactive
+        - pending
+      x-enum-extension: "Status-enum"
+      x-default-value: "pending"

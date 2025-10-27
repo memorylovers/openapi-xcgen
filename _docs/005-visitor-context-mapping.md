@@ -24,7 +24,82 @@ OpenAPI Document → XcgenIR
 └── 付随ヘルパー → build-reference-path.ts / generate-component-name.ts など
 ```
 
-### IRModel の位置づけ
+## Visitor階層の設計思想
+
+### 処理の階層化
+
+Transformerは、OpenAPI仕様の構造に合わせてトップダウンで処理を委譲します。
+
+**トップレベル** (`transform()` エントリポイント):
+
+- `visitMetadata()` - info、contact、license
+- `visitTags()` - タグ配列
+- `visitComponents()` - schemas、securitySchemes、responses、requestBodies
+- `visitPaths()` - paths配列
+- `visitServers()` - サーバー配列
+
+**中間レベル** (パス・オペレーション単位):
+
+- `visitPathItem()` - 個別パス（`/users`等）
+- `visitOperation()` - HTTPメソッド（GET、POST等）
+
+**下位レベル** (詳細な処理):
+
+- `visitParameters()` / `visitRequestBody()` / `visitResponses()`
+- `visitSchema()` → `visitObject()` / `visitEnum()` / `visitArray()` / `visitMap()` 等
+
+### 階層分離の基準
+
+- **OpenAPI仕様の構造に対応**: `components`、`paths`、`operations`、`schema`
+- **単一責任原則**: 1 Visitor = 1責務
+- **再利用性**: schema配下のVisitorは`components/schemas`と`paths`内のインラインスキーマで共通利用
+
+### 再帰的処理の必要性
+
+スキーマ処理（`schema/`配下のVisitor）は再帰的に呼び出し可能:
+
+- オブジェクトのプロパティが別のオブジェクトを持つ
+- 配列のアイテムが別のスキーマを参照
+- `allOf`/`anyOf`/`oneOf`が複数のスキーマを組み合わせる
+
+## コンテキスト伝播の仕組み
+
+各Visitorは、コンテキスト情報を受け取り、下位Visitorに伝播します。
+
+### VisitorContext
+
+**役割**: Visitor間で共有される基本コンテキスト
+
+**主要フィールド**:
+
+- `documentPath`: YAMLパス配列（例: `["paths", "/users", "get", "responses", "200"]`）
+  - インラインスキーマの命名に使用
+  - 参照パス（`$ref`）の構築に使用
+- `rootSegment`: ルートセグメント（`"components"` または `"paths"`）
+  - components由来かpaths由来かを識別
+  - 参照パス構築時に使用
+
+### SchemaContext
+
+**役割**: スキーマ処理に特化したコンテキスト
+
+**追加情報**:
+
+- モデル名（components由来の場合）
+- 親モデル情報（ネストスキーマの場合）
+- プロパティ名（オブジェクト内のプロパティの場合）
+
+### コンテキストの活用
+
+**命名**: `documentPath`と`rootSegment`から一意なモデル名を生成
+
+- 例: `["paths", "/users", "post", "requestBody"]` → `PostUsersRequestBody`
+
+**参照パス構築**: `buildReferencePath()`で`$ref`形式の参照を構築
+
+- 例: `#/paths/::users/post/requestBody/content/application::json/schema/PostUsersRequestBody`
+
+## IRModel の位置づけ
 
 `IRModel` は `packages/core/src/types/ir/models/operation.ts:161` で定義されている判別共用体で、以下の `kind` ごとの形を束ねています。
 
@@ -334,7 +409,7 @@ components:
 
 ```typescript
 // ルート型
-IRDocument / XcgenIR
+XcgenIR
 ├── metadata: IRMetadata
 ├── models: IRModel[]
 ├── tags: IRTag[]

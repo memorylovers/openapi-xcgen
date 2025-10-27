@@ -2,11 +2,15 @@
  * バリデーションpipe生成
  */
 
-import type { IRValidation } from "@openapi-xcgen/core";
+import type { IRExtensions, IRType, IRValidation } from "@openapi-xcgen/core";
+import type { HookableInstance, TsCodeValidation } from "../../hooks";
 
 /**
  * IRValidationからValibotのバリデーションpipesを生成
  * @param validation - IRバリデーション情報
+ * @param type - IR型（Hook context用）
+ * @param hooks - Hook instance（オプション）
+ * @param extensions - x-extensions（Hook context用、オプション）
  * @returns Valibotバリデーション配列（pipe用）
  *
  * @example
@@ -15,12 +19,15 @@ import type { IRValidation } from "@openapi-xcgen/core";
  *   minLength: 1,
  *   maxLength: 100,
  *   pattern: "^[a-z]+$"
- * })
+ * }, "string")
  * // => ["v.minLength(1)", "v.maxLength(100)", "v.regex(/^[a-z]+$/)"]
  * ```
  */
 export function generateValidationPipes(
   validation: IRValidation | undefined,
+  type: IRType,
+  hooks?: HookableInstance,
+  extensions?: IRExtensions,
 ): string[] {
   if (!validation) {
     return [];
@@ -70,6 +77,23 @@ export function generateValidationPipes(
     }
   }
 
+  // validation:transform Hook を呼び出し
+  if (hooks) {
+    const tsCode: TsCodeValidation = {
+      pipes: [...pipes], // コピーを渡す
+    };
+
+    hooks.callHook("validation:transform", {
+      validation,
+      type,
+      tsCode,
+      extensions,
+    });
+
+    // Hook で変更された pipes を返す
+    return tsCode.pipes;
+  }
+
   return pipes;
 }
 
@@ -80,56 +104,62 @@ if (import.meta.vitest) {
   describe("schemas-validation", () => {
     describe("generateValidationPipes", () => {
       it("should return empty array when validation is undefined", () => {
-        const result = generateValidationPipes(undefined);
+        const result = generateValidationPipes(undefined, "string");
         expect(result).toEqual([]);
       });
 
       it("should generate minLength pipe", () => {
-        const result = generateValidationPipes({ minLength: 1 });
+        const result = generateValidationPipes({ minLength: 1 }, "string");
         expect(result).toEqual(["v.minLength(1)"]);
       });
 
       it("should generate maxLength pipe", () => {
-        const result = generateValidationPipes({ maxLength: 100 });
+        const result = generateValidationPipes({ maxLength: 100 }, "string");
         expect(result).toEqual(["v.maxLength(100)"]);
       });
 
       it("should generate pattern pipe", () => {
-        const result = generateValidationPipes({ pattern: "^[a-z]+$" });
+        const result = generateValidationPipes(
+          { pattern: "^[a-z]+$" },
+          "string",
+        );
         expect(result).toEqual(["v.regex(/^[a-z]+$/)"]);
       });
 
       it("should generate minimum pipe", () => {
-        const result = generateValidationPipes({ minimum: 0 });
+        const result = generateValidationPipes({ minimum: 0 }, "int");
         expect(result).toEqual(["v.minValue(0)"]);
       });
 
       it("should generate maximum pipe", () => {
-        const result = generateValidationPipes({ maximum: 100 });
+        const result = generateValidationPipes({ maximum: 100 }, "int");
         expect(result).toEqual(["v.maxValue(100)"]);
       });
 
       it("should generate email format pipe", () => {
-        const result = generateValidationPipes({ format: "email" });
+        const result = generateValidationPipes({ format: "email" }, "string");
         expect(result).toEqual(["v.email()"]);
       });
 
       it("should generate uuid format pipe", () => {
-        const result = generateValidationPipes({ format: "uuid" });
+        const result = generateValidationPipes({ format: "uuid" }, "string");
         expect(result).toEqual(["v.uuid()"]);
       });
 
       it("should generate url format pipe", () => {
-        const result = generateValidationPipes({ format: "url" });
+        const result = generateValidationPipes({ format: "url" }, "string");
         expect(result).toEqual(["v.url()"]);
       });
 
       it("should generate multiple pipes", () => {
-        const result = generateValidationPipes({
-          minLength: 1,
-          maxLength: 100,
-          pattern: "^[a-z]+$",
-        });
+        const result = generateValidationPipes(
+          {
+            minLength: 1,
+            maxLength: 100,
+            pattern: "^[a-z]+$",
+          },
+          "string",
+        );
         expect(result).toEqual([
           "v.minLength(1)",
           "v.maxLength(100)",
@@ -138,7 +168,7 @@ if (import.meta.vitest) {
       });
 
       it("should handle pattern with backslashes", () => {
-        const result = generateValidationPipes({ pattern: "\\d+" });
+        const result = generateValidationPipes({ pattern: "\\d+" }, "string");
         expect(result).toEqual(["v.regex(/\\\\d+/)"]);
       });
     });

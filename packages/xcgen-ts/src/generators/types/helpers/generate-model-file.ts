@@ -5,9 +5,14 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
+import {
+  processImports,
+  generateTypeImports,
+} from "../../../helpers/import-handler";
 import { toTypeName } from "../../../helpers/naming";
+import type { HookableInstance, TsCodeModel } from "../../../hooks";
 import { generateModel } from "../types-model";
-import { generateUnifiedParameterType } from "../types-parameter";
+import { generateUnifiedParameterType } from "../types-parameter-unified";
 import { extractTypeDependencies } from "./extract-dependencies";
 
 /**
@@ -17,6 +22,7 @@ import { extractTypeDependencies } from "./extract-dependencies";
  *
  * @param model - IRModel
  * @param requestBodyTypeName - 統合パラメータ型の場合のrequestBody型名（オプション）
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
@@ -33,28 +39,63 @@ import { extractTypeDependencies } from "./extract-dependencies";
 export function generateModelFile(
   model: IRModel,
   requestBodyTypeName?: string,
+  hooks?: HookableInstance,
 ): string | null {
+  // 1. 型定義コードを生成
   let typeCode: string | null = null;
 
   // parameterモデルで統合型が必要な場合
   if (model.kind === "parameter" && requestBodyTypeName) {
-    typeCode = generateUnifiedParameterType(model, requestBodyTypeName);
+    typeCode = generateUnifiedParameterType(model, requestBodyTypeName, hooks);
   } else {
-    typeCode = generateModel(model);
+    typeCode = generateModel(model, hooks);
   }
 
   if (!typeCode) {
     return null;
   }
 
-  const lines: string[] = [];
-  lines.push("/**");
-  lines.push(` * ${model.name} model`);
-  lines.push(" * Auto-generated from OpenAPI specification");
-  lines.push(" */");
-  lines.push("");
+  // 2. TsCodeModel を初期化（Hookが変更可能）
+  const typeName = toTypeName(model.name);
+  const tsCode: TsCodeModel = {
+    name: typeName,
+    code: typeCode,
+    imports: [],
+    comment: `${model.name} model\nAuto-generated from OpenAPI specification`,
+  };
 
-  // 依存する型のインポート文を生成
+  // 3. modelFile:generate Hook を呼び出し
+  if (hooks) {
+    hooks.callHook("modelFile:generate", {
+      model,
+      tsCode,
+      extensions: "extensions" in model ? model.extensions : undefined,
+    });
+
+    // Hook で型名が変更された場合、コード内の型名も置換
+    if (tsCode.name !== typeName) {
+      // interface/type/enum宣言内の型名を置換
+      tsCode.code = tsCode.code.replace(
+        new RegExp(`\\b${typeName}\\b`, "g"),
+        tsCode.name,
+      );
+    }
+  }
+
+  // 4. 最終的なファイルコードを生成
+  const lines: string[] = [];
+
+  // JSDocコメント
+  if (tsCode.comment) {
+    lines.push("/**");
+    tsCode.comment.split("\n").forEach((line) => {
+      lines.push(` * ${line}`);
+    });
+    lines.push(" */");
+    lines.push("");
+  }
+
+  // 依存型のインポート
   const dependencies = extractTypeDependencies(model);
 
   // 統合パラメータ型の場合、requestBodyの型も追加
@@ -62,21 +103,35 @@ export function generateModelFile(
     dependencies.add(requestBodyTypeName);
   }
 
-  if (dependencies.size > 0) {
-    // 自分自身への参照は除外
-    const currentTypeName = toTypeName(model.name);
-    dependencies.delete(currentTypeName);
+  // 自分自身への参照は除外
+  dependencies.delete(tsCode.name);
 
-    if (dependencies.size > 0) {
-      const sortedDeps = Array.from(dependencies).sort();
-      for (const dep of sortedDeps) {
-        lines.push(`import type { ${dep} } from './${dep}';`);
-      }
-      lines.push("");
+  // Hookで追加されたインポートを処理
+  const { typeNames, rawImports } = processImports(tsCode.imports);
+
+  // 完全なimport文を先に出力
+  if (rawImports.length > 0) {
+    for (const rawImport of rawImports) {
+      lines.push(rawImport);
     }
   }
 
-  lines.push(typeCode);
+  // 型名インポート（依存型 + Hook追加型）をマージ
+  const allTypeImports = new Set([...dependencies, ...typeNames]);
+  if (allTypeImports.size > 0) {
+    const importLines = generateTypeImports(Array.from(allTypeImports));
+    for (const importLine of importLines) {
+      lines.push(importLine);
+    }
+  }
+
+  // import文があれば空行を追加
+  if (rawImports.length > 0 || allTypeImports.size > 0) {
+    lines.push("");
+  }
+
+  // 型定義コード
+  lines.push(tsCode.code);
 
   return lines.join("\n");
 }
@@ -102,12 +157,16 @@ if (import.meta.vitest) {
 
       const result = generateModelFile(model);
 
-      expect(result).toContain("/**");
-      expect(result).toContain(" * User model");
-      expect(result).toContain(" * Auto-generated from OpenAPI specification");
-      expect(result).toContain(" */");
-      expect(result).toContain("export interface User {");
-      expect(result).toContain("email: string;");
+      expect(result).toEqual(
+        `/**
+ * User model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface User {
+  email: string;
+}`,
+      );
     });
 
     it("should generate imports for referenced types", () => {
@@ -131,9 +190,20 @@ if (import.meta.vitest) {
 
       const result = generateModelFile(model);
 
-      expect(result).toContain("import type { Product } from './Product';");
-      expect(result).toContain("import type { User } from './User';");
-      expect(result).toContain("export interface Order {");
+      expect(result).toEqual(
+        `/**
+ * Order model
+ * Auto-generated from OpenAPI specification
+ */
+
+import type { Product } from './Product';
+import type { User } from './User';
+
+export interface Order {
+  user: User;
+  product: Product;
+}`,
+      );
     });
 
     it("should not import self-reference", () => {
@@ -159,9 +229,17 @@ if (import.meta.vitest) {
 
       const result = generateModelFile(model);
 
-      expect(result).not.toContain("import type { TreeNode }");
-      expect(result).toContain("export interface TreeNode {");
-      expect(result).toContain("children?: Array<TreeNode> | undefined;");
+      expect(result).toEqual(
+        `/**
+ * TreeNode model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface TreeNode {
+  value: string;
+  children?: Array<TreeNode> | undefined;
+}`,
+      );
     });
 
     it("should generate unified parameter type with imports", () => {
@@ -181,11 +259,21 @@ if (import.meta.vitest) {
 
       const result = generateModelFile(model, "UserUpdate");
 
-      expect(result).toContain(
-        "import type { UserUpdate } from './UserUpdate';",
+      expect(result).toEqual(
+        `/**
+ * UpdateUserParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+import type { UserUpdate } from './UserUpdate';
+
+export interface UpdateUserParams {
+  path: {
+    userId: string;
+  };
+  body: UserUpdate;
+}`,
       );
-      expect(result).toContain("export interface UpdateUserParams {");
-      expect(result).toContain("body: UserUpdate;");
     });
 
     it("should return null for models that generate no code", () => {
@@ -233,9 +321,11 @@ if (import.meta.vitest) {
       const lines = result!.split("\n");
       const importLines = lines.filter((line) => line.startsWith("import"));
 
-      expect(importLines[0]).toContain("AItem");
-      expect(importLines[1]).toContain("MItem");
-      expect(importLines[2]).toContain("ZItem");
+      expect(importLines).toEqual([
+        "import type { AItem } from './AItem';",
+        "import type { MItem } from './MItem';",
+        "import type { ZItem } from './ZItem';",
+      ]);
     });
   });
 }

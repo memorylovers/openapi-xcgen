@@ -1,0 +1,64 @@
+/**
+ * default service functions
+ * Auto-generated from OpenAPI specification
+ */
+
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
+import type { GetUsers200Response, CreateUserRequest, User, GetUsersUserIdParams } from "../models/index";
+export type { GetUsers200Response, CreateUserRequest, User, GetUsersUserIdParams } from "../models/index";
+
+/**
+ * Get all users
+ * @param init - Additional fetch options
+ * @returns GetUsers200Response
+ * @throws {_XcgenApiError} API error with status and response details
+ */
+export async function listAllUsers(
+  init?: RequestInit,
+): Promise<GetUsers200Response> {
+  return request({
+    method: "GET",
+    path: "/users",
+    options: {},
+    init,
+  });
+}
+
+/**
+ * Create a new user
+ * @param options - Request parameters
+ * @param init - Additional fetch options
+ * @returns User
+ * @throws {_XcgenApiError} API error with status and response details
+ */
+export async function addNewUser(
+  options: CreateUserRequest,
+  init?: RequestInit,
+): Promise<User> {
+  return request({
+    method: "POST",
+    path: "/users",
+    options,
+    init,
+  });
+}
+
+/**
+ * Get user by ID (no custom name)
+ * @param options - Request parameters
+ * @param init - Additional fetch options
+ * @returns User
+ * @throws {_XcgenApiError} API error with status and response details
+ */
+export async function getUserById(
+  options: GetUsersUserIdParams,
+  init?: RequestInit,
+): Promise<User> {
+  return request({
+    method: "GET",
+    path: "/users/{userId}",
+    options,
+    init,
+  });
+}

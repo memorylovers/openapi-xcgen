@@ -97,30 +97,7 @@ openapi-xcgenの型システムと制限事項に関する技術仕様です。
 
 ## サポートされていない機能
 
-以下のOpenAPI機能は現在サポートされていません：
-
-### スキーマ機能
-
-- ❌ **not**: 否定スキーマ
-- ❌ **if/then/else**: 条件付きスキーマ
-- ❌ **空のスキーマ `{}`**: すべての型を受け入れるスキーマ
-
-### バリデーション機能
-
-- ❌ **multipleOf**: 数値の倍数制約
-- ❌ **contentMediaType/contentEncoding**: コンテンツエンコーディング
-- ❌ **patternProperties**: パターンベースのプロパティ
-- ❌ **$id/$anchor**: スキーマ識別子
-
-### オペレーション機能
-
-- ❌ **レスポンスヘッダー**: Rate-Limit情報等
-- ❌ **共通パラメータ**: パスレベルの共通パラメータ
-- ❌ **セキュリティ定義**: security/securitySchemes
-- ❌ **コールバック**: 非同期コールバック
-- ❌ **リンク**: ハイパーメディアリンク
-
-これらの機能は典型的なAPI使用の一部（10%未満）を占めます。基本的な型処理（object、array、primitive、enum、$ref、oneOf/anyOf/allOf）で90%以上のAPIをカバーできます。
+詳細は [_docs/tasks/012-unsupported-features.md](../_docs/tasks/012-unsupported-features.md) を参照してください。
 
 ## 関連ドキュメント
 
