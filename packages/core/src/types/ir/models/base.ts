@@ -2,6 +2,7 @@
  * コアモデル定義のIR型定義
  */
 
+import type { IRExtensions } from "../common/extensions";
 import type { IRScalarType, IRType } from "../common/type";
 import type { IRProperty } from "./property";
 
@@ -55,6 +56,8 @@ export interface IRObjectModel {
   properties: IRProperty[];
   /** 追加プロパティの型（additionalProperties） */
   additionalProperties?: IRType;
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: IRExtensions;
 }
 
 /**
@@ -117,6 +120,8 @@ export interface IREnumModel {
   type: IRScalarType;
   /** Enum値の配列 */
   values: IREnumValue[];
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: IRExtensions;
 }
 
 /**
@@ -185,6 +190,8 @@ export interface IRAllOfModel {
   description?: string;
   /** 合成する型の配列（通常はIRRefまたはインライン型） */
   schemas: IRType[];
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: IRExtensions;
 }
 
 /**
@@ -241,6 +248,8 @@ export interface IRAnyOfModel {
   nullable?: true;
   /** 合成する型の配列（nullableの場合、null型は除外される） */
   schemas: IRType[];
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: IRExtensions;
 }
 
 /**
@@ -337,4 +346,6 @@ export interface IRUnionModel {
   discriminator?: IRDiscriminator;
   /** 合成する型の配列（正確に1つにマッチ） */
   types: IRType[];
+  /** OpenAPI拡張フィールド（x-プレフィックス） */
+  extensions?: IRExtensions;
 }

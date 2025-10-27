@@ -24,6 +24,7 @@ import {
   buildInlineModelName,
   buildInlineSchemaPath,
   buildReferencePath,
+  extractExtensions,
   getModelName,
 } from "../../helpers";
 import type { AllOfContext, VisitorContext } from "../../types";
@@ -130,6 +131,9 @@ export function visitAllOf(
     }
   }
 
+  // 拡張フィールドを抽出
+  const extensions = extractExtensions(schema);
+
   // allOfモデルを作成
   const allOfModel: IRAllOfModel = {
     kind: "allOf",
@@ -137,6 +141,7 @@ export function visitAllOf(
     referencePath: buildReferencePath(context.documentPath),
     ...(schema.description && { description: schema.description }),
     schemas,
+    ...(extensions && { extensions }),
   };
 
   // allOfモデルへの参照を作成

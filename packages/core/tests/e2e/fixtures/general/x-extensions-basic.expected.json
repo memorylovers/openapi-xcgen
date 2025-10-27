@@ -1,0 +1,257 @@
+{
+  "metadata": {
+    "title": "X-Extensions Basic Test API",
+    "version": "1.0.0",
+    "description": "API for testing x-extensions support at various levels"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "User",
+      "referencePath": "#/components/schemas/User",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "id-field",
+            "x-db-type": "uuid"
+          }
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "name-field",
+            "x-searchable": true
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "validation": {
+            "format": "email"
+          },
+          "extensions": {
+            "x-property-extension": "email-field",
+            "x-unique": true
+          }
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "extensions": {
+            "x-property-extension": "age-field",
+            "x-min": 0,
+            "x-max": 150
+          }
+        }
+      ],
+      "extensions": {
+        "x-model-extension": "User-model",
+        "x-table-name": "users",
+        "x-primary-key": "id"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "Post",
+      "referencePath": "#/components/schemas/Post",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "extensions": {
+            "x-db-type": "uuid"
+          }
+        },
+        {
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "name": "authorId",
+          "type": "string",
+          "extensions": {
+            "x-foreign-key": "users.id"
+          }
+        }
+      ],
+      "extensions": {
+        "x-model-extension": "Post-model",
+        "x-table-name": "posts"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "Status",
+      "referencePath": "#/components/schemas/Status",
+      "type": "string",
+      "values": [
+        {
+          "value": "active",
+          "name": "ACTIVE"
+        },
+        {
+          "value": "inactive",
+          "name": "INACTIVE"
+        },
+        {
+          "value": "pending",
+          "name": "PENDING"
+        }
+      ],
+      "extensions": {
+        "x-enum-extension": "Status-enum",
+        "x-default-value": "pending"
+      }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUsersIdParams",
+      "description": "Parameters for GET /users/{id}",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "extensions": {
+            "x-parameter-extension": "path-parameter",
+            "x-validation-rule": "uuid-v4"
+          }
+        },
+        {
+          "name": "include",
+          "type": "string",
+          "in": "query",
+          "extensions": {
+            "x-parameter-extension": "query-parameter",
+            "x-allowed-values": [
+              "profile",
+              "settings"
+            ]
+          }
+        }
+      ],
+      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostPostsRequestBody",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBody",
+      "properties": [
+        {
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "name": "tags",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags"
+          }
+        }
+      ],
+      "required": true
+    },
+    {
+      "kind": "array",
+      "name": "PostPostsRequestBodyTags",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags",
+      "itemType": "string"
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "method": "get",
+      "path": "/users/{id}",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "User found",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/User"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "User not found"
+        }
+      ],
+      "operationId": "getUser",
+      "summary": "Get user by ID",
+      "extensions": {
+        "x-path-item-extension": "Path Item Level",
+        "x-path-custom": true,
+        "x-operation-extension": "Operation Level",
+        "x-rate-limit": 100
+      }
+    },
+    {
+      "method": "post",
+      "path": "/posts",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Post created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/Post"
+              }
+            }
+          ]
+        }
+      ],
+      "operationId": "createPost",
+      "summary": "Create a new post",
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBody"
+            }
+          }
+        ],
+        "required": true
+      },
+      "extensions": {
+        "x-auth-required": true,
+        "x-scopes": [
+          "write:posts"
+        ]
+      }
+    }
+  ]
+}

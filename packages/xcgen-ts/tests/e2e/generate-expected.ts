@@ -22,6 +22,7 @@ import {
   mkdir,
   readdir,
   copyFile,
+  access,
 } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,6 +34,18 @@ import type { GeneratorOptions } from "../../src/types";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // Get the packages/generator-typescript directory
 const packageDir = join(__dirname, "..", "..");
+
+/**
+ * Check if a file exists
+ */
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Recursively copy a directory
@@ -64,12 +77,30 @@ async function generateExpectedForFixture(
   const outputDir = join(tmpdir(), `xcgen-expected-${Date.now()}`);
   await mkdir(outputDir, { recursive: true });
 
-  // 現在の実装で生成処理を実行
-  await generate({
-    input: inputPath,
-    output: outputDir,
-    ...options,
-  });
+  // xcgen.config.ts の有無をチェック
+  const configPath = join(fixtureDir, "xcgen.config.ts");
+  const hasConfig = await fileExists(configPath);
+
+  // xcgen.config.ts がある場合、ディレクトリを移動してから生成
+  // （c12 が config を見つけるため）
+  // eslint-disable-next-line no-undef
+  const originalCwd = process.cwd();
+  try {
+    if (hasConfig) {
+      // eslint-disable-next-line no-undef
+      process.chdir(fixtureDir);
+    }
+
+    // 現在の実装で生成処理を実行
+    await generate({
+      input: inputPath,
+      output: outputDir,
+      ...options,
+    });
+  } finally {
+    // eslint-disable-next-line no-undef
+    process.chdir(originalCwd);
+  }
 
   // expected/ディレクトリを作成 (validator指定時は expected-valibot/)
   const expectedDirName =
@@ -151,11 +182,17 @@ async function main() {
       "models/inline-schemas",
       // Validation fixture
       "validation",
+      // Hooks fixtures (valibot only)
+      "hooks/x-type-custom",
+      "hooks/x-function-name",
+      "hooks/x-validation-custom",
     ];
 
     // Generate without validator
     consola.info("Generating fixtures (without validator)...");
     for (const fixture of fixtures) {
+      // Skip hooks fixtures for non-validator mode
+      if (fixture.startsWith("hooks/")) continue;
       consola.info(`  - ${fixture}`);
       await generateExpectedForFixture(fixture);
     }
@@ -167,8 +204,13 @@ async function main() {
       await generateExpectedForFixture(fixture, { validator: "valibot" });
     }
 
+    // Calculate total runs
+    const hooksFixtures = fixtures.filter((f) => f.startsWith("hooks/")).length;
+    const regularFixtures = fixtures.length - hooksFixtures;
+    const totalRuns = regularFixtures * 2 + hooksFixtures;
+
     consola.success(
-      `✅ All expected files generated successfully! (${fixtures.length} fixtures × 2 modes = ${fixtures.length * 2} runs)\n` +
+      `✅ All expected files generated successfully! (${regularFixtures} regular fixtures × 2 modes + ${hooksFixtures} hooks fixtures × 1 mode = ${totalRuns} runs)\n` +
         "⚠️  Please review the generated files before committing.",
     );
   } catch (error) {

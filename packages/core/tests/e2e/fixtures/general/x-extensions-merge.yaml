@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: X-Extensions Merge Test API
+  version: 1.0.0
+  description: API for testing Path Item + Operation x-extensions merge with conflict resolution
+
+paths:
+  /items/{id}:
+    # Path Item level x-extensions
+    x-shared-extension: "path-item-value"
+    x-priority-test: "path-item-priority"
+    x-path-only: "only-in-path-item"
+    x-rate-limit: 50
+    get:
+      operationId: getItem
+      summary: Get item by ID
+      # Operation level x-extensions (should override Path Item when conflicting)
+      x-priority-test: "operation-priority"
+      x-operation-only: "only-in-operation"
+      x-rate-limit: 100
+      # Expected merge result:
+      # {
+      #   "x-shared-extension": "path-item-value",      // from Path Item
+      #   "x-priority-test": "operation-priority",      // Operation overrides
+      #   "x-path-only": "only-in-path-item",           // from Path Item
+      #   "x-operation-only": "only-in-operation",      // from Operation
+      #   "x-rate-limit": 100                           // Operation overrides
+      # }
+      responses:
+        "200":
+          description: Item found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+
+    put:
+      operationId: updateItem
+      summary: Update item
+      # Only Path Item level x-extensions (no Operation level)
+      # Expected merge result: only Path Item extensions
+      responses:
+        "200":
+          description: Item updated
+
+  /products:
+    # Path Item level x-extensions with complex values
+    x-object-extension:
+      nested:
+        value: "path-item-nested"
+      array: [1, 2, 3]
+    x-array-extension: ["a", "b", "c"]
+    post:
+      operationId: createProduct
+      summary: Create product
+      # Operation level overrides with different complex values
+      x-object-extension:
+        nested:
+          value: "operation-nested"
+          additional: "operation-only-field"
+        array: [4, 5, 6]
+      x-array-extension: ["d", "e", "f"]
+      # Expected merge result: Operation values completely override Path Item values
+      # (not deep merge, just replacement)
+      responses:
+        "201":
+          description: Product created
+
+  /metadata:
+    # Path Item level only (no operations with x-extensions)
+    x-path-metadata: "metadata-value"
+    get:
+      operationId: getMetadata
+      summary: Get metadata
+      # No x-extensions at Operation level
+      # Expected: only Path Item extensions are present
+      responses:
+        "200":
+          description: Metadata retrieved

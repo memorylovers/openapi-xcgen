@@ -25,6 +25,7 @@ import {
   buildInlineModelName,
   buildInlineSchemaPath,
   buildReferencePath,
+  extractExtensions,
   getModelName,
 } from "../../helpers";
 import type { OneOfContext, VisitorContext } from "../../types";
@@ -186,6 +187,9 @@ export function visitOneOf(
     }
   }
 
+  // 拡張フィールドを抽出
+  const extensions = extractExtensions(schema);
+
   // oneOfモデルを作成
   const unionModel: IRUnionModel = {
     kind: "union",
@@ -202,6 +206,7 @@ export function visitOneOf(
       },
     }),
     types,
+    ...(extensions && { extensions }),
   };
 
   // oneOfモデルへの参照を作成

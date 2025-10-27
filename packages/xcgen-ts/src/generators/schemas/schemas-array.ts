@@ -2,13 +2,16 @@
  * Arrayスキーマ生成
  */
 
-import type { IRValidation } from "@openapi-xcgen/core";
+import type { IRExtensions, IRValidation } from "@openapi-xcgen/core";
 import { generateValidationPipes } from "./schemas-validation";
+import type { HookableInstance } from "../../hooks";
 
 /**
  * Array型のValibotスキーマを生成
  * @param itemSchemaRef - アイテムスキーマへの参照（変数名）
  * @param validation - バリデーション情報（minItems/maxItems）
+ * @param hooks - Hook instance（オプション）
+ * @param extensions - x-extensions（オプション）
  * @returns Valibotスキーマ文字列
  *
  * @example
@@ -20,6 +23,8 @@ import { generateValidationPipes } from "./schemas-validation";
 export function generateArraySchema(
   itemSchemaRef: string,
   validation?: IRValidation,
+  hooks?: HookableInstance,
+  extensions?: IRExtensions,
 ): string {
   const baseSchema = `v.array(${itemSchemaRef})`;
 
@@ -31,7 +36,18 @@ export function generateArraySchema(
       }
     : undefined;
 
-  const pipes = generateValidationPipes(arrayValidation);
+  // Array type を表現（型チェック用のダミー）
+  const arrayType: { kind: "array"; itemType: "string" } = {
+    kind: "array",
+    itemType: "string",
+  };
+
+  const pipes = generateValidationPipes(
+    arrayValidation,
+    arrayType,
+    hooks,
+    extensions,
+  );
 
   if (pipes.length === 0) {
     return baseSchema;

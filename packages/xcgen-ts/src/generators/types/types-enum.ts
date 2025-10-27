@@ -4,7 +4,7 @@
  * IREnumModelからTypeScriptのenum/union typeを生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IREnumModel, IRModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 
 /**
@@ -28,7 +28,7 @@ import { toTypeName } from "../../helpers/naming";
  * // => 'export type Status = "active" | "inactive";'
  * ```
  */
-export function generateEnumType(model: IRModel & { kind: "enum" }): string {
+export function generateEnumType(model: IREnumModel): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
 

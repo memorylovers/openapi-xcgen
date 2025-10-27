@@ -11,20 +11,36 @@
  */
 
 import { describe, it, beforeAll, afterAll } from "vitest";
-import { mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdir, writeFile, rm, access } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { generate } from "../../src/generator";
+import { cp } from "node:fs/promises";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
+ * Check if a file or directory exists
+ */
+async function exists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Helper: expected/ディレクトリの型チェック
  */
-async function typeCheckExpectedFiles(fixture: string): Promise<void> {
-  const expectedDir = join(__dirname, "fixtures", fixture, "expected");
+async function typeCheckExpectedFiles(
+  fixture: string,
+  expectedDirName = "expected",
+): Promise<void> {
+  const expectedDir = join(__dirname, "fixtures", fixture, expectedDirName);
 
   try {
     execSync("pnpm exec tsc --noEmit", {
@@ -52,6 +68,7 @@ async function typeCheckGeneratedCode(
   fixture: string,
   tempDir: string,
   validator?: "valibot",
+  useConfig = false,
 ): Promise<void> {
   const fixtureDir = join(__dirname, "fixtures", fixture);
   const inputPath = join(fixtureDir, "openapi.yaml");
@@ -59,12 +76,27 @@ async function typeCheckGeneratedCode(
   const suffix = validator ? `-${validator}` : "-no-validator";
   const outputDir = join(tempDir, `${fixtureName}${suffix}`);
 
-  // Generate TypeScript code
-  await generate({
-    input: inputPath,
-    output: outputDir,
-    validator,
-  });
+  // Change directory if config is needed (for c12 to find xcgen.config.ts)
+  // eslint-disable-next-line no-undef
+  const originalCwd = process.cwd();
+  try {
+    if (useConfig) {
+      // eslint-disable-next-line no-undef
+      process.chdir(fixtureDir);
+    }
+
+    // Generate TypeScript code
+    await generate({
+      input: inputPath,
+      output: outputDir,
+      validator,
+    });
+  } finally {
+    if (useConfig) {
+      // eslint-disable-next-line no-undef
+      process.chdir(originalCwd);
+    }
+  }
 
   // Create tsconfig.json
   const tsconfigPath = join(outputDir, "tsconfig.json");
@@ -107,6 +139,15 @@ async function typeCheckGeneratedCode(
     cwd: outputDir,
     stdio: "pipe",
   });
+
+  // Copy _userdefs directory if it exists (for hooks fixtures)
+  const expectedDirName =
+    validator === "valibot" ? "expected-valibot" : "expected";
+  const userdefsSourcePath = join(fixtureDir, expectedDirName, "_userdefs");
+  if (await exists(userdefsSourcePath)) {
+    const userdefsTargetPath = join(outputDir, "_userdefs");
+    await cp(userdefsSourcePath, userdefsTargetPath, { recursive: true });
+  }
 
   // Run TypeScript compiler
   try {
@@ -336,6 +377,57 @@ describe("Type Check Tests", () => {
 
     it("should pass type checking for generated code (with valibot)", async () => {
       await typeCheckGeneratedCode("validation", tempDir, "valibot");
+    });
+  });
+
+  // hooks/x-type-custom
+  describe("hooks/x-type-custom", () => {
+    it("should type-check expected-valibot files", async () => {
+      await typeCheckExpectedFiles("hooks/x-type-custom", "expected-valibot");
+    });
+
+    it("should pass type checking for generated code (with valibot)", async () => {
+      await typeCheckGeneratedCode(
+        "hooks/x-type-custom",
+        tempDir,
+        "valibot",
+        true,
+      );
+    });
+  });
+
+  // hooks/x-function-name
+  describe("hooks/x-function-name", () => {
+    it("should type-check expected-valibot files", async () => {
+      await typeCheckExpectedFiles("hooks/x-function-name", "expected-valibot");
+    });
+
+    it("should pass type checking for generated code (with valibot)", async () => {
+      await typeCheckGeneratedCode(
+        "hooks/x-function-name",
+        tempDir,
+        "valibot",
+        true,
+      );
+    });
+  });
+
+  // hooks/x-validation-custom
+  describe("hooks/x-validation-custom", () => {
+    it("should type-check expected-valibot files", async () => {
+      await typeCheckExpectedFiles(
+        "hooks/x-validation-custom",
+        "expected-valibot",
+      );
+    });
+
+    it("should pass type checking for generated code (with valibot)", async () => {
+      await typeCheckGeneratedCode(
+        "hooks/x-validation-custom",
+        tempDir,
+        "valibot",
+        true,
+      );
     });
   });
 });

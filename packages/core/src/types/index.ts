@@ -41,6 +41,8 @@ export { isReferenceObject } from "./guards";
 
 // Re-export IR types
 export type {
+  IRExtensions,
+  IRExtensionValue,
   IRAllOfModel,
   IRAnyOfModel,
   IRArray,

@@ -5,18 +5,20 @@
  * {OperationId}Data形式で、path/query/header/bodyを構造化
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRParameterModel } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
-import { generateProperty } from "./types-property";
+import type { HookableInstance } from "../../hooks";
+import { generateParameterProperty } from "./types-parameter-property";
 
 /**
  * IRParameterModelからTypeScript interfaceを生成
  * @param model - IRParameterModel
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript interface定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRParameterModel = {
  *   kind: "parameter",
  *   name: "GetUserData",
  *   referencePath: "#/paths/~1users~1{id}/get/parameters",
@@ -25,12 +27,13 @@ import { generateProperty } from "./types-property";
  *     { name: "include", type: "string", required: false, in: "query" }
  *   ],
  * };
- * generateParameterType(model);
+ * await generateParameterType(model);
  * // => "export interface GetUserData { path: { id: number; }; query: { include?: string; }; }"
  * ```
  */
 export function generateParameterType(
-  model: IRModel & { kind: "parameter" },
+  model: IRParameterModel,
+  hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
@@ -57,74 +60,11 @@ export function generateParameterType(
   for (const [inType, params] of Object.entries(grouped)) {
     lines.push(`  ${inType}: {`);
     for (const param of params) {
-      const propertyCode = generateProperty(param);
+      const propertyCode = generateParameterProperty(param, undefined, hooks);
       lines.push(`    ${propertyCode}`);
     }
     lines.push(`  };`);
   }
-
-  lines.push("}");
-
-  return lines.join("\n");
-}
-
-/**
- * パラメータとリクエストボディを統合したTypeScript interfaceを生成
- * @param parameterModel - IRParameterModel
- * @param requestBodyTypeName - リクエストボディの型名
- * @returns TypeScript interface定義文字列
- *
- * @example
- * ```typescript
- * const parameterModel: IRModel = {
- *   kind: "parameter",
- *   name: "PayForBookingParams",
- *   referencePath: "#/paths/~1bookings~1{bookingId}~1payment/post/parameters",
- *   properties: [
- *     { name: "bookingId", type: "string", required: true, in: "path" }
- *   ],
- * };
- * generateUnifiedParameterType(parameterModel, "CardPayment | BankTransferPayment");
- * // => "export interface PayForBookingParams { path: { bookingId: string; }; body: CardPayment | BankTransferPayment; }"
- * ```
- */
-export function generateUnifiedParameterType(
-  parameterModel: IRModel & { kind: "parameter" },
-  requestBodyTypeName: string,
-): string {
-  const lines: string[] = [];
-  const typeName = toTypeName(parameterModel.name);
-
-  if (parameterModel.description) {
-    lines.push("/**");
-    lines.push(` * ${parameterModel.description}`);
-    lines.push(" */");
-  }
-
-  lines.push(`export interface ${typeName} {`);
-
-  // パラメータをin別にグループ化
-  const grouped: Record<string, typeof parameterModel.properties> = {};
-  for (const param of parameterModel.properties) {
-    const inType = param.in;
-    if (!grouped[inType]) {
-      grouped[inType] = [];
-    }
-    grouped[inType].push(param);
-  }
-
-  // 各in typeごとにネストしたオブジェクト型を生成
-  for (const [inType, params] of Object.entries(grouped)) {
-    lines.push(`  ${inType}: {`);
-    for (const param of params) {
-      const propertyCode = generateProperty(param);
-      lines.push(`    ${propertyCode}`);
-    }
-    lines.push(`  };`);
-  }
-
-  // bodyプロパティを追加
-  lines.push(`  body: ${requestBodyTypeName};`);
 
   lines.push("}");
 
@@ -138,7 +78,7 @@ if (import.meta.vitest) {
   describe("types-parameter", () => {
     describe("generateParameterType", () => {
       it("should generate parameter type with path params", () => {
-        const model: IRModel & { kind: "parameter" } = {
+        const model: IRParameterModel = {
           kind: "parameter",
           name: "GetUserData",
           referencePath: "#/paths/~1users~1{id}/get/parameters",
@@ -166,7 +106,7 @@ export interface GetUserData {
       });
 
       it("should generate parameter type with multiple groups", () => {
-        const model: IRModel & { kind: "parameter" } = {
+        const model: IRParameterModel = {
           kind: "parameter",
           name: "SearchData",
           referencePath: "#/paths/~1search/get/parameters",
@@ -200,7 +140,7 @@ export interface SearchData {
       });
 
       it("should generate parameter type with description", () => {
-        const model: IRModel & { kind: "parameter" } = {
+        const model: IRParameterModel = {
           kind: "parameter",
           name: "UpdateUserData",
           referencePath: "#/paths/~1users~1{id}/put/parameters",
@@ -226,111 +166,6 @@ export interface UpdateUserData {
   path: {
     id: number;
   };
-}
-`.trim(),
-        );
-      });
-    });
-
-    describe("generateUnifiedParameterType", () => {
-      it("should generate unified type with path and body", () => {
-        const model: IRModel & { kind: "parameter" } = {
-          kind: "parameter",
-          name: "PayForBookingParams",
-          referencePath:
-            "#/paths/~1bookings~1{bookingId}~1payment/post/parameters",
-          properties: [
-            {
-              name: "bookingId",
-              type: "string",
-              required: true,
-              in: "path",
-            },
-          ],
-        };
-
-        const result = generateUnifiedParameterType(
-          model,
-          "CardPayment | BankTransferPayment",
-        );
-
-        expect(result).toEqual(
-          `
-export interface PayForBookingParams {
-  path: {
-    bookingId: string;
-  };
-  body: CardPayment | BankTransferPayment;
-}
-`.trim(),
-        );
-      });
-
-      it("should generate unified type with path, query, and body", () => {
-        const model: IRModel & { kind: "parameter" } = {
-          kind: "parameter",
-          name: "UpdateItemParams",
-          referencePath: "#/paths/~1items~1{itemId}/put/parameters",
-          properties: [
-            {
-              name: "itemId",
-              type: "string",
-              required: true,
-              in: "path",
-            },
-            {
-              name: "async",
-              type: "boolean",
-              in: "query",
-            },
-          ],
-        };
-
-        const result = generateUnifiedParameterType(model, "ItemUpdateData");
-
-        expect(result).toEqual(
-          `
-export interface UpdateItemParams {
-  path: {
-    itemId: string;
-  };
-  query: {
-    async?: boolean | undefined;
-  };
-  body: ItemUpdateData;
-}
-`.trim(),
-        );
-      });
-
-      it("should generate unified type with description", () => {
-        const model: IRModel & { kind: "parameter" } = {
-          kind: "parameter",
-          name: "CreateOrderParams",
-          referencePath: "#/paths/~1orders/post/parameters",
-          description: "Parameters for creating an order",
-          properties: [
-            {
-              name: "X-Api-Key",
-              type: "string",
-              required: true,
-              in: "header",
-            },
-          ],
-        };
-
-        const result = generateUnifiedParameterType(model, "OrderData");
-
-        expect(result).toEqual(
-          `
-/**
- * Parameters for creating an order
- */
-export interface CreateOrderParams {
-  header: {
-    xApiKey: string;
-  };
-  body: OrderData;
 }
 `.trim(),
         );

@@ -19,6 +19,7 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import {
+  extractExtensions,
   extractValidation,
   isNullable,
   toIRParameterInType,
@@ -96,6 +97,15 @@ export function visitParameter(
   // バリデーション情報を抽出
   const validation = extractValidation(schema);
 
+  // 拡張フィールドを抽出（parameter レベルの x-* も含む）
+  const schemaExtensions = extractExtensions(schema);
+  const parameterExtensions = extractExtensions(parameter);
+  // parameter レベルの x-* が優先される
+  const extensions =
+    parameterExtensions || schemaExtensions
+      ? { ...schemaExtensions, ...parameterExtensions }
+      : undefined;
+
   // IRParameterを構築
   const irParameter: IRParameter = {
     name: parameter.name,
@@ -107,6 +117,7 @@ export function visitParameter(
     ...(schema.default !== undefined && { defaultValue: schema.default }),
     ...(parameter.deprecated && { deprecated: parameter.deprecated }),
     ...(validation && { validation }),
+    ...(extensions && { extensions }),
   };
 
   return irParameter;

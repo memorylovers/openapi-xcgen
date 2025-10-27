@@ -1,0 +1,10 @@
+{
+  "name": "expected-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Generated expected files for E2E testing - not for publication",
+  "dependencies": {
+    "valibot": "*"
+  }
+}

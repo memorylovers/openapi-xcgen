@@ -96,6 +96,36 @@ export default defineConfig({
 
 Then run: `xcgen-ts` (uses config file automatically)
 
+## Hooks (Customization)
+
+You can customize code generation by defining Hooks in xcgen.config.ts.
+
+**Example: Use custom types with x-type**
+
+```typescript
+// xcgen.config.ts
+export default defineConfig({
+  input: "./openapi.yaml",
+  output: "./generated",
+  hooks: {
+    "property:generate": (ctx) => {
+      if (ctx.extensions?.["x-type"]) {
+        ctx.tsCode.typeName = ctx.extensions["x-type"];
+      }
+    },
+  },
+});
+```
+
+**Available Hooks:**
+
+- `property:generate` - Customize property types
+- `endpoint:generate` - Customize API functions
+- `modelFile:generate` - Add imports and file-level customization
+- `validation:transform` - Customize validation logic
+
+See [Hooks Guide](./_guides/hooks.md) for details.
+
 ## Documentation
 
 - **[Specification](./_guides/spec.md)** - Type system and limitations

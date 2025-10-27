@@ -27,6 +27,7 @@ import type {
 import {
   buildInlineSchemaPath,
   buildReferencePath,
+  extractExtensions,
   extractValidation,
   getModelName,
   isNullable,
@@ -147,6 +148,7 @@ export function visitObject(
       // プロパティの型が取得できた場合のみ追加
       if (propResult.type) {
         const validation = extractValidation(schemaObj);
+        const extensions = extractExtensions(schemaObj);
         const property: IRProperty = {
           name: propName,
           type: propResult.type,
@@ -162,6 +164,7 @@ export function visitObject(
           ...(validation && {
             validation,
           }),
+          ...(extensions && { extensions }),
         };
 
         properties.push(property);
@@ -184,6 +187,9 @@ export function visitObject(
     }
   }
 
+  // モデルレベルの拡張フィールドを抽出
+  const extensions = extractExtensions(schema);
+
   const mainModel: IRModel = {
     kind: "object",
     name,
@@ -193,6 +199,7 @@ export function visitObject(
     ...(additionalPropertiesType && {
       additionalProperties: additionalPropertiesType,
     }),
+    ...(extensions && { extensions }),
   };
 
   // メインモデルを最初に、ネストしたモデルをその後に追加

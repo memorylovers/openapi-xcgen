@@ -5,19 +5,21 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
-import { generateObjectType } from "./types-object";
-import { generateEnumType } from "./types-enum";
-import { generateArrayType } from "./types-array";
-import { generateMapType } from "./types-map";
+import type { HookableInstance } from "../../hooks";
 import { generateAllOfType } from "./types-allof";
 import { generateAnyOfType } from "./types-anyof";
-import { generateUnionType } from "./types-union";
+import { generateArrayType } from "./types-array";
+import { generateEnumType } from "./types-enum";
+import { generateMapType } from "./types-map";
+import { generateObjectType } from "./types-object";
 import { generateParameterType } from "./types-parameter";
+import { generateUnionType } from "./types-union";
 
 /**
  * IRModelをTypeScript型定義に変換
  *
  * @param model - IRモデル
+ * @param hooks - Hook instance（オプション）
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
@@ -27,16 +29,19 @@ import { generateParameterType } from "./types-parameter";
  *   name: "User",
  *   properties: [{ name: "email", type: "string", required: true }]
  * };
- * generateModel(model);
+ * await generateModel(model);
  * // => "export interface User {\n  email: string;\n}"
  * ```
  */
-export function generateModel(model: IRModel): string | null {
+export function generateModel(
+  model: IRModel,
+  hooks?: HookableInstance,
+): string | null {
   switch (model.kind) {
     case "object":
     case "requestBody":
     case "response":
-      return generateObjectType(model);
+      return generateObjectType(model, hooks);
 
     case "enum":
       return generateEnumType(model);
@@ -57,7 +62,7 @@ export function generateModel(model: IRModel): string | null {
       return generateUnionType(model);
 
     case "parameter":
-      return generateParameterType(model);
+      return generateParameterType(model, hooks);
 
     default: {
       // Exhaustive check

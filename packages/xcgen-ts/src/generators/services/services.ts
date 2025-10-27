@@ -6,6 +6,7 @@
 
 import type { XcgenIR } from "@openapi-xcgen/core";
 import type { IFileWriter } from "../../helpers/file-writer";
+import type { HookableInstance } from "../../hooks";
 import type { GeneratorResult } from "../../types";
 import { kebabCase } from "es-toolkit";
 import { runInParallel } from "../../helpers/parallel";
@@ -20,13 +21,15 @@ import { generateServicesIndex } from "./helpers/generate-index";
  *
  * @param ir - 中間表現
  * @param writer - ファイル書き込みインターフェース
+ * @param hooks - Hookインスタンス（オプショナル）
  * @returns 生成結果（ファイルパス配列とカウント）
  *
  * @example
  * ```typescript
  * const ir: XcgenIR = { ... };
  * const writer = new FileWriter('./output');
- * const result = await generateServices(ir, writer);
+ * const hooks = createHooks();
+ * const result = await generateServices(ir, writer, hooks);
  * console.log(result.files); // ['services/pets.ts', 'services/users.ts', 'services/index.ts']
  * console.log(result.count); // 2 (services)
  * ```
@@ -34,6 +37,7 @@ import { generateServicesIndex } from "./helpers/generate-index";
 export async function generateServices(
   ir: XcgenIR,
   writer: IFileWriter,
+  hooks?: HookableInstance,
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 
@@ -45,7 +49,7 @@ export async function generateServices(
     const filename = kebabCase(tag);
     return {
       path: `services/${filename}.ts`,
-      content: generateServiceFile(tag, endpoints),
+      content: generateServiceFile(tag, endpoints, hooks),
     };
   });
 
