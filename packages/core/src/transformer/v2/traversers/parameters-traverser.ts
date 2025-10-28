@@ -1,0 +1,361 @@
+/**
+ * Parameters Traverser - v2 Transformer Architecture
+ *
+ * Operationのparametersフィールドを訪問し、
+ * 各パラメータを処理します。
+ * 各パラメータの変換はparameter-transformerに委譲します。
+ */
+
+import { consola } from "consola";
+import type { IRModel, IRParameter, ParameterObject } from "../../../types";
+import { buildReferencePath } from "../../helpers";
+import type { VisitorContext } from "../../types";
+import { transformParameter } from "../transformers/parameter-transformer";
+import type { ParametersTraversalResult } from "../types";
+
+/**
+ * parametersフィールド（ParameterObjectの配列）を訪問
+ *
+ * @param parameters - parametersオブジェクト配列
+ * @param context - 親コンテキスト
+ * @returns ParametersTraversalResult
+ *
+ * @example OpenAPI YAML
+ * ```yaml
+ * parameters:
+ *   - name: id
+ *     in: path
+ *     required: true
+ *     schema:
+ *       type: string
+ *   - name: limit
+ *     in: query
+ *     schema:
+ *       type: integer
+ *       default: 10
+ * ```
+ */
+export function traverseParameters(
+  parameters: ParameterObject[] | undefined,
+  context: VisitorContext,
+): ParametersTraversalResult {
+  // parametersが未定義または空の場合
+  if (!parameters || parameters.length === 0) {
+    return {
+      parameters: [],
+      childModels: [],
+    };
+  }
+
+  const visitedParameters: ParametersTraversalResult["parameters"] = [];
+  const allChildModels: IRModel[] = [];
+
+  // 各パラメータを訪問
+  parameters.forEach((param, index) => {
+    // ReferenceObjectの場合は現時点でスキップ
+    if ("$ref" in param) {
+      consola.debug(
+        `Parameter reference not supported yet at ${buildReferencePath(context.documentPath)}/parameters[${index}]`,
+      );
+      return;
+    }
+
+    const paramContext: VisitorContext = {
+      documentPath: [...context.documentPath, "parameters", String(index)],
+      rootSegment: context.rootSegment,
+    };
+
+    // parameter-transformerを使用
+    const result = transformParameter(param, paramContext);
+
+    if (!result.parameter) {
+      const referencePath = buildReferencePath(paramContext.documentPath);
+      consola.warn(
+        `Failed to transform parameter ${param.name}: ${referencePath}`,
+      );
+      return; // このパラメータはスキップ
+    }
+
+    const irParam = result.parameter as IRParameter;
+
+    visitedParameters.push({
+      name: irParam.name,
+      in: irParam.in,
+      type: irParam.type,
+      ...(irParam.required && { required: true }),
+      ...(irParam.nullable && { nullable: true }),
+      ...(irParam.description && { description: irParam.description }),
+      ...(irParam.defaultValue !== undefined && {
+        defaultValue: irParam.defaultValue,
+      }),
+      ...(irParam.deprecated && { deprecated: true }),
+    });
+
+    allChildModels.push(...result.models);
+  });
+
+  return {
+    parameters: visitedParameters,
+    childModels: allChildModels,
+  };
+}
+
+// === in-source testing ===
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+
+  describe("traverseParameters", () => {
+    it("should handle empty parameters array", () => {
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters([], context);
+
+      expect(result.parameters).toEqual([]);
+      expect(result.childModels).toEqual([]);
+    });
+
+    it("should handle undefined parameters", () => {
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(undefined, context);
+
+      expect(result.parameters).toEqual([]);
+      expect(result.childModels).toEqual([]);
+    });
+
+    it("should process single path parameter", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          description: "User ID",
+          schema: { type: "string" },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users/{id}", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toEqual({
+        name: "id",
+        in: "path",
+        type: "string",
+        required: true,
+        description: "User ID",
+      });
+      expect(result.childModels).toEqual([]);
+    });
+
+    it("should process multiple parameters", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+        {
+          name: "limit",
+          in: "query",
+          schema: { type: "integer", default: 10 },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users/{id}", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(2);
+      expect(result.parameters[0]).toEqual({
+        name: "id",
+        in: "path",
+        type: "string",
+        required: true,
+      });
+      expect(result.parameters[1]).toEqual({
+        name: "limit",
+        in: "query",
+        type: "int",
+        defaultValue: 10,
+      });
+    });
+
+    it("should handle query parameter with validation", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "limit",
+          in: "query",
+          schema: {
+            type: "integer",
+            minimum: 1,
+            maximum: 100,
+            default: 10,
+          },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toEqual({
+        name: "limit",
+        in: "query",
+        type: "int",
+        defaultValue: 10,
+      });
+    });
+
+    it("should handle deprecated parameter", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "oldParam",
+          in: "query",
+          deprecated: true,
+          schema: { type: "string" },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toEqual({
+        name: "oldParam",
+        in: "query",
+        type: "string",
+        deprecated: true,
+      });
+    });
+
+    it("should handle nullable parameter", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "filter",
+          in: "query",
+          schema: { type: "string", nullable: true },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toEqual({
+        name: "filter",
+        in: "query",
+        type: "string",
+        nullable: true,
+      });
+    });
+
+    it("should skip parameter without schema", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "valid",
+          in: "query",
+          schema: { type: "string" },
+        },
+        {
+          name: "invalid",
+          in: "query",
+          // schemaなし
+        } as ParameterObject,
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      // invalidパラメータはスキップされる
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0].name).toBe("valid");
+    });
+
+    it("should skip parameter with invalid location", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "valid",
+          in: "query",
+          schema: { type: "string" },
+        },
+        {
+          name: "invalid",
+          in: "body" as "path",
+          schema: { type: "object" },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      // invalidパラメータはスキップされる
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0].name).toBe("valid");
+    });
+
+    it("should collect child models from array parameter", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "tags",
+          in: "query",
+          schema: {
+            type: "array",
+            items: { type: "string" },
+          },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/posts", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0].name).toBe("tags");
+      expect(result.parameters[0].type).toEqual({
+        kind: "ref",
+        name: expect.stringMatching(/Tags$/),
+      });
+      // Array parameters create child models
+      expect(result.childModels).toHaveLength(1);
+      expect(result.childModels[0].kind).toBe("array");
+    });
+  });
+}

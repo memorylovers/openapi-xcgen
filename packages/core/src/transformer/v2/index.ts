@@ -13,6 +13,13 @@ export type {
   AdditionalPropertiesTraversalResult,
   ArrayItemTraversalResult,
   CompositionTraversalResult,
+  ContentTraversalResult,
+  HeadersTraversalResult,
+  ParametersTraversalResult,
+  ResponsesTraversalResult,
+  OperationTraversalResult,
+  ParameterAggregationResult,
+  ParameterTransformResult,
 } from "./types";
 
 // Context
@@ -27,6 +34,9 @@ export {
 // Errors
 export { createErrorResult, isErrorResult, collectErrors } from "./errors";
 
+// Aggregators
+export { aggregateParameters } from "./aggregators/parameter-aggregator";
+
 // Transformers
 export { transformEnum } from "./transformers/enum-transformer";
 export { transformPrimitive } from "./transformers/primitive-transformer";
@@ -40,6 +50,26 @@ export { transformAllOf } from "./transformers/allof-transformer";
 export { transformOneOf } from "./transformers/oneof-transformer";
 export { transformAnyOf } from "./transformers/anyof-transformer";
 export { transformObject } from "./transformers/object-transformer";
+export {
+  transformParameter,
+  type ParameterTransformResult,
+} from "./transformers/parameter-transformer";
+export {
+  transformRequestBody,
+  transformRequestBodyObject,
+} from "./transformers/request-body-transformer";
+export {
+  transformResponse,
+  transformResponseObject,
+} from "./transformers/response-transformer";
+export {
+  transformPaths,
+  type PathsTransformResult,
+} from "./transformers/paths-transformer";
+export {
+  transformOperation,
+  type OperationTransformResult,
+} from "./transformers/operation-transformer";
 
 // Traversers
 export { traverseArrayItem } from "./traversers/array-traverser";
@@ -49,6 +79,12 @@ export {
   traverseObjectProperties,
   traverseObjectAdditionalProperties,
 } from "./traversers/object-traverser";
+export { traverseContent } from "./traversers/content-traverser";
+export { traverseHeaders } from "./traversers/headers-traverser";
+export { traverseParameters } from "./traversers/parameters-traverser";
+export { traverseResponses } from "./traversers/responses-traverser";
+export { traverseOperation } from "./traversers/operation-traverser";
 
 // Dispatchers
 export { dispatchSchema } from "./dispatchers/schema-dispatcher";
+export { dispatchOperation } from "./dispatchers/operation-dispatcher";

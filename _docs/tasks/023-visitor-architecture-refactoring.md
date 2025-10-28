@@ -1,6 +1,6 @@
 # Task 023: Visitor Architecture Refactoring
 
-**Status**: 📋 Planning
+**Status**: ⏳ In Progress (Phase 1-4 ✅, Phase 5-9 Operation系 ✅)
 **Priority**: High
 **Complexity**: High
 **Estimated Effort**: 3-5 days
@@ -701,6 +701,186 @@ export function isErrorResult(result: TransformResult): boolean {
 
 ---
 
+## 実装ステータス
+
+### Phase 1-4: Schema型のv2移行（完了 ✅）
+
+**実装日**: 2025-10-27
+**テスト**: 100件 全て成功
+
+- schema-dispatcher.ts
+- enum/primitive/array/map/object transformers
+- composition (allOf/oneOf/anyOf) transformers
+- array/map/object/composition traversers
+- 統一されたTransformResult型
+- エラーハンドリングの標準化
+
+### Phase 5-9: Operation系のv2移行（完了 ✅）
+
+**実装日**: 2025-10-28
+**テスト**: 199件 全て成功 (Schema 100件 + Operation 99件)
+
+#### Phase 5: 基盤整備 (11テスト)
+
+**新設ファイル**:
+
+- `v2/types.ts`: Operation系の型定義追加
+  - ContentTraversalResult
+  - HeadersTraversalResult
+  - ParametersTraversalResult
+  - ResponsesTraversalResult
+  - OperationTraversalResult
+  - ParameterAggregationResult
+  - ParameterTransformResult
+
+- `v2/aggregators/parameter-aggregator.ts` (11テスト)
+  - パラメータ統合モデル生成（例: `GetUsersIdParams`）
+  - `aggregateParameters()`, `generateParameterModelName()`, `convertToParameterProperty()`, `generateDescription()`
+
+- `v2/errors.ts`: 拡張
+  - `createParameterErrorResult()`
+
+#### Phase 6: Transformer層 (35テスト)
+
+**新設ファイル**:
+
+- `v2/transformers/parameter-transformer.ts` (12テスト)
+  - ParameterObjectをIRParameterに変換
+  - ParameterTransformResult型を返す
+  - バリデーション、拡張フィールド抽出
+
+- `v2/transformers/request-body-transformer.ts` (6テスト)
+  - RequestBodyObjectをIRRequestBodyに変換
+  - `transformRequestBody()`, `transformRequestBodyObject()`
+  - ContentTraversalResultを利用
+
+- `v2/transformers/response-transformer.ts` (8テスト)
+  - ResponseObjectをIRResponseに変換
+  - `transformResponse()`, `transformResponseObject()`
+  - ContentTraversalResultとHeadersTraversalResultを利用
+
+- `v2/transformers/paths-transformer.ts` (5テスト)
+  - PathsObjectを処理してエンドポイント抽出
+  - operation-dispatcherとの統合
+
+- `v2/transformers/operation-transformer.ts` (4テスト - skeleton)
+  - OperationObjectをIREndpointに変換（基本情報のみ）
+  - OperationTraversalResultとの完全統合は将来実装予定
+
+#### Phase 7: Traverser層 (46テスト)
+
+**新設ファイル**:
+
+- `v2/traversers/content-traverser.ts` (9テスト)
+  - RequestBodyとResponseで共有
+  - MIMEタイプとスキーマのマッピング処理
+  - インラインobjectスキーマの検出
+
+- `v2/traversers/headers-traverser.ts` (10テスト)
+  - Responseのheadersフィールドを処理
+  - 各ヘッダーのスキーマ変換
+
+- `v2/traversers/parameters-traverser.ts` (10テスト)
+  - Operationのparametersフィールドを処理
+  - parameter-transformerを利用
+
+- `v2/traversers/responses-traverser.ts` (9テスト)
+  - Operationのresponsesフィールドを処理
+  - content-traverserとheaders-traverserを利用
+
+- `v2/traversers/operation-traverser.ts` (8テスト)
+  - OperationObject全体を処理
+  - parameters, requestBody, responsesのtraverserを統合
+
+#### Phase 8: Dispatcher層 (7テスト)
+
+**新設ファイル**:
+
+- `v2/dispatchers/operation-dispatcher.ts` (7テスト)
+  - operation-traverserとoperation-transformerを統合
+  - schema処理はschema-dispatcherに委譲
+  - paths-transformerから呼ばれる
+
+#### Phase 9: 統合とエクスポート
+
+**変更ファイル**:
+
+- `v2/index.ts`: 新しいモジュールのエクスポート追加
+  - Operation系の型エクスポート
+  - parameter-aggregator
+  - Operation系のtransformers
+  - Operation系のtraversers
+  - operation-dispatcher
+
+- `v2/transformers/paths-transformer.ts`: 統合完了
+  - operation-dispatcherの呼び出し
+  - エンドポイントとモデルの収集
+
+#### アーキテクチャ
+
+```
+┌────────────────────────────────────────────────┐
+│  paths-transformer                             │
+│  ├─ dispatchOperation() ←─────────────┐       │
+└──────────────────┬─────────────────────┘       │
+                   │                              │
+┌──────────────────▼─────────────────────┐       │
+│  operation-dispatcher                  │       │
+│  ├─ traverseOperation()                │       │
+│  └─ transformOperation()               │       │
+└──────────────────┬─────────────────────┘       │
+                   │                              │
+      ┌────────────┴────────────────┐            │
+      │                              │            │
+┌─────▼──────────┐        ┌──────────▼────────┐ │
+│  operation-    │        │  operation-        │ │
+│  traverser     │        │  transformer       │ │
+│  ├─ parameters │        │  (skeleton)        │ │
+│  ├─ requestBody│        │  基本情報のみ生成  │ │
+│  └─ responses  │        └────────────────────┘ │
+└────────┬───────┘                               │
+         │                                        │
+    ┌────┴────┐                                  │
+    │         │                                   │
+┌───▼───┐ ┌──▼───┐                               │
+│content│ │headers│                               │
+│       │ │       │                               │
+└───┬───┘ └──┬───┘                               │
+    │        │                                    │
+    └────┬───┴─────────────┐                     │
+         │                 │                      │
+┌────────▼────────┐  ┌────▼─────────────┐        │
+│ schema-dispatcher│  │parameter-        │        │
+│                  │  │aggregator        │        │
+└──────────────────┘  │統合モデル生成    │        │
+                      └──────────────────┘        │
+```
+
+### 次のステップ
+
+#### 短期（将来実装）
+
+1. **operation-transformerの完全実装**
+   - OperationTraversalResultの活用
+   - パラメータ統合モデルの生成
+   - RequestBody/Responseモデルの統合
+   - parameters/responsesフィールドの生成
+
+2. **E2E tests with Operation endpoints**
+   - 実際のOpenAPI仕様でエンドポイント生成のテスト
+
+#### 長期（設計課題）
+
+1. **visitors/ ディレクトリの削除**
+   - v2アーキテクチャへの完全移行後
+   - 既存のvisitor呼び出しを全てv2に置換
+
+2. **v2/ → transformers/ リネーム**
+   - v2が正式版になった時点
+
+---
+
 **Created**: 2025-10-27
 **Author**: AI Analysis
-**Last Updated**: 2025-10-27
+**Last Updated**: 2025-10-28
+**Phase 5-9 Completed**: 2025-10-28

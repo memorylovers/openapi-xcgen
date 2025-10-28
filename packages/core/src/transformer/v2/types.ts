@@ -96,3 +96,132 @@ export interface CompositionTraversalResult {
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
 }
+
+//
+// === Operation System Types ===
+//
+
+/**
+ * Content（MIME type dictionary）トラバーサルの結果
+ *
+ * RequestBodyとResponseで共有される、MIMEタイプとスキーマの組み合わせを
+ * 処理した結果を表します。
+ */
+export interface ContentTraversalResult {
+  /** MIMEタイプとスキーマの配列 */
+  content: Array<{
+    mimeType: string;
+    schema: IRType;
+  }>;
+  /** 子要素から抽出されたモデル */
+  childModels: IRModel[];
+  /** インラインオブジェクトスキーマとして特別なモデルを生成すべきか */
+  requiresSpecialModel: boolean;
+}
+
+/**
+ * ヘッダー（headers dictionary）トラバーサルの結果
+ */
+export interface HeadersTraversalResult {
+  /** 変換されたヘッダーの配列 */
+  headers: Array<{
+    name: string;
+    type: IRType;
+    description?: string;
+    defaultValue?: unknown;
+    deprecated?: boolean;
+  }>;
+  /** 子要素から抽出されたモデル */
+  childModels: IRModel[];
+}
+
+/**
+ * パラメータ配列トラバーサルの結果
+ */
+export interface ParametersTraversalResult {
+  /** 変換されたパラメータの配列 */
+  parameters: Array<{
+    name: string;
+    in: "path" | "query" | "header" | "cookie";
+    type: IRType;
+    required?: boolean;
+    nullable?: boolean;
+    description?: string;
+    defaultValue?: unknown;
+    deprecated?: boolean;
+  }>;
+  /** 子要素から抽出されたモデル */
+  childModels: IRModel[];
+}
+
+/**
+ * レスポンス辞書トラバーサルの結果
+ */
+export interface ResponsesTraversalResult {
+  /** ステータスコード別のレスポンス配列 */
+  responses: Array<{
+    statusCode: string;
+    description?: string;
+    content?: Array<{
+      mimeType: string;
+      schema: IRType;
+    }>;
+    headers?: Array<{
+      name: string;
+      type: IRType;
+      description?: string;
+      defaultValue?: unknown;
+      deprecated?: boolean;
+    }>;
+    ref?: string;
+  }>;
+  /** 子要素から抽出されたモデル */
+  childModels: IRModel[];
+}
+
+/**
+ * Operation子要素トラバーサルの結果
+ *
+ * OperationObjectの子要素（parameters, requestBody, responses）を
+ * すべて訪問した結果を集約します。
+ */
+export interface OperationTraversalResult {
+  /** パラメータトラバーサル結果 */
+  parametersResult?: ParametersTraversalResult;
+  /** リクエストボディトラバーサル結果 */
+  requestBodyResult?: {
+    required?: boolean;
+    description?: string;
+    content: ContentTraversalResult;
+  };
+  /** レスポンストラバーサル結果 */
+  responsesResult?: ResponsesTraversalResult;
+  /** 子要素から抽出されたモデル */
+  childModels: IRModel[];
+}
+
+/**
+ * パラメータ集約の結果
+ *
+ * Aggregatorレイヤーでパラメータ統合モデルを生成した結果を表します。
+ */
+export interface ParameterAggregationResult {
+  /** パラメータ統合モデルへの参照（生成された場合） */
+  reference: IRType | null;
+  /** パラメータ統合モデル（IRParameterModel）*/
+  model: IRModel | null;
+}
+
+/**
+ * パラメータ変換の結果
+ *
+ * Transformerレイヤーで個別のParameterObjectをIRParameterに変換した結果を表します。
+ */
+export interface ParameterTransformResult {
+  /** 変換されたパラメータ（失敗時はnull） */
+  parameter: unknown | null;
+  /** 子要素から抽出されたモデル */
+  models: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
+}

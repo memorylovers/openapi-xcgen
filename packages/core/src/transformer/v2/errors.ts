@@ -5,7 +5,11 @@
  */
 
 import { consola } from "consola";
-import type { TransformError, TransformResult } from "./types";
+import type {
+  ParameterTransformResult,
+  TransformError,
+  TransformResult,
+} from "./types";
 
 /**
  * エラー結果を作成
@@ -60,4 +64,31 @@ export function collectErrors(results: TransformResult[]): TransformError[] {
     .filter(isErrorResult)
     .map((r) => r.error)
     .filter(Boolean) as TransformError[];
+}
+
+/**
+ * パラメータエラー結果を作成
+ *
+ * @param message - エラーメッセージ
+ * @param code - エラーコード（デフォルト: "PARAMETER_TRANSFORM_ERROR"）
+ * @param context - エラーが発生したコンテキスト情報
+ * @returns パラメータエラー結果
+ */
+export function createParameterErrorResult(
+  message: string,
+  code: string = "PARAMETER_TRANSFORM_ERROR",
+  context?: unknown,
+): ParameterTransformResult {
+  // 既存の動作を維持：警告を出力
+  consola.warn(message);
+
+  return {
+    parameter: null,
+    models: [],
+    error: {
+      code,
+      message,
+      context,
+    },
+  };
 }
