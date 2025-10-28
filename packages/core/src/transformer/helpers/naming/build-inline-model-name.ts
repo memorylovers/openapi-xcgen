@@ -171,17 +171,17 @@ if (import.meta.vitest) {
       it("should warn and use fallback for unsupported kinds", () => {
         const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
-        expect(buildInlineModelName("Test", "schema" as any, 0)).toBe(
-          "TestAllOf0",
-        );
+        expect(
+          buildInlineModelName("Test", "schema" as VisitorContextKind, 0),
+        ).toBe("TestAllOf0");
         expect(warnSpy).toHaveBeenCalledWith(
           "Unsupported kind for inline model name generation: schema; using allOf",
         );
 
         warnSpy.mockClear();
-        expect(buildInlineModelName("Test", "parameter" as any, 0)).toBe(
-          "TestAllOf0",
-        );
+        expect(
+          buildInlineModelName("Test", "parameter" as VisitorContextKind, 0),
+        ).toBe("TestAllOf0");
         expect(warnSpy).toHaveBeenCalledWith(
           "Unsupported kind for inline model name generation: parameter; using allOf",
         );
