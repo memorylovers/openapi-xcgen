@@ -110,6 +110,8 @@ export function visitAllOf(
       kind: "allOf",
       documentPath: [...context.documentPath.slice(0, -1), inlineModelName],
       rootSegment: "components",
+      parentSchemaName: name,
+      index: i,
     };
 
     // visitSchemaで処理（getModelNameが自動的に適切な名前を生成）

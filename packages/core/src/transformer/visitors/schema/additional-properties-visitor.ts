@@ -82,6 +82,7 @@ export function visitAdditionalProperties(
     kind: "additionalProperties",
     documentPath: [...context.documentPath.slice(0, -1), inlineModelName],
     rootSegment: context.rootSegment,
+    parentSchemaName: parentName,
   };
 
   const result = visitSchema(schemaObj, inlineContext);

@@ -10,7 +10,6 @@
 import { consola } from "consola";
 import type { AdditionalPropertiesContext, VisitorContext } from "../../types";
 import { isAdditionalPropertiesContext } from "../../../types/guards";
-import { parseAdditionalPropertiesPath } from "../path/parse-document-path";
 
 /**
  * additionalPropertiesの値型モデル名を生成
@@ -42,22 +41,8 @@ export function buildAdditionalPropertiesModelName(
     // 後方互換性: 文字列を直接受け取る（Visitor構築時に使用）
     parentName = contextOrParentName;
   } else if (isAdditionalPropertiesContext(contextOrParentName)) {
-    // AdditionalPropertiesContext（documentPathからパース）
-    const parsed = parseAdditionalPropertiesPath(
-      contextOrParentName.documentPath,
-    );
-    if (!parsed) {
-      consola.warn(
-        `Invalid additional properties path: ${contextOrParentName.documentPath.join("/")}`,
-      );
-      // Fallback: use second-to-last element of documentPath
-      // (last is "additionalProperties", second-to-last is parent schema name)
-      parentName =
-        contextOrParentName.documentPath.at(-2) ??
-        "UnknownAdditionalProperties";
-    } else {
-      parentName = parsed.parentSchemaName;
-    }
+    // AdditionalPropertiesContext（Contextのフィールドから直接取得）
+    parentName = contextOrParentName.parentSchemaName;
   } else {
     // その他のVisitorContext（循環依存回避のため、親名を外部から渡す想定）
     consola.warn(
@@ -85,6 +70,7 @@ if (import.meta.vitest) {
             "additionalProperties",
           ],
           rootSegment: "components",
+          parentSchemaName: "MetricsData",
         };
         expect(buildAdditionalPropertiesModelName(context)).toBe(
           "MetricsDataItem",

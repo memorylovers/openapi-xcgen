@@ -57,44 +57,44 @@ export interface SchemaContext extends VisitorContext {
 
 /**
  * AllOf処理用のコンテキスト（インラインスキーマ）
- *
- * 以下の情報はdocumentPathから導出可能:
- * - parentSchemaName: documentPath[-3]
- * - index: Number(documentPath[-1])
  */
 export interface AllOfContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "allOf";
   /** ルートセグメント（固定値: components） */
   rootSegment: "components";
+  /** 親スキーマ名（例: "Extended"） */
+  parentSchemaName: string;
+  /** allOf配列内のインデックス（例: 0, 1, 2） */
+  index: number;
 }
 
 /**
  * OneOf処理用のコンテキスト（インラインスキーマ）
- *
- * 以下の情報はdocumentPathから導出可能:
- * - parentSchemaName: documentPath[-3]
- * - index: Number(documentPath[-1])
  */
 export interface OneOfContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "oneOf";
   /** ルートセグメント（固定値: components） */
   rootSegment: "components";
+  /** 親スキーマ名（例: "Pet"） */
+  parentSchemaName: string;
+  /** oneOf配列内のインデックス（例: 0, 1, 2） */
+  index: number;
 }
 
 /**
  * AnyOf処理用のコンテキスト（インラインスキーマ）
- *
- * 以下の情報はdocumentPathから導出可能:
- * - parentSchemaName: documentPath[-3]
- * - index: Number(documentPath[-1])
  */
 export interface AnyOfContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "anyOf";
   /** ルートセグメント（固定値: components） */
   rootSegment: "components";
+  /** 親スキーマ名（例: "Item"） */
+  parentSchemaName: string;
+  /** anyOf配列内のインデックス（例: 0, 1, 2） */
+  index: number;
 }
 
 /**
@@ -104,15 +104,14 @@ export type CompositionContext = AllOfContext | OneOfContext | AnyOfContext;
 
 /**
  * AdditionalProperties処理用のコンテキスト
- *
- * 以下の情報はdocumentPathから導出可能（components配下の場合）:
- * - parentSchemaName: documentPath[2]
  */
 export interface AdditionalPropertiesContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "additionalProperties";
   /** ルートセグメント */
   rootSegment: "components" | "paths";
+  /** 親スキーマ名（例: "MetricsData", "GetUsers200Response"） */
+  parentSchemaName: string;
 }
 
 /**
