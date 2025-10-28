@@ -13,6 +13,7 @@
 
 import { consola } from "consola";
 import type {
+  IRHttpMethod,
   IRModel,
   IRRef,
   IRResponse,
@@ -24,7 +25,7 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import { isPathsResponseContext } from "../../../types/guards";
-import { getModelName } from "../../helpers/get-model-name";
+import { getModelName, parseResponsePath } from "../../helpers";
 import type { ResponseContext } from "../../types";
 import { visitResponseObject } from "../schema/object-visitor";
 import { visitSchema } from "../schema/schema-visitor";
@@ -79,6 +80,13 @@ export function visitResponse(
 ): ResponseResult | null {
   const models: IRModel[] = [];
 
+  // statusCodeを取得（共通処理）
+  let statusCode = "200";
+  if (isPathsResponseContext(context)) {
+    const parsed = parseResponsePath(context.documentPath);
+    statusCode = parsed?.statusCode ?? "200";
+  }
+
   // ReferenceObjectの場合は$ref情報を保持
   if (isReferenceObject(response)) {
     const ref: IRRef = {
@@ -88,8 +96,8 @@ export function visitResponse(
 
     const irResponse: IRResponse = {
       kind: "ref",
-      statusCode: isPathsResponseContext(context) ? context.statusCode : "200",
       ref,
+      statusCode,
     };
 
     return { response: irResponse, models: [] };
@@ -122,9 +130,6 @@ export function visitResponse(
                 componentName,
               ],
               rootSegment: context.rootSegment,
-              method: context.method,
-              pathTemplate: context.pathTemplate,
-              statusCode: context.statusCode,
               contentType: mimeType,
               schemaPath: ["content", mimeType, "schema"],
             }
@@ -148,10 +153,15 @@ export function visitResponse(
           mediaType.schema.type === "object"
         ) {
           // レスポンスvisitorで処理して、IRResponseModelとして抽出
+          let statusCode = "200";
+          if (isPathsResponseContext(context)) {
+            const parsed = parseResponsePath(context.documentPath);
+            statusCode = parsed?.statusCode ?? "200";
+          }
           const responseResult = visitResponseObject(
             mediaType.schema as SchemaObject,
             schemaContext,
-            isPathsResponseContext(context) ? context.statusCode : "200",
+            statusCode,
           );
 
           if (responseResult && responseResult.models.length > 0) {
@@ -204,18 +214,25 @@ export function visitResponse(
       }
 
       // visitHeaderで処理
+      let pathTemplate: string | null = null;
+      let statusCode = "200";
+      let method: IRHttpMethod | null = null;
+      if (isPathsResponseContext(context)) {
+        const parsed = parseResponsePath(context.documentPath);
+        if (parsed) {
+          pathTemplate = parsed.pathTemplate;
+          statusCode = parsed.statusCode;
+          method = parsed.method;
+        }
+      }
       const headerResult = visitHeader(headerDef, {
         kind: "header",
         documentPath: [...context.documentPath, "headers", headerName],
         rootSegment: context.rootSegment,
         headerName,
-        method: isPathsResponseContext(context) ? context.method : null,
-        pathTemplate: isPathsResponseContext(context)
-          ? context.pathTemplate
-          : null,
-        statusCode: isPathsResponseContext(context)
-          ? context.statusCode
-          : "200",
+        pathTemplate,
+        statusCode,
+        method,
       });
 
       if (headerResult) {
@@ -231,7 +248,7 @@ export function visitResponse(
 
   const irResponse: IRResponse = {
     kind: "content",
-    statusCode: isPathsResponseContext(context) ? context.statusCode : "200",
+    statusCode,
     ...(responseObj.description && { description: responseObj.description }),
     ...(content && { content }),
     ...(headers && { headers }),
@@ -254,9 +271,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/users", "get", "responses", "200"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users",
-        statusCode: "200",
       });
 
       expect(result).toEqual({
@@ -291,9 +305,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/users", "get", "responses", "200"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users",
-        statusCode: "200",
       });
 
       expect(result).toEqual({
@@ -369,9 +380,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/data", "get", "responses", "200"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/data",
-        statusCode: "200",
       });
 
       expect(result).toEqual({
@@ -440,9 +448,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/users/{id}", "get", "responses", "404"],
         rootSegment: "paths",
-        method: "get",
-        pathTemplate: "/users/{id}",
-        statusCode: "404",
       });
 
       // $ref情報がIRRefとして保持される
@@ -469,9 +474,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/api/users", "post", "responses", "400"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/api/users",
-        statusCode: "400",
       });
 
       expect(result400).toEqual({
@@ -495,9 +497,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/api/users", "post", "responses", "500"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/api/users",
-        statusCode: "500",
       });
 
       expect(result500).toEqual({
@@ -533,9 +532,6 @@ if (import.meta.vitest) {
         kind: "response",
         documentPath: ["paths", "/users", "post", "responses", "400"],
         rootSegment: "paths",
-        method: "post",
-        pathTemplate: "/users",
-        statusCode: "400",
       });
 
       expect(result).toEqual({

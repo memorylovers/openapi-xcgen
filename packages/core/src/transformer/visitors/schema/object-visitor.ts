@@ -26,12 +26,12 @@ import type {
 } from "../../../types";
 import {
   buildReferencePath,
+  buildInlineSchemaPath,
   extractExtensions,
   extractValidation,
   getModelName,
   isNullable,
 } from "../../helpers";
-import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
 import type { VisitorContext } from "../../types";
 import { visitAdditionalProperties } from "./additional-properties-visitor";
 import { visitSchema } from "./schema-visitor";

@@ -6,8 +6,8 @@
  */
 
 import { pascalCase } from "es-toolkit/string";
-import type { ParameterContext } from "../types";
-import { pathToComponentBase } from "./path-to-component-base";
+import type { ParameterContext } from "../../types";
+import { buildParameterModelName } from "./build-parameter-model-name";
 
 /**
  * パラメータinline schema用のモデル名を生成
@@ -20,11 +20,9 @@ import { pathToComponentBase } from "./path-to-component-base";
  *
  * @example
  * ```typescript
- * // context = { method: "get", pathTemplate: "/users/{id}", parameterName: "category" }
  * buildParameterSchemaModelName(context)
  * // => "GetUsersIdParamsCategory"
  *
- * // context = { method: "post", pathTemplate: "/users", parameterName: "limit" }
  * buildParameterSchemaModelName(context)
  * // => "PostUsersParamsLimit"
  * ```
@@ -32,10 +30,9 @@ import { pathToComponentBase } from "./path-to-component-base";
 export function buildParameterSchemaModelName(
   context: ParameterContext,
 ): string {
-  const methodPascal = pascalCase(context.method ?? "");
-  const pathBase = pathToComponentBase(context.pathTemplate ?? "");
+  const paramBase = buildParameterModelName(context);
   const paramNamePascal = pascalCase(context.parameterName);
-  return `${methodPascal}${pathBase}Params${paramNamePascal}`;
+  return `${paramBase}${paramNamePascal}`;
 }
 
 // === in-source testing ===
@@ -49,8 +46,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users/{id}", "get", "parameters"],
         parameterName: "id",
         in: "path",
-        method: "get",
-        pathTemplate: "/users/{id}",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe("GetUsersIdParamsId");
@@ -62,8 +57,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/users", "get", "parameters"],
         parameterName: "category",
         in: "query",
-        method: "get",
-        pathTemplate: "/users",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(
@@ -82,8 +75,6 @@ if (import.meta.vitest) {
         ],
         parameterName: "limit",
         in: "query",
-        method: "post",
-        pathTemplate: "/api/v2/users/{userId}/posts",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(
@@ -97,8 +88,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/posts", "get", "parameters"],
         parameterName: "x-api-key",
         in: "header",
-        method: "get",
-        pathTemplate: "/posts",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(
@@ -112,8 +101,6 @@ if (import.meta.vitest) {
         documentPath: ["paths", "/session", "get", "parameters"],
         parameterName: "session_id",
         in: "cookie",
-        method: "get",
-        pathTemplate: "/session",
         rootSegment: "paths",
       };
       expect(buildParameterSchemaModelName(context)).toBe(

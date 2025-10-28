@@ -1,4 +1,5 @@
 import type {
+  AdditionalPropertiesContext,
   AllOfContext,
   AnyOfContext,
   OneOfContext,
@@ -57,6 +58,15 @@ export function isCompositionContext(
     context.kind === "oneOf" ||
     context.kind === "anyOf"
   );
+}
+
+/**
+ * VisitorContextがAdditionalPropertiesContextかどうかを判定
+ */
+export function isAdditionalPropertiesContext(
+  context: VisitorContext,
+): context is AdditionalPropertiesContext {
+  return context.kind === "additionalProperties";
 }
 
 /**
@@ -355,6 +365,31 @@ if (import.meta.vitest) {
       });
     });
 
+    describe("isAdditionalPropertiesContext", () => {
+      it("should identify additionalProperties contexts", () => {
+        const context: AdditionalPropertiesContext = {
+          kind: "additionalProperties",
+          documentPath: [
+            "components",
+            "schemas",
+            "Test",
+            "additionalProperties",
+          ],
+          rootSegment: "components",
+          parentSchemaName: "Test",
+        };
+        expect(isAdditionalPropertiesContext(context)).toBe(true);
+      });
+
+      it("should return false for non-additionalProperties contexts", () => {
+        const baseContext: VisitorContext = {
+          documentPath: ["components", "schemas", "User"],
+          rootSegment: "components",
+        };
+        expect(isAdditionalPropertiesContext(baseContext)).toBe(false);
+      });
+    });
+
     describe("isParameterContext", () => {
       it("should identify parameter contexts", () => {
         const parameterContext: ParameterContext = {
@@ -363,8 +398,6 @@ if (import.meta.vitest) {
           rootSegment: "paths",
           parameterName: "limit",
           in: "query",
-          method: "get",
-          pathTemplate: "/users",
         };
         expect(isParameterContext(parameterContext)).toBe(true);
       });
@@ -384,8 +417,6 @@ if (import.meta.vitest) {
           kind: "requestBody",
           documentPath: ["paths", "/users", "post", "requestBody"],
           rootSegment: "paths",
-          method: "post",
-          pathTemplate: "/users",
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
@@ -407,9 +438,6 @@ if (import.meta.vitest) {
           kind: "response",
           documentPath: ["paths", "/users", "get", "responses", "200"],
           rootSegment: "paths",
-          method: "get",
-          pathTemplate: "/users",
-          statusCode: "200",
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };

@@ -2,17 +2,17 @@
  * Helper functions exports
  */
 
-export { buildAdditionalPropertiesModelName } from "./build-additional-properties-model-name";
-export { buildComponentSchemaPath } from "./build-component-schema-path";
-export { buildInlineModelName } from "./build-inline-model-name";
-export { buildInlineSchemaPath } from "./build-inline-schema-path";
-export { buildParameterSchemaModelName } from "./build-parameter-schema-model-name";
-export { buildReferencePath } from "./build-reference-path";
+// Re-export from naming subdirectory
+export * from "./naming";
+
+// Re-export from path subdirectory
+export * from "./path";
+
+// Utility functions (remain in helpers/)
 export { createParameterModel } from "./create-parameter-model";
+export { enrichDiscriminatorMappings } from "./enrich-discriminator-mappings";
 export { extractExtensions } from "./extract-extensions";
 export { extractValidation } from "./extract-validation";
-export { generateEnumName } from "./generate-enum-name";
-export { getModelName } from "./get-model-name";
 export { isNullable } from "./is-nullable";
 export { toIRParameterInType } from "./to-ir-parameter-in-type";
 export { toIRScalarType } from "./to-ir-scalar-type";

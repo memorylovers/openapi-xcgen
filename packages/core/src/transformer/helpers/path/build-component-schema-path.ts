@@ -6,7 +6,7 @@
  * referencePathとmodelNameの整合性を保証する
  */
 
-import type { VisitorContext } from "../types";
+import type { VisitorContext } from "../../types";
 
 /**
  * componentsスキーマ用のdocumentPathを構築

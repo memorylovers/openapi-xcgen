@@ -21,12 +21,11 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types/guards";
 import {
+  buildInlineModelName,
   buildReferencePath,
   extractExtensions,
   getModelName,
 } from "../../helpers";
-import { buildInlineModelName } from "../../helpers/build-inline-model-name";
-import { buildInlineSchemaPath } from "../../helpers/build-inline-schema-path";
 import type { AnyOfContext, VisitorContext } from "../../types";
 import { type SchemaVisitorResult, visitSchema } from "./schema-visitor";
 
@@ -152,7 +151,7 @@ export function visitAnyOf(
     const inlineModelName = buildInlineModelName(name, "anyOf", i);
     const inlineContext: AnyOfContext = {
       kind: "anyOf",
-      documentPath: buildInlineSchemaPath(context, inlineModelName),
+      documentPath: [...context.documentPath.slice(0, -1), inlineModelName],
       rootSegment: "components",
       parentSchemaName: name,
       index: i,

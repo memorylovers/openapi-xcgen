@@ -19,6 +19,7 @@ export type VisitorContextKind =
   | "allOf"
   | "oneOf"
   | "anyOf"
+  | "additionalProperties"
   | "parameter"
   | "pathItem"
   | "operation"
@@ -44,14 +45,14 @@ export interface VisitorContext {
 
 /**
  * Schema処理用のコンテキスト
+ *
+ * schemaNameはdocumentPathから導出可能: documentPath[2]
  */
 export interface SchemaContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "schema";
   /** ルートセグメント（固定値: components） */
   rootSegment: "components";
-  /** スキーマ名 */
-  schemaName: string;
 }
 
 /**
@@ -64,7 +65,7 @@ export interface AllOfContext extends VisitorContext {
   rootSegment: "components";
   /** 親スキーマ名（例: "Extended"） */
   parentSchemaName: string;
-  /** allOf配列内のインデックス */
+  /** allOf配列内のインデックス（例: 0, 1, 2） */
   index: number;
 }
 
@@ -76,9 +77,9 @@ export interface OneOfContext extends VisitorContext {
   kind: "oneOf";
   /** ルートセグメント（固定値: components） */
   rootSegment: "components";
-  /** 親スキーマ名 */
+  /** 親スキーマ名（例: "Pet"） */
   parentSchemaName: string;
-  /** oneOf配列内のインデックス */
+  /** oneOf配列内のインデックス（例: 0, 1, 2） */
   index: number;
 }
 
@@ -90,9 +91,9 @@ export interface AnyOfContext extends VisitorContext {
   kind: "anyOf";
   /** ルートセグメント（固定値: components） */
   rootSegment: "components";
-  /** 親スキーマ名 */
+  /** 親スキーマ名（例: "Item"） */
   parentSchemaName: string;
-  /** anyOf配列内のインデックス */
+  /** anyOf配列内のインデックス（例: 0, 1, 2） */
   index: number;
 }
 
@@ -102,7 +103,27 @@ export interface AnyOfContext extends VisitorContext {
 export type CompositionContext = AllOfContext | OneOfContext | AnyOfContext;
 
 /**
+ * AdditionalProperties処理用のコンテキスト
+ */
+export interface AdditionalPropertiesContext extends VisitorContext {
+  /** コンテキストの種類 */
+  kind: "additionalProperties";
+  /** ルートセグメント */
+  rootSegment: "components" | "paths";
+  /** 親スキーマ名（例: "MetricsData", "GetUsers200Response"） */
+  parentSchemaName: string;
+}
+
+/**
  * Parameter処理用のコンテキスト
+ *
+ * 以下の情報はdocumentPathから導出可能:
+ * - method: documentPath[2]
+ * - pathTemplate: documentPath[1]
+ *
+ * 以下の情報はdocumentPathに含まれないため保持:
+ * - parameterName: ParameterObjectから取得
+ * - in: ParameterObjectから取得
  */
 export interface ParameterContext extends VisitorContext {
   /** コンテキストの種類 */
@@ -113,10 +134,6 @@ export interface ParameterContext extends VisitorContext {
   parameterName: string;
   /** パラメータの場所 */
   in: "path" | "query" | "header" | "cookie";
-  /** HTTPメソッド（pathsコンテキストの場合） */
-  method: IRHttpMethod | null;
-  /** パステンプレート（pathsコンテキストの場合） */
-  pathTemplate: string | null;
 }
 
 /**
@@ -151,32 +168,39 @@ export interface OperationContext extends VisitorContext {
 
 /**
  * Parameters処理用のコンテキスト
+ *
+ * 以下の情報はdocumentPathから導出可能:
+ * - method: documentPath[2]
+ * - pathTemplate: documentPath[1]
+ *
+ * 以下の情報はdocumentPathに含まれないため保持:
+ * - commonParameters: PathItemレベルの共通パラメータ（継承用）
  */
 export interface ParametersContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "parameters";
   /** ルートセグメント（固定値: paths） */
   rootSegment: "paths";
-  /** HTTPメソッド */
-  method: IRHttpMethod;
-  /** パステンプレート */
-  pathTemplate: string;
   /** PathItemレベルの共通パラメータ（継承用） */
   commonParameters?: Array<ParameterObject | ReferenceObject>;
 }
 
 /**
  * RequestBody処理用のコンテキスト（paths配下）
+ *
+ * 以下の情報はdocumentPathから導出可能:
+ * - method: documentPath[2]
+ * - pathTemplate: documentPath[1]
+ *
+ * 以下の情報はdocumentPathに含まれないため保持:
+ * - contentType: contentの下の階層情報
+ * - schemaPath: contentの下のネストしたスキーマパス
  */
 export interface PathsRequestBodyContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "requestBody";
   /** ルートセグメント（固定値: paths） */
   rootSegment: "paths";
-  /** HTTPメソッド */
-  method: IRHttpMethod;
-  /** パステンプレート */
-  pathTemplate: string;
   /** コンテンツタイプ（例: "application/json") */
   contentType?: MimeType;
   /** スキーマパス（contentの中のネストしたスキーマパス） */
@@ -206,32 +230,35 @@ export type RequestBodyContext =
 
 /**
  * Responses処理用のコンテキスト
+ *
+ * 以下の情報はdocumentPathから導出可能:
+ * - method: documentPath[2]
+ * - pathTemplate: documentPath[1]
  */
 export interface ResponsesContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "responses";
   /** ルートセグメント（固定値: paths） */
   rootSegment: "paths";
-  /** HTTPメソッド */
-  method: IRHttpMethod;
-  /** パステンプレート */
-  pathTemplate: string;
 }
 
 /**
  * Response処理用のコンテキスト（paths配下）
+ *
+ * 以下の情報はdocumentPathから導出可能:
+ * - method: documentPath[2]
+ * - pathTemplate: documentPath[1]
+ * - statusCode: documentPath[responsesIndex + 1]
+ *
+ * 以下の情報はdocumentPathに含まれないため保持:
+ * - contentType: contentの下の階層情報
+ * - schemaPath: contentの下のネストしたスキーマパス
  */
 export interface PathsResponseContext extends VisitorContext {
   /** コンテキストの種類 */
   kind: "response";
   /** ルートセグメント（固定値: paths） */
   rootSegment: "paths";
-  /** HTTPメソッド */
-  method: IRHttpMethod;
-  /** パステンプレート */
-  pathTemplate: string;
-  /** HTTPステータスコード */
-  statusCode: string;
   /** コンテンツタイプ（例: "application/json") */
   contentType?: MimeType;
   /** スキーマパス（contentの中のネストしたスキーマパス） */

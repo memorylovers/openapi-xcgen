@@ -2,7 +2,9 @@
 
 ## 概要
 
-packages/core に存在する19個のバレルファイル（index.ts）のうち、冗長な12個を削除してTree-shakingの効率を向上させる。
+packages/core に存在する21個のバレルファイル（index.ts）のうち、冗長な14個を削除してTree-shakingの効率を向上させる。
+
+**更新**: Task 022.5でhelpers配下に2個のバレルファイルが追加されたため、削除対象を12個→14個に更新。
 
 ## 背景
 
@@ -13,11 +15,28 @@ packages/core に存在する19個のバレルファイル（index.ts）のう�
 - Tree-shakingの効率低下
 - CLAUDE.mdの「Tree-shaking対応」原則に反する
 
+**⚠️ Task 022.5の影響**:
+Task 022.5でhelpers配下に2個のバレルファイルが追加されました：
+
+- `src/transformer/helpers/naming/index.ts`
+- `src/transformer/helpers/path/index.ts`
+
+これらもTree-shaking効率化のため削除対象とし、`helpers/index.ts`から直接エクスポートします。
+
 ## 目標
 
-**19個 → 7個に削減**（12個削除）
+**21個 → 7個に削減**（14個削除）
 
-### 削除対象（12個）
+- 当初: 19個
+- Task 022.5で追加: +2個
+- 削除対象: 14個（当初12個 + 追加2個）
+
+### 削除対象（14個）
+
+#### transformer/helpers/ 配下（2個） ← **Task 022.5で追加**
+
+1. `src/transformer/helpers/naming/index.ts` - 10ファイルの再エクスポートのみ
+2. `src/transformer/helpers/path/index.ts` - 4ファイルの再エクスポートのみ
 
 #### types/ir/ 配下（7個）
 
@@ -50,6 +69,54 @@ packages/core に存在する19個のバレルファイル（index.ts）のう�
 7. `src/transformer/helpers/index.ts` - helpersの集約
 
 ## 実装手順
+
+### 0. transformer/helpers/ 配下の削除と修正 ← **Task 022.5対応**
+
+#### 0-1. バレルファイルの削除（2個）
+
+```bash
+rm src/transformer/helpers/naming/index.ts
+rm src/transformer/helpers/path/index.ts
+```
+
+#### 0-2. transformer/helpers/index.ts の修正
+
+削除前のimport:
+
+```typescript
+// Re-export from naming subdirectory
+export * from "./naming";
+
+// Re-export from path subdirectory
+export * from "./path";
+```
+
+修正後（直接ファイルからimport）:
+
+```typescript
+// Re-export from naming subdirectory (直接ファイルから)
+export { buildAdditionalPropertiesModelName } from "./naming/build-additional-properties-model-name";
+export { buildInlineModelName } from "./naming/build-inline-model-name";
+export { buildParameterModelName } from "./naming/build-parameter-model-name";
+export { buildParameterSchemaModelName } from "./naming/build-parameter-schema-model-name";
+export { buildRequestBodyModelName } from "./naming/build-request-body-model-name";
+export { buildResponseModelName } from "./naming/build-response-model-name";
+export { generateEnumName } from "./naming/generate-enum-name";
+export { getModelName } from "./naming/get-model-name";
+export { getMediaTypeSuffix } from "./naming/media-type-suffix";
+export { pathToComponentBase } from "./naming/path-to-component-base";
+
+// Re-export from path subdirectory (直接ファイルから)
+export { buildComponentSchemaPath } from "./path/build-component-schema-path";
+export { buildInlineSchemaPath } from "./path/build-inline-schema-path";
+export { buildReferencePath } from "./path/build-reference-path";
+export { parseCompositionPath } from "./path/parse-document-path";
+export { parseParameterPath } from "./path/parse-document-path";
+export { parseResponsePath } from "./path/parse-document-path";
+export { parseRequestBodyPath } from "./path/parse-document-path";
+export { parseAdditionalPropertiesPath } from "./path/parse-document-path";
+export { parseSchemaPath } from "./path/parse-document-path";
+```
 
 ### 1. types/ir/ 配下の削除と修正
 
@@ -254,6 +321,8 @@ pnpm check
 
 ## 完了条件
 
+- [ ] transformer/helpers/ 配下の2個のバレルファイルを削除（Task 022.5対応）
+- [ ] transformer/helpers/index.ts を修正（直接ファイルからexport）
 - [ ] types/ir/ 配下の7個のバレルファイルを削除
 - [ ] types/ir/index.ts を修正（直接ファイルからexport）
 - [ ] transformer/visitors/ 配下の5個のバレルファイルを削除
