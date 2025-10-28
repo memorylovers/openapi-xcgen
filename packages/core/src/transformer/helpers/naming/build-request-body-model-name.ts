@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
 import type { PathsRequestBodyContext } from "../../types";
 import { getMediaTypeSuffix } from "./media-type-suffix";
@@ -21,9 +22,11 @@ export function buildRequestBodyModelName(
 ): string {
   const parsed = parseRequestBodyPath(context.documentPath);
   if (!parsed) {
-    throw new Error(
-      `Failed to parse request body path: ${context.documentPath.join("/")}`,
+    consola.warn(
+      `Invalid request body path: ${context.documentPath.join("/")}`,
     );
+    // Fallback: use last element of documentPath
+    return context.documentPath.at(-1) ?? "UnknownRequestBody";
   }
 
   const methodPascal = pascalCase(parsed.method);

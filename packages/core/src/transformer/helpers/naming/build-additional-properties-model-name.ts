@@ -7,6 +7,7 @@
  * - REST APIの文脈で自然な命名（各アイテムを表す）
  */
 
+import { consola } from "consola";
 import type { AdditionalPropertiesContext, VisitorContext } from "../../types";
 import { isAdditionalPropertiesContext } from "../../../types/guards";
 import { parseAdditionalPropertiesPath } from "../path/parse-document-path";
@@ -46,16 +47,23 @@ export function buildAdditionalPropertiesModelName(
       contextOrParentName.documentPath,
     );
     if (!parsed) {
-      throw new Error(
-        `Failed to parse additional properties path: ${contextOrParentName.documentPath.join("/")}`,
+      consola.warn(
+        `Invalid additional properties path: ${contextOrParentName.documentPath.join("/")}`,
       );
+      // Fallback: use second-to-last element of documentPath
+      // (last is "additionalProperties", second-to-last is parent schema name)
+      parentName =
+        contextOrParentName.documentPath.at(-2) ??
+        "UnknownAdditionalProperties";
+    } else {
+      parentName = parsed.parentSchemaName;
     }
-    parentName = parsed.parentSchemaName;
   } else {
     // その他のVisitorContext（循環依存回避のため、親名を外部から渡す想定）
-    throw new Error(
+    consola.warn(
       "buildAdditionalPropertiesModelName requires AdditionalPropertiesContext or string",
     );
+    return "UnknownItem";
   }
 
   return `${parentName}Item`;

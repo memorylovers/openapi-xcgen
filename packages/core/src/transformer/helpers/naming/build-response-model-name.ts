@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
 import type { PathsResponseContext } from "../../types";
 import { getMediaTypeSuffix } from "./media-type-suffix";
@@ -19,9 +20,9 @@ import { pathToComponentBase } from "./path-to-component-base";
 export function buildResponseModelName(context: PathsResponseContext): string {
   const parsed = parseResponsePath(context.documentPath);
   if (!parsed) {
-    throw new Error(
-      `Failed to parse response path: ${context.documentPath.join("/")}`,
-    );
+    consola.warn(`Invalid response path: ${context.documentPath.join("/")}`);
+    // Fallback: use last element of documentPath
+    return context.documentPath.at(-1) ?? "UnknownResponse";
   }
 
   const methodPascal = pascalCase(parsed.method);

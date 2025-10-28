@@ -179,8 +179,8 @@ export function parseRequestBodyPath(documentPath: string[]): {
  * parseAdditionalPropertiesPath(["components", "schemas", "MetricsData", "additionalProperties"])
  * // => { parentSchemaName: "MetricsData" }
  *
- * parseAdditionalPropertiesPath(["paths", "/users", "get", "responses", "200", "content", "application/json", "schema", "additionalProperties"])
- * // => null (paths配下のadditionalPropertiesは親スキーマ名が複雑なため、現状ではパースしない)
+ * parseAdditionalPropertiesPath(["paths", "/users", "get", "responses", "200", "content", "application/json", "schema", "GetUsers200Response", "additionalProperties"])
+ * // => { parentSchemaName: "GetUsers200Response" }
  * ```
  */
 export function parseAdditionalPropertiesPath(documentPath: string[]): {
@@ -203,8 +203,15 @@ export function parseAdditionalPropertiesPath(documentPath: string[]): {
     return { parentSchemaName };
   }
 
-  // paths配下やネストしたケースは複雑なため、現状ではnullを返す
-  // 必要に応じて将来拡張可能
+  // paths配下: 親スキーマ名は additionalProperties の直前の要素
+  // 例: ["paths", "/users", "get", "responses", "200", "content", "application/json", "schema", "GetUsers200Response", "additionalProperties"]
+  // → parentSchemaName = "GetUsers200Response"
+  if (documentPath[0] === "paths" && additionalPropertiesIndex > 0) {
+    const parentSchemaName = documentPath[additionalPropertiesIndex - 1];
+    return { parentSchemaName };
+  }
+
+  // ネストしたケースは将来拡張可能
   return null;
 }
 
@@ -438,7 +445,7 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should return null for paths-based additional properties", () => {
+    it("should parse paths-based additional properties", () => {
       const result = parseAdditionalPropertiesPath([
         "paths",
         "/users",
@@ -448,9 +455,10 @@ if (import.meta.vitest) {
         "content",
         "application/json",
         "schema",
+        "GetUsers200Response",
         "additionalProperties",
       ]);
-      expect(result).toBeNull();
+      expect(result).toEqual({ parentSchemaName: "GetUsers200Response" });
     });
 
     it("should return null for invalid path", () => {

@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { pascalCase } from "es-toolkit/string";
 import type { ParameterContext } from "../../types";
 import { pathToComponentBase } from "./path-to-component-base";
@@ -18,9 +19,9 @@ import { parseParameterPath } from "../path/parse-document-path";
 export function buildParameterModelName(context: ParameterContext): string {
   const parsed = parseParameterPath(context.documentPath);
   if (!parsed) {
-    throw new Error(
-      `Failed to parse parameter path: ${context.documentPath.join("/")}`,
-    );
+    consola.warn(`Invalid parameter path: ${context.documentPath.join("/")}`);
+    // Fallback: use last element of documentPath
+    return context.documentPath.at(-1) ?? "UnknownParams";
   }
 
   const methodPascal = pascalCase(parsed.method);
