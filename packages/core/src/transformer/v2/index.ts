@@ -34,10 +34,13 @@ export {
   transformServers,
   type ServersTransformResult,
 } from "./transformers/servers-transformer";
+export { transformArray } from "./transformers/array-transformer";
+export { transformMap } from "./transformers/map-transformer";
 
-// Traversers (Phase 2で追加予定)
-// export { traverseArrayItem } from "./traversers/array-traverser";
-// export { traverseObjectProperties } from "./traversers/object-traverser";
+// Traversers
+export { traverseArrayItem } from "./traversers/array-traverser";
+export { traverseMapValue } from "./traversers/map-traverser";
+// export { traverseObjectProperties } from "./traversers/object-traverser"; // Phase 4で追加予定
 
-// Dispatchers (Phase 2で追加予定)
-// export { dispatchSchema } from "./dispatchers/schema-dispatcher";
+// Dispatchers
+export { dispatchSchema } from "./dispatchers/schema-dispatcher";
