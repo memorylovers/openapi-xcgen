@@ -39,12 +39,16 @@ export { transformMap } from "./transformers/map-transformer";
 export { transformAllOf } from "./transformers/allof-transformer";
 export { transformOneOf } from "./transformers/oneof-transformer";
 export { transformAnyOf } from "./transformers/anyof-transformer";
+export { transformObject } from "./transformers/object-transformer";
 
 // Traversers
 export { traverseArrayItem } from "./traversers/array-traverser";
 export { traverseMapValue } from "./traversers/map-traverser";
 export { traverseComposition } from "./traversers/composition-traverser";
-// export { traverseObjectProperties } from "./traversers/object-traverser"; // Phase 4で追加予定
+export {
+  traverseObjectProperties,
+  traverseObjectAdditionalProperties,
+} from "./traversers/object-traverser";
 
 // Dispatchers
 export { dispatchSchema } from "./dispatchers/schema-dispatcher";

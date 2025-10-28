@@ -52,6 +52,7 @@ export type {
   IRMapModel,
   IRMetadata,
   IRModel,
+  IRObjectModel,
   IROAuth2SecurityScheme,
   IROAuthFlow,
   IROAuthFlows,

@@ -6,7 +6,6 @@
  * Phase 3-4で composition型とobject型を追加予定。
  */
 
-import { consola } from "consola";
 import type {
   ReferenceObject,
   SchemaObject,
@@ -19,11 +18,16 @@ import { transformAnyOf } from "../transformers/anyof-transformer";
 import { transformArray } from "../transformers/array-transformer";
 import { transformEnum } from "../transformers/enum-transformer";
 import { transformMap } from "../transformers/map-transformer";
+import { transformObject } from "../transformers/object-transformer";
 import { transformOneOf } from "../transformers/oneof-transformer";
 import { transformPrimitive } from "../transformers/primitive-transformer";
 import { traverseArrayItem } from "../traversers/array-traverser";
 import { traverseComposition } from "../traversers/composition-traverser";
 import { traverseMapValue } from "../traversers/map-traverser";
+import {
+  traverseObjectAdditionalProperties,
+  traverseObjectProperties,
+} from "../traversers/object-traverser";
 import type { TransformResult } from "../types";
 
 /**
@@ -41,8 +45,8 @@ import type { TransformResult } from "../types";
  * - oneOf → traverseComposition + transformOneOf
  * - anyOf → traverseComposition + transformAnyOf
  *
- * Phase 4で追加予定:
- * - object → object traverser + transformer
+ * Phase 4実装範囲:
+ * - object → traverseObjectProperties + transformObject
  *
  * @param schema - 処理対象のスキーマ
  * @param context - Visitorコンテキスト
@@ -125,12 +129,27 @@ export function dispatchSchema(
     return transformAnyOf(schema as SchemaObject, context, traversalResult);
   }
 
-  // Phase 4で実装予定: object
+  // object (properties あり)
   if (schema.type === "object" || (!schema.type && schema.properties)) {
-    consola.warn(
-      `object is not yet supported in Phase 2: ${context.documentPath.join("/")}`,
+    const propertyTraversalResult = traverseObjectProperties(
+      schema as SchemaObject,
+      context,
+      dispatchSchema, // 再帰的に自分自身を渡す
     );
-    return { type: null, models: [] };
+
+    // additionalPropertiesの処理（propertiesと共存する場合）
+    const additionalResult = traverseObjectAdditionalProperties(
+      schema as SchemaObject,
+      context,
+      dispatchSchema,
+    );
+
+    return transformObject(
+      schema as SchemaObject,
+      context,
+      propertyTraversalResult,
+      additionalResult,
+    );
   }
 
   // primitive
@@ -139,7 +158,7 @@ export function dispatchSchema(
 
 // === in-source testing ===
 if (import.meta.vitest) {
-  const { describe, it, expect, vi } = import.meta.vitest;
+  const { describe, it, expect } = import.meta.vitest;
 
   describe("dispatchSchema (Phase 2)", () => {
     it("should dispatch $ref to transformPrimitive", () => {
@@ -255,7 +274,8 @@ if (import.meta.vitest) {
         kind: "ref",
         name: "#/components/schemas/Extended",
       });
-      expect(result.models).toHaveLength(1);
+      // allOf + nested object model
+      expect(result.models.length).toBeGreaterThanOrEqual(1);
       expect(result.models[0].kind).toBe("allOf");
     });
 
@@ -302,13 +322,15 @@ if (import.meta.vitest) {
       expect(result.models[0].kind).toBe("anyOf");
     });
 
-    it("should warn for unsupported object with properties (Phase 4)", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should dispatch object with properties", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
+          id: { type: "string" },
           name: { type: "string" },
         },
+        required: ["id"],
+        description: "User object",
       };
       const context: VisitorContext = {
         documentPath: ["components", "schemas", "User"],
@@ -317,13 +339,61 @@ if (import.meta.vitest) {
 
       const result = dispatchSchema(schema, context);
 
-      expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("object is not yet supported"),
-      );
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/User",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("object");
+      if (result.models[0].kind === "object") {
+        expect(result.models[0].properties).toHaveLength(2);
+      }
+    });
 
-      warnSpy.mockRestore();
+    it("should dispatch object with additionalProperties", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: { type: "string" },
+      };
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "FlexibleObject"],
+        rootSegment: "components",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/FlexibleObject",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("object");
+      expect(result.models[0]).toHaveProperty("additionalProperties");
+    });
+
+    it("should dispatch object without type but with properties", () => {
+      const schema = {
+        properties: {
+          value: { type: "string" as const },
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "ImplicitObject"],
+        rootSegment: "components",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/ImplicitObject",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("object");
     });
   });
 }
