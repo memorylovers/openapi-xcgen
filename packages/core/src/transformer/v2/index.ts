@@ -36,10 +36,14 @@ export {
 } from "./transformers/servers-transformer";
 export { transformArray } from "./transformers/array-transformer";
 export { transformMap } from "./transformers/map-transformer";
+export { transformAllOf } from "./transformers/allof-transformer";
+export { transformOneOf } from "./transformers/oneof-transformer";
+export { transformAnyOf } from "./transformers/anyof-transformer";
 
 // Traversers
 export { traverseArrayItem } from "./traversers/array-traverser";
 export { traverseMapValue } from "./traversers/map-traverser";
+export { traverseComposition } from "./traversers/composition-traverser";
 // export { traverseObjectProperties } from "./traversers/object-traverser"; // Phase 4で追加予定
 
 // Dispatchers

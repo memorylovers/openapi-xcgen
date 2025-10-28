@@ -14,11 +14,15 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import type { VisitorContext } from "../../types";
+import { transformAllOf } from "../transformers/allof-transformer";
+import { transformAnyOf } from "../transformers/anyof-transformer";
 import { transformArray } from "../transformers/array-transformer";
 import { transformEnum } from "../transformers/enum-transformer";
 import { transformMap } from "../transformers/map-transformer";
+import { transformOneOf } from "../transformers/oneof-transformer";
 import { transformPrimitive } from "../transformers/primitive-transformer";
 import { traverseArrayItem } from "../traversers/array-traverser";
+import { traverseComposition } from "../traversers/composition-traverser";
 import { traverseMapValue } from "../traversers/map-traverser";
 import type { TransformResult } from "../types";
 
@@ -32,8 +36,10 @@ import type { TransformResult } from "../types";
  * - map（additionalPropertiesのみ） → traverseMapValue + transformMap
  * - primitive → transformPrimitive
  *
- * Phase 3で追加予定:
- * - allOf/oneOf/anyOf → composition transformer
+ * Phase 3実装範囲:
+ * - allOf → traverseComposition + transformAllOf
+ * - oneOf → traverseComposition + transformOneOf
+ * - anyOf → traverseComposition + transformAnyOf
  *
  * Phase 4で追加予定:
  * - object → object traverser + transformer
@@ -86,24 +92,37 @@ export function dispatchSchema(
     return transformMap(schema as SchemaObject, context, traversalResult);
   }
 
-  // Phase 3で実装予定: allOf/oneOf/anyOf
+  // allOf
   if ("allOf" in schema && schema.allOf) {
-    consola.warn(
-      `allOf is not yet supported in Phase 2: ${context.documentPath.join("/")}`,
+    const traversalResult = traverseComposition(
+      schema.allOf,
+      context,
+      dispatchSchema, // 再帰的に自分自身を渡す
+      "allOf",
     );
-    return { type: null, models: [] };
+    return transformAllOf(schema as SchemaObject, context, traversalResult);
   }
+
+  // oneOf
   if ("oneOf" in schema && schema.oneOf) {
-    consola.warn(
-      `oneOf is not yet supported in Phase 2: ${context.documentPath.join("/")}`,
+    const traversalResult = traverseComposition(
+      schema.oneOf,
+      context,
+      dispatchSchema, // 再帰的に自分自身を渡す
+      "oneOf",
     );
-    return { type: null, models: [] };
+    return transformOneOf(schema as SchemaObject, context, traversalResult);
   }
+
+  // anyOf
   if ("anyOf" in schema && schema.anyOf) {
-    consola.warn(
-      `anyOf is not yet supported in Phase 2: ${context.documentPath.join("/")}`,
+    const traversalResult = traverseComposition(
+      schema.anyOf,
+      context,
+      dispatchSchema, // 再帰的に自分自身を渡す
+      "anyOf",
     );
-    return { type: null, models: [] };
+    return transformAnyOf(schema as SchemaObject, context, traversalResult);
   }
 
   // Phase 4で実装予定: object
@@ -216,10 +235,13 @@ if (import.meta.vitest) {
       expect(result.models[0].kind).toBe("map");
     });
 
-    it("should warn for unsupported allOf (Phase 3)", () => {
-      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+    it("should dispatch allOf with recursive traversal", () => {
       const schema = {
-        allOf: [{ type: "object" }],
+        allOf: [
+          { $ref: "#/components/schemas/Base" },
+          { type: "object", properties: { extra: { type: "string" } } },
+        ],
+        description: "Extended model",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
       const context: VisitorContext = {
@@ -229,13 +251,55 @@ if (import.meta.vitest) {
 
       const result = dispatchSchema(schema, context);
 
-      expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("allOf is not yet supported"),
-      );
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/Extended",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("allOf");
+    });
 
-      warnSpy.mockRestore();
+    it("should dispatch oneOf with recursive traversal", () => {
+      const schema = {
+        oneOf: [
+          { $ref: "#/components/schemas/Success" },
+          { $ref: "#/components/schemas/Error" },
+        ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Result"],
+        rootSegment: "components",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/Result",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("union");
+    });
+
+    it("should dispatch anyOf with recursive traversal", () => {
+      const schema = {
+        anyOf: [{ type: "string" }, { type: "number" }],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "Value"],
+        rootSegment: "components",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/schemas/Value",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("anyOf");
     });
 
     it("should warn for unsupported object with properties (Phase 4)", () => {
