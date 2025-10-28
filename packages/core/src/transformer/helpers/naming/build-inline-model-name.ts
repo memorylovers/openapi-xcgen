@@ -5,6 +5,7 @@
  * 現在はComposition型（allOf/anyOf/oneOf）に対応しています。
  */
 
+import { consola } from "consola";
 import { isCompositionContext } from "../../../types/guards";
 import type { CompositionContext, VisitorContextKind } from "../../types";
 
@@ -53,22 +54,38 @@ export function buildInlineModelName(
   if (typeof contextOrParentName === "string") {
     // 後方互換性: 旧シグネチャ（Visitor構築時に使用）
     if (!kind || index === undefined) {
-      throw new Error(
-        "kind and index are required when using string parentName",
+      consola.warn(
+        "kind and index are required when using string parentName; using defaults (allOf, 0)",
       );
-    }
-    if (kind !== "allOf" && kind !== "anyOf" && kind !== "oneOf") {
-      throw new Error(
-        `Unsupported kind for inline model name generation: ${kind}`,
+      // Fallback: use default values
+      parentSchemaName = contextOrParentName;
+      contextKind = "allOf";
+      contextIndex = 0;
+    } else if (kind !== "allOf" && kind !== "anyOf" && kind !== "oneOf") {
+      consola.warn(
+        `Unsupported kind for inline model name generation: ${kind}; using allOf`,
       );
+      // Fallback: use allOf
+      parentSchemaName = contextOrParentName;
+      contextKind = "allOf";
+      contextIndex = index;
+    } else {
+      parentSchemaName = contextOrParentName;
+      contextKind = kind;
+      contextIndex = index;
     }
-    parentSchemaName = contextOrParentName;
-    contextKind = kind;
-    contextIndex = index;
   } else {
     // 新シグネチャ: Context対応（Contextのフィールドから直接取得）
     if (!isCompositionContext(contextOrParentName)) {
-      throw new Error("Invalid context: not a CompositionContext");
+      const ctx = contextOrParentName as {
+        kind?: string;
+        documentPath: string[];
+      };
+      consola.warn(
+        `Invalid context for inline model name generation: expected CompositionContext, got ${ctx.kind}`,
+      );
+      // Fallback: use documentPath last element or "Unknown"
+      return ctx.documentPath.at(-1) ?? "Unknown";
     }
 
     parentSchemaName = contextOrParentName.parentSchemaName;
@@ -88,7 +105,7 @@ export function buildInlineModelName(
 
 // === in-source testing ===
 if (import.meta.vitest) {
-  const { describe, it, expect } = import.meta.vitest;
+  const { describe, it, expect, vi } = import.meta.vitest;
 
   describe("buildInlineModelName", () => {
     describe("Context-based usage", () => {
@@ -151,13 +168,25 @@ if (import.meta.vitest) {
         expect(buildInlineModelName("Animal", "oneOf", 2)).toBe("AnimalOneOf2");
       });
 
-      it("should throw for unsupported kinds", () => {
-        expect(() => buildInlineModelName("Test", "schema", 0)).toThrow(
-          "Unsupported kind for inline model name generation: schema",
+      it("should warn and use fallback for unsupported kinds", () => {
+        const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+        expect(buildInlineModelName("Test", "schema" as any, 0)).toBe(
+          "TestAllOf0",
         );
-        expect(() => buildInlineModelName("Test", "parameter", 0)).toThrow(
-          "Unsupported kind for inline model name generation: parameter",
+        expect(warnSpy).toHaveBeenCalledWith(
+          "Unsupported kind for inline model name generation: schema; using allOf",
         );
+
+        warnSpy.mockClear();
+        expect(buildInlineModelName("Test", "parameter" as any, 0)).toBe(
+          "TestAllOf0",
+        );
+        expect(warnSpy).toHaveBeenCalledWith(
+          "Unsupported kind for inline model name generation: parameter; using allOf",
+        );
+
+        warnSpy.mockRestore();
       });
     });
   });
