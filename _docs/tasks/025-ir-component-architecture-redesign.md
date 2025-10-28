@@ -455,6 +455,28 @@ export interface IRComponentRef {
    }
    ```
 
+5. Helper関数のリネーム ← **Task 022/022.5との整合性**
+
+   Task 022/022.5で整理された`helpers/`配下の命名関数も"Model"から"Component"へ変更:
+
+   **`helpers/naming/`配下**:
+   - `getModelName` → `getComponentName`
+   - `buildInlineModelName` → `buildInlineComponentName`
+   - `buildParameterModelName` → `buildParameterComponentName`
+   - `buildParameterSchemaModelName` → `buildParameterSchemaComponentName`
+   - `buildRequestBodyModelName` → `buildRequestBodyComponentName`
+   - `buildResponseModelName` → `buildResponseComponentName`
+   - `buildAdditionalPropertiesModelName` → `buildAdditionalPropertiesComponentName`
+
+   **`helpers/`直下**:
+   - `createParameterModel` → `createParameterComponent`
+
+   **影響ファイル**:
+   - `helpers/naming/get-model-name.ts` - メイン関数名変更
+   - `helpers/naming/build-*-model-name.ts` (7ファイル) - 関数名とコメント変更
+   - `helpers/create-parameter-model.ts` - 関数名変更
+   - 全visitorファイル - import文と関数呼び出しを更新
+
 **影響範囲**:
 
 - `packages/core/src/types/ir/` - 型定義全体

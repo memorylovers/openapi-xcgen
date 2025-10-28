@@ -578,6 +578,12 @@ export function isErrorResult(result: TransformResult): boolean {
 
 ### Phase 2: 既存コードのリファクタリング（2-3日）
 
+**📝 注意**: Task 022/022.5で整理された`helpers/`構造を活用：
+
+- **Parser Functions**: `helpers/path/`のパーサー関数（`parseResponsePath`, `parseParameterPath`等）をTransformer層で使用
+- **Naming Functions**: `helpers/naming/`の組織化パターンをTransformer層の命名処理の参考にする
+- **documentPath-based Context**: Task 022で導入された簡素化されたContextがTransformer層で使いやすい
+
 #### Step 1: Schema系の移行
 
 - `schema-visitor.ts` → `schema-dispatcher.ts`
