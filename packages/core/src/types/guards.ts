@@ -376,6 +376,7 @@ if (import.meta.vitest) {
             "additionalProperties",
           ],
           rootSegment: "components",
+          parentSchemaName: "Test",
         };
         expect(isAdditionalPropertiesContext(context)).toBe(true);
       });

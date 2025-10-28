@@ -177,6 +177,8 @@ if (import.meta.vitest) {
           kind: "allOf",
           documentPath: ["components", "schemas", "ExtendedAllOf0"],
           rootSegment: "components",
+          parentSchemaName: "Extended",
+          index: 0,
         };
         expect(getModelName(context)).toBe("ExtendedAllOf0");
       });
@@ -186,6 +188,8 @@ if (import.meta.vitest) {
           kind: "oneOf",
           documentPath: ["components", "schemas", "PetOneOf1"],
           rootSegment: "components",
+          parentSchemaName: "Pet",
+          index: 1,
         };
         expect(getModelName(context)).toBe("PetOneOf1");
       });
@@ -195,6 +199,8 @@ if (import.meta.vitest) {
           kind: "anyOf",
           documentPath: ["components", "schemas", "ItemAnyOf2"],
           rootSegment: "components",
+          parentSchemaName: "Item",
+          index: 2,
         };
         expect(getModelName(context)).toBe("ItemAnyOf2");
       });
