@@ -42,15 +42,6 @@ export function transformArray(
   const name = getModelName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
-  // 名前の妥当性チェック
-  if (!name.trim()) {
-    return createErrorResult(
-      "Invalid array model name: empty or whitespace only",
-      "INVALID_ARRAY_NAME",
-      { context },
-    );
-  }
-
   // トラバーサルが失敗した場合
   if (!traversalResult.itemType) {
     return createErrorResult(
@@ -192,29 +183,6 @@ if (import.meta.vitest) {
       expect(result.type).toBeNull();
       expect(result.models).toEqual([]);
       expect(result.error?.code).toBe("FAILED_ARRAY_ITEM_RESOLUTION");
-    });
-
-    it("should return error result for empty array name", () => {
-      const schema: SchemaObject = {
-        type: "array",
-        items: { type: "string" },
-      };
-
-      const context: VisitorContext = {
-        documentPath: ["components", "schemas", ""],
-        rootSegment: "components",
-      };
-
-      const traversalResult: ArrayItemTraversalResult = {
-        itemType: "string",
-        models: [],
-      };
-
-      const result = transformArray(schema, context, traversalResult);
-
-      expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(result.error?.code).toBe("INVALID_ARRAY_NAME");
     });
   });
 }

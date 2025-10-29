@@ -96,14 +96,6 @@ export function traverseContent(
     // スキーマを訪問
     const result = visitSchema(schema, schemaContext);
 
-    if (!result.type) {
-      const referencePath = buildReferencePath(schemaContext.documentPath);
-      consola.warn(
-        `Failed to resolve content schema for ${mimeType}: ${referencePath}`,
-      );
-      return; // このMIMEタイプはスキップ
-    }
-
     // インラインobjectスキーマの検出
     if ("type" in schema && schema.type === "object" && !("$ref" in schema)) {
       hasInlineObject = true;
@@ -291,30 +283,6 @@ if (import.meta.vitest) {
 
       expect(result.content).toEqual([]);
       expect(mockVisitSchema).not.toHaveBeenCalled();
-    });
-
-    it("should skip mime type when schema resolution fails", () => {
-      const mockVisitSchema = vi.fn().mockReturnValue({
-        type: null,
-        models: [],
-      });
-
-      const content = {
-        "application/json": {
-          schema: { type: "invalid" as const },
-        },
-      } as any;
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "post", "requestBody"],
-        rootSegment: "paths",
-      };
-
-      const result = traverseContent(content, context, mockVisitSchema);
-
-      expect(result.content).toEqual([]);
-      expect(result.childModels).toEqual([]);
-      expect(mockVisitSchema).toHaveBeenCalled();
     });
 
     it("should collect child models from schema resolution", () => {

@@ -54,15 +54,6 @@ export function transformParameter(
   context: VisitorContext,
   dispatchFn: typeof dispatchSchema = dispatchSchema,
 ): ParameterTransformResult {
-  // schemaが必須
-  if (!parameter.schema) {
-    return createParameterErrorResult(
-      `Parameter without schema: ${parameter.name}`,
-      "PARAMETER_WITHOUT_SCHEMA",
-      { parameter },
-    );
-  }
-
   // ReferenceObjectの場合は現時点でスキップ
   if (isReferenceObject(parameter.schema)) {
     return createParameterErrorResult(
@@ -75,15 +66,8 @@ export function transformParameter(
   // SchemaObjectとして扱う
   const schema = parameter.schema as SchemaObject;
 
-  // parameter.inの検証と変換
-  const parameterIn = toIRParameterInType(parameter.in);
-  if (!parameterIn) {
-    return createParameterErrorResult(
-      `Invalid parameter location: ${parameter.in} for parameter: ${parameter.name}`,
-      "INVALID_PARAMETER_LOCATION",
-      { parameter },
-    );
-  }
+  // parameter.inの変換
+  const parameterIn = toIRParameterInType(parameter.in)!;
 
   // スキーマを変換（dispatchSchemaに委譲）
   // buildParameterSchemaModelNameとbuildInlineSchemaPathは旧コンテキスト形式を期待するため、
@@ -253,25 +237,6 @@ if (import.meta.vitest) {
       expect(result.models).toEqual([]);
     });
 
-    it("should return error for parameter without schema", () => {
-      const param: ParameterObject = {
-        name: "invalid",
-        in: "query",
-        // schemaなし
-      } as ParameterObject;
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "get", "parameters", "0"],
-        rootSegment: "paths",
-      };
-
-      const result = transformParameter(param, context);
-
-      expect(result.parameter).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(result.error?.code).toBe("PARAMETER_WITHOUT_SCHEMA");
-    });
-
     it("should return error for parameter with reference schema", () => {
       const param: ParameterObject = {
         name: "userId",
@@ -291,25 +256,6 @@ if (import.meta.vitest) {
       expect(result.parameter).toBeNull();
       expect(result.models).toEqual([]);
       expect(result.error?.code).toBe("PARAMETER_REF_NOT_SUPPORTED");
-    });
-
-    it("should return error for invalid parameter location", () => {
-      const param: ParameterObject = {
-        name: "body",
-        in: "body" as "path",
-        schema: { type: "object" },
-      };
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "post", "parameters", "0"],
-        rootSegment: "paths",
-      };
-
-      const result = transformParameter(param, context);
-
-      expect(result.parameter).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(result.error?.code).toBe("INVALID_PARAMETER_LOCATION");
     });
 
     it("should handle array type parameter", () => {

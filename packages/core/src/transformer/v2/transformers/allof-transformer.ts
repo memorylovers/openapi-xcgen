@@ -39,15 +39,6 @@ export function transformAllOf(
   const name = getModelName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
-  // 名前の妥当性チェック
-  if (!name.trim()) {
-    return createErrorResult(
-      "Invalid allOf model name: empty or whitespace only",
-      "INVALID_ALLOF_NAME",
-      { context },
-    );
-  }
-
   // トラバーサルが失敗した場合（空配列）
   if (traversalResult.schemas.length === 0) {
     return createErrorResult(
@@ -189,28 +180,6 @@ if (import.meta.vitest) {
       expect(result.type).toBeNull();
       expect(result.models).toEqual([]);
       expect(result.error?.code).toBe("FAILED_ALLOF_RESOLUTION");
-    });
-
-    it("should return error result for empty model name", () => {
-      const schema: SchemaObject = {
-        allOf: [{ type: "string" }],
-      };
-
-      const context: VisitorContext = {
-        documentPath: ["components", "schemas", ""],
-        rootSegment: "components",
-      };
-
-      const traversalResult: CompositionTraversalResult = {
-        schemas: ["string"],
-        childModels: [],
-      };
-
-      const result = transformAllOf(schema, context, traversalResult);
-
-      expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(result.error?.code).toBe("INVALID_ALLOF_NAME");
     });
   });
 }

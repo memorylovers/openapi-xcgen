@@ -8,7 +8,6 @@
 import type { IRObjectModel, IRProperty, SchemaObject } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
-import { createErrorResult } from "../errors";
 import type {
   AdditionalPropertiesTraversalResult,
   PropertyTraversalResult,
@@ -60,15 +59,6 @@ export function transformObject(
 ): TransformResult {
   const name = getModelName(context);
   const referencePath = buildReferencePath(context.documentPath);
-
-  // 名前の妥当性チェック
-  if (!name.trim()) {
-    return createErrorResult(
-      "Invalid object model name: empty or whitespace only",
-      "INVALID_OBJECT_NAME",
-      { context },
-    );
-  }
 
   // プロパティをIRProperty形式に変換
   const properties: IRProperty[] = propertyTraversalResult.properties.map(
@@ -349,31 +339,6 @@ if (import.meta.vitest) {
         referencePath: "#/components/schemas/EmptyObject",
         properties: [],
       });
-    });
-
-    it("should return error result for empty model name", () => {
-      const schema: SchemaObject = {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-        },
-      };
-
-      const context: VisitorContext = {
-        documentPath: ["components", "schemas", ""],
-        rootSegment: "components",
-      };
-
-      const propertyResult: PropertyTraversalResult = {
-        properties: [{ name: "id", type: "string" }],
-        childModels: [],
-      };
-
-      const result = transformObject(schema, context, propertyResult);
-
-      expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(result.error?.code).toBe("INVALID_OBJECT_NAME");
     });
 
     it("should collect models from both properties and additionalProperties", () => {

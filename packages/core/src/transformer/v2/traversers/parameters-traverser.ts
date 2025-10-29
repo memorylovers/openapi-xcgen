@@ -276,58 +276,6 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should skip parameter without schema", () => {
-      const parameters: ParameterObject[] = [
-        {
-          name: "valid",
-          in: "query",
-          schema: { type: "string" },
-        },
-        {
-          name: "invalid",
-          in: "query",
-          // schemaなし
-        } as ParameterObject,
-      ];
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "get"],
-        rootSegment: "paths",
-      };
-
-      const result = traverseParameters(parameters, context);
-
-      // invalidパラメータはスキップされる
-      expect(result.parameters).toHaveLength(1);
-      expect(result.parameters[0].name).toBe("valid");
-    });
-
-    it("should skip parameter with invalid location", () => {
-      const parameters: ParameterObject[] = [
-        {
-          name: "valid",
-          in: "query",
-          schema: { type: "string" },
-        },
-        {
-          name: "invalid",
-          in: "body" as "path",
-          schema: { type: "object" },
-        },
-      ];
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "get"],
-        rootSegment: "paths",
-      };
-
-      const result = traverseParameters(parameters, context);
-
-      // invalidパラメータはスキップされる
-      expect(result.parameters).toHaveLength(1);
-      expect(result.parameters[0].name).toBe("valid");
-    });
-
     it("should collect child models from array parameter", () => {
       const parameters: ParameterObject[] = [
         {

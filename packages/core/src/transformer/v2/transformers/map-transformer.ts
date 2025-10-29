@@ -39,15 +39,6 @@ export function transformMap(
   const name = getModelName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
-  // 名前の妥当性チェック
-  if (!name.trim()) {
-    return createErrorResult(
-      "Invalid map model name: empty or whitespace only",
-      "INVALID_MAP_NAME",
-      { context },
-    );
-  }
-
   // トラバーサルが失敗した場合（値型が undefined）
   if (!traversalResult.type) {
     return createErrorResult(
@@ -181,29 +172,6 @@ if (import.meta.vitest) {
       expect(result.type).toBeNull();
       expect(result.models).toEqual([]);
       expect(result.error?.code).toBe("FAILED_MAP_VALUE_RESOLUTION");
-    });
-
-    it("should return error result for empty map name", () => {
-      const schema: SchemaObject = {
-        type: "object",
-        additionalProperties: { type: "string" },
-      };
-
-      const context: VisitorContext = {
-        documentPath: ["components", "schemas", ""],
-        rootSegment: "components",
-      };
-
-      const traversalResult: AdditionalPropertiesTraversalResult = {
-        type: "string",
-        models: [],
-      };
-
-      const result = transformMap(schema, context, traversalResult);
-
-      expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
-      expect(result.error?.code).toBe("INVALID_MAP_NAME");
     });
   });
 }

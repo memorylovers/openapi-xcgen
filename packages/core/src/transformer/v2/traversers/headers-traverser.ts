@@ -110,14 +110,6 @@ export function traverseHeaders(
     // スキーマを訪問
     const result = visitSchema(header.schema, schemaContext);
 
-    if (!result.type) {
-      const referencePath = buildReferencePath(schemaContext.documentPath);
-      consola.warn(
-        `Failed to resolve header schema for ${headerName}: ${referencePath}`,
-      );
-      return; // このヘッダーはスキップ
-    }
-
     visitedHeaders.push({
       name: headerName,
       type: result.type,
@@ -334,30 +326,6 @@ if (import.meta.vitest) {
 
       expect(result.headers).toEqual([]);
       expect(mockVisitSchema).not.toHaveBeenCalled();
-    });
-
-    it("should skip header when schema resolution fails", () => {
-      const mockVisitSchema = vi.fn().mockReturnValue({
-        type: null,
-        models: [],
-      });
-
-      const headers = {
-        "X-Invalid": {
-          schema: { type: "invalid" as const },
-        },
-      } as any;
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "get", "responses", "200"],
-        rootSegment: "paths",
-      };
-
-      const result = traverseHeaders(headers, context, mockVisitSchema);
-
-      expect(result.headers).toEqual([]);
-      expect(result.childModels).toEqual([]);
-      expect(mockVisitSchema).toHaveBeenCalled();
     });
 
     it("should skip header reference", () => {
