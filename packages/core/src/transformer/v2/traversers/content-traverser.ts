@@ -169,7 +169,7 @@ if (import.meta.vitest) {
 
       const content = {
         "application/json": {
-          schema: { type: "string" },
+          schema: { type: "string" as const },
         },
       };
 
@@ -222,7 +222,7 @@ if (import.meta.vitest) {
           schema: { $ref: "#/components/schemas/User" },
         },
         "application/xml": {
-          schema: { type: "string" },
+          schema: { type: "string" as const },
         },
       };
 
@@ -254,9 +254,9 @@ if (import.meta.vitest) {
       const content = {
         "application/json": {
           schema: {
-            type: "object",
+            type: "object" as const,
             properties: {
-              name: { type: "string" },
+              name: { type: "string" as const },
             },
           },
         },
@@ -301,9 +301,9 @@ if (import.meta.vitest) {
 
       const content = {
         "application/json": {
-          schema: { type: "invalid" },
+          schema: { type: "invalid" as const },
         },
-      };
+      } as any;
 
       const context: VisitorContext = {
         documentPath: ["paths", "/users", "post", "requestBody"],
@@ -333,8 +333,8 @@ if (import.meta.vitest) {
       const content = {
         "application/json": {
           schema: {
-            type: "object",
-            properties: { nested: { type: "object" } },
+            type: "object" as const,
+            properties: { nested: { type: "object" as const } },
           },
         },
       };

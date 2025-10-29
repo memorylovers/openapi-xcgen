@@ -8,6 +8,7 @@
 
 import type {
   IRModel,
+  IRType,
   ReferenceObject,
   ResponseObject,
   SchemaObjectWithNullable,
@@ -27,7 +28,7 @@ import { traverseHeaders } from "./headers-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: unknown; models: IRModel[] };
+) => { type: IRType | null; models: IRModel[] };
 
 /**
  * responsesフィールド（ステータスコードとResponseObjectのマップ）を訪問

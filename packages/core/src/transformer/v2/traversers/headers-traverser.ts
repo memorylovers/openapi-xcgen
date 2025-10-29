@@ -183,7 +183,7 @@ if (import.meta.vitest) {
       const headers = {
         "X-Rate-Limit": {
           description: "Rate limit remaining",
-          schema: { type: "integer" },
+          schema: { type: "integer" as const },
         },
       };
 
@@ -234,11 +234,11 @@ if (import.meta.vitest) {
 
       const headers = {
         "X-Total-Count": {
-          schema: { type: "integer" },
+          schema: { type: "integer" as const },
         },
         "X-Request-Id": {
           description: "Request identifier",
-          schema: { type: "string" },
+          schema: { type: "string" as const },
         },
       };
 
@@ -270,7 +270,7 @@ if (import.meta.vitest) {
       const headers = {
         "X-API-Version": {
           deprecated: true,
-          schema: { type: "string" },
+          schema: { type: "string" as const },
         },
       };
 
@@ -297,7 +297,7 @@ if (import.meta.vitest) {
 
       const headers = {
         "X-Page-Size": {
-          schema: { type: "integer", default: 10 },
+          schema: { type: "integer" as const, default: 10 },
         },
       };
 
@@ -344,9 +344,9 @@ if (import.meta.vitest) {
 
       const headers = {
         "X-Invalid": {
-          schema: { type: "invalid" },
+          schema: { type: "invalid" as const },
         },
-      };
+      } as any;
 
       const context: VisitorContext = {
         documentPath: ["paths", "/users", "get", "responses", "200"],
@@ -396,8 +396,8 @@ if (import.meta.vitest) {
       const headers = {
         "X-Custom": {
           schema: {
-            type: "object",
-            properties: { field: { type: "string" } },
+            type: "object" as const,
+            properties: { field: { type: "string" as const } },
           },
         },
       };

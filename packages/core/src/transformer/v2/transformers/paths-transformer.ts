@@ -10,6 +10,7 @@ import type {
   IREndpoint,
   IRHttpMethod,
   IRModel,
+  ParameterObject,
   PathsObject,
 } from "../../../types";
 import type { VisitorContext } from "../../types";
@@ -99,7 +100,9 @@ export function transformPaths(
         pathTemplate,
         method,
         operationContext,
-        pathItem.parameters, // PathItem レベルのパラメータ
+        pathItem.parameters?.filter(
+          (p): p is ParameterObject => !("$ref" in p),
+        ), // PathItem レベルのパラメータ（ReferenceObjectを除外）
       );
 
       if (operationResult.endpoint) {

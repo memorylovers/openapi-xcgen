@@ -8,6 +8,7 @@
 import { consola } from "consola";
 import type {
   IRModel,
+  IRType,
   OperationObject,
   ParameterObject,
   ReferenceObject,
@@ -28,7 +29,7 @@ import { traverseResponses } from "./responses-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: unknown; models: IRModel[] };
+) => { type: IRType | null; models: IRModel[] };
 
 /**
  * OperationObjectを訪問し、parameters、requestBody、responsesを処理
@@ -71,10 +72,13 @@ export function traverseOperation(
   const allChildModels: IRModel[] = [];
 
   // 1. parametersを処理（PathItemとOperationレベルをマージ）
-  const mergedParameters = [
-    ...(pathItemParameters || []),
-    ...(operation.parameters || []),
-  ];
+  const filteredPathParams = (pathItemParameters || []).filter(
+    (p): p is ParameterObject => !("$ref" in p),
+  );
+  const filteredOpParams = (operation.parameters || []).filter(
+    (p): p is ParameterObject => !("$ref" in p),
+  );
+  const mergedParameters = [...filteredPathParams, ...filteredOpParams];
 
   let parametersResult = undefined;
   if (mergedParameters.length > 0) {
@@ -316,12 +320,13 @@ if (import.meta.vitest) {
         },
         responses: {
           "200": {
+            description: "Success",
             content: {
               "application/json": {
                 schema: {
-                  type: "object",
+                  type: "object" as const,
                   properties: {
-                    result: { type: "string" },
+                    result: { type: "string" as const },
                   },
                 },
               },

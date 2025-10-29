@@ -79,7 +79,7 @@ export function transformResponse(
   }
 
   // ResponseObjectとして処理
-  const responseObj = response as ResponseObject;
+  const responseObj = response;
 
   // IRResponseContentに変換
   const irContent: IRResponseContent[] | undefined =
