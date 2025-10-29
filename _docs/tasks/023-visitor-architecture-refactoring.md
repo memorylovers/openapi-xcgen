@@ -1,6 +1,6 @@
 # Task 023: Visitor Architecture Refactoring
 
-**Status**: ⏳ In Progress (Phase 1-4 ✅, Phase 5-9 Operation系 ✅)
+**Status**: ✅ Completed (Phase 1-9 完了、残存課題あり)
 **Priority**: High
 **Complexity**: High
 **Estimated Effort**: 3-5 days
@@ -856,31 +856,179 @@ export function isErrorResult(result: TransformResult): boolean {
                       └──────────────────┘        │
 ```
 
-### 次のステップ
+### Phase 5-9 完了報告（追加実装 - 2025-10-29）
 
-#### 短期（将来実装）
+**実装日**: 2025-10-29
+**commit**: 6446569
+**テスト**: 710件 全て成功 ✅
 
-1. **operation-transformerの完全実装**
-   - OperationTraversalResultの活用
-   - パラメータ統合モデルの生成
-   - RequestBody/Responseモデルの統合
-   - parameters/responsesフィールドの生成
+#### operation-transformerの完全実装
 
-2. **E2E tests with Operation endpoints**
-   - 実際のOpenAPI仕様でエンドポイント生成のテスト
+**operation-transformer.ts** (214行 → 608行):
 
-#### 長期（設計課題）
+1. **convertToIRParameter()** ヘルパー関数実装
+   - ParametersTraversalResultからIRParameterへの型変換
 
-1. **visitors/ ディレクトリの削除**
-   - v2アーキテクチャへの完全移行後
-   - 既存のvisitor呼び出しを全てv2に置換
+2. **Parameters処理の実装**
+   - parameter-aggregatorの統合
+   - 統合パラメータモデル生成 (例: `GetUsersIdParams`)
+   - IRRef参照または空配列を返す
 
-2. **v2/ → transformers/ リネーム**
-   - v2が正式版になった時点
+3. **RequestBody処理の実装**
+   - traversalResultからIRRequestBodyへの変換
+   - required、description、contentの処理
+   - 子モデルの収集
+
+4. **Responses処理の実装**
+   - traversalResultからIRResponse[]への変換
+   - 参照レスポンスとコンテンツレスポンスの処理
+   - headersの処理
+
+5. **子モデル収集の実装**
+   - traversalResult.childModelsの収集
+   - parameters/requestBody/responsesからのモデル収集
+
+6. **5つの新規テスト追加** (計9テスト)
+   - パラメータモデル生成テスト
+   - 空パラメータ処理テスト
+   - RequestBody処理テスト
+   - Responses処理テスト
+   - 子モデル収集テスト
+
+#### テスト更新
+
+**operation-dispatcher.ts** (5テスト):
+
+- スケルトン前提の期待値を実装後の正しい期待値に更新
+- パラメータモデル、RequestBodyモデル、Responseモデルの収集を検証
+
+**paths-transformer.ts** (2テスト):
+
+- モデル収集の期待値を更新
+
+#### コード品質改善
+
+- **index.ts**: ParameterTransformResult重複エクスポートを修正
+- **未使用インポート削除**: consola, buildInlineSchemaPath等
+- **responses-traverser.ts**: ResponsesObject型エイリアスを定義
+
+#### 成果
+
+- ✅ **3層アーキテクチャの完全稼働**: Dispatcher/Traverser/Transformer
+- ✅ **v2移行完了**: Schema系（Phase 1-4）+ Operation系（Phase 5-9）
+- ✅ **全テスト合格**: 710/710 tests passed
+- ✅ **operation-transformerの実装完成**: スケルトンから完全実装へ
+
+---
+
+## 残存課題（Phase 10以降）
+
+### 🔴 優先度: 高
+
+#### 1. TypeScript型エラーの修正（17件）
+
+**本番コード** (5件):
+
+- `paths-transformer.ts(102)`: pathItem.parameters の型不一致
+  - 問題: `(ReferenceObject | ParameterObject)[]` → `ParameterObject[]`
+  - 対策: ReferenceObjectのフィルタリングまたは解決処理を追加
+
+- `operation-traverser.ts(81)`: 同様のParameterObject型エラー
+
+- `operation-traverser.ts(103)`: VisitSchemaFn型不一致
+  - 問題: `{ type: unknown }` → `{ type: IRType | null }`
+  - 対策: schema-dispatcherの型定義を統一
+
+- `responses-traverser.ts(96, 103)`: VisitSchemaFn型エラー (2件)
+
+**テストコード** (12件):
+
+- `content-traverser.ts` (5件): テストモックのschema定義で `type: "string"` が型エラー
+- `headers-traverser.ts` (6件): 同様のschema型エラー
+- `operation-traverser.ts(318)`: ResponseObjectに `description` プロパティが必須だが欠落
+
+**推定作業時間**: 2-3時間
+
+**影響**:
+
+- 型安全性が担保されていない
+- 将来的なバグの温床になる可能性
+- 実行時エラーは発生しないが、TypeScriptの利点を活かせていない
+
+### 🟡 優先度: 中
+
+#### 2. ドキュメント更新
+
+**対象**:
+
+- `CLAUDE.md`: v2アーキテクチャの反映
+- アーキテクチャ図の追加
+  - 3層アーキテクチャの図解
+  - Dispatcher/Traverser/Transformerの役割説明
+- このタスクファイルの完了マーク更新
+
+**推定作業時間**: 1-2時間
+
+#### 3. 古いvisitors/ディレクトリの削除
+
+**現状**:
+
+- 32ファイルが残存
+- v2への移行は完了しているため、古いコードは不要
+
+**注意点**:
+
+- `transformer.ts` や `index.ts` がまだ古いvisitorをインポート・使用している可能性
+- 削除前に依存関係を確認
+
+**推定作業時間**: 1-2時間
+
+### ⚪ 優先度: 低
+
+#### 4. v2/ → transformers/ リネーム
+
+**タイミング**: v2が正式版になった時点で実施
+
+**作業内容**:
+
+- `v2/` ディレクトリを `transformers/` にリネーム
+- 全インポートパスの更新
+- テストの更新
+
+**推定作業時間**: 30分-1時間
+
+---
+
+## 統計
+
+- **TypeScript型エラー**: 17件 (テストコード: 12件、本番コード: 5件)
+- **テスト成功率**: 100% (710/710) ✅
+- **実装完了**: Phase 1-9 完了 ✅
+- **古いvisitorsファイル**: 32ファイル（削除待ち）
+- **未完了サブタスク**: 4件
+
+---
+
+## 次のアクション
+
+1. **TypeScript型エラー修正** (最優先)
+   - 本番コードの型エラー5件を修正
+   - テストコードの型エラー12件を修正
+   - 型安全性の担保
+
+2. **ドキュメント更新**
+   - CLAUDE.md更新
+   - アーキテクチャ図追加
+
+3. **クリーンアップ**
+   - 古いvisitors/削除
+   - v2/リネーム
 
 ---
 
 **Created**: 2025-10-27
 **Author**: AI Analysis
-**Last Updated**: 2025-10-28
+**Last Updated**: 2025-10-29
+**Phase 1-4 Completed**: 2025-10-27
 **Phase 5-9 Completed**: 2025-10-28
+**operation-transformer Completed**: 2025-10-29
