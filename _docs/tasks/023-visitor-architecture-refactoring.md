@@ -610,51 +610,216 @@ export function isErrorResult(result: TransformResult): boolean {
 
 ## 残存課題（Phase 10以降）
 
-### 🔴 優先度: 高
+詳細は下記「残存課題の再整理」セクションを参照してください。
 
-#### 1. TypeScript型エラーの修正（17件）
+---
 
-**本番コード** (5件):
+## 完了報告
 
-- `paths-transformer.ts(102)`: pathItem.parameters の型不一致
-  - 問題: `(ReferenceObject | ParameterObject)[]` → `ParameterObject[]`
-  - 対策: ReferenceObjectのフィルタリングまたは解決処理を追加
+### ✅ Phase 5-9 完了（2025-10-29）
 
-- `operation-traverser.ts(81)`: 同様のParameterObject型エラー
+**commit**: 6446569
 
-- `operation-traverser.ts(103)`: VisitSchemaFn型不一致
-  - 問題: `{ type: unknown }` → `{ type: IRType | null }`
-  - 対策: schema-dispatcherの型定義を統一
+**実装内容**:
 
-- `responses-traverser.ts(96, 103)`: VisitSchemaFn型エラー (2件)
+全てのoperation関連の変換処理をv2アーキテクチャに移行完了：
 
-**テストコード** (12件):
+1. **operation-transformer.ts**: スケルトン → フル実装
+2. **paths-transformer.ts**: 完全実装
+3. **responses-traverser.ts**: 実装完了
+4. **content-traverser.ts**: 実装完了
+5. **headers-traverser.ts**: 実装完了
+6. **parameters-traverser.ts**: 実装完了
+7. **parameter-aggregator.ts**: 実装完了
 
-- `content-traverser.ts` (5件): テストモックのschema定義で `type: "string"` が型エラー
-- `headers-traverser.ts` (6件): 同様のschema型エラー
-- `operation-traverser.ts(318)`: ResponseObjectに `description` プロパティが必須だが欠落
+**テスト結果**: 710/710 tests passed ✅
 
-**推定作業時間**: 2-3時間
+### ✅ TypeScript型エラー修正完了（2025-10-29）
 
-**影響**:
+**commit**: 7db2270
 
-- 型安全性が担保されていない
-- 将来的なバグの温床になる可能性
-- 実行時エラーは発生しないが、TypeScriptの利点を活かせていない
+**修正内容**:
+
+- 本番コード: 5箇所
+- テストコード: 12箇所
+- 合計: 17箇所の型エラーを修正
+
+**検証結果**:
+
+- pnpm typecheck: ✅ エラー0件
+- pnpm test: ✅ 710/710 tests passed
+
+---
+
+## 残存課題の再整理
+
+### 🔴 優先度: 高（即対応）
+
+#### 1. TypeScript型エラーの修正（17件）← ✅ **完了済み**
+
+#### 2. 冗長な型チェック・エラーハンドリングの削除 ← **NEW**
+
+**優先度**: High（現在のESLintエラーを含む）
+**推定時間**: 2-3時間
+
+##### 背景
+
+v2アーキテクチャ全体で約45箇所の冗長な型チェック・エラーハンドリングが発見されました。
+
+**設計原則**:
+
+- パーサー（swagger-parser）が型を保証
+- TypeScriptの型システムで入力を制限
+- YAGNI原則・型安全性に基づく設計
+
+##### 調査結果サマリー
+
+- **調査ファイル数**: 29件
+- **冗長なチェック発見**: 約45箇所
+- **削除推奨（高優先度）**: 18箇所
+- **要検討（グレーゾーン）**: 15箇所
+- **適切なエラーハンドリング（残す）**: 12箇所
+
+##### Phase 1: 高優先度削除（18箇所）
+
+###### 1.1 全transformer系の空文字列名チェック（7ファイル）
+
+**削除対象**:
+
+```typescript
+if (!name.trim()) {
+  return createErrorResult(
+    "Invalid XXX model name: empty or whitespace only",
+    "INVALID_XXX_NAME",
+    { context },
+  );
+}
+```
+
+**ファイル**:
+
+- `enum-transformer.ts:68-74`
+- `array-transformer.ts:45-52`
+- `map-transformer.ts:42-49`
+- `allof-transformer.ts:42-49`
+- `oneof-transformer.ts:58-65`
+- `anyof-transformer.ts:47-54`
+- `object-transformer.ts:64-71`
+
+**理由**: `getModelName(context)` は常に有効な文字列を返すべき。空文字列が返るのはバグ。
+
+###### 1.2 enum-transformer.tsの過剰チェック（3箇所）
+
+**削除対象**:
+
+```typescript
+// ① enum配列の存在チェック (76-83)
+if (!schema.enum) { ... }
+
+// ② enum配列の型チェック (85-92)
+if (!Array.isArray(schema.enum)) { ... }
+
+// ③ enum配列の空チェック (94-101)
+if (schema.enum.length === 0) { ... }
+```
+
+**理由**:
+
+- dispatcherの分岐で `schema.enum !== undefined` 保証済み
+- swagger-parserが配列型を保証
+- OpenAPIバリデーションで空配列は不正（パーサーがエラー）
+
+###### 1.3 parameter-transformer.tsのチェック（2箇所）
+
+**削除対象**:
+
+```typescript
+// ① schemaの存在チェック (57-64)
+if (!parameter.schema) { ... }
+
+// ② parameterInの検証 (79-86)
+const parameterIn = toIRParameterInType(parameter.in);
+if (!parameterIn) { ... }
+```
+
+**理由**:
+
+- swagger-parserが `schema` または `content` を必須として保証
+- `in` フィールドの値をパーサーが保証
+
+###### 1.4 traverser系のnullチェック（2箇所）- **現在のESLintエラー**
+
+**削除対象**:
+
+```typescript
+// content-traverser.ts:99-105
+if (!result.type) {
+  consola.warn(`Failed to resolve content schema...`);
+  return;
+}
+
+// headers-traverser.ts:同様
+```
+
+**理由**: mockで強制的に `type: null` を返すテストは無意味。
+
+**関連テスト削除**:
+
+- `"should skip mime type when schema resolution fails"`
+- `"should skip header when schema resolution fails"`
+
+##### Phase 2: テスト修正
+
+**削除対象のテストパターン**:
+
+1. `as any` を使った無効な型テスト
+2. 上記削除したチェックに対応するエラーケーステスト
+3. 空文字列名のテスト
+
+**推定削除テスト数**: 約20件
+
+##### Phase 3: グレーゾーンの検討（15箇所）
+
+以下は**要検討**（削除を急がない）:
+
+1. `array-traverser.ts:41-49` - itemsフィールドの存在チェック
+2. `composition-traverser.ts:38-47` - allOf/oneOf/anyOfの空配列チェック
+3. その他のtraverser系のnullチェック（子要素の変換失敗ハンドリング）
+
+**判断基準**:
+
+- swagger-parserの実際の動作を確認
+- E2Eテストで検証してから決定
+
+##### Phase 4: エラーハンドリングの統一
+
+traverser系の `consola.warn` を `createErrorResult` に統一:
+
+- エラー情報の構造化
+- 将来の厳格化に備える
+
+##### 削除による効果
+
+- ✅ **コード削減**: 約200行
+- ✅ **可読性向上**: 本質的なロジックに集中
+- ✅ **保守性向上**: 責任範囲の明確化
+- ✅ **ESLintエラー解消**: 2件
+- ✅ **テスト簡潔化**: 不要なエラーケーステスト削除
+
+##### リスク
+
+- ⚠️ swagger-parserへの依存増加
+- ⚠️ パーサーエラーメッセージの不明瞭性
+- ⚠️ 既存テストの一部が失敗する可能性
+
+##### 実行順序
+
+1. **Phase 1** (必須): 高優先度18箇所を削除
+2. **Phase 2** (必須): テスト修正・削除
+3. **Phase 3** (任意): グレーゾーン検討
+4. **Phase 4** (任意): エラーハンドリング統一
 
 ### 🟡 優先度: 中
-
-#### 2. ドキュメント更新
-
-**対象**:
-
-- `CLAUDE.md`: v2アーキテクチャの反映
-- アーキテクチャ図の追加
-  - 3層アーキテクチャの図解
-  - Dispatcher/Traverser/Transformerの役割説明
-- このタスクファイルの完了マーク更新
-
-**推定作業時間**: 1-2時間
 
 #### 3. 古いvisitors/ディレクトリの削除
 
@@ -670,9 +835,21 @@ export function isErrorResult(result: TransformResult): boolean {
 
 **推定作業時間**: 1-2時間
 
+#### 4. ドキュメント更新
+
+**対象**:
+
+- `CLAUDE.md`: v2アーキテクチャの反映
+- アーキテクチャ図の追加
+  - 3層アーキテクチャの図解
+  - Dispatcher/Traverser/Transformerの役割説明
+- このタスクファイルの完了マーク更新
+
+**推定作業時間**: 1-2時間
+
 ### ⚪ 優先度: 低
 
-#### 4. v2/ → transformers/ リネーム
+#### 5. v2/ → transformers/ リネーム
 
 **タイミング**: v2が正式版になった時点で実施
 
@@ -683,33 +860,6 @@ export function isErrorResult(result: TransformResult): boolean {
 - テストの更新
 
 **推定作業時間**: 30分-1時間
-
----
-
-## 統計
-
-- **TypeScript型エラー**: 17件 (テストコード: 12件、本番コード: 5件)
-- **テスト成功率**: 100% (710/710) ✅
-- **実装完了**: Phase 1-9 完了 ✅
-- **古いvisitorsファイル**: 32ファイル（削除待ち）
-- **未完了サブタスク**: 4件
-
----
-
-## 次のアクション
-
-1. **TypeScript型エラー修正** (最優先)
-   - 本番コードの型エラー5件を修正
-   - テストコードの型エラー12件を修正
-   - 型安全性の担保
-
-2. **ドキュメント更新**
-   - CLAUDE.md更新
-   - アーキテクチャ図追加
-
-3. **クリーンアップ**
-   - 古いvisitors/削除
-   - v2/リネーム
 
 ---
 
