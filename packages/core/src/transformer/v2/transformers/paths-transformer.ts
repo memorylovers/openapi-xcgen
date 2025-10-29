@@ -179,8 +179,9 @@ if (import.meta.vitest) {
       expect(result.endpoints[0].method).toBe("get");
       expect(result.endpoints[1].path).toBe("/users/{id}");
       expect(result.endpoints[1].method).toBe("get");
-      // 現時点ではoperation-transformerがスケルトンなので、modelsは空
-      expect(result.models).toEqual([]);
+      // Parameter model should be generated (GetUsersIdParams)
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("parameter");
     });
 
     it("should handle multiple HTTP methods on same path", () => {
@@ -223,8 +224,8 @@ if (import.meta.vitest) {
       expect(result.endpoints[0].method).toBe("get");
       expect(result.endpoints[1].path).toBe("/users");
       expect(result.endpoints[1].method).toBe("post");
-      // 現時点ではoperation-transformerがスケルトンなので、modelsは空
-      expect(result.models).toEqual([]);
+      // RequestBody models should be collected (inline object schema + child models)
+      expect(result.models.length).toBeGreaterThan(0);
     });
 
     it("should skip undefined path items", () => {

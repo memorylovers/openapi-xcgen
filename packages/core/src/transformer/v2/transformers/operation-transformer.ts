@@ -3,8 +3,6 @@
  *
  * OperationObjectをIREndpointに変換します。
  * parameters, requestBody, responsesの処理はそれぞれのtraverserに委譲します。
- *
- * このファイルはPhase 6で骨格のみ作成し、Phase 7でtraverserと統合します。
  */
 
 import { consola } from "consola";
@@ -12,11 +10,24 @@ import type {
   IREndpoint,
   IRHttpMethod,
   IRModel,
+  IRParameter,
+  IRRef,
+  IRRequestBody,
+  IRRequestContent,
+  IRResponse,
+  IRResponseContent,
+  IRResponseHeader,
+  IRType,
+  MimeType,
   OperationObject,
   ParameterObject,
 } from "../../../types";
 import type { VisitorContext } from "../../types";
-import type { OperationTraversalResult } from "../types";
+import { aggregateParameters } from "../aggregators/parameter-aggregator";
+import type {
+  OperationTraversalResult,
+  ParametersTraversalResult,
+} from "../types";
 
 /**
  * Operation変換の結果
@@ -29,6 +40,29 @@ export interface OperationTransformResult {
 }
 
 /**
+ * ParametersTraversalResultのパラメータをIRParameterに変換
+ *
+ * @param param - ParametersTraversalResultのパラメータ
+ * @returns IRParameter
+ */
+function convertToIRParameter(
+  param: ParametersTraversalResult["parameters"][number],
+): IRParameter {
+  return {
+    name: param.name,
+    in: param.in,
+    type: param.type,
+    ...(param.required && { required: true }),
+    ...(param.nullable && { nullable: true }),
+    ...(param.description && { description: param.description }),
+    ...(param.defaultValue !== undefined && {
+      defaultValue: param.defaultValue,
+    }),
+    ...(param.deprecated && { deprecated: true }),
+  };
+}
+
+/**
  * OperationObjectをIREndpointに変換
  *
  * @param operation - OperationObject
@@ -36,7 +70,7 @@ export interface OperationTransformResult {
  * @param method - HTTPメソッド
  * @param context - Visitorコンテキスト
  * @param pathItemParameters - PathItemレベルのパラメータ（オプション）
- * @param traversalResult - operation-traverserからの結果（Phase 7で実装）
+ * @param traversalResult - operation-traverserからの結果
  * @returns OperationTransformResult
  *
  * @example OpenAPI YAML
@@ -66,21 +100,135 @@ export function transformOperation(
   pathTemplate: string,
   method: IRHttpMethod,
   context: VisitorContext,
-  pathItemParameters?: ParameterObject[],
+  _pathItemParameters?: ParameterObject[],
   traversalResult?: OperationTraversalResult,
 ): OperationTransformResult {
   consola.debug(
     `Transforming operation: ${method.toUpperCase()} ${pathTemplate}`,
   );
 
-  // TODO: Phase 7で実装
-  // 1. parametersをマージ（PathItemとOperation）
-  // 2. parameter-aggregatorでパラメータ統合モデルを生成
-  // 3. requestBodyを変換
-  // 4. responsesを変換
-  // 5. すべてを統合してIREndpointを生成
+  const allModels: IRModel[] = [];
 
-  // 仮実装：基本情報のみを使用
+  // ========================================
+  // 1. Parametersの処理
+  // ========================================
+  let endpointParameters: IRType | IRParameter[];
+
+  if (traversalResult?.parametersResult) {
+    // IRParameterに変換
+    const irParameters: IRParameter[] =
+      traversalResult.parametersResult.parameters.map(convertToIRParameter);
+
+    // parameter-aggregatorで統合モデルを生成
+    const aggregationResult = aggregateParameters(
+      irParameters,
+      context,
+      pathTemplate,
+      method,
+    );
+
+    if (aggregationResult.model) {
+      // 統合モデルが生成された場合
+      allModels.push(aggregationResult.model);
+      endpointParameters = aggregationResult.reference!;
+    } else {
+      // パラメータがない場合
+      endpointParameters = [];
+    }
+
+    // traverserから収集された子モデルを追加
+    allModels.push(...traversalResult.parametersResult.childModels);
+  } else {
+    endpointParameters = [];
+  }
+
+  // ========================================
+  // 2. RequestBodyの処理
+  // ========================================
+  let endpointRequestBody: IRRequestBody | undefined;
+
+  if (traversalResult?.requestBodyResult) {
+    const { required, description, content } =
+      traversalResult.requestBodyResult;
+
+    // IRRequestContentに変換
+    const irRequestContent: IRRequestContent[] = content.content.map((c) => ({
+      mimeType: c.mimeType as MimeType,
+      schema: c.schema,
+    }));
+
+    endpointRequestBody = {
+      kind: "content",
+      ...(required && { required: true }),
+      ...(description && { description }),
+      content: irRequestContent,
+    };
+
+    // traverserから収集された子モデルを追加
+    allModels.push(...content.childModels);
+  }
+
+  // ========================================
+  // 3. Responsesの処理
+  // ========================================
+  const endpointResponses: IRResponse[] = [];
+
+  if (traversalResult?.responsesResult) {
+    for (const response of traversalResult.responsesResult.responses) {
+      if (response.ref) {
+        // 参照レスポンス
+        const ref: IRRef = {
+          kind: "ref",
+          name: response.ref,
+        };
+        endpointResponses.push({
+          kind: "ref",
+          statusCode: response.statusCode,
+          ref,
+        });
+      } else {
+        // コンテンツレスポンス
+        const irResponseContent: IRResponseContent[] | undefined =
+          response.content?.map((c) => ({
+            mimeType: c.mimeType as MimeType,
+            schema: c.schema,
+          }));
+
+        const irResponseHeaders: IRResponseHeader[] | undefined =
+          response.headers?.map((h) => ({
+            name: h.name,
+            type: h.type,
+            ...(h.description && { description: h.description }),
+            ...(h.defaultValue !== undefined && {
+              defaultValue: h.defaultValue,
+            }),
+            ...(h.deprecated && { deprecated: true }),
+          }));
+
+        endpointResponses.push({
+          kind: "content",
+          statusCode: response.statusCode,
+          ...(response.description && { description: response.description }),
+          ...(irResponseContent && { content: irResponseContent }),
+          ...(irResponseHeaders && { headers: irResponseHeaders }),
+        });
+      }
+    }
+
+    // traverserから収集された子モデルを追加
+    allModels.push(...traversalResult.responsesResult.childModels);
+  }
+
+  // ========================================
+  // 4. 全体の子モデルを追加
+  // ========================================
+  if (traversalResult?.childModels) {
+    allModels.push(...traversalResult.childModels);
+  }
+
+  // ========================================
+  // 5. IREndpointを生成
+  // ========================================
   const endpoint: IREndpoint = {
     path: pathTemplate,
     method,
@@ -89,13 +237,14 @@ export function transformOperation(
     ...(operation.description && { description: operation.description }),
     ...(operation.deprecated && { deprecated: true }),
     tags: operation.tags || [],
-    parameters: [], // TODO: Phase 7で実装
-    responses: [], // TODO: Phase 7で実装
+    parameters: endpointParameters,
+    ...(endpointRequestBody && { requestBody: endpointRequestBody }),
+    responses: endpointResponses,
   };
 
   return {
     endpoint,
-    models: [], // TODO: Phase 7で実装
+    models: allModels,
   };
 }
 
@@ -203,11 +352,262 @@ if (import.meta.vitest) {
       expect(result.endpoint?.tags).toEqual([]);
     });
 
-    // TODO: Phase 7で追加のテストを実装
-    // - parametersの処理
-    // - requestBodyの処理
-    // - responsesの処理
-    // - パラメータ統合モデルの生成
-    // - 子モデルの収集
+    // ========================================
+    // traversalResult を使用したテスト
+    // ========================================
+    it("should process parameters and generate parameter model", () => {
+      const operation: OperationObject = {
+        summary: "Get user by ID",
+        operationId: "getUserById",
+        responses: {
+          "200": {
+            description: "Success",
+          },
+        },
+      };
+
+      const traversalResult: OperationTraversalResult = {
+        parametersResult: {
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              type: "string",
+              required: true,
+            },
+          ],
+          childModels: [],
+        },
+        childModels: [],
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users/{id}", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/users/{id}",
+        "get",
+        context,
+        undefined,
+        traversalResult,
+      );
+
+      // 統合モデルが生成される
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("parameter");
+      if (result.models[0].kind === "parameter") {
+        expect(result.models[0].name).toBe("GetUsersIdParams");
+      }
+
+      // endpoint.parametersは参照になる
+      expect(result.endpoint?.parameters).toEqual({
+        kind: "ref",
+        name: "#/paths/::users::{id}/get/GetUsersIdParams",
+      });
+    });
+
+    it("should handle empty parameters", () => {
+      const operation: OperationObject = {
+        responses: {
+          "200": {
+            description: "Success",
+          },
+        },
+      };
+
+      const traversalResult: OperationTraversalResult = {
+        childModels: [],
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/users",
+        "get",
+        context,
+        undefined,
+        traversalResult,
+      );
+
+      // パラメータモデルは生成されない
+      expect(result.models).toHaveLength(0);
+
+      // endpoint.parametersは空配列
+      expect(result.endpoint?.parameters).toEqual([]);
+    });
+
+    it("should process requestBody", () => {
+      const operation: OperationObject = {
+        summary: "Create user",
+        responses: {
+          "201": {
+            description: "Created",
+          },
+        },
+      };
+
+      const traversalResult: OperationTraversalResult = {
+        requestBodyResult: {
+          required: true,
+          description: "User data",
+          content: {
+            content: [
+              {
+                mimeType: "application/json",
+                schema: { kind: "ref", name: "#/test" },
+              },
+            ],
+            childModels: [],
+            requiresSpecialModel: false,
+          },
+        },
+        childModels: [],
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "post"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/users",
+        "post",
+        context,
+        undefined,
+        traversalResult,
+      );
+
+      expect(result.endpoint?.requestBody).toBeDefined();
+      if (
+        result.endpoint?.requestBody &&
+        result.endpoint.requestBody.kind === "content"
+      ) {
+        expect(result.endpoint.requestBody.required).toBe(true);
+        expect(result.endpoint.requestBody.description).toBe("User data");
+        expect(result.endpoint.requestBody.content).toHaveLength(1);
+      }
+    });
+
+    it("should process responses", () => {
+      const operation: OperationObject = {
+        summary: "Get user",
+        responses: {},
+      };
+
+      const traversalResult: OperationTraversalResult = {
+        responsesResult: {
+          responses: [
+            {
+              statusCode: "200",
+              description: "Success",
+              content: [
+                {
+                  mimeType: "application/json",
+                  schema: "string",
+                },
+              ],
+            },
+          ],
+          childModels: [],
+        },
+        childModels: [],
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users/{id}", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/users/{id}",
+        "get",
+        context,
+        undefined,
+        traversalResult,
+      );
+
+      expect(result.endpoint?.responses).toHaveLength(1);
+      expect(result.endpoint?.responses[0].kind).toBe("content");
+      if (result.endpoint?.responses[0].kind === "content") {
+        expect(result.endpoint.responses[0].statusCode).toBe("200");
+        expect(result.endpoint.responses[0].description).toBe("Success");
+      }
+    });
+
+    it("should collect all child models", () => {
+      const operation: OperationObject = {
+        summary: "Create item",
+        responses: {},
+      };
+
+      const mockParamModel: IRModel = {
+        kind: "array",
+        name: "Tags",
+        referencePath: "#/param",
+        itemType: "string",
+      };
+
+      const mockRequestModel: IRModel = {
+        kind: "object",
+        name: "RequestModel",
+        referencePath: "#/request",
+        properties: [],
+      };
+
+      const mockResponseModel: IRModel = {
+        kind: "object",
+        name: "ResponseModel",
+        referencePath: "#/response",
+        properties: [],
+      };
+
+      const traversalResult: OperationTraversalResult = {
+        parametersResult: {
+          parameters: [],
+          childModels: [mockParamModel],
+        },
+        requestBodyResult: {
+          content: {
+            content: [],
+            childModels: [mockRequestModel],
+            requiresSpecialModel: false,
+          },
+        },
+        responsesResult: {
+          responses: [],
+          childModels: [mockResponseModel],
+        },
+        childModels: [],
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/items", "post"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/items",
+        "post",
+        context,
+        undefined,
+        traversalResult,
+      );
+
+      // すべての子モデルが収集される
+      expect(result.models).toHaveLength(3);
+      expect(result.models).toContain(mockParamModel);
+      expect(result.models).toContain(mockRequestModel);
+      expect(result.models).toContain(mockResponseModel);
+    });
   });
 }

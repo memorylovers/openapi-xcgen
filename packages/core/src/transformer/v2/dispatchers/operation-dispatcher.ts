@@ -135,8 +135,9 @@ if (import.meta.vitest) {
 
       expect(result.endpoint).not.toBeNull();
       expect(result.endpoint?.operationId).toBe("getUserById");
-      // Parameters are collected in traversalResult and will be used by transformer
-      expect(result.models).toEqual([]); // No complex models generated
+      // Parameter model should be generated (GetUsersIdParams)
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("parameter");
     });
 
     it("should merge pathItem and operation level parameters", () => {
@@ -178,8 +179,9 @@ if (import.meta.vitest) {
       );
 
       expect(result.endpoint).not.toBeNull();
-      // Both parameters should be processed by traverser
-      expect(result.models).toEqual([]);
+      // Unified parameter model should be generated (GetUsersIdParams)
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("parameter");
     });
 
     it("should process operation with requestBody", () => {
@@ -215,9 +217,8 @@ if (import.meta.vitest) {
 
       expect(result.endpoint).not.toBeNull();
       expect(result.endpoint?.summary).toBe("Create user");
-      // TODO: When operation-transformer uses traversalResult, models will be collected
-      // For now, transformer returns empty models array (skeleton implementation)
-      expect(result.models).toEqual([]);
+      // RequestBody models should be collected (inline object schema + child models)
+      expect(result.models.length).toBeGreaterThan(0);
     });
 
     it("should process operation with response containing schema", () => {
@@ -253,8 +254,8 @@ if (import.meta.vitest) {
       );
 
       expect(result.endpoint).not.toBeNull();
-      // TODO: When operation-transformer uses traversalResult, models will be collected
-      expect(result.models).toEqual([]);
+      // Response models should be collected (inline object schema + child models)
+      expect(result.models.length).toBeGreaterThan(0);
     });
 
     it("should collect all models from complex operation", () => {
@@ -320,12 +321,12 @@ if (import.meta.vitest) {
       expect(result.endpoint).not.toBeNull();
       expect(result.endpoint?.operationId).toBe("updateUser");
 
-      // TODO: When operation-transformer uses traversalResult, models will be collected from:
-      // 1. tags array parameter
+      // Models should be collected from:
+      // 1. Parameter model (GetUsersIdParams with tags array)
       // 2. requestBody object
       // 3. response object
-      // For now, transformer returns empty models array (skeleton implementation)
-      expect(result.models).toEqual([]);
+      // 4. Child models from nested structures
+      expect(result.models.length).toBeGreaterThan(0);
     });
 
     it("should handle deprecated operation", () => {

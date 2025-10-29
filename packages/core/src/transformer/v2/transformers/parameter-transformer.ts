@@ -5,7 +5,6 @@
  * スキーマの変換はschema-dispatcherに委譲します。
  */
 
-import { consola } from "consola";
 import type {
   IRParameter,
   ParameterObject,
@@ -13,8 +12,6 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import {
-  buildInlineSchemaPath,
-  buildParameterSchemaModelName,
   extractExtensions,
   extractValidation,
   isNullable,
@@ -148,7 +145,7 @@ export function transformParameter(
 
 // === in-source testing ===
 if (import.meta.vitest) {
-  const { describe, it, expect, vi } = import.meta.vitest;
+  const { describe, it, expect } = import.meta.vitest;
 
   describe("transformParameter", () => {
     it("should handle path parameter", () => {

@@ -6,16 +6,16 @@
  * content処理はcontent-traverserに、headers処理はheaders-traverserに委譲します。
  */
 
-import { consola } from "consola";
 import type {
   IRModel,
   ReferenceObject,
   ResponseObject,
-  ResponsesObject,
   SchemaObjectWithNullable,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { buildReferencePath } from "../../helpers";
+
+// Type alias for responses dictionary
+type ResponsesObject = Record<string, ResponseObject | ReferenceObject>;
 import type { VisitorContext } from "../../types";
 import type { ResponsesTraversalResult } from "../types";
 import { traverseContent } from "./content-traverser";

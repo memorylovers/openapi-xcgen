@@ -5,7 +5,6 @@
  * contentの処理はcontent-traverserに、headersの処理はheaders-traverserに委譲します。
  */
 
-import { consola } from "consola";
 import type {
   IRModel,
   IRRef,
