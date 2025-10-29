@@ -73,7 +73,10 @@ export function transformResponse(
     };
 
     return {
-      type: irResponse as unknown as TransformResult["type"],
+      // NOTE: IRResponseはIRTypeに含まれないが、Operation系の特別な型として扱う
+      // TransformResultインターフェースは汎用的なため、型の妥協が必要
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type: irResponse as any,
       models: [],
     };
   }
@@ -120,7 +123,10 @@ export function transformResponse(
   ];
 
   return {
-    type: irResponse as unknown as TransformResult["type"],
+    // NOTE: IRResponseはIRTypeに含まれないが、Operation系の特別な型として扱う
+    // TransformResultインターフェースは汎用的なため、型の妥協が必要
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: irResponse as any,
     models: childModels,
   };
 }
@@ -314,7 +320,8 @@ if (import.meta.vitest) {
         headersResult,
       );
 
-      const responseType = result.type as unknown as IRResponse;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const responseType = result.type as any as IRResponse;
       expect(responseType.kind).toBe("content");
       if (responseType.kind === "content") {
         expect(responseType.headers).toHaveLength(1);

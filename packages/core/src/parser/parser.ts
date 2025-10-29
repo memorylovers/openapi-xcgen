@@ -44,8 +44,14 @@ export async function parse(
     const api = await swaggerParser.bundle(resolvedPath);
 
     // Check OpenAPI version
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const openapiVersion = (api as any).openapi;
+    // swagger-parserの型定義が不完全なため、型ガードを使用
+    const openapiVersion =
+      typeof api === "object" &&
+      api !== null &&
+      "openapi" in api &&
+      typeof api.openapi === "string"
+        ? api.openapi
+        : undefined;
 
     // Ensure it's OpenAPI 3.x
     if (!openapiVersion || !openapiVersion.startsWith("3.")) {

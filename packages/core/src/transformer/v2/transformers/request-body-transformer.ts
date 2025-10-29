@@ -62,7 +62,10 @@ export function transformRequestBody(
     };
 
     return {
-      type: irRequestBody as unknown as TransformResult["type"],
+      // NOTE: IRRequestBodyはIRTypeに含まれないが、Operation系の特別な型として扱う
+      // TransformResultインターフェースは汎用的なため、型の妥協が必要
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type: irRequestBody as any,
       models: [],
     };
   }
@@ -98,7 +101,10 @@ export function transformRequestBody(
   };
 
   return {
-    type: irRequestBody as unknown as TransformResult["type"],
+    // NOTE: IRRequestBodyはIRTypeに含まれないが、Operation系の特別な型として扱う
+    // TransformResultインターフェースは汎用的なため、型の妥協が必要
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: irRequestBody as any,
     models: contentResult.childModels,
   };
 }

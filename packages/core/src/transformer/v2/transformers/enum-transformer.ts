@@ -64,6 +64,42 @@ export function transformEnum(
   // コンテキストからモデル名を取得
   const name = getModelName(context);
 
+  // 名前の妥当性チェック
+  if (!name.trim()) {
+    return createErrorResult(
+      "Invalid enum name: empty or whitespace only",
+      "INVALID_ENUM_NAME",
+      { context },
+    );
+  }
+
+  // enum配列のチェック
+  if (!schema.enum) {
+    return createErrorResult(
+      `Missing enum array for ${name}`,
+      "MISSING_ENUM_ARRAY",
+      { name, context },
+    );
+  }
+
+  // enum配列が配列でない場合
+  if (!Array.isArray(schema.enum)) {
+    return createErrorResult(
+      `Invalid enum type for ${name}: not an array`,
+      "INVALID_ENUM_TYPE",
+      { name, context },
+    );
+  }
+
+  // enum配列が空の場合
+  if (schema.enum.length === 0) {
+    return createErrorResult(
+      `Empty enum array for ${name}`,
+      "EMPTY_ENUM_ARRAY",
+      { name, context },
+    );
+  }
+
   // NOTE: TypeSpecは常にtypeを明示的に出力するため、
   // typeが未定義の場合はエラーとして扱う。
   // 手書きOpenAPIで型推論が必要な場合（例: enum: [1,2,3]のみ）は
@@ -214,6 +250,58 @@ if (import.meta.vitest) {
       ]);
     });
 
+    it("should return error result for schema without enum array", () => {
+      const schema: SchemaObject = {
+        type: "string",
+        minLength: 3,
+        maxLength: 50,
+      };
+
+      const result = transformEnum(schema, {
+        documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
+      });
+
+      expect(result.type).toBeNull();
+      expect(result.models).toEqual([]);
+      expect(result.error).toBeDefined();
+      expect(result.error?.code).toBe("MISSING_ENUM_ARRAY");
+    });
+
+    it("should warn and return error result for invalid enum type", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      // enum配列が空の場合
+      const emptySchema: SchemaObject = {
+        type: "string",
+        enum: [],
+      };
+
+      const emptyResult = transformEnum(emptySchema, {
+        documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
+      });
+      expect(emptyResult.type).toBeNull();
+      expect(emptyResult.models).toEqual([]);
+      expect(emptyResult.error?.code).toBe("EMPTY_ENUM_ARRAY");
+
+      // enum配列でない場合
+      const invalidSchema = {
+        type: "string",
+        enum: "not-an-array",
+      } as unknown as SchemaObject;
+
+      const invalidResult = transformEnum(invalidSchema, {
+        documentPath: ["components", "schemas", "Status"],
+        rootSegment: "components",
+      });
+      expect(invalidResult.type).toBeNull();
+      expect(invalidResult.models).toEqual([]);
+      expect(invalidResult.error?.code).toBe("INVALID_ENUM_TYPE");
+
+      warnSpy.mockRestore();
+    });
+
     it("should return error result when type is missing", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
@@ -230,6 +318,46 @@ if (import.meta.vitest) {
       expect(result.type).toBeNull();
       expect(result.models).toEqual([]);
       expect(result.error?.code).toBe("INVALID_ENUM_SCHEMA_TYPE");
+
+      warnSpy.mockRestore();
+    });
+
+    it("should return error result for empty enum name", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const schema: SchemaObject = {
+        type: "string",
+        enum: ["a", "b", "c"],
+      };
+
+      const result = transformEnum(schema, {
+        documentPath: ["components", "schemas", ""],
+        rootSegment: "components",
+      });
+
+      expect(result.type).toBeNull();
+      expect(result.models).toEqual([]);
+      expect(result.error?.code).toBe("INVALID_ENUM_NAME");
+
+      warnSpy.mockRestore();
+    });
+
+    it("should return error result for whitespace-only enum name", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const schema: SchemaObject = {
+        type: "string",
+        enum: ["x", "y", "z"],
+      };
+
+      const result = transformEnum(schema, {
+        documentPath: ["components", "schemas", "   "],
+        rootSegment: "components",
+      });
+
+      expect(result.type).toBeNull();
+      expect(result.models).toEqual([]);
+      expect(result.error?.code).toBe("INVALID_ENUM_NAME");
 
       warnSpy.mockRestore();
     });

@@ -228,8 +228,10 @@ export interface TransformResult {
 
 - swagger-parserが入力データを検証・保証
 - TypeScriptの型システムで不正な値を排除
-- YAGNI原則: 実行されないエラーハンドリングは実装しない
-- Trust the types: 型が正しいと言えば正しい
+- **Trust the types**: 型が安全を保証している場合は追加チェック不要
+- **型が `undefined` の可能性を示す場合はチェックが必要** - TypeScriptの型システムを無視しない
+- YAGNI原則: 型システムが保証する範囲では追加チェック不要（型システムが保証しない範囲は必要）
+- **非null assertion (`!`) の禁止**: 型システムを無視する危険な回避策
 
 **責務分離**:
 
@@ -243,31 +245,25 @@ export interface TransformResult {
 
 ### 🟡 優先度: 中
 
-#### 1. グレーゾーンの判断（15箇所）← **保持決定**
+#### 1. 本当に冗長なエラーハンドリングの精査（今後の課題）
 
-**判断**: 以下のチェックは**削除せず保持**
+**現状**: 現在のエラーハンドリングは全て適切に機能している
 
-**理由**:
+**検討が必要な項目**:
 
-- これらは「事前の型チェック」ではなく「実際の変換失敗のエラーハンドリング」
-- swagger-parserは**入力**を保証するが、**変換ロジックのバグ**は保証しない
-- 実行時エラーを防ぐための防御的プログラミングとして適切
+以下のようなケースのみ「冗長」の可能性がある：
 
-**保持箇所**:
+1. **機能制限の警告** - `additionalProperties: true` などの未サポート機能の通知
+2. **デバッグログ** - 未実装機能の通知（`consola.debug`）
+3. **型システムが明らかに保証しているケース** - 重複チェック
 
-1. `array-traverser.ts` - itemsフィールドの存在チェック
-2. `composition-traverser.ts` - allOf/oneOf/anyOfの空配列チェック
-3. traverser系のnullチェック（子要素の変換失敗ハンドリング）
+**重要な原則**:
 
-**例**:
+- TypeScriptが `undefined` の可能性を示す場合、チェックは必須
+- 非null assertion (`!`) は型システムを無視する危険な回避策として禁止
+- エラーハンドリングの削除は、型定義の改善が前提
 
-```typescript
-// 変換失敗のエラーハンドリング（保持）
-if (!itemResult.type) {
-  consola.warn(`Failed to resolve array item type: ...`);
-  return { itemType: null, models: [] };
-}
-```
+**実施タイミング**: 型定義の見直しと並行して実施
 
 #### 2. 古いvisitors/ディレクトリの削除
 
