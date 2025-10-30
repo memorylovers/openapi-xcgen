@@ -10,12 +10,19 @@ import { consola } from "consola";
 import type {
   IRModel,
   IRType,
+  MimeType,
   ReferenceObject,
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../../types";
 import { buildReferencePath } from "../../helpers";
-import type { VisitorContext } from "../../types";
+import type {
+  ComponentsRequestBodyContext,
+  ComponentsResponseContext,
+  PathsRequestBodyContext,
+  PathsResponseContext,
+  VisitorContext,
+} from "../../types";
 import type { ContentTraversalResult } from "../types";
 
 /**
@@ -88,10 +95,60 @@ export function traverseContent(
     }
 
     // スキーマコンテキストを作成
-    const schemaContext: VisitorContext = {
-      documentPath: [...context.documentPath, "content", mimeType, "schema"],
-      rootSegment: context.rootSegment,
-    };
+    // requestBody内のスキーマの場合はRequestBodyContextとして作成
+    let schemaContext: VisitorContext;
+    if (
+      context.documentPath.includes("requestBody") &&
+      context.rootSegment === "paths"
+    ) {
+      schemaContext = {
+        kind: "requestBody",
+        documentPath: [...context.documentPath, "content", mimeType, "schema"],
+        rootSegment: "paths",
+        contentType: mimeType as MimeType,
+        schemaPath: ["content", mimeType, "schema"],
+      } as PathsRequestBodyContext;
+    } else if (
+      context.documentPath.includes("requestBody") &&
+      context.rootSegment === "components"
+    ) {
+      schemaContext = {
+        kind: "componentsRequestBody",
+        documentPath: [...context.documentPath, "content", mimeType, "schema"],
+        rootSegment: "components",
+        contentType: mimeType as MimeType,
+        schemaPath: ["content", mimeType, "schema"],
+      } as ComponentsRequestBodyContext;
+    } else if (
+      context.documentPath.some((p) => p === "responses") &&
+      context.rootSegment === "paths"
+    ) {
+      // response内のスキーマの場合はResponseContextとして作成
+      schemaContext = {
+        kind: "response",
+        documentPath: [...context.documentPath, "content", mimeType, "schema"],
+        rootSegment: "paths",
+        contentType: mimeType as MimeType,
+        schemaPath: ["content", mimeType, "schema"],
+      } as PathsResponseContext;
+    } else if (
+      context.documentPath.some((p) => p === "responses") &&
+      context.rootSegment === "components"
+    ) {
+      schemaContext = {
+        kind: "componentsResponse",
+        documentPath: [...context.documentPath, "content", mimeType, "schema"],
+        rootSegment: "components",
+        contentType: mimeType as MimeType,
+        schemaPath: ["content", mimeType, "schema"],
+      } as ComponentsResponseContext;
+    } else {
+      // その他の場合は基本的なVisitorContext
+      schemaContext = {
+        documentPath: [...context.documentPath, "content", mimeType, "schema"],
+        rootSegment: context.rootSegment,
+      };
+    }
 
     // スキーマを訪問
     const result = visitSchema(schema, schemaContext);
@@ -191,6 +248,7 @@ if (import.meta.vitest) {
       expect(mockVisitSchema).toHaveBeenCalledWith(
         { type: "string" },
         {
+          kind: "requestBody",
           documentPath: [
             "paths",
             "/users",
@@ -201,6 +259,8 @@ if (import.meta.vitest) {
             "schema",
           ],
           rootSegment: "paths",
+          contentType: "application/json",
+          schemaPath: ["content", "application/json", "schema"],
         },
       );
     });

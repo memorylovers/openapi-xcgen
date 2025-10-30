@@ -5,9 +5,9 @@
 
 import * as v from "valibot";
 import { FooSchema } from './FooSchema';
-import { QuxAllOf1Schema } from './QuxAllOf1Schema';
+import { QuxallOf1Schema } from './QuxallOf1Schema';
 
 /**
  * Schema for Qux
  */
-export const QuxSchema = v.intersect([FooSchema, QuxAllOf1Schema]);
+export const QuxSchema = v.intersect([FooSchema, QuxallOf1Schema]);

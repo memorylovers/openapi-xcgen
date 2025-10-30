@@ -10,7 +10,7 @@ import * as v from "valibot";
  */
 export const UserSchema = v.object({
   userId: v.string(),
-  email: v.pipe(v.string(), v.email()),
-  username: v.pipe(v.string(), v.minLength(3), v.maxLength(20)),
+  email: v.string(),
+  username: v.string(),
   phoneNumber: v.optional(v.string()),
 });

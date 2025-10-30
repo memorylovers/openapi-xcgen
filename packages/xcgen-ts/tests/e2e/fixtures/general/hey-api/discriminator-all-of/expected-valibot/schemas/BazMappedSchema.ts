@@ -4,10 +4,10 @@
  */
 
 import * as v from "valibot";
-import { BazMappedAllOf1Schema } from './BazMappedAllOf1Schema';
+import { BazMappedallOf1Schema } from './BazMappedallOf1Schema';
 import { FooMappedSchema } from './FooMappedSchema';
 
 /**
  * Schema for BazMapped
  */
-export const BazMappedSchema = v.intersect([FooMappedSchema, BazMappedAllOf1Schema]);
+export const BazMappedSchema = v.intersect([FooMappedSchema, BazMappedallOf1Schema]);

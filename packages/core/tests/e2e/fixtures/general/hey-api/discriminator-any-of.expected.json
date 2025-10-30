@@ -111,8 +111,8 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/foo",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [

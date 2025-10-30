@@ -1,6 +1,6 @@
 /**
- * AuditableUserAllOf2Role model
+ * AuditableUserallOf2Role model
  * Auto-generated from OpenAPI specification
  */
 
-export type AuditableUserAllOf2Role = "admin" | "user" | "guest";
+export type AuditableUserallOf2Role = "admin" | "user" | "guest";

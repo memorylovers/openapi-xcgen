@@ -102,21 +102,18 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazAllOf1"
+          "name": "#/components/schemas/BazallOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "BazAllOf1",
-      "referencePath": "#/components/schemas/BazAllOf1",
+      "name": "BazallOf1",
+      "referencePath": "#/components/schemas/BazallOf1",
       "properties": [
         {
           "name": "foo",
-          "type": "int",
-          "validation": {
-            "format": "int32"
-          }
+          "type": "int"
         },
         {
           "name": "bar",
@@ -126,22 +123,19 @@
           "name": "baz",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BazAllOf1Baz"
+            "name": "#/components/schemas/BazallOf1Baz"
           }
         },
         {
           "name": "qux",
-          "type": "int",
-          "validation": {
-            "format": "int32"
-          }
+          "type": "int"
         }
       ]
     },
     {
       "kind": "enum",
-      "name": "BazAllOf1Baz",
-      "referencePath": "#/components/schemas/BazAllOf1Baz",
+      "name": "BazallOf1Baz",
+      "referencePath": "#/components/schemas/BazallOf1Baz",
       "type": "string",
       "values": [
         {
@@ -166,10 +160,7 @@
         {
           "name": "foo",
           "type": "int",
-          "required": true,
-          "validation": {
-            "format": "int32"
-          }
+          "required": true
         },
         {
           "name": "bar",
@@ -191,8 +182,8 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/foo",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [

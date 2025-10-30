@@ -12,5 +12,5 @@ export const OrderCustomerAddressSchema = v.object({
   street: v.optional(v.string()),
   city: v.optional(v.string()),
   country: v.optional(v.string()),
-  zipCode: v.optional(v.pipe(v.string(), v.regex(/^\\d{5}(-\\d{4})?$/))),
+  zipCode: v.optional(v.string()),
 });

@@ -8,8 +8,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "operationId": "getUsers",
       "tags": [
         "users"
       ],
@@ -26,12 +27,12 @@
             }
           ]
         }
-      ],
-      "operationId": "getUsers"
+      ]
     },
     {
-      "method": "get",
       "path": "/products",
+      "method": "get",
+      "operationId": "getProducts",
       "tags": [
         "products"
       ],
@@ -48,8 +49,7 @@
             }
           ]
         }
-      ],
-      "operationId": "getProducts"
+      ]
     }
   ]
 }

@@ -19,36 +19,25 @@
           "name": "open",
           "type": "string",
           "required": true,
-          "description": "Opening time in 24-hour format",
-          "validation": {
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-          }
+          "description": "Opening time in 24-hour format"
         },
         {
           "name": "close",
           "type": "string",
           "required": true,
-          "description": "Closing time in 24-hour format",
-          "validation": {
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-          }
+          "description": "Closing time in 24-hour format"
         },
         {
           "name": "special_hours",
-          "type": "boolean",
-          "defaultValue": false
+          "type": "boolean"
         },
         {
           "name": "note",
-          "type": "string",
-          "validation": {
-            "maxLength": 500
-          }
+          "type": "string"
         },
         {
           "name": "closed",
-          "type": "boolean",
-          "defaultValue": false
+          "type": "boolean"
         }
       ]
     },
@@ -60,29 +49,17 @@
         {
           "name": "event_id",
           "type": "string",
-          "required": true,
-          "readOnly": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "name",
           "type": "string",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 200
-          }
+          "required": true
         },
         {
           "name": "description",
           "type": "string",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 2000
-          }
+          "required": true
         },
         {
           "name": "start_date",
@@ -119,40 +96,27 @@
         },
         {
           "name": "capacity",
-          "type": "int",
-          "validation": {
-            "minimum": 1,
-            "maximum": 1000
-          }
+          "type": "int"
         },
         {
           "name": "registration_required",
-          "type": "boolean",
-          "defaultValue": false
+          "type": "boolean"
         },
         {
           "name": "registration_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "image_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "created_at",
-          "type": "datetime",
-          "readOnly": true
+          "type": "datetime"
         },
         {
           "name": "updated_at",
-          "type": "datetime",
-          "readOnly": true
+          "type": "datetime"
         }
       ]
     },
@@ -236,20 +200,12 @@
         {
           "name": "name",
           "type": "string",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 200
-          }
+          "required": true
         },
         {
           "name": "description",
           "type": "string",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 2000
-          }
+          "required": true
         },
         {
           "name": "start_date",
@@ -286,30 +242,19 @@
         },
         {
           "name": "capacity",
-          "type": "int",
-          "validation": {
-            "minimum": 1,
-            "maximum": 1000
-          }
+          "type": "int"
         },
         {
           "name": "registration_required",
-          "type": "boolean",
-          "defaultValue": false
+          "type": "boolean"
         },
         {
           "name": "registration_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "image_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         }
       ]
     },
@@ -392,19 +337,11 @@
       "properties": [
         {
           "name": "name",
-          "type": "string",
-          "validation": {
-            "minLength": 1,
-            "maxLength": 200
-          }
+          "type": "string"
         },
         {
           "name": "description",
-          "type": "string",
-          "validation": {
-            "minLength": 1,
-            "maxLength": 2000
-          }
+          "type": "string"
         },
         {
           "name": "start_date",
@@ -437,11 +374,7 @@
         },
         {
           "name": "capacity",
-          "type": "int",
-          "validation": {
-            "minimum": 1,
-            "maximum": 1000
-          }
+          "type": "int"
         },
         {
           "name": "registration_required",
@@ -449,17 +382,11 @@
         },
         {
           "name": "registration_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "image_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         }
       ]
     },
@@ -543,20 +470,11 @@
         {
           "name": "visitor_email",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "format": "email"
-          }
+          "required": true
         },
         {
           "name": "visitor_name",
-          "type": "string",
-          "writeOnly": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 200
-          }
+          "type": "string"
         },
         {
           "name": "visit_date",
@@ -566,10 +484,7 @@
         {
           "name": "visit_time",
           "type": "string",
-          "description": "Preferred entry time in 24-hour format",
-          "validation": {
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-          }
+          "description": "Preferred entry time in 24-hour format"
         },
         {
           "name": "ticket_type",
@@ -582,18 +497,11 @@
         {
           "name": "quantity",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 1,
-            "maximum": 20
-          }
+          "required": true
         },
         {
           "name": "special_requests",
-          "type": "string",
-          "validation": {
-            "maxLength": 500
-          }
+          "type": "string"
         },
         {
           "name": "payment_method",
@@ -641,13 +549,6 @@
       "kind": "union",
       "name": "TicketPurchaseRequestPaymentMethod",
       "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod",
-      "discriminator": {
-        "propertyName": "type",
-        "mapping": {
-          "credit_card": "#/components/schemas/CreditCardPayment",
-          "paypal": "#/components/schemas/PayPalPayment"
-        }
-      },
       "types": [
         {
           "kind": "ref",
@@ -657,7 +558,10 @@
           "kind": "ref",
           "name": "#/components/schemas/PayPalPayment"
         }
-      ]
+      ],
+      "discriminator": {
+        "propertyName": "type"
+      }
     },
     {
       "kind": "object",
@@ -667,24 +571,16 @@
         {
           "name": "confirmation_id",
           "type": "string",
-          "required": true,
-          "readOnly": true,
-          "validation": {
-            "pattern": "^[A-Z0-9]{8}$"
-          }
+          "required": true
         },
         {
           "name": "purchase_date",
           "type": "datetime",
-          "required": true,
-          "readOnly": true
+          "required": true
         },
         {
           "name": "visitor_email",
-          "type": "string",
-          "validation": {
-            "format": "email"
-          }
+          "type": "string"
         },
         {
           "name": "visitor_name",
@@ -697,10 +593,7 @@
         },
         {
           "name": "visit_time",
-          "type": "string",
-          "validation": {
-            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
-          }
+          "type": "string"
         },
         {
           "name": "ticket_type",
@@ -729,16 +622,11 @@
             "kind": "ref",
             "name": "#/components/schemas/TicketPurchaseConfirmationStatus"
           },
-          "required": true,
-          "readOnly": true
+          "required": true
         },
         {
           "name": "qr_code_url",
-          "type": "string",
-          "readOnly": true,
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "special_requests",
@@ -814,48 +702,28 @@
         {
           "name": "type",
           "type": "string",
-          "required": true,
-          "validation": {
-            "const": "credit_card"
-          }
+          "required": true
         },
         {
           "name": "card_number",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "pattern": "^[0-9]{13,19}$"
-          }
+          "required": true
         },
         {
           "name": "card_holder_name",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 100
-          }
+          "required": true
         },
         {
           "name": "expiry_date",
           "type": "string",
           "required": true,
-          "description": "MM/YY format",
-          "writeOnly": true,
-          "validation": {
-            "pattern": "^(0[1-9]|1[0-2])\\/[0-9]{2}$"
-          }
+          "description": "MM/YY format"
         },
         {
           "name": "cvv",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "pattern": "^[0-9]{3,4}$"
-          }
+          "required": true
         }
       ]
     },
@@ -867,24 +735,16 @@
         {
           "name": "type",
           "type": "string",
-          "required": true,
-          "validation": {
-            "const": "paypal"
-          }
+          "required": true
         },
         {
           "name": "paypal_email",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "format": "email"
-          }
+          "required": true
         },
         {
           "name": "paypal_auth_code",
-          "type": "string",
-          "writeOnly": true
+          "type": "string"
         }
       ]
     },
@@ -896,19 +756,12 @@
         {
           "name": "amount",
           "type": "double",
-          "required": true,
-          "validation": {
-            "minimum": 0
-          }
+          "required": true
         },
         {
           "name": "currency",
           "type": "string",
-          "required": true,
-          "defaultValue": "USD",
-          "validation": {
-            "pattern": "^[A-Z]{3}$"
-          }
+          "required": true
         }
       ]
     },
@@ -920,26 +773,17 @@
         {
           "name": "total",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 0
-          }
+          "required": true
         },
         {
           "name": "limit",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 1
-          }
+          "required": true
         },
         {
           "name": "offset",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 0
-          }
+          "required": true
         },
         {
           "name": "has_more",
@@ -955,11 +799,7 @@
         {
           "name": "type",
           "type": "string",
-          "required": true,
-          "defaultValue": "about:blank",
-          "validation": {
-            "format": "uri"
-          }
+          "required": true
         },
         {
           "name": "title",
@@ -969,11 +809,7 @@
         {
           "name": "status",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 100,
-            "maximum": 599
-          }
+          "required": true
         },
         {
           "name": "detail",
@@ -981,10 +817,7 @@
         },
         {
           "name": "instance",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "timestamp",
@@ -992,46 +825,14 @@
         },
         {
           "name": "correlation_id",
-          "type": "string",
-          "validation": {
-            "format": "uuid"
-          }
+          "type": "string"
         }
       ]
     },
     {
-      "kind": "response",
-      "name": "GetMuseumHours200Response",
-      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200Response",
-      "properties": [
-        {
-          "name": "timezone",
-          "type": "string",
-          "description": "Timezone used for the hours"
-        },
-        {
-          "name": "daily_hours",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours"
-          }
-        }
-      ],
-      "statusCode": "200"
-    },
-    {
-      "kind": "array",
-      "name": "GetMuseumHours200ResponseDailyHours",
-      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours",
-      "itemType": {
-        "kind": "ref",
-        "name": "#/components/schemas/DailyHours"
-      }
-    },
-    {
       "kind": "parameter",
       "name": "GetMuseumHoursParams",
-      "description": "Parameters for GET /museum-hours\ndate: Specific date to retrieve hours for (ISO 8601 format)\ntimezone: Timezone for displaying hours (IANA timezone format)",
+      "referencePath": "#/paths/::museum-hours/get/GetMuseumHoursParams",
       "properties": [
         {
           "name": "date",
@@ -1047,43 +848,83 @@
           "defaultValue": "America/New_York"
         }
       ],
-      "referencePath": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
+      "description": "Parameters for GET /museum-hours\ndate: Specific date to retrieve hours for (ISO 8601 format)\ntimezone: Timezone for displaying hours (IANA timezone format)"
     },
     {
-      "kind": "response",
-      "name": "GetSpecialEvents200Response",
-      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200Response",
+      "kind": "object",
+      "name": "GetMuseumHours200Response",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema",
       "properties": [
         {
-          "name": "events",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents"
-          }
+          "name": "timezone",
+          "type": "string",
+          "description": "Timezone used for the hours"
         },
         {
-          "name": "pagination",
+          "name": "daily_hours",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Pagination"
+            "name": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours"
           }
         }
-      ],
-      "statusCode": "200"
+      ]
     },
     {
       "kind": "array",
-      "name": "GetSpecialEvents200ResponseEvents",
-      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents",
+      "name": "GetMuseumHours200ResponseDailyHours",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/SpecialEvent"
+        "name": "#/components/schemas/DailyHours"
       }
     },
     {
+      "kind": "parameter",
+      "name": "GetSpecialEventsParams",
+      "referencePath": "#/paths/::special-events/get/GetSpecialEventsParams",
+      "properties": [
+        {
+          "name": "start_date",
+          "type": "date",
+          "in": "query",
+          "description": "Filter events starting from this date"
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "in": "query",
+          "description": "Filter events until this date"
+        },
+        {
+          "name": "category",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::special-events/get/parameters/2/schema/Category"
+          },
+          "in": "query",
+          "description": "Filter by event category"
+        },
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "Maximum number of events to return",
+          "defaultValue": 20
+        },
+        {
+          "name": "offset",
+          "type": "int",
+          "in": "query",
+          "description": "Number of events to skip (for pagination)",
+          "defaultValue": 0
+        }
+      ],
+      "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)"
+    },
+    {
       "kind": "enum",
-      "name": "GetSpecialEventsParamsCategory",
-      "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParamsCategory",
+      "name": "Category",
+      "referencePath": "#/paths/::special-events/get/parameters/2/schema/Category",
       "type": "string",
       "values": [
         {
@@ -1113,141 +954,138 @@
       ]
     },
     {
-      "kind": "parameter",
-      "name": "GetSpecialEventsParams",
-      "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)",
+      "kind": "object",
+      "name": "GetSpecialEvents200Response",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema",
       "properties": [
         {
-          "name": "start_date",
-          "type": "date",
-          "in": "query",
-          "description": "Filter events starting from this date"
-        },
-        {
-          "name": "end_date",
-          "type": "date",
-          "in": "query",
-          "description": "Filter events until this date"
-        },
-        {
-          "name": "category",
+          "name": "events",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParamsCategory"
-          },
-          "in": "query",
-          "description": "Filter by event category"
-        },
-        {
-          "name": "limit",
-          "type": "int",
-          "in": "query",
-          "description": "Maximum number of events to return",
-          "defaultValue": 20,
-          "validation": {
-            "minimum": 1,
-            "maximum": 100
+            "name": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents"
           }
         },
         {
-          "name": "offset",
-          "type": "int",
-          "in": "query",
-          "description": "Number of events to skip (for pagination)",
-          "defaultValue": 0,
-          "validation": {
-            "minimum": 0
+          "name": "pagination",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pagination"
           }
         }
-      ],
-      "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "GetSpecialEvents200ResponseEvents",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/SpecialEvent"
+      }
     },
     {
       "kind": "parameter",
       "name": "GetSpecialEventsEventIdParams",
-      "description": "Parameters for GET /special-events/{eventId}\neventId: Unique identifier of the special event",
+      "referencePath": "#/paths/::special-events::{eventId}/get/GetSpecialEventsEventIdParams",
       "properties": [
         {
           "name": "eventId",
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event",
-          "validation": {
-            "format": "uuid"
-          }
+          "description": "Unique identifier of the special event"
         }
       ],
-      "referencePath": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
-    },
-    {
-      "kind": "parameter",
-      "name": "PatchSpecialEventsEventIdParams",
-      "description": "Parameters for PATCH /special-events/{eventId}\neventId: Unique identifier of the special event",
-      "properties": [
-        {
-          "name": "eventId",
-          "type": "string",
-          "in": "path",
-          "required": true,
-          "description": "Unique identifier of the special event",
-          "validation": {
-            "format": "uuid"
-          }
-        }
-      ],
-      "referencePath": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
+      "description": "Parameters for GET /special-events/{eventId}\neventId: Unique identifier of the special event"
     },
     {
       "kind": "parameter",
       "name": "DeleteSpecialEventsEventIdParams",
-      "description": "Parameters for DELETE /special-events/{eventId}\neventId: Unique identifier of the special event",
+      "referencePath": "#/paths/::special-events::{eventId}/delete/DeleteSpecialEventsEventIdParams",
       "properties": [
         {
           "name": "eventId",
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event",
-          "validation": {
-            "format": "uuid"
-          }
+          "description": "Unique identifier of the special event"
         }
       ],
-      "referencePath": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
+      "description": "Parameters for DELETE /special-events/{eventId}\neventId: Unique identifier of the special event"
+    },
+    {
+      "kind": "parameter",
+      "name": "PatchSpecialEventsEventIdParams",
+      "referencePath": "#/paths/::special-events::{eventId}/patch/PatchSpecialEventsEventIdParams",
+      "properties": [
+        {
+          "name": "eventId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Unique identifier of the special event"
+        }
+      ],
+      "description": "Parameters for PATCH /special-events/{eventId}\neventId: Unique identifier of the special event"
     },
     {
       "kind": "parameter",
       "name": "GetTicketsConfirmationIdParams",
-      "description": "Parameters for GET /tickets/{confirmationId}\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase",
+      "referencePath": "#/paths/::tickets::{confirmationId}/get/GetTicketsConfirmationIdParams",
       "properties": [
         {
           "name": "confirmationId",
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Ticket purchase confirmation ID",
-          "validation": {
-            "pattern": "^[A-Z0-9]{8}$"
-          }
+          "description": "Ticket purchase confirmation ID"
         },
         {
           "name": "email",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "Email address used for the purchase",
-          "validation": {
-            "format": "email"
-          }
+          "description": "Email address used for the purchase"
         }
       ],
-      "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
+      "description": "Parameters for GET /tickets/{confirmationId}\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetTicketsConfirmationIdQrCodeParams",
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/GetTicketsConfirmationIdQrCodeParams",
+      "properties": [
+        {
+          "name": "confirmationId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Ticket purchase confirmation ID"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "in": "query",
+          "required": true,
+          "description": "Email address used for the purchase"
+        },
+        {
+          "name": "format",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/Format"
+          },
+          "in": "query",
+          "description": "QR code format",
+          "defaultValue": "png"
+        }
+      ],
+      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase\nformat: QR code format"
     },
     {
       "kind": "enum",
-      "name": "GetTicketsConfirmationIdQrCodeParamsFormat",
-      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParamsFormat",
+      "name": "Format",
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/Format",
       "type": "string",
       "values": [
         {
@@ -1259,44 +1097,6 @@
           "name": "SVG"
         }
       ]
-    },
-    {
-      "kind": "parameter",
-      "name": "GetTicketsConfirmationIdQrCodeParams",
-      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase\nformat: QR code format",
-      "properties": [
-        {
-          "name": "confirmationId",
-          "type": "string",
-          "in": "path",
-          "required": true,
-          "description": "Ticket purchase confirmation ID",
-          "validation": {
-            "pattern": "^[A-Z0-9]{8}$"
-          }
-        },
-        {
-          "name": "email",
-          "type": "string",
-          "in": "query",
-          "required": true,
-          "description": "Email address used for the purchase",
-          "validation": {
-            "format": "email"
-          }
-        },
-        {
-          "name": "format",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParamsFormat"
-          },
-          "in": "query",
-          "description": "QR code format",
-          "defaultValue": "png"
-        }
-      ],
-      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
     }
   ],
   "tags": [
@@ -1315,14 +1115,17 @@
   ],
   "endpoints": [
     {
-      "method": "get",
       "path": "/museum-hours",
+      "method": "get",
+      "operationId": "getMuseumHours",
+      "summary": "Get museum operating hours",
+      "description": "Returns the operating hours for the museum for the next seven days.",
       "tags": [
         "Operations"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
+        "name": "#/paths/::museum-hours/get/GetMuseumHoursParams"
       },
       "responses": [
         {
@@ -1334,7 +1137,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200Response"
+                "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1355,20 +1158,20 @@
             "name": "#/components/responses/InternalServerError"
           }
         }
-      ],
-      "operationId": "getMuseumHours",
-      "summary": "Get museum operating hours",
-      "description": "Returns the operating hours for the museum for the next seven days."
+      ]
     },
     {
-      "method": "get",
       "path": "/special-events",
+      "method": "get",
+      "operationId": "listSpecialEvents",
+      "summary": "List special events",
+      "description": "Get a list of upcoming special events at the museum",
       "tags": [
         "Events"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
+        "name": "#/paths/::special-events/get/GetSpecialEventsParams"
       },
       "responses": [
         {
@@ -1380,7 +1183,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200Response"
+                "name": "#/paths/::special-events/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1393,18 +1196,31 @@
             "name": "#/components/responses/BadRequest"
           }
         }
-      ],
-      "operationId": "listSpecialEvents",
-      "summary": "List special events",
-      "description": "Get a list of upcoming special events at the museum"
+      ]
     },
     {
-      "method": "post",
       "path": "/special-events",
+      "method": "post",
+      "operationId": "createSpecialEvent",
+      "summary": "Create a new special event",
+      "description": "Create a new special event (requires admin privileges)",
       "tags": [
         "Events"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventRequest"
+            }
+          }
+        ]
+      },
       "responses": [
         {
           "kind": "content",
@@ -1451,38 +1267,20 @@
             "name": "#/components/responses/Forbidden"
           }
         }
-      ],
-      "operationId": "createSpecialEvent",
-      "summary": "Create a new special event",
-      "description": "Create a new special event (requires admin privileges)",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/SpecialEventRequest"
-            }
-          }
-        ],
-        "required": true
-      },
-      "security": [
-        {
-          "scheme": "ApiKey"
-        }
       ]
     },
     {
-      "method": "get",
       "path": "/special-events/{eventId}",
+      "method": "get",
+      "operationId": "getSpecialEvent",
+      "summary": "Get special event details",
+      "description": "Get details about a specific special event",
       "tags": [
         "Events"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
+        "name": "#/paths/::special-events::{eventId}/get/GetSpecialEventsEventIdParams"
       },
       "responses": [
         {
@@ -1507,20 +1305,78 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getSpecialEvent",
-      "summary": "Get special event details",
-      "description": "Get details about a specific special event"
+      ]
     },
     {
-      "method": "patch",
       "path": "/special-events/{eventId}",
+      "method": "delete",
+      "operationId": "deleteSpecialEvent",
+      "summary": "Delete special event",
+      "description": "Delete a special event (requires admin privileges)",
       "tags": [
         "Events"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
+        "name": "#/paths/::special-events::{eventId}/delete/DeleteSpecialEventsEventIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "204",
+          "description": "Event deleted successfully"
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "403",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Forbidden"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        }
+      ]
+    },
+    {
+      "path": "/special-events/{eventId}",
+      "method": "patch",
+      "operationId": "updateSpecialEvent",
+      "summary": "Update special event",
+      "description": "Update a special event (requires admin privileges)",
+      "tags": [
+        "Events"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::special-events::{eventId}/patch/PatchSpecialEventsEventIdParams"
+      },
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventUpdate"
+            }
+          }
+        ]
       },
       "responses": [
         {
@@ -1569,86 +1425,31 @@
             "name": "#/components/responses/NotFound"
           }
         }
+      ]
+    },
+    {
+      "path": "/tickets",
+      "method": "post",
+      "operationId": "purchaseTickets",
+      "summary": "Purchase museum tickets",
+      "description": "Purchase tickets for museum admission",
+      "tags": [
+        "Tickets"
       ],
-      "operationId": "updateSpecialEvent",
-      "summary": "Update special event",
-      "description": "Update a special event (requires admin privileges)",
+      "parameters": [],
       "requestBody": {
         "kind": "content",
+        "required": true,
         "content": [
           {
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/SpecialEventUpdate"
+              "name": "#/components/schemas/TicketPurchaseRequest"
             }
           }
-        ],
-        "required": true
+        ]
       },
-      "security": [
-        {
-          "scheme": "ApiKey"
-        }
-      ]
-    },
-    {
-      "method": "delete",
-      "path": "/special-events/{eventId}",
-      "tags": [
-        "Events"
-      ],
-      "parameters": {
-        "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
-      },
-      "responses": [
-        {
-          "kind": "content",
-          "statusCode": "204",
-          "description": "Event deleted successfully"
-        },
-        {
-          "kind": "ref",
-          "statusCode": "401",
-          "ref": {
-            "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
-          }
-        },
-        {
-          "kind": "ref",
-          "statusCode": "403",
-          "ref": {
-            "kind": "ref",
-            "name": "#/components/responses/Forbidden"
-          }
-        },
-        {
-          "kind": "ref",
-          "statusCode": "404",
-          "ref": {
-            "kind": "ref",
-            "name": "#/components/responses/NotFound"
-          }
-        }
-      ],
-      "operationId": "deleteSpecialEvent",
-      "summary": "Delete special event",
-      "description": "Delete a special event (requires admin privileges)",
-      "security": [
-        {
-          "scheme": "ApiKey"
-        }
-      ]
-    },
-    {
-      "method": "post",
-      "path": "/tickets",
-      "tags": [
-        "Tickets"
-      ],
-      "parameters": [],
       "responses": [
         {
           "kind": "content",
@@ -1700,33 +1501,20 @@
             }
           ]
         }
-      ],
-      "operationId": "purchaseTickets",
-      "summary": "Purchase museum tickets",
-      "description": "Purchase tickets for museum admission",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/TicketPurchaseRequest"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     },
     {
-      "method": "get",
       "path": "/tickets/{confirmationId}",
+      "method": "get",
+      "operationId": "getTicket",
+      "summary": "Retrieve ticket details",
+      "description": "Get details of a ticket purchase",
       "tags": [
         "Tickets"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
+        "name": "#/paths/::tickets::{confirmationId}/get/GetTicketsConfirmationIdParams"
       },
       "responses": [
         {
@@ -1759,20 +1547,20 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getTicket",
-      "summary": "Retrieve ticket details",
-      "description": "Get details of a ticket purchase"
+      ]
     },
     {
-      "method": "get",
       "path": "/tickets/{confirmationId}/qr-code",
+      "method": "get",
+      "operationId": "getTicketQRCode",
+      "summary": "Generate QR code for tickets",
+      "description": "Generate a QR code for ticket validation at the museum entrance",
       "tags": [
         "Tickets"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
+        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/GetTicketsConfirmationIdQrCodeParams"
       },
       "responses": [
         {
@@ -1806,10 +1594,7 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getTicketQRCode",
-      "summary": "Generate QR code for tickets",
-      "description": "Generate a QR code for ticket validation at the museum entrance"
+      ]
     }
   ],
   "servers": [
@@ -1828,78 +1613,6 @@
       "name": "X-API-Key",
       "in": "header",
       "description": "API key for admin operations"
-    }
-  },
-  "commonResponses": {
-    "BadRequest": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Bad Request - Invalid input parameters",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "Unauthorized": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Unauthorized - Authentication required",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "Forbidden": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Forbidden - Insufficient privileges",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "NotFound": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Not Found - Resource not found",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "InternalServerError": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Internal Server Error",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
     }
   }
 }

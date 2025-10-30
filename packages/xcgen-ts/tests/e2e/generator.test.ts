@@ -158,16 +158,28 @@ describe("E2E: TypeScript Generator", () => {
   });
 
   describe("Hooks - X-Extensions Integration", () => {
+    it("should handle x-type custom Hook", async () => {
+      await compareWithExpected("hooks/x-type-custom");
+    });
+
     it("should handle x-type custom Hook (with valibot)", async () => {
       await compareWithExpected("hooks/x-type-custom", {
         validator: "valibot",
       });
     });
 
+    it("should handle x-function-name Hook", async () => {
+      await compareWithExpected("hooks/x-function-name");
+    });
+
     it("should handle x-function-name Hook (with valibot)", async () => {
       await compareWithExpected("hooks/x-function-name", {
         validator: "valibot",
       });
+    });
+
+    it("should handle x-validation-custom Hook", async () => {
+      await compareWithExpected("hooks/x-validation-custom");
     });
 
     it("should handle x-validation-custom Hook (with valibot)", async () => {

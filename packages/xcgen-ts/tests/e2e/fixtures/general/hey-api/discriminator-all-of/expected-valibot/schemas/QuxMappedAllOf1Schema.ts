@@ -1,13 +1,13 @@
 /**
- * Valibot validation schema for QuxMappedAllOf1
+ * Valibot validation schema for QuxMappedallOf1
  * Auto-generated from OpenAPI specification
  */
 
 import * as v from "valibot";
 
 /**
- * Schema for QuxMappedAllOf1
+ * Schema for QuxMappedallOf1
  */
-export const QuxMappedAllOf1Schema = v.object({
+export const QuxMappedallOf1Schema = v.object({
   qux: v.optional(v.boolean()),
 });

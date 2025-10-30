@@ -12,71 +12,41 @@
       "properties": [
         {
           "name": "name",
-          "type": "string",
-          "validation": {
-            "minLength": 1,
-            "maxLength": 100
-          }
+          "type": "string"
         },
         {
           "name": "code",
-          "type": "string",
-          "validation": {
-            "pattern": "^[A-Z]{3}$"
-          }
+          "type": "string"
         },
         {
           "name": "userId",
-          "type": "string",
-          "validation": {
-            "format": "uuid"
-          }
+          "type": "string"
         },
         {
           "name": "email",
-          "type": "string",
-          "validation": {
-            "format": "email"
-          }
+          "type": "string"
         },
         {
           "name": "website",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "ipAddress",
-          "type": "string",
-          "validation": {
-            "format": "ipv4"
-          }
+          "type": "string"
         },
         {
           "name": "price",
-          "type": "double",
-          "validation": {
-            "minimum": 0,
-            "maximum": 1000
-          }
+          "type": "double"
         },
         {
           "name": "quantity",
-          "type": "int",
-          "validation": {
-            "minimum": 1
-          }
+          "type": "int"
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/ProductTags"
-          },
-          "validation": {
-            "minItems": 1,
-            "maxItems": 5
           }
         }
       ]
@@ -91,8 +61,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/products",
+      "method": "get",
+      "summary": "Get products",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -110,8 +81,7 @@
             }
           ]
         }
-      ],
-      "summary": "Get products"
+      ]
     }
   ]
 }

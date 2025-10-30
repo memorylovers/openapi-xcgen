@@ -5,21 +5,21 @@
 
 import { request } from "../client";
 import type { XcgenApiError as _XcgenApiError } from "../client";
-import type { GetTest1ParametersIdParams, GetTest1ParametersId200Response, PostTest2RequestRequestBody, PostTest2Request201Response, GetTest3ResponseParams } from "../models/index";
-export type { GetTest1ParametersIdParams, GetTest1ParametersId200Response, PostTest2RequestRequestBody, PostTest2Request201Response, GetTest3ResponseParams } from "../models/index";
+import type { GetTest1ParametersIdParams, Schema, GetTest3ResponseParams } from "../models/index";
+export type { GetTest1ParametersIdParams, Schema, GetTest3ResponseParams } from "../models/index";
 
 /**
  * Test 1: Parameters model generation (Basic)
  * Validates parameter model generation with all parameter types (path/query/header/cookie). Tests: enum parameters, required/optional mixing, default values, parameter type conversion.
  * @param options - Request parameters
  * @param init - Additional fetch options
- * @returns GetTest1ParametersId200Response
+ * @returns Schema
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function testParametersModelGeneration(
   options: GetTest1ParametersIdParams,
   init?: RequestInit,
-): Promise<GetTest1ParametersId200Response> {
+): Promise<Schema> {
   return request({
     method: "GET",
     path: "/test-1-parameters/{id}",
@@ -33,13 +33,13 @@ export async function testParametersModelGeneration(
  * Validates extraction of inline schemas from request body into separate models. Tests: required fields, nested object extraction, format validation.
  * @param options - Request parameters
  * @param init - Additional fetch options
- * @returns PostTest2Request201Response
+ * @returns Schema
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function testRequestInlineExtraction(
-  options: PostTest2RequestRequestBody,
+  options: Schema,
   init?: RequestInit,
-): Promise<PostTest2Request201Response> {
+): Promise<Schema> {
   return request({
     method: "POST",
     path: "/test-2-request",

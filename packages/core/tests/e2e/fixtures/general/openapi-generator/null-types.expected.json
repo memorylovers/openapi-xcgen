@@ -62,10 +62,10 @@
       "kind": "union",
       "name": "PersonMaidenName",
       "referencePath": "#/components/schemas/PersonMaidenName",
-      "nullable": true,
       "types": [
         "string"
-      ]
+      ],
+      "nullable": true
     },
     {
       "kind": "object",
@@ -106,27 +106,27 @@
       "kind": "union",
       "name": "PersonNullableSkillsVariant2",
       "referencePath": "#/components/schemas/PersonNullableSkillsVariant2",
-      "nullable": true,
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1"
+          "name": "#/components/schemas/PersonNullableSkillsVariant2oneOf1"
         }
-      ]
+      ],
+      "nullable": true
     },
     {
       "kind": "array",
-      "name": "PersonNullableSkillsVariant2OneOf1",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1",
+      "name": "PersonNullableSkillsVariant2oneOf1",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2oneOf1",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item"
+        "name": "#/components/schemas/PersonNullableSkillsVariant2oneOf1Item"
       }
     },
     {
       "kind": "object",
-      "name": "PersonNullableSkillsVariant2OneOf1Item",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item",
+      "name": "PersonNullableSkillsVariant2oneOf1Item",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2oneOf1Item",
       "properties": [
         {
           "name": "name",
@@ -138,7 +138,6 @@
       "kind": "allOf",
       "name": "Adult",
       "referencePath": "#/components/schemas/Adult",
-      "description": "A representation of an adult",
       "schemas": [
         {
           "kind": "ref",
@@ -146,35 +145,36 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AdultAllOf1"
+          "name": "#/components/schemas/AdultallOf1"
         }
-      ]
+      ],
+      "description": "A representation of an adult"
     },
     {
       "kind": "object",
-      "name": "AdultAllOf1",
-      "referencePath": "#/components/schemas/AdultAllOf1",
+      "name": "AdultallOf1",
+      "referencePath": "#/components/schemas/AdultallOf1",
       "properties": [
         {
           "name": "children",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AdultAllOf1Children"
+            "name": "#/components/schemas/AdultallOf1Children"
           }
         },
         {
           "name": "nullableChildrenVariant2",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2"
+            "name": "#/components/schemas/AdultallOf1NullableChildrenVariant2"
           }
         }
       ]
     },
     {
       "kind": "array",
-      "name": "AdultAllOf1Children",
-      "referencePath": "#/components/schemas/AdultAllOf1Children",
+      "name": "AdultallOf1Children",
+      "referencePath": "#/components/schemas/AdultallOf1Children",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Child"
@@ -182,20 +182,20 @@
     },
     {
       "kind": "union",
-      "name": "AdultAllOf1NullableChildrenVariant2",
-      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2",
-      "nullable": true,
+      "name": "AdultallOf1NullableChildrenVariant2",
+      "referencePath": "#/components/schemas/AdultallOf1NullableChildrenVariant2",
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1"
+          "name": "#/components/schemas/AdultallOf1NullableChildrenVariant2oneOf1"
         }
-      ]
+      ],
+      "nullable": true
     },
     {
       "kind": "array",
-      "name": "AdultAllOf1NullableChildrenVariant2OneOf1",
-      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1",
+      "name": "AdultallOf1NullableChildrenVariant2oneOf1",
+      "referencePath": "#/components/schemas/AdultallOf1NullableChildrenVariant2oneOf1",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Child"
@@ -205,29 +205,26 @@
       "kind": "allOf",
       "name": "Child",
       "referencePath": "#/components/schemas/Child",
-      "description": "A representation of a child",
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/ChildAllOf0"
+          "name": "#/components/schemas/ChildallOf0"
         },
         {
           "kind": "ref",
           "name": "#/components/schemas/Person"
         }
-      ]
+      ],
+      "description": "A representation of a child"
     },
     {
       "kind": "object",
-      "name": "ChildAllOf0",
-      "referencePath": "#/components/schemas/ChildAllOf0",
+      "name": "ChildallOf0",
+      "referencePath": "#/components/schemas/ChildallOf0",
       "properties": [
         {
           "name": "age",
-          "type": "int",
-          "validation": {
-            "format": "int32"
-          }
+          "type": "int"
         }
       ]
     },
@@ -250,7 +247,7 @@
     {
       "kind": "parameter",
       "name": "GetPersonDisplayPersonIdParams",
-      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve",
+      "referencePath": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams",
       "properties": [
         {
           "name": "personId",
@@ -260,18 +257,19 @@
           "description": "The id of the person to retrieve"
         }
       ],
-      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/person/display/{personId}",
+      "method": "get",
+      "operationId": "list",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+        "name": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams"
       },
       "responses": [
         {
@@ -288,8 +286,7 @@
             }
           ]
         }
-      ],
-      "operationId": "list"
+      ]
     }
   ],
   "servers": [

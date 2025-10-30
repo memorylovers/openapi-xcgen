@@ -8,7 +8,7 @@
     {
       "kind": "parameter",
       "name": "GetUsersIdParams",
-      "description": "Parameters for GET /users/{id}",
+      "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams",
       "properties": [
         {
           "name": "id",
@@ -17,14 +17,15 @@
           "required": true
         }
       ],
-      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+      "description": "Parameters for GET /users/{id}"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "operationId": "listUsers",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -39,16 +40,15 @@
             }
           ]
         }
-      ],
-      "operationId": "listUsers"
+      ]
     },
     {
-      "method": "get",
       "path": "/users/{id}",
+      "method": "get",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -65,8 +65,8 @@
       ]
     },
     {
-      "method": "get",
       "path": "/products",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -84,8 +84,8 @@
       ]
     },
     {
-      "method": "post",
       "path": "/products",
+      "method": "post",
       "tags": [],
       "parameters": [],
       "responses": [

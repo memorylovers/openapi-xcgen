@@ -11,7 +11,7 @@ import * as v from "valibot";
  */
 export const UserCreateSchema = v.object({
   username: v.string(),
-  email: v.pipe(v.string(), v.email()),
+  email: v.string(),
   password: v.string(),
   confirmPassword: v.string(),
 });

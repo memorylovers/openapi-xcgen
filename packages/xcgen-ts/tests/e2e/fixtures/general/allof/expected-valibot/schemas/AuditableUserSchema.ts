@@ -4,7 +4,7 @@
  */
 
 import * as v from "valibot";
-import { AuditableUserAllOf2Schema } from './AuditableUserAllOf2Schema';
+import { AuditableUserallOf2Schema } from './AuditableUserallOf2Schema';
 import { BaseSchema } from './BaseSchema';
 import { TimestampsSchema } from './TimestampsSchema';
 
@@ -12,4 +12,4 @@ import { TimestampsSchema } from './TimestampsSchema';
  * Schema for AuditableUser
  * User with audit timestamps
  */
-export const AuditableUserSchema = v.intersect([BaseSchema, TimestampsSchema, AuditableUserAllOf2Schema]);
+export const AuditableUserSchema = v.intersect([BaseSchema, TimestampsSchema, AuditableUserallOf2Schema]);

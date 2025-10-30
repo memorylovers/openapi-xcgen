@@ -73,8 +73,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/profiles",
+      "method": "get",
+      "summary": "Get profiles",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -92,8 +93,7 @@
             }
           ]
         }
-      ],
-      "summary": "Get profiles"
+      ]
     }
   ]
 }

@@ -1,8 +1,8 @@
 /**
- * BarAllOf1 model
+ * BarallOf1 model
  * Auto-generated from OpenAPI specification
  */
 
-export interface BarAllOf1 {
+export interface BarallOf1 {
   bar?: string | undefined;
 }

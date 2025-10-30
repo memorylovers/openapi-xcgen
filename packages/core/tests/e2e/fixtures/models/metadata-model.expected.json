@@ -21,23 +21,19 @@
         },
         {
           "name": "status",
-          "type": "string",
-          "defaultValue": "active"
+          "type": "string"
         },
         {
           "name": "createdAt",
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         {
           "name": "password",
-          "type": "string",
-          "writeOnly": true
+          "type": "string"
         },
         {
           "name": "oldId",
-          "type": "string",
-          "deprecated": true
+          "type": "string"
         }
       ],
       "description": "Article model with metadata"
@@ -46,8 +42,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/articles",
+      "method": "get",
+      "summary": "Get articles",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -65,8 +62,7 @@
             }
           ]
         }
-      ],
-      "summary": "Get articles"
+      ]
     }
   ]
 }

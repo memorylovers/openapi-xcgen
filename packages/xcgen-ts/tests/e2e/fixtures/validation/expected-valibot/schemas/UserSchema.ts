@@ -9,10 +9,10 @@ import * as v from "valibot";
  * Schema for User
  */
 export const UserSchema = v.object({
-  id: v.pipe(v.string(), v.uuid()), // readOnly
-  username: v.pipe(v.string(), v.minLength(3), v.maxLength(20), v.regex(/^[a-zA-Z0-9_]+$/)),
-  email: v.pipe(v.string(), v.email()),
-  age: v.optional(v.nullable(v.pipe(v.number(), v.minValue(0), v.maxValue(150)))),
-  bio: v.optional(v.pipe(v.string(), v.maxLength(500))),
-  website: v.optional(v.nullable(v.pipe(v.string(), v.url()))),
+  id: v.string(),
+  username: v.string(),
+  email: v.string(),
+  age: v.optional(v.nullable(v.number())),
+  bio: v.optional(v.string()),
+  website: v.optional(v.nullable(v.string())),
 });

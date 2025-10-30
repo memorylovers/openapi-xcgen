@@ -8,51 +8,53 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/endpoint1",
-      "tags": [],
-      "parameters": [],
-      "responses": [
-        {
-          "kind": "content",
-          "statusCode": "200",
-          "description": "Success",
-          "content": [
-            {
-              "mimeType": "application/json",
-              "schema": "string"
-            }
-          ]
-        }
-      ],
+      "method": "get",
       "operationId": "endpoint1",
       "summary": "Test summary",
-      "description": "Test description"
+      "description": "Test description",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ]
     },
     {
-      "method": "get",
       "path": "/endpoint2",
-      "tags": [],
-      "parameters": [],
-      "responses": [
-        {
-          "kind": "content",
-          "statusCode": "200",
-          "description": "Success",
-          "content": [
-            {
-              "mimeType": "application/json",
-              "schema": "string"
-            }
-          ]
-        }
-      ],
+      "method": "get",
       "operationId": "endpoint2",
-      "summary": "Test summary only"
+      "summary": "Test summary only",
+      "tags": [],
+      "parameters": [],
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Success",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": "string"
+            }
+          ]
+        }
+      ]
     },
     {
-      "method": "get",
       "path": "/endpoint3",
+      "method": "get",
+      "operationId": "endpoint3",
+      "description": "Test description only",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -67,13 +69,12 @@
             }
           ]
         }
-      ],
-      "operationId": "endpoint3",
-      "description": "Test description only"
+      ]
     },
     {
-      "method": "get",
       "path": "/endpoint4",
+      "method": "get",
+      "operationId": "endpoint4",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -88,8 +89,7 @@
             }
           ]
         }
-      ],
-      "operationId": "endpoint4"
+      ]
     }
   ]
 }

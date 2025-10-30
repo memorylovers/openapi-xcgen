@@ -10,7 +10,7 @@ import * as v from "valibot";
  */
 export const OrderItemsItemSchema = v.object({
   productId: v.string(),
-  quantity: v.pipe(v.number(), v.minValue(1)),
+  quantity: v.number(),
   price: v.optional(v.number()),
-  discount: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(100))),
+  discount: v.optional(v.number()),
 });

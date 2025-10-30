@@ -136,8 +136,8 @@ export function transformOperation(
       endpointParameters = [];
     }
 
-    // traverserから収集された子モデルを追加
-    allModels.push(...traversalResult.parametersResult.childModels);
+    // NOTE: parametersResult.childModelsはtraversalResult.childModelsに既に含まれているため、
+    // ここでは追加しない（重複を防ぐため）
   } else {
     endpointParameters = [];
   }
@@ -164,8 +164,8 @@ export function transformOperation(
       content: irRequestContent,
     };
 
-    // traverserから収集された子モデルを追加
-    allModels.push(...content.childModels);
+    // NOTE: content.childModelsはtraversalResult.childModelsに既に含まれているため、
+    // ここでは追加しない（重複を防ぐため）
   }
 
   // ========================================
@@ -215,8 +215,8 @@ export function transformOperation(
       }
     }
 
-    // traverserから収集された子モデルを追加
-    allModels.push(...traversalResult.responsesResult.childModels);
+    // NOTE: responsesResult.childModelsはtraversalResult.childModelsに既に含まれているため、
+    // ここでは追加しない（重複を防ぐため）
   }
 
   // ========================================
@@ -586,7 +586,8 @@ if (import.meta.vitest) {
           responses: [],
           childModels: [mockResponseModel],
         },
-        childModels: [],
+        // traverserがすべての子モデルを収集する
+        childModels: [mockParamModel, mockRequestModel, mockResponseModel],
       };
 
       const context: VisitorContext = {

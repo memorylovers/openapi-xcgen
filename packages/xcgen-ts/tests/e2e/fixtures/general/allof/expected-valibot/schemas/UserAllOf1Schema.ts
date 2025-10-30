@@ -1,14 +1,14 @@
 /**
- * Valibot validation schema for UserAllOf1
+ * Valibot validation schema for UserallOf1
  * Auto-generated from OpenAPI specification
  */
 
 import * as v from "valibot";
 
 /**
- * Schema for UserAllOf1
+ * Schema for UserallOf1
  */
-export const UserAllOf1Schema = v.object({
+export const UserallOf1Schema = v.object({
   name: v.string(),
-  email: v.pipe(v.string(), v.email()),
+  email: v.string(),
 });

@@ -12,10 +12,7 @@
         {
           "name": "id",
           "type": "long",
-          "required": true,
-          "validation": {
-            "format": "int64"
-          }
+          "required": true
         },
         {
           "name": "name",

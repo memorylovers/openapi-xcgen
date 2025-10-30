@@ -5,9 +5,9 @@
 
 import * as v from "valibot";
 import { BaseSchema } from './BaseSchema';
-import { UserAllOf1Schema } from './UserAllOf1Schema';
+import { UserallOf1Schema } from './UserallOf1Schema';
 
 /**
  * Schema for User
  */
-export const UserSchema = v.intersect([BaseSchema, UserAllOf1Schema]);
+export const UserSchema = v.intersect([BaseSchema, UserallOf1Schema]);

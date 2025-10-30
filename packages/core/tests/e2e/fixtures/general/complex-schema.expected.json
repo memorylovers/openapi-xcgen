@@ -13,10 +13,7 @@
         {
           "name": "id",
           "type": "string",
-          "required": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "items",
@@ -24,10 +21,7 @@
             "kind": "ref",
             "name": "#/components/schemas/OrderItems"
           },
-          "required": true,
-          "validation": {
-            "minItems": 1
-          }
+          "required": true
         },
         {
           "name": "customer",
@@ -97,26 +91,15 @@
         {
           "name": "quantity",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 1
-          }
+          "required": true
         },
         {
           "name": "price",
-          "type": "float",
-          "validation": {
-            "format": "float"
-          }
+          "type": "float"
         },
         {
           "name": "discount",
-          "type": "float",
-          "validation": {
-            "minimum": 0,
-            "maximum": 100,
-            "format": "float"
-          }
+          "type": "float"
         }
       ]
     },
@@ -137,10 +120,7 @@
         },
         {
           "name": "email",
-          "type": "string",
-          "validation": {
-            "format": "email"
-          }
+          "type": "string"
         },
         {
           "name": "address",
@@ -170,10 +150,7 @@
         },
         {
           "name": "zipCode",
-          "type": "string",
-          "validation": {
-            "pattern": "^\\d{5}(-\\d{4})?$"
-          }
+          "type": "string"
         }
       ]
     },
@@ -245,12 +222,27 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "post",
       "path": "/orders",
+      "method": "post",
+      "operationId": "createOrder",
+      "summary": "Create a new order",
       "tags": [
         "orders"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Order"
+            }
+          }
+        ]
+      },
       "responses": [
         {
           "kind": "content",
@@ -266,22 +258,7 @@
             }
           ]
         }
-      ],
-      "operationId": "createOrder",
-      "summary": "Create a new order",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/Order"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     }
   ]
 }

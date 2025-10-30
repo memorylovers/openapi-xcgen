@@ -7,12 +7,17 @@
  */
 
 import { consola } from "consola";
+import { pascalCase } from "es-toolkit/string";
 import type {
   ReferenceObject,
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import {
+  buildInlineSchemaPath,
+  buildReferencePath,
+  getModelName,
+} from "../../helpers";
 import type { VisitorContext } from "../../types";
 import type {
   AdditionalPropertiesTraversalResult,
@@ -59,8 +64,13 @@ export function traverseObjectProperties(
 
   // 各プロパティを訪問
   Object.entries(properties).forEach(([propName, propSchema]) => {
+    // プロパティ名を含む適切なモデル名を生成
+    const parentName = getModelName(context);
+    const propTypeName = `${parentName}${pascalCase(propName)}`;
+
+    // 適切なdocumentPathを構築
     const propContext: VisitorContext = {
-      documentPath: [...context.documentPath, "properties", propName],
+      documentPath: buildInlineSchemaPath(context, propTypeName),
       rootSegment: context.rootSegment,
     };
 

@@ -12,6 +12,6 @@ import { OrderCustomerAddressSchema } from './OrderCustomerAddressSchema';
 export const OrderCustomerSchema = v.object({
   id: v.string(),
   name: v.string(),
-  email: v.optional(v.pipe(v.string(), v.email())),
+  email: v.optional(v.string()),
   address: v.optional(OrderCustomerAddressSchema),
 });

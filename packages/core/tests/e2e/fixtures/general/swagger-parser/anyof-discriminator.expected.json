@@ -23,18 +23,18 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineDiscAnyOf0"
+          "name": "#/components/schemas/FruitInlineDiscanyOf0"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineDiscAnyOf1"
+          "name": "#/components/schemas/FruitInlineDiscanyOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "FruitInlineDiscAnyOf0",
-      "referencePath": "#/components/schemas/FruitInlineDiscAnyOf0",
+      "name": "FruitInlineDiscanyOf0",
+      "referencePath": "#/components/schemas/FruitInlineDiscanyOf0",
       "properties": [
         {
           "name": "seeds",
@@ -50,8 +50,8 @@
     },
     {
       "kind": "object",
-      "name": "FruitInlineDiscAnyOf1",
-      "referencePath": "#/components/schemas/FruitInlineDiscAnyOf1",
+      "name": "FruitInlineDiscanyOf1",
+      "referencePath": "#/components/schemas/FruitInlineDiscanyOf1",
       "properties": [
         {
           "name": "length",
@@ -72,29 +72,29 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf0"
+          "name": "#/components/schemas/FruitInlineInlineDiscanyOf0"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf1"
+          "name": "#/components/schemas/FruitInlineInlineDiscanyOf1"
         }
       ]
     },
     {
       "kind": "anyOf",
-      "name": "FruitInlineInlineDiscAnyOf0",
-      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf0",
+      "name": "FruitInlineInlineDiscanyOf0",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscanyOf0",
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf0AnyOf0"
+          "name": "#/components/schemas/FruitInlineInlineDiscanyOf0anyOf0"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "FruitInlineInlineDiscAnyOf0AnyOf0",
-      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf0AnyOf0",
+      "name": "FruitInlineInlineDiscanyOf0anyOf0",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscanyOf0anyOf0",
       "properties": [
         {
           "name": "fruitType",
@@ -105,19 +105,19 @@
     },
     {
       "kind": "anyOf",
-      "name": "FruitInlineInlineDiscAnyOf1",
-      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf1",
+      "name": "FruitInlineInlineDiscanyOf1",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscanyOf1",
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf1AnyOf0"
+          "name": "#/components/schemas/FruitInlineInlineDiscanyOf1anyOf0"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "FruitInlineInlineDiscAnyOf1AnyOf0",
-      "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf1AnyOf0",
+      "name": "FruitInlineInlineDiscanyOf1anyOf0",
+      "referencePath": "#/components/schemas/FruitInlineInlineDiscanyOf1anyOf0",
       "properties": [
         {
           "name": "fruitType",
@@ -452,8 +452,8 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [

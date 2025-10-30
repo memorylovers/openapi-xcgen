@@ -13,7 +13,7 @@ export const ArticleSchema = v.object({
   name: v.optional(v.string()),
   code: v.optional(v.string()),
   status: v.optional(v.string()),
-  createdAt: v.optional(v.string()), // readOnly
+  createdAt: v.optional(v.string()),
   password: v.optional(v.string()),
   oldId: v.optional(v.string()),
 });

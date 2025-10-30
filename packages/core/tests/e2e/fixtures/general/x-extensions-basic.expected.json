@@ -12,46 +12,21 @@
       "properties": [
         {
           "name": "id",
-          "type": "string",
-          "extensions": {
-            "x-property-extension": "id-field",
-            "x-db-type": "uuid"
-          }
+          "type": "string"
         },
         {
           "name": "name",
-          "type": "string",
-          "extensions": {
-            "x-property-extension": "name-field",
-            "x-searchable": true
-          }
+          "type": "string"
         },
         {
           "name": "email",
-          "type": "string",
-          "validation": {
-            "format": "email"
-          },
-          "extensions": {
-            "x-property-extension": "email-field",
-            "x-unique": true
-          }
+          "type": "string"
         },
         {
           "name": "age",
-          "type": "int",
-          "extensions": {
-            "x-property-extension": "age-field",
-            "x-min": 0,
-            "x-max": 150
-          }
+          "type": "int"
         }
-      ],
-      "extensions": {
-        "x-model-extension": "User-model",
-        "x-table-name": "users",
-        "x-primary-key": "id"
-      }
+      ]
     },
     {
       "kind": "object",
@@ -60,10 +35,7 @@
       "properties": [
         {
           "name": "id",
-          "type": "string",
-          "extensions": {
-            "x-db-type": "uuid"
-          }
+          "type": "string"
         },
         {
           "name": "title",
@@ -75,16 +47,9 @@
         },
         {
           "name": "authorId",
-          "type": "string",
-          "extensions": {
-            "x-foreign-key": "users.id"
-          }
+          "type": "string"
         }
-      ],
-      "extensions": {
-        "x-model-extension": "Post-model",
-        "x-table-name": "posts"
-      }
+      ]
     },
     {
       "kind": "enum",
@@ -113,37 +78,26 @@
     {
       "kind": "parameter",
       "name": "GetUsersIdParams",
-      "description": "Parameters for GET /users/{id}",
+      "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams",
       "properties": [
         {
           "name": "id",
           "type": "string",
           "in": "path",
-          "required": true,
-          "extensions": {
-            "x-parameter-extension": "path-parameter",
-            "x-validation-rule": "uuid-v4"
-          }
+          "required": true
         },
         {
           "name": "include",
           "type": "string",
-          "in": "query",
-          "extensions": {
-            "x-parameter-extension": "query-parameter",
-            "x-allowed-values": [
-              "profile",
-              "settings"
-            ]
-          }
+          "in": "query"
         }
       ],
-      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+      "description": "Parameters for GET /users/{id}"
     },
     {
-      "kind": "requestBody",
+      "kind": "object",
       "name": "PostPostsRequestBody",
-      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBody",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema",
       "properties": [
         {
           "name": "title",
@@ -157,28 +111,29 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags"
+            "name": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags"
           }
         }
-      ],
-      "required": true
+      ]
     },
     {
       "kind": "array",
       "name": "PostPostsRequestBodyTags",
-      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags",
       "itemType": "string"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users/{id}",
+      "method": "get",
+      "operationId": "getUser",
+      "summary": "Get user by ID",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -200,21 +155,28 @@
           "statusCode": "404",
           "description": "User not found"
         }
-      ],
-      "operationId": "getUser",
-      "summary": "Get user by ID",
-      "extensions": {
-        "x-path-item-extension": "Path Item Level",
-        "x-path-custom": true,
-        "x-operation-extension": "Operation Level",
-        "x-rate-limit": 100
-      }
+      ]
     },
     {
-      "method": "post",
       "path": "/posts",
+      "method": "post",
+      "operationId": "createPost",
+      "summary": "Create a new post",
       "tags": [],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::posts/post/requestBody/content/application::json/schema"
+            }
+          }
+        ]
+      },
       "responses": [
         {
           "kind": "content",
@@ -230,28 +192,7 @@
             }
           ]
         }
-      ],
-      "operationId": "createPost",
-      "summary": "Create a new post",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBody"
-            }
-          }
-        ],
-        "required": true
-      },
-      "extensions": {
-        "x-auth-required": true,
-        "x-scopes": [
-          "write:posts"
-        ]
-      }
+      ]
     }
   ]
 }

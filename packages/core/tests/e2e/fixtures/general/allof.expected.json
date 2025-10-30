@@ -34,14 +34,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/UserAllOf1"
+          "name": "#/components/schemas/UserallOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "UserAllOf1",
-      "referencePath": "#/components/schemas/UserAllOf1",
+      "name": "UserallOf1",
+      "referencePath": "#/components/schemas/UserallOf1",
       "properties": [
         {
           "name": "name",
@@ -53,10 +53,7 @@
           "name": "email",
           "type": "string",
           "required": true,
-          "description": "Email address",
-          "validation": {
-            "format": "email"
-          }
+          "description": "Email address"
         }
       ]
     },
@@ -79,7 +76,6 @@
       "kind": "allOf",
       "name": "AuditableUser",
       "referencePath": "#/components/schemas/AuditableUser",
-      "description": "User with audit timestamps",
       "schemas": [
         {
           "kind": "ref",
@@ -91,20 +87,21 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AuditableUserAllOf2"
+          "name": "#/components/schemas/AuditableUserallOf2"
         }
-      ]
+      ],
+      "description": "User with audit timestamps"
     },
     {
       "kind": "object",
-      "name": "AuditableUserAllOf2",
-      "referencePath": "#/components/schemas/AuditableUserAllOf2",
+      "name": "AuditableUserallOf2",
+      "referencePath": "#/components/schemas/AuditableUserallOf2",
       "properties": [
         {
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AuditableUserAllOf2Role"
+            "name": "#/components/schemas/AuditableUserallOf2Role"
           },
           "required": true
         }
@@ -112,8 +109,8 @@
     },
     {
       "kind": "enum",
-      "name": "AuditableUserAllOf2Role",
-      "referencePath": "#/components/schemas/AuditableUserAllOf2Role",
+      "name": "AuditableUserallOf2Role",
+      "referencePath": "#/components/schemas/AuditableUserallOf2Role",
       "type": "string",
       "values": [
         {
@@ -134,8 +131,10 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "operationId": "getUsers",
+      "summary": "Get users",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -153,9 +152,7 @@
             }
           ]
         }
-      ],
-      "operationId": "getUsers",
-      "summary": "Get users"
+      ]
     }
   ]
 }

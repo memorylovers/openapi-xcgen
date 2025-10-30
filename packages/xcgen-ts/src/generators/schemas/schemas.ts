@@ -7,6 +7,7 @@
 import type { XcgenIR } from "@openapi-xcgen/core";
 import { sortModelsByDependencies } from "./schemas-sort";
 import type { IFileWriter } from "../../helpers/file-writer";
+import { toTypeName } from "../../helpers/naming";
 import type { HookableInstance } from "../../hooks";
 import type { GeneratorResult } from "../../types";
 import { runInParallel } from "../../helpers/parallel";
@@ -64,7 +65,7 @@ export async function generateSchemas(
       }
 
       return {
-        path: `schemas/${model.name}Schema.ts`,
+        path: `schemas/${toTypeName(model.name)}Schema.ts`,
         content: generateSchemaFile(model, hooks, schemaImports),
       };
     })

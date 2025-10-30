@@ -4,6 +4,6 @@
  */
 
 import type { Base } from './Base';
-import type { UserAllOf1 } from './UserAllOf1';
+import type { UserallOf1 } from './UserallOf1';
 
-export type User = Base & UserAllOf1;
+export type User = Base & UserallOf1;

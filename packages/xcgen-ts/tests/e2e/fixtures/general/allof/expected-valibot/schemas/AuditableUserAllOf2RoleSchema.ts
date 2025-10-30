@@ -1,11 +1,11 @@
 /**
- * Valibot validation schema for AuditableUserAllOf2Role
+ * Valibot validation schema for AuditableUserallOf2Role
  * Auto-generated from OpenAPI specification
  */
 
 import * as v from "valibot";
 
 /**
- * Schema for AuditableUserAllOf2Role
+ * Schema for AuditableUserallOf2Role
  */
-export const AuditableUserAllOf2RoleSchema = v.picklist(["admin", "user", "guest"]);
+export const AuditableUserallOf2RoleSchema = v.picklist(["admin", "user", "guest"]);

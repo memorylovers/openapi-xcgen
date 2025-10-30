@@ -38,6 +38,8 @@ const testCases = [
   "general/petstore",
   "general/complex-schema",
   "general/multi-service",
+  "general/servers",
+  "general/readonly-writeonly",
   "general/train-travel-api",
   "general/museum-api",
   "general/allof",

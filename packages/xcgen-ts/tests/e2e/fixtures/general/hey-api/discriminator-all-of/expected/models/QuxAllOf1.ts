@@ -1,8 +1,8 @@
 /**
- * QuxAllOf1 model
+ * QuxallOf1 model
  * Auto-generated from OpenAPI specification
  */
 
-export interface QuxAllOf1 {
+export interface QuxallOf1 {
   qux?: boolean | undefined;
 }

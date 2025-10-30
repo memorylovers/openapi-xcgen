@@ -13,11 +13,7 @@
         {
           "name": "id",
           "type": "string",
-          "required": true,
-          "readOnly": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "name",
@@ -32,10 +28,7 @@
         {
           "name": "country_code",
           "type": "string",
-          "required": true,
-          "validation": {
-            "pattern": "^[A-Z]{2}$"
-          }
+          "required": true
         },
         {
           "name": "timezone",
@@ -57,19 +50,11 @@
       "properties": [
         {
           "name": "latitude",
-          "type": "double",
-          "validation": {
-            "minimum": -90,
-            "maximum": 90
-          }
+          "type": "double"
         },
         {
           "name": "longitude",
-          "type": "double",
-          "validation": {
-            "minimum": -180,
-            "maximum": 180
-          }
+          "type": "double"
         }
       ]
     },
@@ -81,11 +66,7 @@
         {
           "name": "id",
           "type": "string",
-          "required": true,
-          "readOnly": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "origin",
@@ -144,11 +125,7 @@
         {
           "name": "trip_id",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "passengers",
@@ -156,11 +133,7 @@
             "kind": "ref",
             "name": "#/components/schemas/BookingRequestPassengers"
           },
-          "required": true,
-          "validation": {
-            "minItems": 1,
-            "maxItems": 10
-          }
+          "required": true
         },
         {
           "name": "seat_preferences",
@@ -212,11 +185,7 @@
         {
           "name": "id",
           "type": "string",
-          "required": true,
-          "readOnly": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "trip",
@@ -240,22 +209,19 @@
             "kind": "ref",
             "name": "#/components/schemas/BookingStatus"
           },
-          "required": true,
-          "readOnly": true
+          "required": true
         },
         {
           "name": "payment_status",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/BookingPaymentStatus"
-          },
-          "readOnly": true
+          }
         },
         {
           "name": "created_at",
           "type": "datetime",
-          "required": true,
-          "readOnly": true
+          "required": true
         },
         {
           "name": "total_price",
@@ -324,19 +290,12 @@
         {
           "name": "name",
           "type": "string",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 200
-          }
+          "required": true
         },
         {
           "name": "email",
           "type": "string",
-          "required": true,
-          "validation": {
-            "format": "email"
-          }
+          "required": true
         },
         {
           "name": "date_of_birth",
@@ -345,10 +304,7 @@
         },
         {
           "name": "passport_number",
-          "type": "string",
-          "validation": {
-            "pattern": "^[A-Z0-9]+$"
-          }
+          "type": "string"
         }
       ]
     },
@@ -360,18 +316,12 @@
         {
           "name": "amount",
           "type": "double",
-          "required": true,
-          "validation": {
-            "minimum": 0
-          }
+          "required": true
         },
         {
           "name": "currency",
           "type": "string",
-          "required": true,
-          "validation": {
-            "pattern": "^[A-Z]{3}$"
-          }
+          "required": true
         }
       ]
     },
@@ -383,54 +333,32 @@
         {
           "name": "method",
           "type": "string",
-          "required": true,
-          "validation": {
-            "const": "card"
-          }
+          "required": true
         },
         {
           "name": "card_number",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "pattern": "^[0-9]{13,19}$"
-          }
+          "required": true
         },
         {
           "name": "card_holder",
           "type": "string",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 100
-          }
+          "required": true
         },
         {
           "name": "expiry_month",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 1,
-            "maximum": 12
-          }
+          "required": true
         },
         {
           "name": "expiry_year",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 2024
-          }
+          "required": true
         },
         {
           "name": "cvv",
           "type": "string",
-          "required": true,
-          "writeOnly": true,
-          "validation": {
-            "pattern": "^[0-9]{3,4}$"
-          }
+          "required": true
         }
       ]
     },
@@ -442,22 +370,17 @@
         {
           "name": "method",
           "type": "string",
-          "required": true,
-          "validation": {
-            "const": "bank_transfer"
-          }
+          "required": true
         },
         {
           "name": "account_number",
           "type": "string",
-          "required": true,
-          "writeOnly": true
+          "required": true
         },
         {
           "name": "routing_number",
           "type": "string",
-          "required": true,
-          "writeOnly": true
+          "required": true
         },
         {
           "name": "account_holder",
@@ -474,10 +397,7 @@
         {
           "name": "payment_id",
           "type": "string",
-          "required": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         },
         {
           "name": "status",
@@ -502,10 +422,7 @@
         },
         {
           "name": "receipt_url",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         }
       ]
     },
@@ -536,38 +453,23 @@
       "properties": [
         {
           "name": "self",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "next",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "prev",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "first",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         },
         {
           "name": "last",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         }
       ]
     },
@@ -579,11 +481,7 @@
         {
           "name": "type",
           "type": "string",
-          "required": true,
-          "defaultValue": "about:blank",
-          "validation": {
-            "format": "uri"
-          }
+          "required": true
         },
         {
           "name": "title",
@@ -593,11 +491,7 @@
         {
           "name": "status",
           "type": "int",
-          "required": true,
-          "validation": {
-            "minimum": 100,
-            "maximum": 599
-          }
+          "required": true
         },
         {
           "name": "detail",
@@ -605,23 +499,53 @@
         },
         {
           "name": "instance",
-          "type": "string",
-          "validation": {
-            "format": "uri"
-          }
+          "type": "string"
         }
       ]
     },
     {
-      "kind": "response",
+      "kind": "parameter",
+      "name": "GetStationsParams",
+      "referencePath": "#/paths/::stations/get/GetStationsParams",
+      "properties": [
+        {
+          "name": "coordinates",
+          "type": "string",
+          "in": "query",
+          "description": "Find stations close to a location."
+        },
+        {
+          "name": "search",
+          "type": "string",
+          "in": "query",
+          "description": "Search for stations by name or code"
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "in": "query",
+          "description": "Filter by country code (ISO 3166-1 alpha-2)"
+        },
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "Maximum number of results",
+          "defaultValue": 10
+        }
+      ],
+      "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results"
+    },
+    {
+      "kind": "object",
       "name": "GetStations200Response",
-      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema",
       "properties": [
         {
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData"
+            "name": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData"
           }
         },
         {
@@ -631,13 +555,12 @@
             "name": "#/components/schemas/PaginationLinks"
           }
         }
-      ],
-      "statusCode": "200"
+      ]
     },
     {
       "kind": "array",
       "name": "GetStations200ResponseData",
-      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Station"
@@ -645,106 +568,22 @@
     },
     {
       "kind": "parameter",
-      "name": "GetStationsParams",
-      "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results",
-      "properties": [
-        {
-          "name": "coordinates",
-          "type": "string",
-          "in": "query",
-          "description": "Find stations close to a location.",
-          "validation": {
-            "pattern": "^(-?\\\\d+\\\\.\\\\d+),(-?\\\\d+\\\\.\\\\d+)$"
-          }
-        },
-        {
-          "name": "search",
-          "type": "string",
-          "in": "query",
-          "description": "Search for stations by name or code",
-          "validation": {
-            "minLength": 3,
-            "maxLength": 100
-          }
-        },
-        {
-          "name": "country",
-          "type": "string",
-          "in": "query",
-          "description": "Filter by country code (ISO 3166-1 alpha-2)",
-          "validation": {
-            "pattern": "^[A-Z]{2}$"
-          }
-        },
-        {
-          "name": "limit",
-          "type": "int",
-          "in": "query",
-          "description": "Maximum number of results",
-          "defaultValue": 10,
-          "validation": {
-            "minimum": 1,
-            "maximum": 100
-          }
-        }
-      ],
-      "referencePath": "#/paths/::stations/get/parameters/GetStationsParams"
-    },
-    {
-      "kind": "response",
-      "name": "GetTrips200Response",
-      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response",
-      "properties": [
-        {
-          "name": "data",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData"
-          }
-        },
-        {
-          "name": "links",
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/PaginationLinks"
-          }
-        }
-      ],
-      "statusCode": "200"
-    },
-    {
-      "kind": "array",
-      "name": "GetTrips200ResponseData",
-      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData",
-      "itemType": {
-        "kind": "ref",
-        "name": "#/components/schemas/Trip"
-      }
-    },
-    {
-      "kind": "parameter",
       "name": "GetTripsParams",
-      "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs",
+      "referencePath": "#/paths/::trips/get/GetTripsParams",
       "properties": [
         {
           "name": "origin",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The ID of the origin station",
-          "validation": {
-            "format": "uuid"
-          }
+          "description": "The ID of the origin station"
         },
         {
           "name": "destination",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The ID of the destination station",
-          "validation": {
-            "format": "uuid"
-          }
+          "description": "The ID of the destination station"
         },
         {
           "name": "date",
@@ -766,18 +605,18 @@
           "description": "Only return trips that allow dogs"
         }
       ],
-      "referencePath": "#/paths/::trips/get/parameters/GetTripsParams"
+      "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs"
     },
     {
-      "kind": "response",
-      "name": "GetBookings200Response",
-      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response",
+      "kind": "object",
+      "name": "GetTrips200Response",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema",
       "properties": [
         {
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData"
+            "name": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData"
           }
         },
         {
@@ -787,13 +626,42 @@
             "name": "#/components/schemas/PaginationLinks"
           }
         }
-      ],
-      "statusCode": "200"
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "GetTrips200ResponseData",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Trip"
+      }
+    },
+    {
+      "kind": "object",
+      "name": "GetBookings200Response",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData"
+          }
+        },
+        {
+          "name": "links",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          }
+        }
+      ]
     },
     {
       "kind": "array",
       "name": "GetBookings200ResponseData",
-      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Booking"
@@ -802,48 +670,49 @@
     {
       "kind": "parameter",
       "name": "GetBookingsBookingIdParams",
-      "description": "Parameters for GET /bookings/{bookingId}",
+      "referencePath": "#/paths/::bookings::{bookingId}/get/GetBookingsBookingIdParams",
       "properties": [
         {
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         }
       ],
-      "referencePath": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+      "description": "Parameters for GET /bookings/{bookingId}"
     },
     {
       "kind": "parameter",
       "name": "DeleteBookingsBookingIdParams",
-      "description": "Parameters for DELETE /bookings/{bookingId}",
+      "referencePath": "#/paths/::bookings::{bookingId}/delete/DeleteBookingsBookingIdParams",
       "properties": [
         {
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true,
-          "validation": {
-            "format": "uuid"
-          }
+          "required": true
         }
       ],
-      "referencePath": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+      "description": "Parameters for DELETE /bookings/{bookingId}"
+    },
+    {
+      "kind": "parameter",
+      "name": "PostBookingsBookingIdPaymentParams",
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/PostBookingsBookingIdPaymentParams",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "description": "Parameters for POST /bookings/{bookingId}/payment"
     },
     {
       "kind": "union",
       "name": "PostBookingsBookingIdPaymentRequestBody",
-      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody",
-      "discriminator": {
-        "propertyName": "method",
-        "mapping": {
-          "card": "#/components/schemas/CardPayment",
-          "bank_transfer": "#/components/schemas/BankTransferPayment"
-        }
-      },
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
       "types": [
         {
           "kind": "ref",
@@ -853,37 +722,26 @@
           "kind": "ref",
           "name": "#/components/schemas/BankTransferPayment"
         }
-      ]
-    },
-    {
-      "kind": "parameter",
-      "name": "PostBookingsBookingIdPaymentParams",
-      "description": "Parameters for POST /bookings/{bookingId}/payment",
-      "properties": [
-        {
-          "name": "bookingId",
-          "type": "string",
-          "in": "path",
-          "required": true,
-          "validation": {
-            "format": "uuid"
-          }
-        }
       ],
-      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+      "discriminator": {
+        "propertyName": "method"
+      }
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/stations",
+      "method": "get",
+      "operationId": "getStations",
+      "summary": "Get a list of train stations",
+      "description": "Returns a list of all train stations in the system.",
       "tags": [
         "Stations"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::stations/get/parameters/GetStationsParams"
+        "name": "#/paths/::stations/get/GetStationsParams"
       },
       "responses": [
         {
@@ -895,7 +753,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response"
+                "name": "#/paths/::stations/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -924,20 +782,20 @@
             "name": "#/components/responses/InternalServerError"
           }
         }
-      ],
-      "operationId": "getStations",
-      "summary": "Get a list of train stations",
-      "description": "Returns a list of all train stations in the system."
+      ]
     },
     {
-      "method": "get",
       "path": "/trips",
+      "method": "get",
+      "operationId": "getTrips",
+      "summary": "Get available train trips",
+      "description": "Returns a list of available trips between stations",
       "tags": [
         "Trips"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::trips/get/parameters/GetTripsParams"
+        "name": "#/paths/::trips/get/GetTripsParams"
       },
       "responses": [
         {
@@ -949,7 +807,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response"
+                "name": "#/paths/::trips/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -970,14 +828,14 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getTrips",
-      "summary": "Get available train trips",
-      "description": "Returns a list of available trips between stations"
+      ]
     },
     {
-      "method": "get",
       "path": "/bookings",
+      "method": "get",
+      "operationId": "getBookings",
+      "summary": "List bookings for the authenticated user",
+      "description": "Returns a list of bookings for the authenticated user",
       "tags": [
         "Bookings"
       ],
@@ -992,7 +850,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response"
+                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1005,18 +863,31 @@
             "name": "#/components/responses/Unauthorized"
           }
         }
-      ],
-      "operationId": "getBookings",
-      "summary": "List bookings for the authenticated user",
-      "description": "Returns a list of bookings for the authenticated user"
+      ]
     },
     {
-      "method": "post",
       "path": "/bookings",
+      "method": "post",
+      "operationId": "createBooking",
+      "summary": "Create a new booking",
+      "description": "Book a trip for one or more passengers",
       "tags": [
         "Bookings"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/BookingRequest"
+            }
+          }
+        ]
+      },
       "responses": [
         {
           "kind": "content",
@@ -1063,33 +934,20 @@
             "name": "#/components/responses/Conflict"
           }
         }
-      ],
-      "operationId": "createBooking",
-      "summary": "Create a new booking",
-      "description": "Book a trip for one or more passengers",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/BookingRequest"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     },
     {
-      "method": "get",
       "path": "/bookings/{bookingId}",
+      "method": "get",
+      "operationId": "getBooking",
+      "summary": "Get booking details",
+      "description": "Returns details of a specific booking",
       "tags": [
         "Bookings"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+        "name": "#/paths/::bookings::{bookingId}/get/GetBookingsBookingIdParams"
       },
       "responses": [
         {
@@ -1122,20 +980,20 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getBooking",
-      "summary": "Get booking details",
-      "description": "Returns details of a specific booking"
+      ]
     },
     {
-      "method": "delete",
       "path": "/bookings/{bookingId}",
+      "method": "delete",
+      "operationId": "cancelBooking",
+      "summary": "Cancel a booking",
+      "description": "Cancel an existing booking",
       "tags": [
         "Bookings"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+        "name": "#/paths/::bookings::{bookingId}/delete/DeleteBookingsBookingIdParams"
       },
       "responses": [
         {
@@ -1167,20 +1025,33 @@
             "name": "#/components/responses/Conflict"
           }
         }
-      ],
-      "operationId": "cancelBooking",
-      "summary": "Cancel a booking",
-      "description": "Cancel an existing booking"
+      ]
     },
     {
-      "method": "post",
       "path": "/bookings/{bookingId}/payment",
+      "method": "post",
+      "operationId": "payForBooking",
+      "summary": "Pay for a booking",
+      "description": "Process payment for a booking",
       "tags": [
         "Payments"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+        "name": "#/paths/::bookings::{bookingId}::payment/post/PostBookingsBookingIdPaymentParams"
+      },
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema"
+            }
+          }
+        ]
       },
       "responses": [
         {
@@ -1235,23 +1106,7 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "payForBooking",
-      "summary": "Pay for a booking",
-      "description": "Process payment for a booking",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     }
   ],
   "servers": [
@@ -1280,108 +1135,5 @@
     {
       "scheme": "OAuth2"
     }
-  ],
-  "commonResponses": {
-    "BadRequest": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Bad Request - Invalid input",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "Unauthorized": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Unauthorized - Authentication required",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "NotFound": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Not Found - Resource not found",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "Conflict": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Conflict - Resource state conflict",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    },
-    "TooManyRequests": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Too Many Requests - Rate limit exceeded",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ],
-      "headers": [
-        {
-          "name": "RateLimit-Limit",
-          "type": "int",
-          "description": "Request limit per hour"
-        },
-        {
-          "name": "RateLimit-Remaining",
-          "type": "int",
-          "description": "Remaining requests"
-        },
-        {
-          "name": "RateLimit-Reset",
-          "type": "int",
-          "description": "Time when limit resets (Unix timestamp)"
-        }
-      ]
-    },
-    "InternalServerError": {
-      "kind": "content",
-      "statusCode": "200",
-      "description": "Internal Server Error",
-      "content": [
-        {
-          "mimeType": "application/problem+json",
-          "schema": {
-            "kind": "ref",
-            "name": "#/components/schemas/Problem"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }

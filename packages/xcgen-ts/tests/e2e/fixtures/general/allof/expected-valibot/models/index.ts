@@ -5,8 +5,8 @@
 
 export * from './Base';
 export * from './User';
-export * from './UserAllOf1';
+export * from './UserallOf1';
 export * from './Timestamps';
 export * from './AuditableUser';
-export * from './AuditableUserAllOf2';
-export * from './AuditableUserAllOf2Role';
+export * from './AuditableUserallOf2';
+export * from './AuditableUserallOf2Role';

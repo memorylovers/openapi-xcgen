@@ -41,8 +41,13 @@ export { aggregateParameters } from "./aggregators/parameter-aggregator";
 export { transformAllOf } from "./transformers/allof-transformer";
 export { transformAnyOf } from "./transformers/anyof-transformer";
 export { transformArray } from "./transformers/array-transformer";
+export {
+  transformComponents,
+  type ComponentsTransformResult,
+} from "./transformers/components-transformer";
 export { transformEnum } from "./transformers/enum-transformer";
 export { transformMap } from "./transformers/map-transformer";
+export { transformMetadata } from "./transformers/metadata-transformer";
 export { transformObject } from "./transformers/object-transformer";
 export { transformOneOf } from "./transformers/oneof-transformer";
 export {
@@ -64,9 +69,14 @@ export {
   transformResponseObject,
 } from "./transformers/response-transformer";
 export {
+  transformSecurityScheme,
+  transformSecuritySchemes,
+} from "./transformers/security-schemes-transformer";
+export {
   transformServers,
   type ServersTransformResult,
 } from "./transformers/servers-transformer";
+export { transformTags } from "./transformers/tags-transformer";
 
 // Traversers
 export { traverseArrayItem } from "./traversers/array-traverser";

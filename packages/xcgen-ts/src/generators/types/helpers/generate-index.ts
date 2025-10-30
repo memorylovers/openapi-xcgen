@@ -5,6 +5,7 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
+import { toTypeName } from "../../../helpers/naming";
 
 /**
  * 純粋関数: IRModel[] → models/index.ts コード
@@ -31,7 +32,7 @@ export function generateModelsIndex(models: IRModel[]): string {
   lines.push("");
 
   for (const model of models) {
-    lines.push(`export * from './${model.name}';`);
+    lines.push(`export * from './${toTypeName(model.name)}';`);
   }
 
   return lines.join("\n");
@@ -122,7 +123,7 @@ if (import.meta.vitest) {
 
       const result = generateModelsIndex(models);
 
-      expect(result).toContain("export * from './User_Profile';");
+      expect(result).toContain("export * from './UserProfile';");
     });
   });
 }

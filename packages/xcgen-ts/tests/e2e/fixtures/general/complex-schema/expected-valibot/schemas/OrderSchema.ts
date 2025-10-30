@@ -15,7 +15,7 @@ import { OrderTagsSchema } from './OrderTagsSchema';
  * Schema for Order
  */
 export const OrderSchema = v.object({
-  id: v.pipe(v.string(), v.uuid()),
+  id: v.string(),
   items: OrderItemsSchema,
   customer: OrderCustomerSchema,
   status: v.optional(OrderStatusSchema),

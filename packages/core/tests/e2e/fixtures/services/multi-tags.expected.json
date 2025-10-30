@@ -8,8 +8,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/endpoint1",
+      "method": "get",
+      "operationId": "endpoint1",
       "tags": [
         "users",
         "admin"
@@ -27,12 +28,12 @@
             }
           ]
         }
-      ],
-      "operationId": "endpoint1"
+      ]
     },
     {
-      "method": "get",
       "path": "/endpoint2",
+      "method": "get",
+      "operationId": "endpoint2",
       "tags": [
         "admin",
         "users"
@@ -50,12 +51,12 @@
             }
           ]
         }
-      ],
-      "operationId": "endpoint2"
+      ]
     },
     {
-      "method": "get",
       "path": "/endpoint3",
+      "method": "get",
+      "operationId": "endpoint3",
       "tags": [
         "products",
         "admin",
@@ -74,8 +75,7 @@
             }
           ]
         }
-      ],
-      "operationId": "endpoint3"
+      ]
     }
   ]
 }

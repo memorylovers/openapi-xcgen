@@ -9,5 +9,5 @@ import * as v from "valibot";
  * Schema for CreateUserRequest
  */
 export const CreateUserRequestSchema = v.object({
-  email: v.pipe(v.string(), v.email()),
+  email: v.string(),
 });

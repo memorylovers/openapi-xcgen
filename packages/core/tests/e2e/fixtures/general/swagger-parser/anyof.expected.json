@@ -45,8 +45,8 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [

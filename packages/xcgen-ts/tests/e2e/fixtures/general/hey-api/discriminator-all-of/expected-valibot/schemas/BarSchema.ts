@@ -4,10 +4,10 @@
  */
 
 import * as v from "valibot";
-import { BarAllOf1Schema } from './BarAllOf1Schema';
+import { BarallOf1Schema } from './BarallOf1Schema';
 import { FooSchema } from './FooSchema';
 
 /**
  * Schema for Bar
  */
-export const BarSchema = v.intersect([FooSchema, BarAllOf1Schema]);
+export const BarSchema = v.intersect([FooSchema, BarallOf1Schema]);

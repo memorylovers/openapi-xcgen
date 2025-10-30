@@ -15,14 +15,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperBabyAllOf1"
+          "name": "#/components/schemas/SuperBabyallOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "SuperBabyAllOf1",
-      "referencePath": "#/components/schemas/SuperBabyAllOf1",
+      "name": "SuperBabyallOf1",
+      "referencePath": "#/components/schemas/SuperBabyallOf1",
       "properties": [
         {
           "name": "gender",
@@ -45,14 +45,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperBoyAllOf1"
+          "name": "#/components/schemas/SuperBoyallOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "SuperBoyAllOf1",
-      "referencePath": "#/components/schemas/SuperBoyAllOf1",
+      "name": "SuperBoyallOf1",
+      "referencePath": "#/components/schemas/SuperBoyallOf1",
       "properties": [
         {
           "name": "category",
@@ -80,14 +80,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperManAllOf2"
+          "name": "#/components/schemas/SuperManallOf2"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "SuperManAllOf2",
-      "referencePath": "#/components/schemas/SuperManAllOf2",
+      "name": "SuperManallOf2",
+      "referencePath": "#/components/schemas/SuperManallOf2",
       "properties": [
         {
           "name": "category",
@@ -107,10 +107,7 @@
       "properties": [
         {
           "name": "reward",
-          "type": "long",
-          "validation": {
-            "format": "int64"
-          }
+          "type": "long"
         },
         {
           "name": "origin",
@@ -128,10 +125,7 @@
         {
           "name": "id",
           "type": "long",
-          "required": true,
-          "validation": {
-            "format": "int64"
-          }
+          "required": true
         },
         {
           "name": "name",
@@ -143,7 +137,7 @@
     {
       "kind": "parameter",
       "name": "GetPersonDisplayPersonIdParams",
-      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve",
+      "referencePath": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams",
       "properties": [
         {
           "name": "personId",
@@ -153,18 +147,19 @@
           "description": "The id of the person to retrieve"
         }
       ],
-      "referencePath": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+      "description": "Parameters for GET /person/display/{personId}\npersonId: The id of the person to retrieve"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/person/display/{personId}",
+      "method": "get",
+      "operationId": "list",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::person::display::{personId}/get/parameters/GetPersonDisplayPersonIdParams"
+        "name": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams"
       },
       "responses": [
         {
@@ -181,8 +176,7 @@
             }
           ]
         }
-      ],
-      "operationId": "list"
+      ]
     }
   ],
   "servers": [

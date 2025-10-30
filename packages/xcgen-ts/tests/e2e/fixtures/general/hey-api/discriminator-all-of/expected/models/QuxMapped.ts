@@ -4,6 +4,6 @@
  */
 
 import type { FooMapped } from './FooMapped';
-import type { QuxMappedAllOf1 } from './QuxMappedAllOf1';
+import type { QuxMappedallOf1 } from './QuxMappedallOf1';
 
-export type QuxMapped = FooMapped & QuxMappedAllOf1;
+export type QuxMapped = FooMapped & QuxMappedallOf1;

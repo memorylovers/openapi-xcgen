@@ -5,6 +5,7 @@
  */
 
 import type { IRModel } from "@openapi-xcgen/core";
+import { toTypeName } from "../../../helpers/naming";
 
 /**
  * 純粋関数: IRModel[] → schemas/index.ts コード
@@ -35,7 +36,7 @@ export function generateSchemasIndex(models: IRModel[]): string {
   // parameterモデルはスキーマを生成しないため除外
   for (const model of models) {
     if (model.kind !== "parameter") {
-      lines.push(`export * from './${model.name}Schema';`);
+      lines.push(`export * from './${toTypeName(model.name)}Schema';`);
     }
   }
 

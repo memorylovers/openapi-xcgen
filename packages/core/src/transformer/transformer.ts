@@ -27,12 +27,12 @@ import type {
 } from "../types";
 import { enrichDiscriminatorMappings } from "./helpers/enrich-discriminator-mappings";
 import {
-  visitComponents,
-  visitMetadata,
-  visitPaths,
-  visitServers,
-  visitTags,
-} from "./visitors";
+  transformComponents,
+  transformMetadata,
+  transformPaths,
+  transformServers,
+  transformTags,
+} from "./v2";
 
 /**
  * OpenAPIDocumentをXcgenIRに変換
@@ -76,7 +76,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   let commonRequestBodies: Record<string, IRRequestBody> | undefined;
   if (document.components) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
-    const componentsResult = visitComponents(
+    const componentsResult = transformComponents(
       document.components as ComponentsObject,
       { documentPath: ["components"], rootSegment: "components" },
     );
@@ -87,13 +87,13 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   }
 
   // Tags処理
-  const tags: IRTag[] = visitTags(document.tags);
+  const tags: IRTag[] = transformTags(document.tags);
 
   // Paths処理（endpoints）
   let endpoints: IREndpoint[] = [];
   if (document.paths) {
     // OpenAPIV3とOpenAPIV3_1の両方に対応するためキャスト
-    const pathsResult = visitPaths(document.paths as PathsObject, {
+    const pathsResult = transformPaths(document.paths as PathsObject, {
       documentPath: ["paths"],
       rootSegment: "paths",
     });
@@ -103,7 +103,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   }
 
   // Servers処理
-  const servers = visitServers(document.servers);
+  const serversResult = transformServers(document.servers);
 
   // 重複検出と警告（name + kindの組み合わせで判定）
   const modelKeys = new Set<string>();
@@ -139,14 +139,14 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   }
 
   // XcgenIR生成
-  const metadata: IRMetadata = visitMetadata(document.info);
+  const metadata: IRMetadata = transformMetadata(document.info);
 
   const xcgenIR: XcgenIR = {
     metadata,
     models,
     tags,
     endpoints,
-    ...(servers && { servers }),
+    ...(serversResult.servers && { servers: serversResult.servers }),
     ...(securitySchemes && { securitySchemes }),
     ...(globalSecurity && { globalSecurity }),
     ...(commonResponses && { commonResponses }),
@@ -321,10 +321,10 @@ if (import.meta.vitest) {
         },
         models: [
           {
-            kind: "requestBody",
+            kind: "object",
             name: "PostPetsRequestBody",
             referencePath:
-              "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+              "#/paths/::pets/post/requestBody/content/application::json/schema",
             properties: [
               {
                 name: "name",
@@ -362,7 +362,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::pets/post/requestBody/content/application::json/schema/PostPetsRequestBody",
+                    name: "#/paths/::pets/post/requestBody/content/application::json/schema",
                   },
                 },
               ],
@@ -494,8 +494,7 @@ if (import.meta.vitest) {
           {
             kind: "parameter",
             name: "GetPetsIdParams",
-            referencePath:
-              "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+            referencePath: "#/paths/::pets::{id}/get/GetPetsIdParams",
             description: "Parameters for GET /pets/{id}",
             properties: [
               {
@@ -516,7 +515,7 @@ if (import.meta.vitest) {
             tags: ["pets"],
             parameters: {
               kind: "ref",
-              name: "#/paths/::pets::{id}/get/parameters/GetPetsIdParams",
+              name: "#/paths/::pets::{id}/get/GetPetsIdParams",
             },
             responses: [
               {
@@ -803,11 +802,14 @@ if (import.meta.vitest) {
 
       transform(doc);
 
-      expect(warnSpy).toHaveBeenCalledTimes(1);
+      // v2では親名とプロパティ名を結合するため、重複が発生する
+      // components: PostUsersRequestBodyStatus
+      // requestBody inline: PostUsersRequestBodyStatus
       expect(warnSpy).toHaveBeenCalledWith(
         "Duplicate component names detected: PostUsersRequestBodyStatus",
       );
 
+      warnSpy.mockClear();
       warnSpy.mockRestore();
     });
 

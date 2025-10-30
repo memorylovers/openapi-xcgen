@@ -11,8 +11,8 @@ import * as v from "valibot";
  */
 export const UserUpdateSchema = v.object({
   username: v.optional(v.string()),
-  email: v.optional(v.pipe(v.string(), v.email())),
+  email: v.optional(v.string()),
   currentPassword: v.optional(v.string()),
   newPassword: v.optional(v.string()),
-  lastLoginAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))), // readOnly
+  lastLoginAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
 });

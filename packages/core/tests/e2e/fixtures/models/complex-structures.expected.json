@@ -170,7 +170,7 @@
     {
       "kind": "array",
       "name": "GetUsers200Response",
-      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/User"
@@ -180,8 +180,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/level1",
+      "method": "get",
+      "summary": "1階層ネスト",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -199,12 +200,12 @@
             }
           ]
         }
-      ],
-      "summary": "1階層ネスト"
+      ]
     },
     {
-      "method": "get",
       "path": "/level2",
+      "method": "get",
+      "summary": "2階層ネスト",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -222,12 +223,12 @@
             }
           ]
         }
-      ],
-      "summary": "2階層ネスト"
+      ]
     },
     {
-      "method": "get",
       "path": "/level3",
+      "method": "get",
+      "summary": "3階層ネスト",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -245,12 +246,12 @@
             }
           ]
         }
-      ],
-      "summary": "3階層ネスト"
+      ]
     },
     {
-      "method": "get",
       "path": "/teams",
+      "method": "get",
+      "summary": "オブジェクト内の配列",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -268,12 +269,12 @@
             }
           ]
         }
-      ],
-      "summary": "オブジェクト内の配列"
+      ]
     },
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "summary": "トップレベルが配列",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -286,13 +287,12 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response"
+                "name": "#/paths/::users/get/responses/200/content/application::json/schema"
               }
             }
           ]
         }
-      ],
-      "summary": "トップレベルが配列"
+      ]
     }
   ]
 }

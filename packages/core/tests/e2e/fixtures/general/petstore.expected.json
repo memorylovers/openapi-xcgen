@@ -13,10 +13,7 @@
         {
           "name": "id",
           "type": "long",
-          "required": true,
-          "validation": {
-            "format": "int64"
-          }
+          "required": true
         },
         {
           "name": "name",
@@ -53,10 +50,7 @@
         {
           "name": "code",
           "type": "int",
-          "required": true,
-          "validation": {
-            "format": "int32"
-          }
+          "required": true
         },
         {
           "name": "message",
@@ -66,9 +60,24 @@
       ]
     },
     {
+      "kind": "parameter",
+      "name": "GetPetsParams",
+      "referencePath": "#/paths/::pets/get/GetPetsParams",
+      "properties": [
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "How many items to return at one time",
+          "defaultValue": 20
+        }
+      ],
+      "description": "Parameters for GET /pets\nlimit: How many items to return at one time"
+    },
+    {
       "kind": "array",
       "name": "GetPets200Response",
-      "referencePath": "#/paths/::pets/get/responses/200/content/application::json/schema/GetPets200Response",
+      "referencePath": "#/paths/::pets/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Pet"
@@ -76,28 +85,8 @@
     },
     {
       "kind": "parameter",
-      "name": "GetPetsParams",
-      "description": "Parameters for GET /pets\nlimit: How many items to return at one time",
-      "properties": [
-        {
-          "name": "limit",
-          "type": "int",
-          "in": "query",
-          "description": "How many items to return at one time",
-          "defaultValue": 20,
-          "validation": {
-            "minimum": 1,
-            "maximum": 100,
-            "format": "int32"
-          }
-        }
-      ],
-      "referencePath": "#/paths/::pets/get/parameters/GetPetsParams"
-    },
-    {
-      "kind": "parameter",
       "name": "GetPetsPetIdParams",
-      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve",
+      "referencePath": "#/paths/::pets::{petId}/get/GetPetsPetIdParams",
       "properties": [
         {
           "name": "petId",
@@ -107,20 +96,22 @@
           "description": "The id of the pet to retrieve"
         }
       ],
-      "referencePath": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
+      "description": "Parameters for GET /pets/{petId}\npetId: The id of the pet to retrieve"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/pets",
+      "method": "get",
+      "operationId": "listPets",
+      "summary": "List all pets",
       "tags": [
         "pets"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets/get/parameters/GetPetsParams"
+        "name": "#/paths/::pets/get/GetPetsParams"
       },
       "responses": [
         {
@@ -132,7 +123,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::pets/get/responses/200/content/application::json/schema/GetPets200Response"
+                "name": "#/paths/::pets/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -151,17 +142,30 @@
             }
           ]
         }
-      ],
-      "operationId": "listPets",
-      "summary": "List all pets"
+      ]
     },
     {
-      "method": "post",
       "path": "/pets",
+      "method": "post",
+      "operationId": "createPet",
+      "summary": "Create a pet",
       "tags": [
         "pets"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "required": true,
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/NewPet"
+            }
+          }
+        ]
+      },
       "responses": [
         {
           "kind": "content",
@@ -191,32 +195,19 @@
             }
           ]
         }
-      ],
-      "operationId": "createPet",
-      "summary": "Create a pet",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/NewPet"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     },
     {
-      "method": "get",
       "path": "/pets/{petId}",
+      "method": "get",
+      "operationId": "getPetById",
+      "summary": "Info for a specific pet",
       "tags": [
         "pets"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets::{petId}/get/parameters/GetPetsPetIdParams"
+        "name": "#/paths/::pets::{petId}/get/GetPetsPetIdParams"
       },
       "responses": [
         {
@@ -252,9 +243,7 @@
             }
           ]
         }
-      ],
-      "operationId": "getPetById",
-      "summary": "Info for a specific pet"
+      ]
     }
   ],
   "servers": [
