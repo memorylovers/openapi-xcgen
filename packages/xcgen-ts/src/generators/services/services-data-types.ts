@@ -2,8 +2,8 @@
  * エンドポイントのデータ型情報を抽出
  */
 
-import type { IREndpoint } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming";
+import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import { resolveModelName } from "../../helpers/model-resolver";
 
 /**
  * エンドポイントのデータ型情報
@@ -20,6 +20,7 @@ export interface EndpointDataTypes {
 /**
  * IREndpointからデータ型情報を抽出
  * @param endpoint - IRエンドポイント
+ * @param models - IRモデルリスト（型名解決用）
  * @returns データ型情報
  *
  * @example
@@ -29,7 +30,8 @@ export interface EndpointDataTypes {
  *   parameters: { kind: "ref", name: "#/paths/.../GetPetsParams" },
  *   ...
  * };
- * const result = getEndpointDataTypes(endpoint);
+ * const models: IRModel[] = [...];
+ * const result = getEndpointDataTypes(endpoint, models);
  * // => { parameterType: "GetPetsParams", needsDataType: true }
  *
  * // パラメータなし
@@ -37,11 +39,14 @@ export interface EndpointDataTypes {
  *   parameters: [],
  *   ...
  * };
- * const result = getEndpointDataTypes(endpoint);
+ * const result = getEndpointDataTypes(endpoint, models);
  * // => { needsDataType: false }
  * ```
  */
-export function getEndpointDataTypes(endpoint: IREndpoint): EndpointDataTypes {
+export function getEndpointDataTypes(
+  endpoint: IREndpoint,
+  models: readonly IRModel[],
+): EndpointDataTypes {
   let parameterType: string | undefined;
   let requestBodyType: string | undefined;
 
@@ -52,11 +57,8 @@ export function getEndpointDataTypes(endpoint: IREndpoint): EndpointDataTypes {
       typeof endpoint.parameters !== "string" &&
       endpoint.parameters.kind === "ref"
     ) {
-      // Core packageはreference path全体を保存: "#/paths/.../GetPetsParams"
-      // 最後のセグメントを抽出: "GetPetsParams"
-      const modelName =
-        endpoint.parameters.name.split("/").at(-1) ?? endpoint.parameters.name;
-      parameterType = toTypeName(modelName);
+      // IRモデルリストから正しいモデル名を逆引き
+      parameterType = resolveModelName(endpoint.parameters.name, models);
     }
   }
 
@@ -64,11 +66,8 @@ export function getEndpointDataTypes(endpoint: IREndpoint): EndpointDataTypes {
   if (endpoint.requestBody && endpoint.requestBody.kind === "content") {
     for (const content of endpoint.requestBody.content) {
       if (typeof content.schema !== "string" && content.schema.kind === "ref") {
-        // Core packageはreference path全体を保存
-        // 最後のセグメントを抽出
-        const modelName =
-          content.schema.name.split("/").at(-1) ?? content.schema.name;
-        requestBodyType = toTypeName(modelName);
+        // IRモデルリストから正しいモデル名を逆引き
+        requestBodyType = resolveModelName(content.schema.name, models);
         break; // 最初のスキーマのみ使用
       }
     }
@@ -101,7 +100,7 @@ if (import.meta.vitest) {
           responses: [],
         };
 
-        const result = getEndpointDataTypes(endpoint);
+        const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
           parameterType: "GetPetsParams",
@@ -118,7 +117,7 @@ if (import.meta.vitest) {
           responses: [],
         };
 
-        const result = getEndpointDataTypes(endpoint);
+        const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
           needsDataType: false,
@@ -147,7 +146,7 @@ if (import.meta.vitest) {
           responses: [],
         };
 
-        const result = getEndpointDataTypes(endpoint);
+        const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
           requestBodyType: "PostPetsRequestBody",
@@ -180,7 +179,7 @@ if (import.meta.vitest) {
           responses: [],
         };
 
-        const result = getEndpointDataTypes(endpoint);
+        const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
           parameterType: "PutPetsIdParams",
@@ -198,7 +197,7 @@ if (import.meta.vitest) {
           responses: [],
         };
 
-        const result = getEndpointDataTypes(endpoint);
+        const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
           needsDataType: false,
@@ -224,7 +223,7 @@ if (import.meta.vitest) {
           responses: [],
         };
 
-        const result = getEndpointDataTypes(endpoint);
+        const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
           needsDataType: false,

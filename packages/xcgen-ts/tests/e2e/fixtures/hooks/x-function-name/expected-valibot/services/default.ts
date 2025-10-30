@@ -5,18 +5,18 @@
 
 import { request } from "../client";
 import type { XcgenApiError as _XcgenApiError } from "../client";
-import type { Schema, CreateUserRequest, User, GetUsersUserIdParams } from "../models/index";
-export type { Schema, CreateUserRequest, User, GetUsersUserIdParams } from "../models/index";
+import type { GetUsers200Response, CreateUserRequest, User, GetUsersUserIdParams } from "../models/index";
+export type { GetUsers200Response, CreateUserRequest, User, GetUsersUserIdParams } from "../models/index";
 
 /**
  * Get all users
  * @param init - Additional fetch options
- * @returns Schema
+ * @returns GetUsers200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function getUsers(
   init?: RequestInit,
-): Promise<Schema> {
+): Promise<GetUsers200Response> {
   return request({
     method: "GET",
     path: "/users",

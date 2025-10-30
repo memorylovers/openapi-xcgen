@@ -4,7 +4,7 @@
  * タグ別のエンドポイントグループからサービスファイルを生成
  */
 
-import type { IREndpoint } from "@openapi-xcgen/core";
+import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
 import { processImports } from "../../../helpers/import-handler";
 import type { HookableInstance } from "../../../hooks";
 import { generateServicesImports } from "../services-imports";
@@ -15,6 +15,7 @@ import { generateEndpoint } from "../services-endpoint";
  *
  * @param tag - タグ名
  * @param endpoints - そのタグに属するエンドポイント配列
+ * @param models - IRモデルリスト（型名解決用）
  * @param hooks - Hook instance（オプション）
  * @returns サービスファイルのコード
  *
@@ -24,13 +25,15 @@ import { generateEndpoint } from "../services-endpoint";
  *   { operationId: "getPet", ... },
  *   { operationId: "createPet", ... }
  * ];
- * generateServiceFile("pets", endpoints);
+ * const models: IRModel[] = [...];
+ * generateServiceFile("pets", endpoints, models);
  * // => "/**\n * pets service functions\n * ...\n *\/\n\nimport { request } from '../client';\n\nexport async function getPet(...) { ... }"
  * ```
  */
 export function generateServiceFile(
   tag: string,
   endpoints: IREndpoint[],
+  models: readonly IRModel[],
   hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
@@ -42,7 +45,7 @@ export function generateServiceFile(
   lines.push("");
 
   // インポート文（自動検出）
-  lines.push(generateServicesImports(endpoints));
+  lines.push(generateServicesImports(endpoints, models));
 
   // Hookで追加されたimportを収集
   const customImports = new Set<string>();
@@ -78,7 +81,7 @@ export function generateServiceFile(
   // 各エンドポイントを関数に変換
   for (const endpoint of endpoints) {
     if (endpoint.operationId) {
-      const functionCode = generateEndpoint(endpoint, hooks);
+      const functionCode = generateEndpoint(endpoint, models, hooks);
       if (functionCode) {
         lines.push(functionCode);
         lines.push("");
@@ -118,7 +121,7 @@ if (import.meta.vitest) {
         },
       ];
 
-      const result = generateServiceFile("pets", endpoints);
+      const result = generateServiceFile("pets", endpoints, []);
 
       expect(result).toContain("/**");
       expect(result).toContain(" * pets service functions");
@@ -148,7 +151,7 @@ if (import.meta.vitest) {
         },
       ];
 
-      const result = generateServiceFile("pets", endpoints);
+      const result = generateServiceFile("pets", endpoints, []);
 
       expect(result).toContain("export async function getPets");
       expect(result).toContain("export async function getPet");
@@ -166,7 +169,7 @@ if (import.meta.vitest) {
         },
       ];
 
-      const result = generateServiceFile("pets", endpoints);
+      const result = generateServiceFile("pets", endpoints, []);
 
       expect(result).toContain(" * pets service functions");
       expect(result).not.toContain("export async function");
@@ -184,7 +187,7 @@ if (import.meta.vitest) {
         },
       ];
 
-      const result = generateServiceFile("default", endpoints);
+      const result = generateServiceFile("default", endpoints, []);
 
       expect(result).toContain(" * default service functions");
       expect(result).toContain("export async function healthCheck");

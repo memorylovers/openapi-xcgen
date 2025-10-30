@@ -2,16 +2,20 @@
  * サービスインポート文生成
  */
 
-import type { IREndpoint } from "@openapi-xcgen/core";
-import { toTypeName } from "../../helpers/naming";
+import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
 import { getEndpointDataTypes } from "./services-data-types";
+import { resolveModelName } from "../../helpers/model-resolver";
 
 /**
  * サービスファイルのインポート文を生成
  * @param endpoints - エンドポイント配列
+ * @param models - IRモデルリスト（型名解決用）
  * @returns インポート文字列
  */
-export function generateServicesImports(endpoints: IREndpoint[]): string {
+export function generateServicesImports(
+  endpoints: IREndpoint[],
+  models: readonly IRModel[],
+): string {
   const lines: string[] = [];
 
   // clientのインポート（servicesはservices/ディレクトリ内なので相対パス）
@@ -25,7 +29,7 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
   for (const endpoint of endpoints) {
     if (endpoint.operationId) {
       // エンドポイントのデータ型情報を取得
-      const dataTypes = getEndpointDataTypes(endpoint);
+      const dataTypes = getEndpointDataTypes(endpoint, models);
 
       // パラメータ型をインポート
       if (dataTypes.parameterType) {
@@ -50,11 +54,9 @@ export function generateServicesImports(endpoints: IREndpoint[]): string {
             typeof content.schema !== "string" &&
             content.schema.kind === "ref"
           ) {
-            // Core packageはreference path全体を保存: "#/components/schemas/Pet"
-            // 最後のセグメントを抽出: "Pet"
-            const modelName =
-              content.schema.name.split("/").at(-1) ?? content.schema.name;
-            importedTypes.add(toTypeName(modelName));
+            // IRモデルリストから正しいモデル名を逆引き
+            const modelName = resolveModelName(content.schema.name, models);
+            importedTypes.add(modelName);
           }
         }
       }
@@ -81,7 +83,7 @@ if (import.meta.vitest) {
       it("should generate client imports", () => {
         const endpoints: IREndpoint[] = [];
 
-        const result = generateServicesImports(endpoints);
+        const result = generateServicesImports(endpoints, []);
 
         expect(result).toEqual(
           `
@@ -115,7 +117,7 @@ import type { XcgenApiError as _XcgenApiError } from "../client";
           },
         ];
 
-        const result = generateServicesImports(endpoints);
+        const result = generateServicesImports(endpoints, []);
 
         expect(result).toEqual(
           `
@@ -138,7 +140,7 @@ export type { Pet } from "../models/index";
           },
         ];
 
-        const result = generateServicesImports(endpoints);
+        const result = generateServicesImports(endpoints, []);
 
         expect(result).toEqual(
           `
@@ -183,7 +185,7 @@ import type { XcgenApiError as _XcgenApiError } from "../client";
           },
         ];
 
-        const result = generateServicesImports(endpoints);
+        const result = generateServicesImports(endpoints, []);
 
         // Should only import GetBookings200Response, not Problem
         expect(result).toEqual(

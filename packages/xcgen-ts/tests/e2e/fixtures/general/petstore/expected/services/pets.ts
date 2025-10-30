@@ -5,20 +5,20 @@
 
 import { request } from "../client";
 import type { XcgenApiError as _XcgenApiError } from "../client";
-import type { GetPetsParams, Schema, NewPet, Pet, GetPetsPetIdParams } from "../models/index";
-export type { GetPetsParams, Schema, NewPet, Pet, GetPetsPetIdParams } from "../models/index";
+import type { GetPetsParams, GetPets200Response, NewPet, Pet, GetPetsPetIdParams } from "../models/index";
+export type { GetPetsParams, GetPets200Response, NewPet, Pet, GetPetsPetIdParams } from "../models/index";
 
 /**
  * List all pets
  * @param options - Request parameters
  * @param init - Additional fetch options
- * @returns Schema
+ * @returns GetPets200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
 export async function listPets(
   options: GetPetsParams,
   init?: RequestInit,
-): Promise<Schema> {
+): Promise<GetPets200Response> {
   return request({
     method: "GET",
     path: "/pets",
