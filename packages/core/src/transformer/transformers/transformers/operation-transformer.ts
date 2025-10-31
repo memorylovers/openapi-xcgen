@@ -76,12 +76,24 @@ function convertToIRParameter(
  *
  * @param security - OpenAPIのsecurity配列
  * @returns IRSecurityRequirement配列、存在しない場合はundefined
+ *
+ * @remarks
+ * OpenAPI仕様では security: [] は「認証不要」を意味し、グローバルsecurityを上書きします。
+ * - security: undefined → グローバルsecurityを使用
+ * - security: [] → 認証不要（グローバルsecurityを上書き）
+ * - security: [{ ... }] → 指定された認証を使用
  */
 function convertSecurityRequirements(
   security: Array<Record<string, string[]>> | undefined,
 ): IRSecurityRequirement[] | undefined {
-  if (!security || security.length === 0) {
+  // undefined の場合のみ undefined を返す（グローバルsecurityを使用）
+  if (!security) {
     return undefined;
+  }
+
+  // 空配列の場合は空配列を返す（認証不要、グローバルsecurityを上書き）
+  if (security.length === 0) {
+    return [];
   }
 
   const irSecurity: IRSecurityRequirement[] = [];
@@ -717,6 +729,83 @@ if (import.meta.vitest) {
         scheme: "OAuth2",
         scopes: ["read:pets", "write:pets"],
       });
+    });
+
+    it("should preserve empty security array (no authentication required)", () => {
+      const operation: OperationObject = {
+        summary: "Public operation",
+        security: [], // 認証不要（グローバルsecurityを上書き）
+        responses: {
+          "200": { description: "Success" },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/public", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(operation, "/public", "get", context);
+
+      // security: [] は空配列として保持される
+      expect(result.endpoint?.security).toBeDefined();
+      expect(result.endpoint?.security).toEqual([]);
+    });
+
+    it("should return undefined security when not specified (use global security)", () => {
+      const operation: OperationObject = {
+        summary: "Operation without security field",
+        // security フィールドなし → グローバルsecurityを使用
+        responses: {
+          "200": { description: "Success" },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/default", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(operation, "/default", "get", context);
+
+      // security フィールドが undefined → グローバルsecurityを使用
+      expect(result.endpoint?.security).toBeUndefined();
+    });
+
+    it("should distinguish between empty array and undefined security", () => {
+      // Case 1: security: []
+      const publicOp: OperationObject = {
+        summary: "Public",
+        security: [],
+        responses: { "200": { description: "Success" } },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
+      };
+
+      const publicResult = transformOperation(
+        publicOp,
+        "/test",
+        "get",
+        context,
+      );
+      expect(publicResult.endpoint?.security).toEqual([]);
+
+      // Case 2: security: undefined
+      const defaultOp: OperationObject = {
+        summary: "Default",
+        responses: { "200": { description: "Success" } },
+      };
+
+      const defaultResult = transformOperation(
+        defaultOp,
+        "/test",
+        "get",
+        context,
+      );
+      expect(defaultResult.endpoint?.security).toBeUndefined();
     });
 
     it("should merge PathItem and Operation extensions (Operation priority)", () => {
