@@ -155,7 +155,13 @@
           "statusCode": "404",
           "description": "User not found"
         }
-      ]
+      ],
+      "extensions": {
+        "x-path-item-extension": "Path Item Level",
+        "x-path-custom": true,
+        "x-operation-extension": "Operation Level",
+        "x-rate-limit": 100
+      }
     },
     {
       "path": "/posts",
@@ -192,7 +198,13 @@
             }
           ]
         }
-      ]
+      ],
+      "extensions": {
+        "x-auth-required": true,
+        "x-scopes": [
+          "write:posts"
+        ]
+      }
     }
   ]
 }

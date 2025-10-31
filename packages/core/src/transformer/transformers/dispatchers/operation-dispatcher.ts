@@ -8,6 +8,7 @@ import type {
   IRHttpMethod,
   OperationObject,
   ParameterObject,
+  PathItemObject,
 } from "../../../types";
 import type { VisitorContext } from "../../types";
 import type { OperationTransformResult } from "../transformers/operation-transformer";
@@ -23,6 +24,7 @@ import { dispatchSchema } from "./schema-dispatcher";
  * @param method - HTTPメソッド
  * @param context - Visitorコンテキスト
  * @param pathItemParameters - PathItemレベルのパラメータ（オプション）
+ * @param pathItem - PathItemObject（security/extensions取得用、オプション）
  * @returns OperationTransformResult
  *
  * @example OpenAPI YAML
@@ -53,6 +55,7 @@ export function dispatchOperation(
   method: IRHttpMethod,
   context: VisitorContext,
   pathItemParameters?: ParameterObject[],
+  pathItem?: PathItemObject,
 ): OperationTransformResult {
   // 1. operation-traverserでOperation配下の要素を訪問
   const traversalResult = traverseOperation(
@@ -70,6 +73,7 @@ export function dispatchOperation(
     context,
     pathItemParameters,
     traversalResult,
+    pathItem,
   );
 }
 

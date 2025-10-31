@@ -600,6 +600,15 @@
           "statusCode": "405",
           "description": "Invalid input"
         }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
       ]
     },
     {
@@ -648,6 +657,15 @@
           "statusCode": "405",
           "description": "Validation exception"
         }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
       ]
     },
     {
@@ -689,6 +707,14 @@
           "kind": "content",
           "statusCode": "400",
           "description": "Invalid status value"
+        }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "read:pets"
+          ]
         }
       ]
     },
@@ -732,6 +758,14 @@
           "kind": "content",
           "statusCode": "400",
           "description": "Invalid tag value"
+        }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "read:pets"
+          ]
         }
       ]
     },
@@ -780,6 +814,11 @@
           "statusCode": "404",
           "description": "Pet not found"
         }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
+        }
       ]
     },
     {
@@ -812,6 +851,15 @@
           "statusCode": "405",
           "description": "Invalid input"
         }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
       ]
     },
     {
@@ -831,6 +879,15 @@
           "kind": "content",
           "statusCode": "400",
           "description": "Invalid pet value"
+        }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
         }
       ]
     },
@@ -873,6 +930,15 @@
             }
           ]
         }
+      ],
+      "security": [
+        {
+          "scheme": "petstore_auth",
+          "scopes": [
+            "write:pets",
+            "read:pets"
+          ]
+        }
       ]
     },
     {
@@ -899,6 +965,11 @@
               }
             }
           ]
+        }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
         }
       ]
     },
@@ -1057,6 +1128,11 @@
           "statusCode": "default",
           "description": "successful operation"
         }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
+        }
       ]
     },
     {
@@ -1074,6 +1150,11 @@
           "statusCode": "default",
           "description": "successful operation"
         }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
+        }
       ]
     },
     {
@@ -1090,6 +1171,11 @@
           "kind": "content",
           "statusCode": "default",
           "description": "successful operation"
+        }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
         }
       ]
     },
@@ -1159,6 +1245,11 @@
           "kind": "content",
           "statusCode": "default",
           "description": "successful operation"
+        }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
         }
       ]
     },
@@ -1246,6 +1337,11 @@
           "statusCode": "404",
           "description": "User not found"
         }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
+        }
       ]
     },
     {
@@ -1271,6 +1367,11 @@
           "kind": "content",
           "statusCode": "404",
           "description": "User not found"
+        }
+      ],
+      "security": [
+        {
+          "scheme": "api_key"
         }
       ]
     }

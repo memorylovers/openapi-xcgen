@@ -103,6 +103,7 @@ export function transformPaths(
         pathItem.parameters?.filter(
           (p): p is ParameterObject => !("$ref" in p),
         ), // PathItem レベルのパラメータ（ReferenceObjectを除外）
+        pathItem, // PathItemObject全体を渡す（security/extensions用）
       );
 
       if (operationResult.endpoint) {

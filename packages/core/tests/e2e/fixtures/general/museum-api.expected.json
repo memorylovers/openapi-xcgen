@@ -1269,6 +1269,11 @@
             "name": "#/components/responses/Forbidden"
           }
         }
+      ],
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
       ]
     },
     {
@@ -1352,6 +1357,11 @@
             "name": "#/components/responses/NotFound"
           }
         }
+      ],
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
       ]
     },
     {
@@ -1426,6 +1436,11 @@
             "kind": "ref",
             "name": "#/components/responses/NotFound"
           }
+        }
+      ],
+      "security": [
+        {
+          "scheme": "ApiKey"
         }
       ]
     },

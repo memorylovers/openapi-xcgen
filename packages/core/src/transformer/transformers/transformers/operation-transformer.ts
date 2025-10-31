@@ -8,6 +8,7 @@
 import { consola } from "consola";
 import type {
   IREndpoint,
+  IRExtensions,
   IRHttpMethod,
   IRModel,
   IRParameter,
@@ -17,11 +18,14 @@ import type {
   IRResponse,
   IRResponseContent,
   IRResponseHeader,
+  IRSecurityRequirement,
   IRType,
   MimeType,
   OperationObject,
   ParameterObject,
+  PathItemObject,
 } from "../../../types";
+import { extractExtensions } from "../../helpers/extract-extensions";
 import type { VisitorContext } from "../../types";
 import { aggregateParameters } from "../aggregators/parameter-aggregator";
 import type {
@@ -63,6 +67,62 @@ function convertToIRParameter(
 }
 
 /**
+ * OpenAPI SecurityRequirementをIRSecurityRequirementに変換
+ *
+ * OpenAPI形式: { "ApiKey": [], "OAuth2": ["read:pets", "write:pets"] }
+ * IR形式: [{ scheme: "ApiKey", scopes: [] }, { scheme: "OAuth2", scopes: ["read:pets", "write:pets"] }]
+ *
+ * @param security - OpenAPIのsecurity配列
+ * @returns IRSecurityRequirement配列、存在しない場合はundefined
+ */
+function convertSecurityRequirements(
+  security: Array<Record<string, string[]>> | undefined,
+): IRSecurityRequirement[] | undefined {
+  if (!security || security.length === 0) {
+    return undefined;
+  }
+
+  const irSecurity: IRSecurityRequirement[] = [];
+
+  for (const requirement of security) {
+    for (const [scheme, scopes] of Object.entries(requirement)) {
+      irSecurity.push({
+        scheme,
+        ...(scopes && scopes.length > 0 && { scopes }),
+      });
+    }
+  }
+
+  return irSecurity.length > 0 ? irSecurity : undefined;
+}
+
+/**
+ * PathItemとOperationのextensionsをマージ（Operation優先）
+ *
+ * 同じキーがある場合、Operation側の値が優先される（完全上書き、deepマージではない）
+ *
+ * @param pathItemExtensions - PathItemレベルの拡張フィールド
+ * @param operationExtensions - Operationレベルの拡張フィールド
+ * @returns マージされた拡張フィールド、存在しない場合はundefined
+ */
+function mergeExtensions(
+  pathItemExtensions: IRExtensions | undefined,
+  operationExtensions: IRExtensions | undefined,
+): IRExtensions | undefined {
+  if (!pathItemExtensions && !operationExtensions) {
+    return undefined;
+  }
+
+  // Operation優先でマージ（スプレッド演算子でshallow merge）
+  const merged = {
+    ...pathItemExtensions,
+    ...operationExtensions,
+  };
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+/**
  * OperationObjectをIREndpointに変換
  *
  * @param operation - OperationObject
@@ -71,6 +131,7 @@ function convertToIRParameter(
  * @param context - Visitorコンテキスト
  * @param pathItemParameters - PathItemレベルのパラメータ（オプション）
  * @param traversalResult - operation-traverserからの結果
+ * @param pathItem - PathItemObject（security/extensions取得用、オプション）
  * @returns OperationTransformResult
  *
  * @example OpenAPI YAML
@@ -102,6 +163,7 @@ export function transformOperation(
   context: VisitorContext,
   _pathItemParameters?: ParameterObject[],
   traversalResult?: OperationTraversalResult,
+  pathItem?: PathItemObject,
 ): OperationTransformResult {
   consola.debug(
     `Transforming operation: ${method.toUpperCase()} ${pathTemplate}`,
@@ -227,7 +289,22 @@ export function transformOperation(
   }
 
   // ========================================
-  // 5. IREndpointを生成
+  // 5. Securityの処理
+  // ========================================
+  const endpointSecurity = convertSecurityRequirements(operation.security);
+
+  // ========================================
+  // 6. Extensionsの処理（PathItem + Operation merge）
+  // ========================================
+  const pathItemExtensions = pathItem ? extractExtensions(pathItem) : undefined;
+  const operationExtensions = extractExtensions(operation);
+  const endpointExtensions = mergeExtensions(
+    pathItemExtensions,
+    operationExtensions,
+  );
+
+  // ========================================
+  // 7. IREndpointを生成
   // ========================================
   const endpoint: IREndpoint = {
     path: pathTemplate,
@@ -240,6 +317,8 @@ export function transformOperation(
     parameters: endpointParameters,
     ...(endpointRequestBody && { requestBody: endpointRequestBody }),
     responses: endpointResponses,
+    ...(endpointSecurity && { security: endpointSecurity }),
+    ...(endpointExtensions && { extensions: endpointExtensions }),
   };
 
   return {
@@ -609,6 +688,102 @@ if (import.meta.vitest) {
       expect(result.models).toContain(mockParamModel);
       expect(result.models).toContain(mockRequestModel);
       expect(result.models).toContain(mockResponseModel);
+    });
+
+    it("should handle operation with security", () => {
+      const operation: OperationObject = {
+        summary: "Secure operation",
+        security: [{ ApiKey: [] }, { OAuth2: ["read:pets", "write:pets"] }],
+        responses: {
+          "200": { description: "Success" },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/secure", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(operation, "/secure", "get", context);
+
+      expect(result.endpoint?.security).toBeDefined();
+      expect(result.endpoint?.security).toHaveLength(2);
+      expect(result.endpoint?.security?.[0]).toEqual({
+        scheme: "ApiKey",
+      });
+      expect(result.endpoint?.security?.[1]).toEqual({
+        scheme: "OAuth2",
+        scopes: ["read:pets", "write:pets"],
+      });
+    });
+
+    it("should merge PathItem and Operation extensions (Operation priority)", () => {
+      const operation: OperationObject = {
+        summary: "Test operation",
+        "x-operation-ext": "operation-value",
+        "x-shared": "operation-wins",
+        responses: {
+          "200": { description: "Success" },
+        },
+      } as OperationObject;
+
+      const pathItem = {
+        "x-path-ext": "path-value",
+        "x-shared": "path-loses",
+      } as PathItemObject;
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/test",
+        "get",
+        context,
+        undefined,
+        undefined,
+        pathItem,
+      );
+
+      expect(result.endpoint?.extensions).toEqual({
+        "x-path-ext": "path-value",
+        "x-operation-ext": "operation-value",
+        "x-shared": "operation-wins",
+      });
+    });
+
+    it("should handle operation with only PathItem extensions", () => {
+      const operation: OperationObject = {
+        summary: "Test operation",
+        responses: {
+          "200": { description: "Success" },
+        },
+      };
+
+      const pathItem = {
+        "x-path-only": "value",
+      } as PathItemObject;
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/test", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/test",
+        "get",
+        context,
+        undefined,
+        undefined,
+        pathItem,
+      );
+
+      expect(result.endpoint?.extensions).toEqual({
+        "x-path-only": "value",
+      });
     });
   });
 }

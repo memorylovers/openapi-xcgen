@@ -46,7 +46,14 @@
             }
           ]
         }
-      ]
+      ],
+      "extensions": {
+        "x-shared-extension": "path-item-value",
+        "x-priority-test": "operation-priority",
+        "x-path-only": "only-in-path-item",
+        "x-rate-limit": 100,
+        "x-operation-only": "only-in-operation"
+      }
     },
     {
       "path": "/items/{id}",
@@ -61,7 +68,13 @@
           "statusCode": "200",
           "description": "Item updated"
         }
-      ]
+      ],
+      "extensions": {
+        "x-shared-extension": "path-item-value",
+        "x-priority-test": "path-item-priority",
+        "x-path-only": "only-in-path-item",
+        "x-rate-limit": 50
+      }
     },
     {
       "path": "/products",
@@ -76,7 +89,25 @@
           "statusCode": "201",
           "description": "Product created"
         }
-      ]
+      ],
+      "extensions": {
+        "x-object-extension": {
+          "nested": {
+            "value": "operation-nested",
+            "additional": "operation-only-field"
+          },
+          "array": [
+            4,
+            5,
+            6
+          ]
+        },
+        "x-array-extension": [
+          "d",
+          "e",
+          "f"
+        ]
+      }
     },
     {
       "path": "/metadata",
@@ -91,7 +122,10 @@
           "statusCode": "200",
           "description": "Metadata retrieved"
         }
-      ]
+      ],
+      "extensions": {
+        "x-path-metadata": "metadata-value"
+      }
     }
   ]
 }
