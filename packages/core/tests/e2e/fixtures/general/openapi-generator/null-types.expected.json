@@ -224,7 +224,10 @@
       "properties": [
         {
           "name": "age",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
         }
       ]
     },

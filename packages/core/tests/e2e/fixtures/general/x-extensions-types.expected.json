@@ -12,7 +12,20 @@
       "properties": [
         {
           "name": "field",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-string": "property extension",
+            "x-number": 123,
+            "x-boolean": true,
+            "x-array": [
+              1,
+              2,
+              3
+            ],
+            "x-object": {
+              "key": "value"
+            }
+          }
         }
       ]
     }

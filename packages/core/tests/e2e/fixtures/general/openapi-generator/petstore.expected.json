@@ -12,15 +12,24 @@
       "properties": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "petId",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "quantity",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
         },
         {
           "name": "shipDate",
@@ -36,7 +45,8 @@
         },
         {
           "name": "complete",
-          "type": "boolean"
+          "type": "boolean",
+          "defaultValue": false
         }
       ],
       "description": "An order for a pets from the pet store"
@@ -69,11 +79,17 @@
       "properties": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "name",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "pattern": "^[a-zA-Z0-9]+[a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]+$"
+          }
         }
       ],
       "description": "A category for a pet"
@@ -85,7 +101,10 @@
       "properties": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "username",
@@ -114,7 +133,10 @@
         {
           "name": "userStatus",
           "type": "int",
-          "description": "User Status"
+          "description": "User Status",
+          "validation": {
+            "format": "int32"
+          }
         }
       ],
       "description": "A User who is purchasing from the pet store"
@@ -126,7 +148,10 @@
       "properties": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "name",
@@ -142,7 +167,10 @@
       "properties": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "category",
@@ -177,7 +205,8 @@
             "kind": "ref",
             "name": "#/components/schemas/PetStatus"
           },
-          "description": "pet status in the store"
+          "description": "pet status in the store",
+          "deprecated": true
         }
       ],
       "description": "A pet for sale in the pet store"
@@ -225,7 +254,10 @@
       "properties": [
         {
           "name": "code",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
         },
         {
           "name": "type",
@@ -356,7 +388,10 @@
           "type": "long",
           "in": "path",
           "required": true,
-          "description": "ID of pet to return"
+          "description": "ID of pet to return",
+          "validation": {
+            "format": "int64"
+          }
         }
       ],
       "description": "Parameters for GET /pet/{petId}\npetId: ID of pet to return"
@@ -371,7 +406,10 @@
           "type": "long",
           "in": "path",
           "required": true,
-          "description": "ID of pet that needs to be updated"
+          "description": "ID of pet that needs to be updated",
+          "validation": {
+            "format": "int64"
+          }
         }
       ],
       "description": "Parameters for POST /pet/{petId}\npetId: ID of pet that needs to be updated"
@@ -408,7 +446,10 @@
           "type": "long",
           "in": "path",
           "required": true,
-          "description": "Pet id to delete"
+          "description": "Pet id to delete",
+          "validation": {
+            "format": "int64"
+          }
         }
       ],
       "description": "Parameters for DELETE /pet/{petId}\npetId: Pet id to delete"
@@ -423,7 +464,10 @@
           "type": "long",
           "in": "path",
           "required": true,
-          "description": "ID of pet to update"
+          "description": "ID of pet to update",
+          "validation": {
+            "format": "int64"
+          }
         }
       ],
       "description": "Parameters for POST /pet/{petId}/uploadImage\npetId: ID of pet to update"
@@ -461,7 +505,12 @@
           "type": "long",
           "in": "path",
           "required": true,
-          "description": "ID of pet that needs to be fetched"
+          "description": "ID of pet that needs to be fetched",
+          "validation": {
+            "minimum": 1,
+            "maximum": 5,
+            "format": "int64"
+          }
         }
       ],
       "description": "Parameters for GET /store/order/{orderId}\norderId: ID of pet that needs to be fetched"
@@ -491,7 +540,10 @@
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The user name for login"
+          "description": "The user name for login",
+          "validation": {
+            "pattern": "^[a-zA-Z0-9]+[a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]+$"
+          }
         },
         {
           "name": "password",

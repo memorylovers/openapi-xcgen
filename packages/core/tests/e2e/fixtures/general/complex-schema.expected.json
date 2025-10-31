@@ -13,7 +13,10 @@
         {
           "name": "id",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "items",
@@ -21,7 +24,10 @@
             "kind": "ref",
             "name": "#/components/schemas/OrderItems"
           },
-          "required": true
+          "required": true,
+          "validation": {
+            "minItems": 1
+          }
         },
         {
           "name": "customer",
@@ -91,15 +97,26 @@
         {
           "name": "quantity",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 1
+          }
         },
         {
           "name": "price",
-          "type": "float"
+          "type": "float",
+          "validation": {
+            "format": "float"
+          }
         },
         {
           "name": "discount",
-          "type": "float"
+          "type": "float",
+          "validation": {
+            "minimum": 0,
+            "maximum": 100,
+            "format": "float"
+          }
         }
       ]
     },
@@ -120,7 +137,10 @@
         },
         {
           "name": "email",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "address",
@@ -150,7 +170,10 @@
         },
         {
           "name": "zipCode",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "pattern": "^\\d{5}(-\\d{4})?$"
+          }
         }
       ]
     },

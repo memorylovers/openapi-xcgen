@@ -20,7 +20,10 @@
         },
         {
           "name": "email",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "role",

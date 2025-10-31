@@ -110,7 +110,11 @@
           "type": "int",
           "in": "query",
           "description": "Optional integer parameter with default value",
-          "defaultValue": 20
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
         },
         {
           "name": "includeDetails",

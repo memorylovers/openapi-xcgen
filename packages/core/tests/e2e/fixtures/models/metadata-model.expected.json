@@ -21,19 +21,23 @@
         },
         {
           "name": "status",
-          "type": "string"
+          "type": "string",
+          "defaultValue": "active"
         },
         {
           "name": "createdAt",
-          "type": "string"
+          "type": "string",
+          "readOnly": true
         },
         {
           "name": "password",
-          "type": "string"
+          "type": "string",
+          "writeOnly": true
         },
         {
           "name": "oldId",
-          "type": "string"
+          "type": "string",
+          "deprecated": true
         }
       ],
       "description": "Article model with metadata"

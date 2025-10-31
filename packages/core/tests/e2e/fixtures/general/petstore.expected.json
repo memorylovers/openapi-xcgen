@@ -13,7 +13,10 @@
         {
           "name": "id",
           "type": "long",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "name",
@@ -50,7 +53,10 @@
         {
           "name": "code",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
         },
         {
           "name": "message",
@@ -69,7 +75,12 @@
           "type": "int",
           "in": "query",
           "description": "How many items to return at one time",
-          "defaultValue": 20
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100,
+            "format": "int32"
+          }
         }
       ],
       "description": "Parameters for GET /pets\nlimit: How many items to return at one time"

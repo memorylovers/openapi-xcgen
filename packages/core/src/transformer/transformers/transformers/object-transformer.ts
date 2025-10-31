@@ -68,6 +68,14 @@ export function transformObject(
       ...(prop.required && { required: true as const }),
       ...(prop.nullable && { nullable: true as const }),
       ...(prop.description && { description: prop.description }),
+      ...(prop.defaultValue !== undefined && {
+        defaultValue: prop.defaultValue,
+      }),
+      ...(prop.deprecated && { deprecated: true as const }),
+      ...(prop.readOnly && { readOnly: true as const }),
+      ...(prop.writeOnly && { writeOnly: true as const }),
+      ...(prop.validation && { validation: prop.validation }),
+      ...(prop.extensions && { extensions: prop.extensions }),
     }),
   );
 

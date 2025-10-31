@@ -12,19 +12,39 @@
       "properties": [
         {
           "name": "id",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "id-field",
+            "x-db-type": "uuid"
+          }
         },
         {
           "name": "name",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "name-field",
+            "x-searchable": true
+          }
         },
         {
           "name": "email",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "email"
+          },
+          "extensions": {
+            "x-property-extension": "email-field",
+            "x-unique": true
+          }
         },
         {
           "name": "age",
-          "type": "int"
+          "type": "int",
+          "extensions": {
+            "x-property-extension": "age-field",
+            "x-min": 0,
+            "x-max": 150
+          }
         }
       ]
     },
@@ -35,7 +55,10 @@
       "properties": [
         {
           "name": "id",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-db-type": "uuid"
+          }
         },
         {
           "name": "title",
@@ -47,7 +70,10 @@
         },
         {
           "name": "authorId",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-foreign-key": "users.id"
+          }
         }
       ]
     },
@@ -84,12 +110,23 @@
           "name": "id",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "extensions": {
+            "x-parameter-extension": "path-parameter",
+            "x-validation-rule": "uuid-v4"
+          }
         },
         {
           "name": "include",
           "type": "string",
-          "in": "query"
+          "in": "query",
+          "extensions": {
+            "x-parameter-extension": "query-parameter",
+            "x-allowed-values": [
+              "profile",
+              "settings"
+            ]
+          }
         }
       ],
       "description": "Parameters for GET /users/{id}"

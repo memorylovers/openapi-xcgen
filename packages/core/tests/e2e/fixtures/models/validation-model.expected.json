@@ -12,41 +12,71 @@
       "properties": [
         {
           "name": "name",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         {
           "name": "code",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "pattern": "^[A-Z]{3}$"
+          }
         },
         {
           "name": "userId",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "email",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "website",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "ipAddress",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "ipv4"
+          }
         },
         {
           "name": "price",
-          "type": "double"
+          "type": "double",
+          "validation": {
+            "minimum": 0,
+            "maximum": 1000
+          }
         },
         {
           "name": "quantity",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "minimum": 1
+          }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/ProductTags"
+          },
+          "validation": {
+            "minItems": 1,
+            "maxItems": 5
           }
         }
       ]

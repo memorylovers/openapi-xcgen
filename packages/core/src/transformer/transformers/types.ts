@@ -62,6 +62,12 @@ export interface PropertyTraversalResult {
     required?: boolean;
     nullable?: boolean;
     description?: string;
+    defaultValue?: unknown;
+    deprecated?: boolean;
+    readOnly?: boolean;
+    writeOnly?: boolean;
+    validation?: import("../../types").IRValidation;
+    extensions?: import("../../types").IRExtensions;
   }>;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
@@ -161,6 +167,8 @@ export interface ParametersTraversalResult {
     description?: string;
     defaultValue?: unknown;
     deprecated?: boolean;
+    validation?: import("../../types").IRValidation;
+    extensions?: import("../../types").IRExtensions;
   }>;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];

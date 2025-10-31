@@ -19,25 +19,36 @@
           "name": "open",
           "type": "string",
           "required": true,
-          "description": "Opening time in 24-hour format"
+          "description": "Opening time in 24-hour format",
+          "validation": {
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+          }
         },
         {
           "name": "close",
           "type": "string",
           "required": true,
-          "description": "Closing time in 24-hour format"
+          "description": "Closing time in 24-hour format",
+          "validation": {
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+          }
         },
         {
           "name": "special_hours",
-          "type": "boolean"
+          "type": "boolean",
+          "defaultValue": false
         },
         {
           "name": "note",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "maxLength": 500
+          }
         },
         {
           "name": "closed",
-          "type": "boolean"
+          "type": "boolean",
+          "defaultValue": false
         }
       ]
     },
@@ -49,17 +60,29 @@
         {
           "name": "event_id",
           "type": "string",
-          "required": true
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
         },
         {
           "name": "description",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 2000
+          }
         },
         {
           "name": "start_date",
@@ -96,27 +119,40 @@
         },
         {
           "name": "capacity",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "minimum": 1,
+            "maximum": 1000
+          }
         },
         {
           "name": "registration_required",
-          "type": "boolean"
+          "type": "boolean",
+          "defaultValue": false
         },
         {
           "name": "registration_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "image_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "created_at",
-          "type": "datetime"
+          "type": "datetime",
+          "readOnly": true
         },
         {
           "name": "updated_at",
-          "type": "datetime"
+          "type": "datetime",
+          "readOnly": true
         }
       ]
     },
@@ -200,12 +236,20 @@
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
         },
         {
           "name": "description",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 2000
+          }
         },
         {
           "name": "start_date",
@@ -242,19 +286,30 @@
         },
         {
           "name": "capacity",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "minimum": 1,
+            "maximum": 1000
+          }
         },
         {
           "name": "registration_required",
-          "type": "boolean"
+          "type": "boolean",
+          "defaultValue": false
         },
         {
           "name": "registration_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "image_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         }
       ]
     },
@@ -337,11 +392,19 @@
       "properties": [
         {
           "name": "name",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
         },
         {
           "name": "description",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 2000
+          }
         },
         {
           "name": "start_date",
@@ -374,7 +437,11 @@
         },
         {
           "name": "capacity",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "minimum": 1,
+            "maximum": 1000
+          }
         },
         {
           "name": "registration_required",
@@ -382,11 +449,17 @@
         },
         {
           "name": "registration_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "image_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         }
       ]
     },
@@ -470,11 +543,20 @@
         {
           "name": "visitor_email",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "visitor_name",
-          "type": "string"
+          "type": "string",
+          "writeOnly": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
         },
         {
           "name": "visit_date",
@@ -484,7 +566,10 @@
         {
           "name": "visit_time",
           "type": "string",
-          "description": "Preferred entry time in 24-hour format"
+          "description": "Preferred entry time in 24-hour format",
+          "validation": {
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+          }
         },
         {
           "name": "ticket_type",
@@ -497,11 +582,18 @@
         {
           "name": "quantity",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 1,
+            "maximum": 20
+          }
         },
         {
           "name": "special_requests",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "maxLength": 500
+          }
         },
         {
           "name": "payment_method",
@@ -560,7 +652,11 @@
         }
       ],
       "discriminator": {
-        "propertyName": "type"
+        "propertyName": "type",
+        "mapping": {
+          "credit_card": "#/components/schemas/CreditCardPayment",
+          "paypal": "#/components/schemas/PayPalPayment"
+        }
       }
     },
     {
@@ -571,16 +667,24 @@
         {
           "name": "confirmation_id",
           "type": "string",
-          "required": true
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "pattern": "^[A-Z0-9]{8}$"
+          }
         },
         {
           "name": "purchase_date",
           "type": "datetime",
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "visitor_email",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "visitor_name",
@@ -593,7 +697,10 @@
         },
         {
           "name": "visit_time",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+          }
         },
         {
           "name": "ticket_type",
@@ -622,11 +729,16 @@
             "kind": "ref",
             "name": "#/components/schemas/TicketPurchaseConfirmationStatus"
           },
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "qr_code_url",
-          "type": "string"
+          "type": "string",
+          "readOnly": true,
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "special_requests",
@@ -702,28 +814,48 @@
         {
           "name": "type",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "credit_card"
+          }
         },
         {
           "name": "card_number",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^[0-9]{13,19}$"
+          }
         },
         {
           "name": "card_holder_name",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         {
           "name": "expiry_date",
           "type": "string",
           "required": true,
-          "description": "MM/YY format"
+          "description": "MM/YY format",
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^(0[1-9]|1[0-2])\\/[0-9]{2}$"
+          }
         },
         {
           "name": "cvv",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^[0-9]{3,4}$"
+          }
         }
       ]
     },
@@ -735,16 +867,24 @@
         {
           "name": "type",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "paypal"
+          }
         },
         {
           "name": "paypal_email",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "paypal_auth_code",
-          "type": "string"
+          "type": "string",
+          "writeOnly": true
         }
       ]
     },
@@ -756,12 +896,19 @@
         {
           "name": "amount",
           "type": "double",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 0
+          }
         },
         {
           "name": "currency",
           "type": "string",
-          "required": true
+          "required": true,
+          "defaultValue": "USD",
+          "validation": {
+            "pattern": "^[A-Z]{3}$"
+          }
         }
       ]
     },
@@ -773,17 +920,26 @@
         {
           "name": "total",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 0
+          }
         },
         {
           "name": "limit",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 1
+          }
         },
         {
           "name": "offset",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 0
+          }
         },
         {
           "name": "has_more",
@@ -799,7 +955,11 @@
         {
           "name": "type",
           "type": "string",
-          "required": true
+          "required": true,
+          "defaultValue": "about:blank",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "title",
@@ -809,7 +969,11 @@
         {
           "name": "status",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 100,
+            "maximum": 599
+          }
         },
         {
           "name": "detail",
@@ -817,7 +981,10 @@
         },
         {
           "name": "instance",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "timestamp",
@@ -825,7 +992,10 @@
         },
         {
           "name": "correlation_id",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ]
     },
@@ -910,14 +1080,21 @@
           "type": "int",
           "in": "query",
           "description": "Maximum number of events to return",
-          "defaultValue": 20
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
         },
         {
           "name": "offset",
           "type": "int",
           "in": "query",
           "description": "Number of events to skip (for pagination)",
-          "defaultValue": 0
+          "defaultValue": 0,
+          "validation": {
+            "minimum": 0
+          }
         }
       ],
       "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)"
@@ -995,7 +1172,10 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event"
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "description": "Parameters for GET /special-events/{eventId}\neventId: Unique identifier of the special event"
@@ -1010,7 +1190,10 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event"
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "description": "Parameters for DELETE /special-events/{eventId}\neventId: Unique identifier of the special event"
@@ -1025,7 +1208,10 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Unique identifier of the special event"
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "description": "Parameters for PATCH /special-events/{eventId}\neventId: Unique identifier of the special event"
@@ -1040,14 +1226,20 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Ticket purchase confirmation ID"
+          "description": "Ticket purchase confirmation ID",
+          "validation": {
+            "pattern": "^[A-Z0-9]{8}$"
+          }
         },
         {
           "name": "email",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "Email address used for the purchase"
+          "description": "Email address used for the purchase",
+          "validation": {
+            "format": "email"
+          }
         }
       ],
       "description": "Parameters for GET /tickets/{confirmationId}\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase"
@@ -1062,14 +1254,20 @@
           "type": "string",
           "in": "path",
           "required": true,
-          "description": "Ticket purchase confirmation ID"
+          "description": "Ticket purchase confirmation ID",
+          "validation": {
+            "pattern": "^[A-Z0-9]{8}$"
+          }
         },
         {
           "name": "email",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "Email address used for the purchase"
+          "description": "Email address used for the purchase",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "format",

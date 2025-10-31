@@ -87,6 +87,8 @@ export function traverseParameters(
         defaultValue: irParam.defaultValue,
       }),
       ...(irParam.deprecated && { deprecated: true }),
+      ...(irParam.validation && { validation: irParam.validation }),
+      ...(irParam.extensions && { extensions: irParam.extensions }),
     });
 
     allChildModels.push(...result.models);
@@ -220,6 +222,10 @@ if (import.meta.vitest) {
         in: "query",
         type: "int",
         defaultValue: 10,
+        validation: {
+          minimum: 1,
+          maximum: 100,
+        },
       });
     });
 
@@ -302,6 +308,151 @@ if (import.meta.vitest) {
       // Array parameters create child models
       expect(result.childModels).toHaveLength(1);
       expect(result.childModels[0].kind).toBe("array");
+    });
+
+    it("should preserve validation constraints from parameters", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "limit",
+          in: "query",
+          schema: {
+            type: "integer",
+            minimum: 1,
+            maximum: 100,
+            default: 10,
+          },
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toMatchObject({
+        name: "limit",
+        in: "query",
+        type: "int",
+        defaultValue: 10,
+        validation: {
+          minimum: 1,
+          maximum: 100,
+        },
+      });
+    });
+
+    it("should preserve x-extensions from parameters", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "userId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+          "x-custom-field": "custom-value",
+          "x-validation-message": "Invalid user ID",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users/{userId}", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toMatchObject({
+        name: "userId",
+        in: "path",
+        type: "string",
+        required: true,
+        extensions: {
+          "x-custom-field": "custom-value",
+          "x-validation-message": "Invalid user ID",
+        },
+      });
+    });
+
+    it("should preserve all metadata from parameters", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "status",
+          in: "query",
+          description: "Filter by status",
+          deprecated: true,
+          schema: {
+            type: "string",
+            minLength: 1,
+            maxLength: 50,
+            default: "active",
+          },
+          "x-deprecated-reason": "Use statusCode instead",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toMatchObject({
+        name: "status",
+        in: "query",
+        type: "string",
+        description: "Filter by status",
+        defaultValue: "active",
+        deprecated: true,
+        validation: {
+          minLength: 1,
+          maxLength: 50,
+        },
+        extensions: {
+          "x-deprecated-reason": "Use statusCode instead",
+        },
+      });
+    });
+
+    it("should preserve validation and extensions when converting to IRParameter", () => {
+      const parameters: ParameterObject[] = [
+        {
+          name: "email",
+          in: "query",
+          schema: {
+            type: "string",
+            pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+          },
+          "x-validation-message": "Invalid email format",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "get"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseParameters(parameters, context);
+
+      expect(result.parameters).toHaveLength(1);
+      expect(result.parameters[0]).toMatchObject({
+        name: "email",
+        in: "query",
+        type: "string",
+        validation: {
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        },
+        extensions: {
+          "x-validation-message": "Invalid email format",
+        },
+      });
     });
   });
 }

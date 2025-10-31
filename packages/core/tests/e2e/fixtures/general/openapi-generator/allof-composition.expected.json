@@ -107,7 +107,10 @@
       "properties": [
         {
           "name": "reward",
-          "type": "long"
+          "type": "long",
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "origin",
@@ -125,7 +128,10 @@
         {
           "name": "id",
           "type": "long",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "name",

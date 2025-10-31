@@ -16,6 +16,8 @@ import type {
 import {
   buildInlineSchemaPath,
   buildReferencePath,
+  extractExtensions,
+  extractValidation,
   getModelName,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
@@ -97,6 +99,10 @@ export function traverseObjectProperties(
       nullable = true;
     }
 
+    // メタデータ抽出
+    const validation = extractValidation(propSchema);
+    const extensions = extractExtensions(propSchema);
+
     visitedProperties.push({
       name: propName,
       type: result.type as PropertyTraversalResult["properties"][0]["type"],
@@ -104,6 +110,18 @@ export function traverseObjectProperties(
       ...(nullable && { nullable: true }),
       ...("description" in propSchema &&
         propSchema.description && { description: propSchema.description }),
+      ...("default" in propSchema &&
+        propSchema.default !== undefined && {
+          defaultValue: propSchema.default,
+        }),
+      ...("deprecated" in propSchema &&
+        propSchema.deprecated === true && { deprecated: true }),
+      ...("readOnly" in propSchema &&
+        propSchema.readOnly === true && { readOnly: true }),
+      ...("writeOnly" in propSchema &&
+        propSchema.writeOnly === true && { writeOnly: true }),
+      ...(validation && { validation }),
+      ...(extensions && { extensions }),
     });
 
     allChildModels.push(...result.models);
@@ -416,6 +434,232 @@ if (import.meta.vitest) {
       expect(result.properties).toHaveLength(2);
       expect(result.childModels).toHaveLength(1);
       expect(result.childModels[0].kind).toBe("object");
+    });
+
+    it("should extract defaultValue from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "integer",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          age: { type: "integer", default: 18 },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toEqual({
+        name: "age",
+        type: "integer",
+        defaultValue: 18,
+      });
+    });
+
+    it("should extract deprecated flag from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "string",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          oldField: { type: "string", deprecated: true },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toEqual({
+        name: "oldField",
+        type: "string",
+        deprecated: true,
+      });
+    });
+
+    it("should extract readOnly flag from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "string",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "string", readOnly: true },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toEqual({
+        name: "id",
+        type: "string",
+        readOnly: true,
+      });
+    });
+
+    it("should extract writeOnly flag from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "string",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          password: { type: "string", writeOnly: true },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toEqual({
+        name: "password",
+        type: "string",
+        writeOnly: true,
+      });
+    });
+
+    it("should extract validation constraints from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "string",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          username: {
+            type: "string",
+            minLength: 3,
+            maxLength: 20,
+            pattern: "^[a-zA-Z0-9_]+$",
+          },
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toMatchObject({
+        name: "username",
+        type: "string",
+        validation: {
+          minLength: 3,
+          maxLength: 20,
+          pattern: "^[a-zA-Z0-9_]+$",
+        },
+      });
+    });
+
+    it("should extract x-extensions from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "string",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          email: {
+            type: "string",
+            "x-validation-message": "Invalid email format",
+            "x-custom-field": "custom-value",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toMatchObject({
+        name: "email",
+        type: "string",
+        extensions: {
+          "x-validation-message": "Invalid email format",
+          "x-custom-field": "custom-value",
+        },
+      });
+    });
+
+    it("should extract all metadata together from properties", () => {
+      const mockVisitSchema = vi.fn().mockReturnValue({
+        type: "string",
+        models: [],
+      });
+
+      const schema: SchemaObject = {
+        type: "object",
+        required: ["status"],
+        properties: {
+          status: {
+            type: "string",
+            description: "User status",
+            default: "active",
+            deprecated: true,
+            minLength: 1,
+            maxLength: 50,
+            "x-deprecated-reason": "Use accountState instead",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+        },
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["components", "schemas", "User"],
+        rootSegment: "components",
+      };
+
+      const result = traverseObjectProperties(schema, context, mockVisitSchema);
+
+      expect(result.properties[0]).toMatchObject({
+        name: "status",
+        type: "string",
+        required: true,
+        description: "User status",
+        defaultValue: "active",
+        deprecated: true,
+        validation: {
+          minLength: 1,
+          maxLength: 50,
+        },
+        extensions: {
+          "x-deprecated-reason": "Use accountState instead",
+        },
+      });
     });
   });
 

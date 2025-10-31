@@ -63,6 +63,8 @@ function convertToIRParameter(
       defaultValue: param.defaultValue,
     }),
     ...(param.deprecated && { deprecated: true }),
+    ...(param.validation && { validation: param.validation }),
+    ...(param.extensions && { extensions: param.extensions }),
   };
 }
 

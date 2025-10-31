@@ -13,7 +13,11 @@
         {
           "name": "id",
           "type": "string",
-          "required": true
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "name",
@@ -28,7 +32,10 @@
         {
           "name": "country_code",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "pattern": "^[A-Z]{2}$"
+          }
         },
         {
           "name": "timezone",
@@ -50,11 +57,19 @@
       "properties": [
         {
           "name": "latitude",
-          "type": "double"
+          "type": "double",
+          "validation": {
+            "minimum": -90,
+            "maximum": 90
+          }
         },
         {
           "name": "longitude",
-          "type": "double"
+          "type": "double",
+          "validation": {
+            "minimum": -180,
+            "maximum": 180
+          }
         }
       ]
     },
@@ -66,7 +81,11 @@
         {
           "name": "id",
           "type": "string",
-          "required": true
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "origin",
@@ -125,7 +144,11 @@
         {
           "name": "trip_id",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "passengers",
@@ -133,7 +156,11 @@
             "kind": "ref",
             "name": "#/components/schemas/BookingRequestPassengers"
           },
-          "required": true
+          "required": true,
+          "validation": {
+            "minItems": 1,
+            "maxItems": 10
+          }
         },
         {
           "name": "seat_preferences",
@@ -185,7 +212,11 @@
         {
           "name": "id",
           "type": "string",
-          "required": true
+          "required": true,
+          "readOnly": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "trip",
@@ -209,19 +240,22 @@
             "kind": "ref",
             "name": "#/components/schemas/BookingStatus"
           },
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "payment_status",
           "type": {
             "kind": "ref",
             "name": "#/components/schemas/BookingPaymentStatus"
-          }
+          },
+          "readOnly": true
         },
         {
           "name": "created_at",
           "type": "datetime",
-          "required": true
+          "required": true,
+          "readOnly": true
         },
         {
           "name": "total_price",
@@ -290,12 +324,19 @@
         {
           "name": "name",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
         },
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "date_of_birth",
@@ -304,7 +345,10 @@
         },
         {
           "name": "passport_number",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "pattern": "^[A-Z0-9]+$"
+          }
         }
       ]
     },
@@ -316,12 +360,18 @@
         {
           "name": "amount",
           "type": "double",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 0
+          }
         },
         {
           "name": "currency",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "pattern": "^[A-Z]{3}$"
+          }
         }
       ]
     },
@@ -333,32 +383,54 @@
         {
           "name": "method",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "card"
+          }
         },
         {
           "name": "card_number",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^[0-9]{13,19}$"
+          }
         },
         {
           "name": "card_holder",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         {
           "name": "expiry_month",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 1,
+            "maximum": 12
+          }
         },
         {
           "name": "expiry_year",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 2024
+          }
         },
         {
           "name": "cvv",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true,
+          "validation": {
+            "pattern": "^[0-9]{3,4}$"
+          }
         }
       ]
     },
@@ -370,17 +442,22 @@
         {
           "name": "method",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "const": "bank_transfer"
+          }
         },
         {
           "name": "account_number",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true
         },
         {
           "name": "routing_number",
           "type": "string",
-          "required": true
+          "required": true,
+          "writeOnly": true
         },
         {
           "name": "account_holder",
@@ -397,7 +474,10 @@
         {
           "name": "payment_id",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "status",
@@ -422,7 +502,10 @@
         },
         {
           "name": "receipt_url",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         }
       ]
     },
@@ -453,23 +536,38 @@
       "properties": [
         {
           "name": "self",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "next",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "prev",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "first",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "last",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         }
       ]
     },
@@ -481,7 +579,11 @@
         {
           "name": "type",
           "type": "string",
-          "required": true
+          "required": true,
+          "defaultValue": "about:blank",
+          "validation": {
+            "format": "uri"
+          }
         },
         {
           "name": "title",
@@ -491,7 +593,11 @@
         {
           "name": "status",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "minimum": 100,
+            "maximum": 599
+          }
         },
         {
           "name": "detail",
@@ -499,7 +605,10 @@
         },
         {
           "name": "instance",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "uri"
+          }
         }
       ]
     },
@@ -512,26 +621,40 @@
           "name": "coordinates",
           "type": "string",
           "in": "query",
-          "description": "Find stations close to a location."
+          "description": "Find stations close to a location.",
+          "validation": {
+            "pattern": "^(-?\\\\d+\\\\.\\\\d+),(-?\\\\d+\\\\.\\\\d+)$"
+          }
         },
         {
           "name": "search",
           "type": "string",
           "in": "query",
-          "description": "Search for stations by name or code"
+          "description": "Search for stations by name or code",
+          "validation": {
+            "minLength": 3,
+            "maxLength": 100
+          }
         },
         {
           "name": "country",
           "type": "string",
           "in": "query",
-          "description": "Filter by country code (ISO 3166-1 alpha-2)"
+          "description": "Filter by country code (ISO 3166-1 alpha-2)",
+          "validation": {
+            "pattern": "^[A-Z]{2}$"
+          }
         },
         {
           "name": "limit",
           "type": "int",
           "in": "query",
           "description": "Maximum number of results",
-          "defaultValue": 10
+          "defaultValue": 10,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
         }
       ],
       "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results"
@@ -577,14 +700,20 @@
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The ID of the origin station"
+          "description": "The ID of the origin station",
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "destination",
           "type": "string",
           "in": "query",
           "required": true,
-          "description": "The ID of the destination station"
+          "description": "The ID of the destination station",
+          "validation": {
+            "format": "uuid"
+          }
         },
         {
           "name": "date",
@@ -679,7 +808,10 @@
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "description": "Parameters for GET /bookings/{bookingId}"
@@ -693,7 +825,10 @@
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "description": "Parameters for DELETE /bookings/{bookingId}"
@@ -707,7 +842,10 @@
           "name": "bookingId",
           "type": "string",
           "in": "path",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
         }
       ],
       "description": "Parameters for POST /bookings/{bookingId}/payment"
@@ -727,7 +865,11 @@
         }
       ],
       "discriminator": {
-        "propertyName": "method"
+        "propertyName": "method",
+        "mapping": {
+          "card": "#/components/schemas/CardPayment",
+          "bank_transfer": "#/components/schemas/BankTransferPayment"
+        }
       }
     }
   ],

@@ -12,26 +12,46 @@
         {
           "name": "id",
           "type": "long",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "int64"
+          }
         },
         {
           "name": "name",
           "type": "string",
           "required": true,
-          "description": "Name of pet"
+          "description": "Name of pet",
+          "validation": {
+            "minLength": 0,
+            "maxLength": 40
+          }
         },
         {
           "name": "age",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "minimum": 0,
+            "maximum": 30,
+            "exclusiveMinimum": true,
+            "exclusiveMaximum": true,
+            "format": "int32"
+          }
         },
         {
           "name": "tag",
           "type": "string",
-          "nullable": true
+          "nullable": true,
+          "validation": {
+            "pattern": "^\\\\d{3}-\\\\d{2}-\\\\d{4}$"
+          }
         },
         {
           "name": "email",
-          "type": "string"
+          "type": "string",
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "callingCode",
@@ -125,7 +145,10 @@
         {
           "name": "code",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
         },
         {
           "name": "message",

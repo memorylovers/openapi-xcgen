@@ -113,7 +113,10 @@
       "properties": [
         {
           "name": "foo",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
         },
         {
           "name": "bar",
@@ -128,7 +131,10 @@
         },
         {
           "name": "qux",
-          "type": "int"
+          "type": "int",
+          "validation": {
+            "format": "int32"
+          }
         }
       ]
     },
@@ -160,7 +166,10 @@
         {
           "name": "foo",
           "type": "int",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "int32"
+          }
         },
         {
           "name": "bar",
