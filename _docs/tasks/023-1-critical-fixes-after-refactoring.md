@@ -1,10 +1,10 @@
 # Task 023-1: Task 023リファクタリング後の重大問題修正
 
-**Status**: 🟡 進行中 (2/3完了)
+**Status**: 🟢 完了 (3/3完了)
 **Priority**: Critical（即時対応必須）
 **Created**: 2025-10-31
 **Parent Task**: Task 023 (Visitor Architecture Refactoring)
-**Last Updated**: 2025-10-31 (問題2完了)
+**Last Updated**: 2025-10-31 (全問題完了)
 
 ## 概要
 
@@ -271,7 +271,7 @@ const endpoint: IREndpoint = {
 |------|-----------|--------|----------|
 | 1. parameters重複 | ✅ 完了 | 2025-10-31 | 8e2352a |
 | 2. kind不整合 | ✅ 完了 | 2025-10-31 | 21b3e6f |
-| 3. security/extensions欠落 | 🔴 未着手 | - | - |
+| 3. security/extensions欠落 | ✅ 完了 | 2025-10-31 | 118a39c |
 
 ---
 
@@ -300,13 +300,17 @@ const endpoint: IREndpoint = {
 - [x] E2E期待値更新（10ファイル、kind変更）
 - [x] 全テスト実行（512件成功）
 
-### 問題3: security/extensions欠落
+### 問題3: security/extensions欠落 ✅
 
-- [ ] `extractExtensions()` ヘルパー確認/実装
-- [ ] `operation-transformer.ts` でsecurity設定
-- [ ] `operation-transformer.ts` でextensions設定
-- [ ] テストケース追加（security, x-extensions）
-- [ ] E2Eテスト実行
+- [x] `extractExtensions()` ヘルパー確認（既存実装を使用）
+- [x] operation-dispatcher.tsにPathItemObject追加
+- [x] convertSecurityRequirements() 実装（OpenAPI → IR変換）
+- [x] mergeExtensions() 実装（PathItem + Operation merge）
+- [x] `operation-transformer.ts` でsecurity設定
+- [x] `operation-transformer.ts` でextensions設定
+- [x] in-sourceテスト追加（3件: security, extensions merge, PathItem-only）
+- [x] E2E期待値更新（40ファイル再生成）
+- [x] 全テスト実行（515件成功）
 
 ---
 
