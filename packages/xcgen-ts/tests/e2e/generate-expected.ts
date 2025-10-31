@@ -180,6 +180,8 @@ async function main() {
       "models/validation-model",
       "models/metadata-model",
       "models/inline-schemas",
+      // Endpoints fixtures
+      "endpoints/parameter-override",
       // Validation fixture
       "validation",
       // Hooks fixtures (valibot only)

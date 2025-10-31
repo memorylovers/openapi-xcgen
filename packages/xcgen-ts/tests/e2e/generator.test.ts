@@ -157,6 +157,18 @@ describe("E2E: TypeScript Generator", () => {
     });
   });
 
+  describe("Endpoints - Parameter Handling", () => {
+    it("should override PathItem-level parameters with Operation-level parameters", async () => {
+      await compareWithExpected("endpoints/parameter-override");
+    });
+
+    it("should override PathItem-level parameters with Operation-level parameters (with valibot)", async () => {
+      await compareWithExpected("endpoints/parameter-override", {
+        validator: "valibot",
+      });
+    });
+  });
+
   describe("Hooks - X-Extensions Integration", () => {
     it("should handle x-type custom Hook", async () => {
       await compareWithExpected("hooks/x-type-custom");

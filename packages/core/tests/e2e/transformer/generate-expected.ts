@@ -74,6 +74,7 @@ const testCases = [
   "endpoints/operation-id",
   "endpoints/path-structure",
   "endpoints/endpoint-metadata",
+  "endpoints/parameter-override",
 ];
 
 async function generateAll() {

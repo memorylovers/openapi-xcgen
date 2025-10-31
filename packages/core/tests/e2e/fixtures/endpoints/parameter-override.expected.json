@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "title": "Parameter Override Test API",
+    "version": "1.0.0",
+    "description": "Test PathItem-level parameters being overridden by Operation-level parameters"
+  },
+  "models": [
+    {
+      "kind": "parameter",
+      "name": "GetPetsIdParams",
+      "referencePath": "#/paths/::pets::{id}/get/GetPetsIdParams",
+      "properties": [
+        {
+          "name": "id",
+          "type": "int",
+          "in": "path",
+          "required": true,
+          "description": "Pet ID (Operation level - integer, overrides PathItem)"
+        }
+      ],
+      "description": "Parameters for GET /pets/{id}\nid: Pet ID (Operation level - integer, overrides PathItem)"
+    },
+    {
+      "kind": "object",
+      "name": "GetPetsId200Response",
+      "referencePath": "#/paths/::pets::{id}/get/responses/200/content/application::json/schema",
+      "properties": [
+        {
+          "name": "id",
+          "type": "int"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUsersUserIdParams",
+      "referencePath": "#/paths/::users::{userId}/get/GetUsersUserIdParams",
+      "properties": [
+        {
+          "name": "userId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "User ID (PathItem level)"
+        },
+        {
+          "name": "format",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::users::{userId}/get/parameters/1/schema/Format"
+          },
+          "in": "query",
+          "description": "Response format (Operation level - extended)"
+        }
+      ],
+      "description": "Parameters for GET /users/{userId}\nuserId: User ID (PathItem level)\nformat: Response format (Operation level - extended)"
+    },
+    {
+      "kind": "enum",
+      "name": "Format",
+      "referencePath": "#/paths/::users::{userId}/get/parameters/1/schema/Format",
+      "type": "string",
+      "values": [
+        {
+          "value": "json",
+          "name": "JSON"
+        },
+        {
+          "value": "xml",
+          "name": "XML"
+        },
+        {
+          "value": "yaml",
+          "name": "YAML"
+        }
+      ]
+    },
+    {
+      "kind": "object",
+      "name": "GetUsersUserId200Response",
+      "referencePath": "#/paths/::users::{userId}/get/responses/200/content/application::json/schema",
+      "properties": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "path": "/pets/{id}",
+      "method": "get",
+      "operationId": "getPet",
+      "summary": "Get pet by ID",
+      "description": "Operation-level parameter overrides PathItem-level parameter",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::pets::{id}/get/GetPetsIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "Pet found",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::pets::{id}/get/responses/200/content/application::json/schema"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "Pet not found"
+        }
+      ]
+    },
+    {
+      "path": "/users/{userId}",
+      "method": "get",
+      "operationId": "getUser",
+      "summary": "Get user by ID",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "User found",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::users::{userId}/get/responses/200/content/application::json/schema"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

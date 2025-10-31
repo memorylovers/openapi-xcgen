@@ -1,9 +1,10 @@
 # Task 023-1: Task 023リファクタリング後の重大問題修正
 
-**Status**: 🔴 未着手
+**Status**: 🟡 進行中
 **Priority**: Critical（即時対応必須）
 **Created**: 2025-10-31
 **Parent Task**: Task 023 (Visitor Architecture Refactoring)
+**Last Updated**: 2025-10-31
 
 ## 概要
 
@@ -14,7 +15,7 @@ Task 023 (3層アーキテクチャ導入) のリファクタリング後に発�
 
 ## 問題1: PathItem/Operation parametersの重複 🔴
 
-### 現状の問題
+### 1-1. 現状の問題
 
 **ファイル**: `packages/core/src/transformer/transformers/traversers/operation-traverser.ts:75-81`
 
@@ -28,13 +29,13 @@ const filteredOpParams = (operation.parameters || []).filter(
 const mergedParameters = [...filteredPathParams, ...filteredOpParams]; // ← 単純結合
 ```
 
-### 原因
+### 1-2. 原因
 
 PathItemレベルとOperationレベルのparametersを単純に結合しているため、同じ`name+in`の組み合わせが重複します。
 
 OpenAPI仕様では、**operation側のパラメータがpathItem側を上書きする**べきですが、現在は両方が残ります。
 
-### 影響範囲
+### 1-3. 影響範囲
 
 **例**: `GET /pets/{id}` で両方に`id`パラメータが定義される場合
 
@@ -63,7 +64,7 @@ paths:
 - 型定義の不整合
 - 予期しない動作
 
-### 修正方針
+### 1-4. 修正方針
 
 1. `mergedParameters` 生成時に重複除去を実装
 2. `name+in` の組み合わせでMap化し、operation側を優先
@@ -82,7 +83,7 @@ paths:
 
 ## 問題2: IRRequestBodyModel/IRResponseModelのkind不整合 🔴
 
-### 現状の問題
+### 2-1. 現状の問題
 
 **E2E期待値**: `packages/core/tests/e2e/fixtures/general/orval/petstore-basic.expected.json:152`
 
@@ -95,7 +96,7 @@ paths:
 }
 ```
 
-### 原因
+### 2-2. 原因
 
 `content-traverser.ts` は `kind: "requestBody"` のコンテキストを作成しますが、`schema-dispatcher.ts` がそれを無視して常に `transformObject()` を呼び出すため、すべて `kind: "object"` になります。
 
@@ -106,7 +107,7 @@ paths:
 
 しかし実際には使用されていません。
 
-### 影響範囲
+### 2-3. 影響範囲
 
 **requestBodyの場合**:
 
@@ -125,7 +126,7 @@ paths:
 - `packages/core/src/types/ir/models/operation.ts:72-87, 111-128` で定義された型が使われていない
 - IRModel判別共用体に含まれているが、実際には生成されない
 
-### 修正方針
+### 2-4. 修正方針
 
 #### 方針A: schema-dispatcherでコンテキストを判定
 
@@ -156,7 +157,7 @@ export function dispatchSchema(schema, context) {
 
 **採用**: 方針A（dispatcher層で判定するのが3層アーキテクチャに沿う）
 
-### 修正箇所
+### 2-5. 修正箇所
 
 1. `packages/core/src/transformer/transformers/dispatchers/schema-dispatcher.ts`
    - コンテキストkindを判定してルーティング
@@ -170,7 +171,7 @@ export function dispatchSchema(schema, context) {
 4. E2E期待値の更新
    - `kind: "object"` → `kind: "requestBody"` / `kind: "response"`
 
-### テスト
+### 2-6. テスト
 
 - requestBodyのインラインobjectがIRRequestBodyModelになることを確認
 - responseのインラインobjectがIRResponseModelになることを確認
@@ -180,7 +181,7 @@ export function dispatchSchema(schema, context) {
 
 ## 問題3: security/extensionsの欠落 🔴
 
-### 現状の問題
+### 3-1. 現状の問題
 
 **IREndpoint型定義**: `packages/core/src/types/ir/endpoints/endpoint.ts:74, 76`
 
@@ -204,11 +205,11 @@ const endpoint: IREndpoint = {
 };
 ```
 
-### 原因
+### 3-2. 原因
 
 新しい3層アーキテクチャ実装で、`operation.security` と PathItem/Operationの `x-*` 拡張フィールドが転記されていません。
 
-### 影響範囲
+### 3-3. 影響範囲
 
 **security欠落**:
 
@@ -222,7 +223,7 @@ const endpoint: IREndpoint = {
 - Hooksシステムで利用する拡張情報が取得できない
 - ユーザー独自の拡張仕様が全て失われる
 
-### 修正方針
+### 3-4. 修正方針
 
 1. `operation.security` をIREndpointに設定
 2. PathItem/Operationの `x-*` 拡張を `extractExtensions()` でマージ（Operation優先）
@@ -233,7 +234,7 @@ const endpoint: IREndpoint = {
 - `packages/core/src/transformer/helpers/extract-extensions.ts` が存在するか確認
 - なければ新規実装
 
-### 修正箇所
+### 3-5. 修正箇所
 
 1. `packages/core/src/transformer/transformers/transformers/operation-transformer.ts`
    - `operation.security` の転記
@@ -244,7 +245,7 @@ const endpoint: IREndpoint = {
    - `extractExtensions()` - x-系フィールドの抽出
    - `mergeExtensions()` - PathItemとOperationの拡張マージ
 
-### テスト
+### 3-6. テスト
 
 - securityが設定されたエンドポイントのテスト
 - x-拡張フィールドが正しくマージされることを確認
@@ -266,12 +267,18 @@ const endpoint: IREndpoint = {
 
 ## 実装チェックリスト
 
-### 問題1: parameters重複
+### 問題1: parameters重複 ✅
 
-- [ ] `operation-traverser.ts` で重複除去実装
-- [ ] operation側優先のロジック実装
-- [ ] テストケース追加（PathItem + Operation重複）
-- [ ] E2Eテスト実行
+- [x] `operation-traverser.ts` で重複除去実装
+- [x] operation側優先のロジック実装（name+inでMap化）
+- [x] in-sourceテストケース追加（operation-traverser.ts:245-294）
+- [x] E2Eテストケース追加（core + xcgen-ts）
+  - [x] `endpoints/parameter-override.yaml` フィクスチャ作成
+  - [x] core期待値JSON生成
+  - [x] xcgen-ts期待値TS生成（expected + expected-valibot）
+  - [x] core endpoints.test.ts にテスト追加
+  - [x] xcgen-ts generator.test.ts にテスト追加
+- [x] 全テスト実行（935件成功）
 
 ### 問題2: kind不整合
 

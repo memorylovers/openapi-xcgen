@@ -78,7 +78,18 @@ export function traverseOperation(
   const filteredOpParams = (operation.parameters || []).filter(
     (p): p is ParameterObject => !("$ref" in p),
   );
-  const mergedParameters = [...filteredPathParams, ...filteredOpParams];
+
+  // name+inの組み合わせでMap化し、operation側を優先（OpenAPI仕様準拠）
+  const paramMap = new Map<string, ParameterObject>();
+  filteredPathParams.forEach((p) => {
+    const key = `${p.name}:${p.in}`;
+    paramMap.set(key, p);
+  });
+  filteredOpParams.forEach((p) => {
+    const key = `${p.name}:${p.in}`;
+    paramMap.set(key, p); // 同じキーの場合は上書き（operation優先）
+  });
+  const mergedParameters = Array.from(paramMap.values());
 
   let parametersResult = undefined;
   if (mergedParameters.length > 0) {
@@ -229,6 +240,57 @@ if (import.meta.vitest) {
       expect(result.parametersResult?.parameters).toHaveLength(2);
       expect(result.parametersResult?.parameters[0].name).toBe("id");
       expect(result.parametersResult?.parameters[1].name).toBe("limit");
+    });
+
+    it("should override pathItem parameters with operation parameters (same name+in)", async () => {
+      // PathItemとOperationで同じname+inのパラメータがある場合
+      // OpenAPI仕様ではoperation側が優先される
+      const operation: OperationObject = {
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "integer" as const }, // ← operation側はinteger
+          },
+        ],
+        responses: {},
+      };
+
+      const pathItemParameters: ParameterObject[] = [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "string" as const }, // ← pathItem側はstring
+        },
+      ];
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/pets/{id}", "get"],
+        rootSegment: "paths",
+      };
+
+      // 実際のdispatchSchemaを使用してテスト
+      const { dispatchSchema } = await import(
+        "../dispatchers/schema-dispatcher"
+      );
+
+      const result = traverseOperation(
+        operation,
+        context,
+        dispatchSchema,
+        pathItemParameters,
+      );
+
+      expect(result.parametersResult).toBeDefined();
+      // 重複除去されて1件のみ
+      expect(result.parametersResult?.parameters).toHaveLength(1);
+      expect(result.parametersResult?.parameters[0].name).toBe("id");
+      expect(result.parametersResult?.parameters[0].in).toBe("path");
+      // operation側の型（integer）が優先される
+      // IRTypeは"int"に変換される
+      expect(result.parametersResult?.parameters[0].type).toBe("int");
     });
 
     it("should process operation with requestBody", () => {
