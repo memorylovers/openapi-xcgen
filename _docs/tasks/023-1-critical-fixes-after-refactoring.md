@@ -1,10 +1,10 @@
 # Task 023-1: Task 023リファクタリング後の重大問題修正
 
-**Status**: 🟡 進行中 (1/3完了)
+**Status**: 🟡 進行中 (2/3完了)
 **Priority**: Critical（即時対応必須）
 **Created**: 2025-10-31
 **Parent Task**: Task 023 (Visitor Architecture Refactoring)
-**Last Updated**: 2025-10-31 (問題1完了)
+**Last Updated**: 2025-10-31 (問題2完了)
 
 ## 概要
 
@@ -270,7 +270,7 @@ const endpoint: IREndpoint = {
 | 問題 | ステータス | 完了日 | コミット |
 |------|-----------|--------|----------|
 | 1. parameters重複 | ✅ 完了 | 2025-10-31 | 8e2352a |
-| 2. kind不整合 | 🔴 未着手 | - | - |
+| 2. kind不整合 | ✅ 完了 | 2025-10-31 | 21b3e6f |
 | 3. security/extensions欠落 | 🔴 未着手 | - | - |
 
 ---
@@ -290,13 +290,15 @@ const endpoint: IREndpoint = {
   - [x] xcgen-ts generator.test.ts にテスト追加
 - [x] 全テスト実行（935件成功）
 
-### 問題2: kind不整合
+### 問題2: kind不整合 ✅
 
-- [ ] `schema-dispatcher.ts` でコンテキスト判定追加
-- [ ] `transformRequestBodyObject()` 修正
-- [ ] `transformResponseObject()` 新規実装
-- [ ] E2E期待値更新（kind変更）
-- [ ] 全テスト実行（427件）
+- [x] `schema-dispatcher.ts` で3層アーキテクチャ準拠（Transformerに委譲）
+- [x] `transformRequestBodyObject()` シグネチャ統一とIRRequestBodyModel生成
+- [x] `transformResponseObject()` シグネチャ統一とIRResponseModel生成
+- [x] in-sourceテスト追加（request-body-transformer: 3件、response-transformer: 4件）
+- [x] schema-dispatcher.ts テスト追加（requestBody/response: 7件）
+- [x] E2E期待値更新（10ファイル、kind変更）
+- [x] 全テスト実行（512件成功）
 
 ### 問題3: security/extensions欠落
 
