@@ -32,7 +32,7 @@ import {
   transformPaths,
   transformServers,
   transformTags,
-} from "./v2";
+} from "./transformers";
 
 /**
  * OpenAPIDocumentをXcgenIRに変換

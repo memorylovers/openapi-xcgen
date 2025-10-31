@@ -33,4 +33,4 @@ export {
   dispatchSchema,
   type ComponentsTransformResult,
   type TransformResult,
-} from "./v2";
+} from "./transformers";
