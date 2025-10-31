@@ -154,11 +154,9 @@ export function traverseContent(
     const result = visitSchema(schema, schemaContext);
 
     if (!result.type) {
-      const referencePath = buildReferencePath(schemaContext.documentPath);
-      consola.warn(
-        `Failed to resolve content schema for ${mimeType}: ${referencePath}`,
-      );
-      return; // このMIMEタイプはスキップ
+      // MIMEタイプのスキーマ解決に失敗した場合はスキップ
+      // エラーはvisitSchema内で既に報告済み
+      return;
     }
 
     // インラインobjectスキーマの検出

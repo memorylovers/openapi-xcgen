@@ -8,7 +8,13 @@
 
 従来の`visitors/`実装は、トラバーサル（子要素訪問）と変換処理が混在し、単一責任原則に違反していました。このタスクでは、**3層アーキテクチャ（Dispatcher/Traverser/Transformer）**を導入し、責務を明確に分離しました。
 
-**✅ v2移行完了**: Schema系とOperation系のv2移行が完了し、710件のテストが全て成功しています。
+**✅ v2移行完了**: Schema系とOperation系のv2移行が完了し、427件のテストが全て成功しています。
+
+**最近の修正** (2025-10-30):
+
+- 配列レスポンス型名生成バグ修正（`resolveModelName()` ヘルパー導入）
+- IRModelリストからreferencePathで型名を逆引きする仕組みを実装
+- services生成器全体にmodelsパラメータを追加し型名解決を統一
 
 ---
 
@@ -245,23 +251,13 @@ export interface TransformResult {
 
 ### 🟡 優先度: 中
 
-#### 1. 古いvisitors/ディレクトリの削除
-
-- 32ファイルが残存
-- v2への移行は完了済み
-- `transformer.ts` と `index.ts` の依存関係を確認後、削除とインポートパス更新
-
-#### 2. ドキュメント更新
+#### 1. ドキュメント更新
 
 - `CLAUDE.md`: v2アーキテクチャの反映
 - アーキテクチャ図の追加
 
 ### ⚪ 優先度: 低
 
-#### 3. エラーハンドリングの統一（任意）
-
-traverser系の `consola.warn` を `createErrorResult` に統一し、エラー情報を構造化
-
-#### 4. v2/ → transformers/ リネーム
+#### 3. v2/ → transformers/ リネーム
 
 v2が正式版になった時点で実施

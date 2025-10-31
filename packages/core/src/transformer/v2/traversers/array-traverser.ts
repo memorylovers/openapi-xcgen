@@ -9,6 +9,7 @@ import { consola } from "consola";
 import type { ReferenceObject, SchemaObjectWithNullable } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { createArrayItemTraversalError } from "../errors";
 import type { ArrayItemTraversalResult } from "../types";
 
 /**
@@ -39,13 +40,12 @@ export function traverseArrayItem(
 ): ArrayItemTraversalResult {
   // items フィールドのチェック
   if (!schema.items) {
-    consola.warn(
-      `Array schema without items: ${buildReferencePath(context.documentPath)}`,
+    const referencePath = buildReferencePath(context.documentPath);
+    return createArrayItemTraversalError(
+      `Array schema without items: ${referencePath}`,
+      "ARRAY_ITEMS_MISSING",
+      { documentPath: context.documentPath, referencePath },
     );
-    return {
-      itemType: null,
-      models: [],
-    };
   }
 
   // 配列要素用のコンテキストを構築
@@ -60,11 +60,11 @@ export function traverseArrayItem(
 
   if (!itemResult.type) {
     const referencePath = buildReferencePath(context.documentPath);
-    consola.warn(`Failed to resolve array item type: ${referencePath}`);
-    return {
-      itemType: null,
-      models: [],
-    };
+    return createArrayItemTraversalError(
+      `Failed to resolve array item type: ${referencePath}`,
+      "ARRAY_ITEM_RESOLUTION_FAILED",
+      { documentPath: context.documentPath, referencePath },
+    );
   }
 
   return {
@@ -167,6 +167,14 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         itemType: null,
         models: [],
+        error: {
+          code: "ARRAY_ITEMS_MISSING",
+          message: "Array schema without items: #/components/schemas/Missing",
+          context: {
+            documentPath: ["components", "schemas", "Missing"],
+            referencePath: "#/components/schemas/Missing",
+          },
+        },
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Array schema without items: #/components/schemas/Missing",
@@ -199,6 +207,15 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         itemType: null,
         models: [],
+        error: {
+          code: "ARRAY_ITEM_RESOLUTION_FAILED",
+          message:
+            "Failed to resolve array item type: #/components/schemas/FailedArray",
+          context: {
+            documentPath: ["components", "schemas", "FailedArray"],
+            referencePath: "#/components/schemas/FailedArray",
+          },
+        },
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Failed to resolve array item type: #/components/schemas/FailedArray",

@@ -69,11 +69,9 @@ export function traverseParameters(
     const result = transformParameter(param, paramContext);
 
     if (!result.parameter) {
-      const referencePath = buildReferencePath(paramContext.documentPath);
-      consola.warn(
-        `Failed to transform parameter ${param.name}: ${referencePath}`,
-      );
-      return; // このパラメータはスキップ
+      // パラメータ変換に失敗した場合はスキップ
+      // エラーはtransformParameter内で既に報告済み
+      return;
     }
 
     const irParam = result.parameter as IRParameter;

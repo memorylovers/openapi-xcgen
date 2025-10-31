@@ -6,7 +6,7 @@
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
-import { toTypeName } from "../../../helpers/naming";
+import { resolveModelName } from "../../../helpers/model-resolver";
 
 /**
  * 統合パラメータ型のマップを構築
@@ -50,9 +50,11 @@ export function buildUnifiedParameterTypesMap(
           typeof content.schema !== "string" &&
           content.schema.kind === "ref"
         ) {
-          const requestBodyModelName =
-            content.schema.name.split("/").at(-1) ?? content.schema.name;
-          const requestBodyTypeName = toTypeName(requestBodyModelName);
+          // ir.modelsから正しいモデル名を逆引き
+          const requestBodyTypeName = resolveModelName(
+            content.schema.name,
+            ir.models,
+          );
           unifiedParameterTypes.set(parameterPath, requestBodyTypeName);
           break; // 最初のスキーマのみ使用
         }
@@ -236,6 +238,58 @@ if (import.meta.vitest) {
       const result = buildUnifiedParameterTypesMap(ir);
 
       expect(result.size).toBe(0);
+    });
+
+    it("should resolve requestBody type from ir.models for inline schemas (paths)", () => {
+      const ir: XcgenIR = {
+        metadata: { title: "Test API", version: "1.0.0" },
+        models: [
+          {
+            kind: "union",
+            name: "PostBookingsBookingIdPaymentRequestBody",
+            referencePath:
+              "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
+            types: [
+              { kind: "ref", name: "#/components/schemas/CardPayment" },
+              { kind: "ref", name: "#/components/schemas/BankTransferPayment" },
+            ],
+          },
+        ],
+        tags: [],
+        endpoints: [
+          {
+            path: "/bookings/{bookingId}/payment",
+            method: "post",
+            operationId: "payForBooking",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              name: "#/paths/~1bookings~1{bookingId}~1payment/post/parameters",
+            },
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "application/json",
+                  schema: {
+                    kind: "ref",
+                    name: "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
+                  },
+                },
+              ],
+            },
+            responses: [],
+          },
+        ],
+      };
+
+      const result = buildUnifiedParameterTypesMap(ir);
+
+      expect(result.size).toBe(1);
+      expect(
+        result.get("#/paths/~1bookings~1{bookingId}~1payment/post/parameters"),
+      ).toBe("PostBookingsBookingIdPaymentRequestBody");
     });
   });
 }

@@ -95,9 +95,7 @@ export function traverseHeaders(
 
     // schemaが存在しない場合はスキップ
     if (!header.schema) {
-      consola.warn(
-        `Header without schema: ${headerName} at ${buildReferencePath(context.documentPath)}`,
-      );
+      // ヘッダーにschemaがない場合はスキップ（OpenAPI仕様では許容）
       return;
     }
 
@@ -111,11 +109,9 @@ export function traverseHeaders(
     const result = visitSchema(header.schema, schemaContext);
 
     if (!result.type) {
-      const referencePath = buildReferencePath(schemaContext.documentPath);
-      consola.warn(
-        `Failed to resolve header schema for ${headerName}: ${referencePath}`,
-      );
-      return; // このヘッダーはスキップ
+      // ヘッダースキーマの解決に失敗した場合はスキップ
+      // エラーはvisitSchema内で既に報告済み
+      return;
     }
 
     visitedHeaders.push({

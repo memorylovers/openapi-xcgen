@@ -10,6 +10,7 @@ import { consola } from "consola";
 import type { ReferenceObject, SchemaObjectWithNullable } from "../../../types";
 import { buildReferencePath } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { createCompositionTraversalError } from "../errors";
 import type { CompositionTraversalResult } from "../types";
 
 /**
@@ -37,13 +38,12 @@ export function traverseComposition(
 ): CompositionTraversalResult {
   // 空配列チェック
   if (!schemas || schemas.length === 0) {
-    consola.warn(
-      `Empty ${compositionType} array: ${buildReferencePath(context.documentPath)}`,
+    const referencePath = buildReferencePath(context.documentPath);
+    return createCompositionTraversalError(
+      `Empty ${compositionType} array: ${referencePath}`,
+      "COMPOSITION_EMPTY",
+      { documentPath: context.documentPath, referencePath, compositionType },
     );
-    return {
-      schemas: [],
-      childModels: [],
-    };
   }
 
   const visitedTypes: unknown[] = [];
@@ -62,11 +62,9 @@ export function traverseComposition(
     const result = visitSchema(subSchema, subContext);
 
     if (!result.type) {
-      const referencePath = buildReferencePath(subContext.documentPath);
-      consola.warn(
-        `Failed to resolve ${compositionType}[${index}] schema: ${referencePath}`,
-      );
-      return; // このサブスキーマはスキップ
+      // サブスキーマの解決に失敗した場合はスキップ
+      // エラーはvisitSchema内で既に報告済み
+      return;
     }
 
     visitedTypes.push(result.type);
@@ -75,13 +73,12 @@ export function traverseComposition(
 
   // 全てのサブスキーマが失敗した場合
   if (visitedTypes.length === 0) {
-    consola.warn(
-      `All ${compositionType} schemas failed: ${buildReferencePath(context.documentPath)}`,
+    const referencePath = buildReferencePath(context.documentPath);
+    return createCompositionTraversalError(
+      `All ${compositionType} schemas failed: ${referencePath}`,
+      "COMPOSITION_ALL_FAILED",
+      { documentPath: context.documentPath, referencePath, compositionType },
     );
-    return {
-      schemas: [],
-      childModels: [],
-    };
   }
 
   return {
@@ -241,9 +238,10 @@ if (import.meta.vitest) {
 
       expect(result.schemas).toHaveLength(2);
       expect(result.schemas).toEqual(["string", "number"]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to resolve oneOf[1] schema"),
-      );
+      // サブスキーマのスキップ時は警告を出さない（エラーはvisitSchema内で既に報告済み）
+      // expect(warnSpy).toHaveBeenCalledWith(
+      //   expect.stringContaining("Failed to resolve oneOf[1] schema"),
+      // );
 
       warnSpy.mockRestore();
     });

@@ -14,6 +14,7 @@ import type {
 } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { createAdditionalPropertiesTraversalError } from "../errors";
 import type { AdditionalPropertiesTraversalResult } from "../types";
 
 /**
@@ -51,13 +52,11 @@ export function traverseMapValue(
 
   // additionalProperties: true の場合（any型、サポート外）
   if (additional === true) {
-    consola.warn(
+    return createAdditionalPropertiesTraversalError(
       "additionalProperties: true (any type) is not supported; specify a schema for map values",
+      "MAP_ANY_TYPE_NOT_SUPPORTED",
+      { documentPath: context.documentPath },
     );
-    return {
-      type: undefined,
-      models: [],
-    };
   }
 
   // additionalProperties: false の場合
@@ -79,13 +78,11 @@ export function traverseMapValue(
 
   if (!valueResult.type) {
     const referencePath = buildReferencePath(context.documentPath);
-    consola.warn(
+    return createAdditionalPropertiesTraversalError(
       `Failed to process additionalProperties-only schema: ${referencePath}`,
+      "MAP_VALUE_RESOLUTION_FAILED",
+      { documentPath: context.documentPath, referencePath },
     );
-    return {
-      type: undefined,
-      models: [],
-    };
   }
 
   return {
@@ -207,6 +204,14 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         type: undefined,
         models: [],
+        error: {
+          code: "MAP_ANY_TYPE_NOT_SUPPORTED",
+          message:
+            "additionalProperties: true (any type) is not supported; specify a schema for map values",
+          context: {
+            documentPath: ["components", "schemas", "AnyMap"],
+          },
+        },
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "additionalProperties: true (any type) is not supported; specify a schema for map values",
@@ -261,6 +266,15 @@ if (import.meta.vitest) {
       expect(result).toEqual({
         type: undefined,
         models: [],
+        error: {
+          code: "MAP_VALUE_RESOLUTION_FAILED",
+          message:
+            "Failed to process additionalProperties-only schema: #/components/schemas/FailedMap",
+          context: {
+            documentPath: ["components", "schemas", "FailedMap"],
+            referencePath: "#/components/schemas/FailedMap",
+          },
+        },
       });
       expect(warnSpy).toHaveBeenCalledWith(
         "Failed to process additionalProperties-only schema: #/components/schemas/FailedMap",

@@ -19,6 +19,7 @@ import {
   getModelName,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
+import { createAdditionalPropertiesTraversalError } from "../errors";
 import type {
   AdditionalPropertiesTraversalResult,
   PropertyTraversalResult,
@@ -77,9 +78,9 @@ export function traverseObjectProperties(
     const result = visitSchema(propSchema, propContext);
 
     if (!result.type) {
-      const referencePath = buildReferencePath(propContext.documentPath);
-      consola.warn(`Failed to resolve property type: ${referencePath}`);
-      return; // このプロパティはスキップ
+      // プロパティの型解決に失敗した場合はスキップ
+      // エラーはvisitSchema内で既に報告済み
+      return;
     }
 
     // nullable判定
@@ -142,13 +143,11 @@ export function traverseObjectAdditionalProperties(
 
   // additionalProperties: true の場合（any型、サポート外）
   if (additional === true) {
-    consola.warn(
+    return createAdditionalPropertiesTraversalError(
       "additionalProperties: true (any type) is not supported in object schemas",
+      "ADDITIONAL_PROPERTIES_ANY_NOT_SUPPORTED",
+      { documentPath: context.documentPath },
     );
-    return {
-      type: undefined,
-      models: [],
-    };
   }
 
   // additionalProperties: false の場合
@@ -173,13 +172,11 @@ export function traverseObjectAdditionalProperties(
 
   if (!valueResult.type) {
     const referencePath = buildReferencePath(context.documentPath);
-    consola.warn(
+    return createAdditionalPropertiesTraversalError(
       `Failed to process additionalProperties in object: ${referencePath}`,
+      "ADDITIONAL_PROPERTIES_RESOLUTION_FAILED",
+      { documentPath: context.documentPath, referencePath },
     );
-    return {
-      type: undefined,
-      models: [],
-    };
   }
 
   return {
@@ -371,9 +368,10 @@ if (import.meta.vitest) {
 
       expect(result.properties).toHaveLength(2);
       expect(result.properties.map((p) => p.name)).toEqual(["name", "age"]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to resolve property type"),
-      );
+      // プロパティのスキップ時は警告を出さない（エラーはvisitSchema内で既に報告済み）
+      // expect(warnSpy).toHaveBeenCalledWith(
+      //   expect.stringContaining("Failed to resolve property type"),
+      // );
 
       warnSpy.mockRestore();
     });

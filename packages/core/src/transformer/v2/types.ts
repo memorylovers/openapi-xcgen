@@ -65,6 +65,8 @@ export interface PropertyTraversalResult {
   }>;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -75,6 +77,8 @@ export interface AdditionalPropertiesTraversalResult {
   type: IRType | undefined;
   /** 子要素から抽出されたモデル */
   models: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -85,6 +89,8 @@ export interface ArrayItemTraversalResult {
   itemType: IRType | null;
   /** 子要素から抽出されたモデル */
   models: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -95,6 +101,8 @@ export interface CompositionTraversalResult {
   schemas: IRType[];
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 //
@@ -117,6 +125,8 @@ export interface ContentTraversalResult {
   childModels: IRModel[];
   /** インラインオブジェクトスキーマとして特別なモデルを生成すべきか */
   requiresSpecialModel: boolean;
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -133,6 +143,8 @@ export interface HeadersTraversalResult {
   }>;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -152,6 +164,8 @@ export interface ParametersTraversalResult {
   }>;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -177,6 +191,8 @@ export interface ResponsesTraversalResult {
   }>;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
@@ -198,6 +214,8 @@ export interface OperationTraversalResult {
   responsesResult?: ResponsesTraversalResult;
   /** 子要素から抽出されたモデル */
   childModels: IRModel[];
+  /** エラー情報（オプショナル） */
+  error?: TransformError;
 }
 
 /**
