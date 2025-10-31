@@ -6,7 +6,7 @@
   },
   "models": [
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetItemsId200Response",
       "referencePath": "#/paths/::items::{id}/get/responses/200/content/application::json/schema",
       "properties": [
@@ -18,7 +18,8 @@
           "name": "name",
           "type": "string"
         }
-      ]
+      ],
+      "statusCode": "200"
     }
   ],
   "tags": [],

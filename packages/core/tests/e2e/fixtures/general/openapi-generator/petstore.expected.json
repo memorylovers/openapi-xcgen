@@ -377,7 +377,7 @@
       "description": "Parameters for POST /pet/{petId}\npetId: ID of pet that needs to be updated"
     },
     {
-      "kind": "object",
+      "kind": "requestBody",
       "name": "PostPetPetIdWwwFormUrlencodedRequestBody",
       "referencePath": "#/paths/::pet::{petId}/post/requestBody/content/application::x-www-form-urlencoded/schema",
       "properties": [
@@ -429,7 +429,7 @@
       "description": "Parameters for POST /pet/{petId}/uploadImage\npetId: ID of pet to update"
     },
     {
-      "kind": "object",
+      "kind": "requestBody",
       "name": "PostPetPetIdUploadImageMultipartFormDataRequestBody",
       "referencePath": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema",
       "properties": [

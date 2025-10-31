@@ -8,17 +8,24 @@
 import { consola } from "consola";
 import type {
   IRModel,
+  IRProperty,
   IRRef,
   IRRequestBody,
   IRRequestBodyModel,
   IRRequestContent,
   ReferenceObject,
   RequestBodyObject,
+  SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { buildReferencePath } from "../../helpers";
+import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
-import type { ContentTraversalResult, TransformResult } from "../types";
+import type {
+  AdditionalPropertiesTraversalResult,
+  ContentTraversalResult,
+  PropertyTraversalResult,
+  TransformResult,
+} from "../types";
 
 /**
  * RequestBodyObjectをIRRequestBodyに変換
@@ -112,19 +119,18 @@ export function transformRequestBody(
 /**
  * インラインobjectスキーマからIRRequestBodyModelを生成
  *
- * これは特別なケースで、RequestBodyのcontentに直接objectスキーマがある場合に
- * IRRequestBodyModelとして抽出します。
+ * 3層アーキテクチャに準拠: SchemaObject と PropertyTraversalResult を受け取り、
+ * TransformResult を返します。
  *
- * @param properties - オブジェクトのプロパティ配列
- * @param context - Visitorコンテキスト
- * @param required - リクエストボディが必須かどうか
- * @param description - 説明
- * @returns IRRequestBodyModel
+ * @param schema - ObjectスキーマまたはSchemaObject
+ * @param context - Visitorコンテキスト（kind: "requestBody" または "componentsRequestBody"）
+ * @param propertyTraversalResult - プロパティトラバーサル結果
+ * @param additionalPropertiesResult - additionalPropertiesトラバーサル結果（オプション）
+ * @returns TransformResult
  *
  * @example OpenAPI YAML
  * ```yaml
  * requestBody:
- *   required: true
  *   content:
  *     application/json:
  *       schema:
@@ -132,35 +138,52 @@ export function transformRequestBody(
  *         properties:
  *           name:
  *             type: string
- * # → PostUsersRequestBody model
+ * # → PostUsersRequestBody model (kind: "requestBody")
  * ```
  */
 export function transformRequestBodyObject(
-  properties: Array<{
-    name: string;
-    type: unknown;
-    required?: boolean;
-    nullable?: boolean;
-    description?: string;
-  }>,
+  schema: SchemaObject,
   context: VisitorContext,
-  required?: boolean,
-  description?: string,
-): IRRequestBodyModel {
-  // モデル名を生成（最後のセグメントを使用）
-  const modelName = context.documentPath[context.documentPath.length - 1];
+  propertyTraversalResult: PropertyTraversalResult,
+  additionalPropertiesResult?: AdditionalPropertiesTraversalResult,
+): TransformResult {
+  const name = getModelName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
-  const model: IRRequestBodyModel = {
+  // プロパティをIRProperty形式に変換
+  const properties: IRProperty[] = propertyTraversalResult.properties.map(
+    (prop) => ({
+      name: prop.name,
+      type: prop.type,
+      ...(prop.required && { required: true as const }),
+      ...(prop.nullable && { nullable: true as const }),
+      ...(prop.description && { description: prop.description }),
+    }),
+  );
+
+  // 子モデルの収集
+  const childModels = [
+    ...propertyTraversalResult.childModels,
+    ...(additionalPropertiesResult?.models || []),
+  ];
+
+  // IRRequestBodyModelを作成
+  const requestBodyModel: IRRequestBodyModel = {
     kind: "requestBody",
-    name: modelName,
+    name,
     referencePath,
-    properties: properties as IRRequestBodyModel["properties"],
-    ...(required && { required: true }),
-    ...(description && { description }),
+    properties,
+    ...(schema.description && { description: schema.description }),
+    ...(additionalPropertiesResult?.type && {
+      additionalProperties: additionalPropertiesResult.type,
+    }),
   };
 
-  return model;
+  // requestBodyモデルと子要素から抽出されたモデルを返す
+  return {
+    type: { kind: "ref", name: referencePath },
+    models: [requestBodyModel, ...childModels],
+  };
 }
 
 // === in-source testing ===
@@ -308,55 +331,156 @@ if (import.meta.vitest) {
   });
 
   describe("transformRequestBodyObject", () => {
-    it("should create IRRequestBodyModel", () => {
-      const properties = [
-        { name: "name", type: "string", required: true },
-        { name: "email", type: "string" },
-      ];
+    it("should create IRRequestBodyModel from schema and traversal result", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          email: { type: "string" },
+        },
+        required: ["name"],
+        description: "User data",
+      };
 
       const context: VisitorContext = {
+        kind: "requestBody",
         documentPath: [
           "paths",
           "/users",
           "post",
           "requestBody",
-          "PostUsersRequestBody",
+          "content",
+          "application/json",
+          "schema",
         ],
         rootSegment: "paths",
       };
 
-      const result = transformRequestBodyObject(
-        properties,
-        context,
-        true,
-        "User data",
-      );
-
-      expect(result).toEqual({
-        kind: "requestBody",
-        name: "PostUsersRequestBody",
-        referencePath: "#/paths/::users/post/requestBody/PostUsersRequestBody",
+      const propertyResult: PropertyTraversalResult = {
         properties: [
           { name: "name", type: "string", required: true },
           { name: "email", type: "string" },
         ],
-        required: true,
+        childModels: [],
+      };
+
+      const result = transformRequestBodyObject(
+        schema,
+        context,
+        propertyResult,
+      );
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/paths/::users/post/requestBody/content/application::json/schema",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
+        kind: "requestBody",
+        name: "PostUsersRequestBody",
+        referencePath:
+          "#/paths/::users/post/requestBody/content/application::json/schema",
+        properties: [
+          { name: "name", type: "string", required: true },
+          { name: "email", type: "string" },
+        ],
         description: "User data",
       });
     });
 
-    it("should handle optional request body", () => {
-      const properties = [{ name: "data", type: "string" }];
+    it("should handle additionalProperties in request body", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: { type: "string" },
+      };
 
       const context: VisitorContext = {
-        documentPath: ["paths", "/data", "post", "requestBody", "DataModel"],
+        kind: "requestBody",
+        documentPath: [
+          "paths",
+          "/data",
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+        ],
         rootSegment: "paths",
       };
 
-      const result = transformRequestBodyObject(properties, context);
+      const propertyResult: PropertyTraversalResult = {
+        properties: [{ name: "id", type: "string" }],
+        childModels: [],
+      };
 
-      expect(result.required).toBeUndefined();
-      expect(result.description).toBeUndefined();
+      const additionalResult: AdditionalPropertiesTraversalResult = {
+        type: "string",
+        models: [],
+      };
+
+      const result = transformRequestBodyObject(
+        schema,
+        context,
+        propertyResult,
+        additionalResult,
+      );
+
+      expect(result.models[0]).toMatchObject({
+        kind: "requestBody",
+        additionalProperties: "string",
+      });
+    });
+
+    it("should collect child models from properties", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          nested: { type: "object" },
+        },
+      };
+
+      const context: VisitorContext = {
+        kind: "requestBody",
+        documentPath: [
+          "paths",
+          "/test",
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const mockChildModel: IRModel = {
+        kind: "object",
+        name: "NestedModel",
+        referencePath: "#/nested",
+        properties: [],
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          {
+            name: "nested",
+            type: { kind: "ref", name: "#/nested" },
+          },
+        ],
+        childModels: [mockChildModel],
+      };
+
+      const result = transformRequestBodyObject(
+        schema,
+        context,
+        propertyResult,
+      );
+
+      expect(result.models).toHaveLength(2); // requestBody + nested
+      expect(result.models[1]).toBe(mockChildModel);
     });
   });
 }

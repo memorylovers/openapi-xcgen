@@ -95,7 +95,7 @@
       "description": "Parameters for GET /users/{id}"
     },
     {
-      "kind": "object",
+      "kind": "requestBody",
       "name": "PostPostsRequestBody",
       "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema",
       "properties": [

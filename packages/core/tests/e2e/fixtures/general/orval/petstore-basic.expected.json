@@ -149,7 +149,7 @@
       "description": "Parameters for GET /pets\nlimit: How many items to return at one time (max 100)"
     },
     {
-      "kind": "object",
+      "kind": "requestBody",
       "name": "PostPetsRequestBody",
       "referencePath": "#/paths/::pets/post/requestBody/content/application::json/schema",
       "properties": [

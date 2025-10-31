@@ -321,7 +321,7 @@ if (import.meta.vitest) {
         },
         models: [
           {
-            kind: "object",
+            kind: "requestBody",
             name: "PostPetsRequestBody",
             referencePath:
               "#/paths/::pets/post/requestBody/content/application::json/schema",

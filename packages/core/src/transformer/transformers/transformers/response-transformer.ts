@@ -7,6 +7,7 @@
 
 import type {
   IRModel,
+  IRProperty,
   IRRef,
   IRResponse,
   IRResponseContent,
@@ -14,13 +15,16 @@ import type {
   IRResponseModel,
   ReferenceObject,
   ResponseObject,
+  SchemaObject,
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
-import { buildReferencePath } from "../../helpers";
+import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import type {
+  AdditionalPropertiesTraversalResult,
   ContentTraversalResult,
   HeadersTraversalResult,
+  PropertyTraversalResult,
   TransformResult,
 } from "../types";
 
@@ -134,21 +138,19 @@ export function transformResponse(
 /**
  * インラインobjectスキーマからIRResponseModelを生成
  *
- * これは特別なケースで、Responseのcontentに直接objectスキーマがある場合に
- * IRResponseModelとして抽出します。
+ * 3層アーキテクチャに準拠: SchemaObject と PropertyTraversalResult を受け取り、
+ * TransformResult を返します。
  *
- * @param properties - オブジェクトのプロパティ配列
- * @param statusCode - HTTPステータスコード
- * @param context - Visitorコンテキスト
- * @param description - 説明
- * @param headers - レスポンスヘッダー
- * @returns IRResponseModel
+ * @param schema - ObjectスキーマまたはSchemaObject
+ * @param context - Visitorコンテキスト（kind: "response" または "componentsResponse"）
+ * @param propertyTraversalResult - プロパティトラバーサル結果
+ * @param additionalPropertiesResult - additionalPropertiesトラバーサル結果（オプション）
+ * @returns TransformResult
  *
  * @example OpenAPI YAML
  * ```yaml
  * responses:
  *   '200':
- *     description: Success
  *     content:
  *       application/json:
  *         schema:
@@ -156,37 +158,59 @@ export function transformResponse(
  *           properties:
  *             result:
  *               type: string
- * # → GetUsers200Response model
+ * # → GetUsers200Response model (kind: "response")
  * ```
  */
 export function transformResponseObject(
-  properties: Array<{
-    name: string;
-    type: unknown;
-    required?: boolean;
-    nullable?: boolean;
-    description?: string;
-  }>,
-  statusCode: string,
+  schema: SchemaObject,
   context: VisitorContext,
-  description?: string,
-  headers?: IRResponseHeader[],
-): IRResponseModel {
-  // モデル名を生成（最後のセグメントを使用）
-  const modelName = context.documentPath[context.documentPath.length - 1];
+  propertyTraversalResult: PropertyTraversalResult,
+  additionalPropertiesResult?: AdditionalPropertiesTraversalResult,
+): TransformResult {
+  const name = getModelName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
-  const model: IRResponseModel = {
+  // ステータスコードを取得（documentPathから）
+  const responsesIndex = context.documentPath.findIndex(
+    (p) => p === "responses",
+  );
+  const statusCode = context.documentPath[responsesIndex + 1] as string;
+
+  // プロパティをIRProperty形式に変換
+  const properties: IRProperty[] = propertyTraversalResult.properties.map(
+    (prop) => ({
+      name: prop.name,
+      type: prop.type,
+      ...(prop.required && { required: true as const }),
+      ...(prop.nullable && { nullable: true as const }),
+      ...(prop.description && { description: prop.description }),
+    }),
+  );
+
+  // 子モデルの収集
+  const childModels = [
+    ...propertyTraversalResult.childModels,
+    ...(additionalPropertiesResult?.models || []),
+  ];
+
+  // IRResponseModelを作成
+  const responseModel: IRResponseModel = {
     kind: "response",
-    name: modelName,
+    name,
     referencePath,
-    properties: properties as IRResponseModel["properties"],
+    properties,
     statusCode,
-    ...(description && { description }),
-    ...(headers && headers.length > 0 && { headers }),
+    ...(schema.description && { description: schema.description }),
+    ...(additionalPropertiesResult?.type && {
+      additionalProperties: additionalPropertiesResult.type,
+    }),
   };
 
-  return model;
+  // responseモデルと子要素から抽出されたモデルを返す
+  return {
+    type: { kind: "ref", name: referencePath },
+    models: [responseModel, ...childModels],
+  };
 }
 
 // === in-source testing ===
@@ -413,35 +437,52 @@ if (import.meta.vitest) {
   });
 
   describe("transformResponseObject", () => {
-    it("should create IRResponseModel", () => {
-      const properties = [
-        { name: "result", type: "string", required: true },
-        { name: "count", type: "int" },
-      ];
+    it("should create IRResponseModel from schema and traversal result", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          result: { type: "string" },
+          count: { type: "integer" },
+        },
+        required: ["result"],
+        description: "Success response",
+      };
 
       const context: VisitorContext = {
+        kind: "response",
         documentPath: [
           "paths",
           "/users",
           "get",
           "responses",
           "200",
-          "GetUsers200Response",
+          "content",
+          "application/json",
+          "schema",
         ],
         rootSegment: "paths",
       };
 
-      const result = transformResponseObject(
-        properties,
-        "200",
-        context,
-        "Success response",
-      );
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          { name: "result", type: "string", required: true },
+          { name: "count", type: "int" },
+        ],
+        childModels: [],
+      };
 
-      expect(result).toEqual({
+      const result = transformResponseObject(schema, context, propertyResult);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/paths/::users/get/responses/200/content/application::json/schema",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
         kind: "response",
         name: "GetUsers200Response",
-        referencePath: "#/paths/::users/get/responses/200/GetUsers200Response",
+        referencePath:
+          "#/paths/::users/get/responses/200/content/application::json/schema",
         properties: [
           { name: "result", type: "string", required: true },
           { name: "count", type: "int" },
@@ -451,59 +492,134 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should include headers in response model", () => {
-      const properties = [{ name: "data", type: "string" }];
-
-      const headers: IRResponseHeader[] = [
-        {
-          name: "X-Rate-Limit",
-          type: "int",
+    it("should handle additionalProperties in response", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
         },
-      ];
+        additionalProperties: { type: "number" },
+      };
 
       const context: VisitorContext = {
+        kind: "response",
         documentPath: [
           "paths",
-          "/api",
+          "/data",
           "get",
           "responses",
           "200",
-          "ApiResponse",
+          "content",
+          "application/json",
+          "schema",
         ],
         rootSegment: "paths",
       };
 
+      const propertyResult: PropertyTraversalResult = {
+        properties: [{ name: "id", type: "string" }],
+        childModels: [],
+      };
+
+      const additionalResult: AdditionalPropertiesTraversalResult = {
+        type: "double", // number -> double in IR
+        models: [],
+      };
+
       const result = transformResponseObject(
-        properties,
-        "200",
+        schema,
         context,
-        "API response",
-        headers,
+        propertyResult,
+        additionalResult,
       );
 
-      expect(result.headers).toHaveLength(1);
-      expect(result.headers?.[0].name).toBe("X-Rate-Limit");
+      expect(result.models[0]).toMatchObject({
+        kind: "response",
+        additionalProperties: "double",
+      });
     });
 
-    it("should handle response without description", () => {
-      const properties = [{ name: "value", type: "string" }];
+    it("should collect child models from properties", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          nested: { type: "object" },
+        },
+      };
 
       const context: VisitorContext = {
+        kind: "response",
         documentPath: [
           "paths",
           "/test",
           "get",
           "responses",
           "200",
-          "TestResponse",
+          "content",
+          "application/json",
+          "schema",
         ],
         rootSegment: "paths",
       };
 
-      const result = transformResponseObject(properties, "200", context);
+      const mockChildModel: IRModel = {
+        kind: "object",
+        name: "NestedModel",
+        referencePath: "#/nested",
+        properties: [],
+      };
 
-      expect(result.description).toBeUndefined();
-      expect(result.headers).toBeUndefined();
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          {
+            name: "nested",
+            type: { kind: "ref", name: "#/nested" },
+          },
+        ],
+        childModels: [mockChildModel],
+      };
+
+      const result = transformResponseObject(schema, context, propertyResult);
+
+      expect(result.models).toHaveLength(2); // response + nested
+      expect(result.models[1]).toBe(mockChildModel);
+    });
+
+    it("should handle different status codes", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          error: { type: "string" },
+        },
+      };
+
+      const context: VisitorContext = {
+        kind: "response",
+        documentPath: [
+          "paths",
+          "/users/{id}",
+          "get",
+          "responses",
+          "404",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [{ name: "error", type: "string" }],
+        childModels: [],
+      };
+
+      const result = transformResponseObject(schema, context, propertyResult);
+
+      expect(result.models[0]).toMatchObject({
+        kind: "response",
+        name: "GetUsersId404Response",
+        statusCode: "404",
+      });
     });
   });
 }

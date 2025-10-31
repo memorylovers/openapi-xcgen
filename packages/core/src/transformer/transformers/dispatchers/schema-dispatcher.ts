@@ -21,6 +21,8 @@ import { transformMap } from "../transformers/map-transformer";
 import { transformObject } from "../transformers/object-transformer";
 import { transformOneOf } from "../transformers/oneof-transformer";
 import { transformPrimitive } from "../transformers/primitive-transformer";
+import { transformRequestBodyObject } from "../transformers/request-body-transformer";
+import { transformResponseObject } from "../transformers/response-transformer";
 import { traverseArrayItem } from "../traversers/array-traverser";
 import { traverseComposition } from "../traversers/composition-traverser";
 import { traverseMapValue } from "../traversers/map-traverser";
@@ -144,6 +146,30 @@ export function dispatchSchema(
       dispatchSchema,
     );
 
+    // requestBody文脈の場合、TransformerにIRRequestBodyModel生成を委譲
+    if (
+      context.kind === "requestBody" ||
+      context.kind === "componentsRequestBody"
+    ) {
+      return transformRequestBodyObject(
+        schema as SchemaObject,
+        context,
+        propertyTraversalResult,
+        additionalResult,
+      );
+    }
+
+    // response文脈の場合、TransformerにIRResponseModel生成を委譲
+    if (context.kind === "response" || context.kind === "componentsResponse") {
+      return transformResponseObject(
+        schema as SchemaObject,
+        context,
+        propertyTraversalResult,
+        additionalResult,
+      );
+    }
+
+    // 通常のobjectモデル
     return transformObject(
       schema as SchemaObject,
       context,
@@ -394,6 +420,199 @@ if (import.meta.vitest) {
       });
       expect(result.models).toHaveLength(1);
       expect(result.models[0].kind).toBe("object");
+    });
+
+    it("should dispatch object in requestBody context to IRRequestBodyModel", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          email: { type: "string" },
+        },
+        description: "User data",
+      };
+      const context: VisitorContext = {
+        kind: "requestBody",
+        documentPath: [
+          "paths",
+          "/users",
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/paths/::users/post/requestBody/content/application::json/schema",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("requestBody");
+      if (result.models[0].kind === "requestBody") {
+        expect(result.models[0].properties).toHaveLength(2);
+        expect(result.models[0].description).toBe("User data");
+      }
+    });
+
+    it("should dispatch object in componentsRequestBody context to IRRequestBodyModel", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          data: { type: "string" },
+        },
+      };
+      const context: VisitorContext = {
+        kind: "componentsRequestBody",
+        documentPath: [
+          "components",
+          "requestBodies",
+          "UserInput",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "components",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("requestBody");
+    });
+
+    it("should dispatch object in response context to IRResponseModel", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          result: { type: "string" },
+          count: { type: "integer" },
+        },
+        description: "Success response",
+      };
+      const context: VisitorContext = {
+        kind: "response",
+        documentPath: [
+          "paths",
+          "/users",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/paths/::users/get/responses/200/content/application::json/schema",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("response");
+      if (result.models[0].kind === "response") {
+        expect(result.models[0].properties).toHaveLength(2);
+        expect(result.models[0].statusCode).toBe("200");
+        expect(result.models[0].description).toBe("Success response");
+      }
+    });
+
+    it("should dispatch object in componentsResponse context to IRResponseModel", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          error: { type: "string" },
+        },
+      };
+      const context: VisitorContext = {
+        kind: "componentsResponse",
+        documentPath: [
+          "components",
+          "responses",
+          "ErrorResponse",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "components",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0].kind).toBe("response");
+      // components配下のresponseの場合、statusCodeはdocumentPathから取得できないため
+      // responsesIndexが見つからず、documentPath[responsesIndex + 1]はundefinedになるが
+      // これは想定された動作（実際にはcomponentsの場合は使われない）
+    });
+
+    it("should handle requestBody object with additionalProperties", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: { type: "string" },
+      };
+      const context: VisitorContext = {
+        kind: "requestBody",
+        documentPath: [
+          "paths",
+          "/data",
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.models[0].kind).toBe("requestBody");
+      if (result.models[0].kind === "requestBody") {
+        expect(result.models[0].additionalProperties).toBe("string");
+      }
+    });
+
+    it("should handle response object with additionalProperties", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+        },
+        additionalProperties: { type: "number" },
+      };
+      const context: VisitorContext = {
+        kind: "response",
+        documentPath: [
+          "paths",
+          "/data",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const result = dispatchSchema(schema, context);
+
+      expect(result.models[0].kind).toBe("response");
+      if (result.models[0].kind === "response") {
+        // number型はIR変換で"double"になる
+        expect(result.models[0].additionalProperties).toBe("double");
+      }
     });
   });
 }

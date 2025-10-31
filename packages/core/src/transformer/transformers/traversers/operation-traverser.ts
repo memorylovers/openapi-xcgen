@@ -417,7 +417,8 @@ if (import.meta.vitest) {
       // Verify model kinds
       const modelKinds = result.childModels.map((m) => m.kind);
       expect(modelKinds).toContain("array"); // from parameter
-      expect(modelKinds).toContain("object"); // from request/response
+      expect(modelKinds).toContain("requestBody"); // from requestBody
+      expect(modelKinds).toContain("response"); // from response
     });
 
     it("should skip requestBody reference", () => {

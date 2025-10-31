@@ -175,7 +175,7 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetTest1ParametersId200Response",
       "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema",
       "properties": [
@@ -183,10 +183,11 @@
           "name": "result",
           "type": "string"
         }
-      ]
+      ],
+      "statusCode": "200"
     },
     {
-      "kind": "object",
+      "kind": "requestBody",
       "name": "PostTest2RequestRequestBody",
       "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema",
       "properties": [
@@ -232,7 +233,7 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "PostTest2Request201Response",
       "referencePath": "#/paths/::test-2-request/post/responses/201/content/application::json/schema",
       "properties": [
@@ -240,7 +241,8 @@
           "name": "result",
           "type": "string"
         }
-      ]
+      ],
+      "statusCode": "201"
     },
     {
       "kind": "parameter",
@@ -294,7 +296,7 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetTest3Response202Response",
       "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema",
       "properties": [
@@ -309,7 +311,8 @@
             "name": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResult"
           }
         }
-      ]
+      ],
+      "statusCode": "202"
     },
     {
       "kind": "object",

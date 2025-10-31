@@ -6,7 +6,7 @@
   },
   "models": [
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetHealth200Response",
       "referencePath": "#/paths/::health/get/responses/200/content/application::json/schema",
       "properties": [
@@ -14,7 +14,8 @@
           "name": "status",
           "type": "string"
         }
-      ]
+      ],
+      "statusCode": "200"
     }
   ],
   "tags": [],

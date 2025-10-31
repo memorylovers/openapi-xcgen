@@ -851,7 +851,7 @@
       "description": "Parameters for GET /museum-hours\ndate: Specific date to retrieve hours for (ISO 8601 format)\ntimezone: Timezone for displaying hours (IANA timezone format)"
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetMuseumHours200Response",
       "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema",
       "properties": [
@@ -867,7 +867,8 @@
             "name": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours"
           }
         }
-      ]
+      ],
+      "statusCode": "200"
     },
     {
       "kind": "array",
@@ -954,7 +955,7 @@
       ]
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetSpecialEvents200Response",
       "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema",
       "properties": [
@@ -972,7 +973,8 @@
             "name": "#/components/schemas/Pagination"
           }
         }
-      ]
+      ],
+      "statusCode": "200"
     },
     {
       "kind": "array",

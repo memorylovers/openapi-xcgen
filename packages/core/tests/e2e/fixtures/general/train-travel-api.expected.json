@@ -537,7 +537,7 @@
       "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results"
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetStations200Response",
       "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema",
       "properties": [
@@ -555,7 +555,8 @@
             "name": "#/components/schemas/PaginationLinks"
           }
         }
-      ]
+      ],
+      "statusCode": "200"
     },
     {
       "kind": "array",
@@ -608,7 +609,7 @@
       "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs"
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetTrips200Response",
       "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema",
       "properties": [
@@ -626,7 +627,8 @@
             "name": "#/components/schemas/PaginationLinks"
           }
         }
-      ]
+      ],
+      "statusCode": "200"
     },
     {
       "kind": "array",
@@ -638,7 +640,7 @@
       }
     },
     {
-      "kind": "object",
+      "kind": "response",
       "name": "GetBookings200Response",
       "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema",
       "properties": [
@@ -656,7 +658,8 @@
             "name": "#/components/schemas/PaginationLinks"
           }
         }
-      ]
+      ],
+      "statusCode": "200"
     },
     {
       "kind": "array",
