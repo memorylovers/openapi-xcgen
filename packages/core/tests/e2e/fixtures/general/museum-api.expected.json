@@ -1829,5 +1829,77 @@
       "in": "header",
       "description": "API key for admin operations"
     }
+  },
+  "commonResponses": {
+    "BadRequest": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Bad Request - Invalid input parameters",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Unauthorized": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Unauthorized - Authentication required",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Forbidden": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Forbidden - Insufficient privileges",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "NotFound": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Not Found - Resource not found",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "InternalServerError": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Internal Server Error",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    }
   }
 }

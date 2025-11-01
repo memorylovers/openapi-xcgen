@@ -6,6 +6,15 @@
   },
   "models": [
     {
+      "kind": "array",
+      "name": "schema",
+      "referencePath": "#/components/requestBodies/UserArray/content/application/json/schema",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/User"
+      }
+    },
+    {
       "kind": "object",
       "name": "Order",
       "referencePath": "#/components/schemas/Order",
@@ -1478,6 +1487,43 @@
       "type": "apiKey",
       "name": "api_key",
       "in": "header"
+    }
+  },
+  "commonRequestBodies": {
+    "UserArray": {
+      "kind": "content",
+      "content": [
+        {
+          "mimeType": "application/json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/requestBodies/UserArray/content/application/json/schema"
+          }
+        }
+      ],
+      "required": true,
+      "description": "List of user object"
+    },
+    "Pet": {
+      "kind": "content",
+      "content": [
+        {
+          "mimeType": "application/json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pet"
+          }
+        },
+        {
+          "mimeType": "application/xml",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pet"
+          }
+        }
+      ],
+      "required": true,
+      "description": "Pet object that needs to be added to the store"
     }
   }
 }

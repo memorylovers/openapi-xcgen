@@ -9,17 +9,24 @@
  */
 
 import { consola } from "consola";
-import { buildComponentSchemaPath } from "../../helpers";
 import type {
   ComponentsObject,
   IRModel,
   IRRequestBody,
   IRResponse,
   IRSecurityScheme,
+  RequestBodyObject,
+  ResponseObject,
   SchemaObjectWithNullable,
 } from "../../../types";
+import { isReferenceObject } from "../../../types";
 import type { TransformContext } from "../context";
 import { dispatchSchema } from "../dispatchers/schema-dispatcher";
+import { traverseComponentSchemas } from "../traversers/component-schemas-traverser";
+import { traverseContent } from "../traversers/content-traverser";
+import { traverseHeaders } from "../traversers/headers-traverser";
+import { transformRequestBody } from "./request-body-transformer";
+import { transformResponse } from "./response-transformer";
 import { transformSecuritySchemes } from "./security-schemes-transformer";
 
 /**
@@ -82,38 +89,109 @@ export function transformComponents(
     }
   }
 
-  // Note: responses と requestBodies は現時点では処理しない
-  // これらは古い実装でも未実装でした
+  // components.responsesを処理
+  if (components.responses) {
+    const responses: Record<string, IRResponse> = {};
+    for (const [name, response] of Object.entries(components.responses)) {
+      // ReferenceObjectの場合は警告してスキップ（ネストされた$refは未対応）
+      if (isReferenceObject(response)) {
+        consola.warn(
+          `Nested $ref in components.responses["${name}"] is not supported`,
+        );
+        continue;
+      }
 
-  // schemasが存在しない場合は早期リターン
-  if (!components.schemas) {
-    return result;
-  }
-
-  // 各スキーマを処理
-  for (const [name, schema] of Object.entries(components.schemas)) {
-    // null/undefinedチェック
-    if (!schema) {
-      consola.warn(`Invalid schema for "${name}": schema is null or undefined`);
-      continue;
-    }
-
-    try {
-      // dispatchSchemaを呼び出し
-      const schemaContext: TransformContext = {
-        documentPath: buildComponentSchemaPath(context, name),
+      const responseObj = response as ResponseObject;
+      const responseContext: TransformContext = {
+        documentPath: ["components", "responses", name],
         rootSegment: "components",
       };
-      const schemaResult = dispatchSchema(
-        schema as SchemaObjectWithNullable,
-        schemaContext,
+
+      // contentとheadersをtraverse
+      const contentResult = responseObj.content
+        ? traverseContent(responseObj.content, responseContext, dispatchSchema)
+        : undefined;
+      const headersResult = responseObj.headers
+        ? traverseHeaders(responseObj.headers, responseContext, dispatchSchema)
+        : undefined;
+
+      // transformResponseを呼び出し（statusCodeは空文字列）
+      const responseResult = transformResponse(
+        responseObj,
+        "", // components.responsesではstatusCodeは不要
+        responseContext,
+        contentResult,
+        headersResult,
       );
 
-      // 結果をマージ（統一されたモデル配列）
-      result.models.push(...schemaResult.models);
-    } catch (error) {
-      consola.warn(`Failed to process schema "${name}":`, error);
+      if (responseResult.type) {
+        responses[name] = responseResult.type as unknown as IRResponse;
+        result.models.push(...responseResult.models);
+      }
     }
+
+    if (Object.keys(responses).length > 0) {
+      result.responses = responses;
+    }
+  }
+
+  // components.requestBodiesを処理
+  if (components.requestBodies) {
+    const requestBodies: Record<string, IRRequestBody> = {};
+    for (const [name, requestBody] of Object.entries(
+      components.requestBodies,
+    )) {
+      // ReferenceObjectの場合は警告してスキップ（ネストされた$refは未対応）
+      if (isReferenceObject(requestBody)) {
+        consola.warn(
+          `Nested $ref in components.requestBodies["${name}"] is not supported`,
+        );
+        continue;
+      }
+
+      const requestBodyObj = requestBody as RequestBodyObject;
+      const requestBodyContext: TransformContext = {
+        documentPath: ["components", "requestBodies", name],
+        rootSegment: "components",
+      };
+
+      // contentをtraverse
+      const contentResult = requestBodyObj.content
+        ? traverseContent(
+            requestBodyObj.content,
+            requestBodyContext,
+            dispatchSchema,
+          )
+        : { content: [], childModels: [], requiresSpecialModel: false };
+
+      // transformRequestBodyを呼び出し
+      const requestBodyResult = transformRequestBody(
+        requestBodyObj,
+        requestBodyContext,
+        contentResult,
+      );
+
+      if (requestBodyResult.type) {
+        requestBodies[name] =
+          requestBodyResult.type as unknown as IRRequestBody;
+        result.models.push(...requestBodyResult.models);
+      }
+    }
+
+    if (Object.keys(requestBodies).length > 0) {
+      result.requestBodies = requestBodies;
+    }
+  }
+
+  // schemasが存在する場合は処理
+  if (components.schemas) {
+    // traverseComponentSchemasを呼び出し
+    const schemasResult = traverseComponentSchemas(
+      components.schemas,
+      context,
+      dispatchSchema,
+    );
+    result.models.push(...schemasResult.models);
   }
 
   return result;
@@ -177,12 +255,12 @@ if (import.meta.vitest) {
     it("should warn and skip invalid schemas", () => {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
 
-      const components: ComponentsObject = {
+      const components = {
         schemas: {
           Invalid: null as unknown as SchemaObjectWithNullable,
           Valid: { type: "string", enum: ["a", "b"] },
         },
-      };
+      } as ComponentsObject;
 
       const result = transformComponents(components, {
         documentPath: ["components"],
@@ -251,6 +329,148 @@ if (import.meta.vitest) {
 
       // GoodSchemaは正常に処理される
       expect(result.models.length).toBeGreaterThan(0);
+
+      warnSpy.mockRestore();
+    });
+
+    it("should process components.responses", () => {
+      const components: ComponentsObject = {
+        responses: {
+          BadRequest: {
+            description: "Bad request error",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    error: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          NotFound: {
+            description: "Resource not found",
+          },
+        },
+      };
+
+      const result = transformComponents(components, {
+        documentPath: ["components"],
+        rootSegment: "components",
+      });
+
+      expect(result.responses).toBeDefined();
+      expect(Object.keys(result.responses!)).toHaveLength(2);
+      expect(result.responses!.BadRequest).toBeDefined();
+      expect(result.responses!.BadRequest.kind).toBe("content");
+      if (result.responses!.BadRequest.kind === "content") {
+        expect(result.responses!.BadRequest.description).toBe(
+          "Bad request error",
+        );
+      }
+      expect(result.responses!.NotFound).toBeDefined();
+      if (result.responses!.NotFound.kind === "content") {
+        expect(result.responses!.NotFound.description).toBe(
+          "Resource not found",
+        );
+      }
+    });
+
+    it("should process components.requestBodies", () => {
+      const components: ComponentsObject = {
+        requestBodies: {
+          UserRequest: {
+            description: "User creation request",
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const result = transformComponents(components, {
+        documentPath: ["components"],
+        rootSegment: "components",
+      });
+
+      expect(result.requestBodies).toBeDefined();
+      expect(Object.keys(result.requestBodies!)).toHaveLength(1);
+      expect(result.requestBodies!.UserRequest).toBeDefined();
+      expect(result.requestBodies!.UserRequest.kind).toBe("content");
+    });
+
+    it("should warn and skip nested $ref in components.responses", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const components = {
+        responses: {
+          ValidResponse: {
+            description: "Valid response",
+          },
+          InvalidRef: {
+            $ref: "#/components/responses/SomeOtherResponse",
+          },
+        },
+      } as ComponentsObject;
+
+      const result = transformComponents(components, {
+        documentPath: ["components"],
+        rootSegment: "components",
+      });
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Nested $ref in components.responses["InvalidRef"]',
+        ),
+      );
+      expect(result.responses).toBeDefined();
+      expect(Object.keys(result.responses!)).toHaveLength(1);
+      expect(result.responses!.ValidResponse).toBeDefined();
+
+      warnSpy.mockRestore();
+    });
+
+    it("should warn and skip nested $ref in components.requestBodies", () => {
+      const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
+
+      const components = {
+        requestBodies: {
+          ValidRequestBody: {
+            description: "Valid request body",
+            content: {
+              "application/json": {
+                schema: { type: "object" },
+              },
+            },
+          },
+          InvalidRef: {
+            $ref: "#/components/requestBodies/SomeOtherRequestBody",
+          },
+        },
+      } as ComponentsObject;
+
+      const result = transformComponents(components, {
+        documentPath: ["components"],
+        rootSegment: "components",
+      });
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Nested $ref in components.requestBodies["InvalidRef"]',
+        ),
+      );
+      expect(result.requestBodies).toBeDefined();
+      expect(Object.keys(result.requestBodies!)).toHaveLength(1);
+      expect(result.requestBodies!.ValidRequestBody).toBeDefined();
 
       warnSpy.mockRestore();
     });

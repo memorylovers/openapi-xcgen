@@ -1280,5 +1280,108 @@
     {
       "scheme": "OAuth2"
     }
-  ]
+  ],
+  "commonResponses": {
+    "BadRequest": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Bad Request - Invalid input",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Unauthorized": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Unauthorized - Authentication required",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "NotFound": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Not Found - Resource not found",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "Conflict": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Conflict - Resource state conflict",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    },
+    "TooManyRequests": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Too Many Requests - Rate limit exceeded",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ],
+      "headers": [
+        {
+          "name": "RateLimit-Limit",
+          "type": "int",
+          "description": "Request limit per hour"
+        },
+        {
+          "name": "RateLimit-Remaining",
+          "type": "int",
+          "description": "Remaining requests"
+        },
+        {
+          "name": "RateLimit-Reset",
+          "type": "int",
+          "description": "Time when limit resets (Unix timestamp)"
+        }
+      ]
+    },
+    "InternalServerError": {
+      "kind": "content",
+      "statusCode": "",
+      "description": "Internal Server Error",
+      "content": [
+        {
+          "mimeType": "application/problem+json",
+          "schema": {
+            "kind": "ref",
+            "name": "#/components/schemas/Problem"
+          }
+        }
+      ]
+    }
+  }
 }

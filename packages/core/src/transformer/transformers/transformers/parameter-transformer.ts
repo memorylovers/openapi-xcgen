@@ -54,6 +54,15 @@ export function transformParameter(
   context: VisitorContext,
   dispatchFn: typeof dispatchSchema = dispatchSchema,
 ): ParameterTransformResult {
+  // schema の存在を検証
+  if (!parameter.schema) {
+    return createParameterErrorResult(
+      `Parameter without schema: ${parameter.name}`,
+      "PARAMETER_MISSING_SCHEMA",
+      { parameter },
+    );
+  }
+
   // ReferenceObjectの場合は現時点でスキップ
   if (isReferenceObject(parameter.schema)) {
     return createParameterErrorResult(
@@ -235,6 +244,25 @@ if (import.meta.vitest) {
         type: "string",
       });
       expect(result.models).toEqual([]);
+    });
+
+    it("should return error for parameter without schema", () => {
+      const param: ParameterObject = {
+        name: "userId",
+        in: "path",
+      } as ParameterObject;
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users/{id}", "get", "parameters", "0"],
+        rootSegment: "paths",
+      };
+
+      const result = transformParameter(param, context);
+
+      expect(result.parameter).toBeNull();
+      expect(result.models).toEqual([]);
+      expect(result.error?.code).toBe("PARAMETER_MISSING_SCHEMA");
+      expect(result.error?.message).toContain("Parameter without schema");
     });
 
     it("should return error for parameter with reference schema", () => {
