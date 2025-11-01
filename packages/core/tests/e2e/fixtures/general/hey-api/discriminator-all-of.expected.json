@@ -27,14 +27,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BarallOf1"
+          "name": "#/components/schemas/BarAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "BarallOf1",
-      "referencePath": "#/components/schemas/BarallOf1",
+      "name": "BarAllOf1",
+      "referencePath": "#/components/schemas/BarAllOf1",
       "properties": [
         {
           "name": "bar",
@@ -53,14 +53,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazallOf1"
+          "name": "#/components/schemas/BazAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "BazallOf1",
-      "referencePath": "#/components/schemas/BazallOf1",
+      "name": "BazAllOf1",
+      "referencePath": "#/components/schemas/BazAllOf1",
       "properties": [
         {
           "name": "baz",
@@ -79,14 +79,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/QuxallOf1"
+          "name": "#/components/schemas/QuxAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "QuxallOf1",
-      "referencePath": "#/components/schemas/QuxallOf1",
+      "name": "QuxAllOf1",
+      "referencePath": "#/components/schemas/QuxAllOf1",
       "properties": [
         {
           "name": "qux",
@@ -117,14 +117,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BarMappedallOf1"
+          "name": "#/components/schemas/BarMappedAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "BarMappedallOf1",
-      "referencePath": "#/components/schemas/BarMappedallOf1",
+      "name": "BarMappedAllOf1",
+      "referencePath": "#/components/schemas/BarMappedAllOf1",
       "properties": [
         {
           "name": "bar",
@@ -143,14 +143,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazMappedallOf1"
+          "name": "#/components/schemas/BazMappedAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "BazMappedallOf1",
-      "referencePath": "#/components/schemas/BazMappedallOf1",
+      "name": "BazMappedAllOf1",
+      "referencePath": "#/components/schemas/BazMappedAllOf1",
       "properties": [
         {
           "name": "baz",
@@ -169,14 +169,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/QuxMappedallOf1"
+          "name": "#/components/schemas/QuxMappedAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "QuxMappedallOf1",
-      "referencePath": "#/components/schemas/QuxMappedallOf1",
+      "name": "QuxMappedAllOf1",
+      "referencePath": "#/components/schemas/QuxMappedAllOf1",
       "properties": [
         {
           "name": "qux",

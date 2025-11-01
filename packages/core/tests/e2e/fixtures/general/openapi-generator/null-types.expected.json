@@ -109,24 +109,24 @@
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/PersonNullableSkillsVariant2oneOf1"
+          "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1"
         }
       ],
       "nullable": true
     },
     {
       "kind": "array",
-      "name": "PersonNullableSkillsVariant2oneOf1",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2oneOf1",
+      "name": "PersonNullableSkillsVariant2OneOf1",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/PersonNullableSkillsVariant2oneOf1Item"
+        "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item"
       }
     },
     {
       "kind": "object",
-      "name": "PersonNullableSkillsVariant2oneOf1Item",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2oneOf1Item",
+      "name": "PersonNullableSkillsVariant2OneOf1Item",
+      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item",
       "properties": [
         {
           "name": "name",
@@ -145,36 +145,36 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AdultallOf1"
+          "name": "#/components/schemas/AdultAllOf1"
         }
       ],
       "description": "A representation of an adult"
     },
     {
       "kind": "object",
-      "name": "AdultallOf1",
-      "referencePath": "#/components/schemas/AdultallOf1",
+      "name": "AdultAllOf1",
+      "referencePath": "#/components/schemas/AdultAllOf1",
       "properties": [
         {
           "name": "children",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AdultallOf1Children"
+            "name": "#/components/schemas/AdultAllOf1Children"
           }
         },
         {
           "name": "nullableChildrenVariant2",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AdultallOf1NullableChildrenVariant2"
+            "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2"
           }
         }
       ]
     },
     {
       "kind": "array",
-      "name": "AdultallOf1Children",
-      "referencePath": "#/components/schemas/AdultallOf1Children",
+      "name": "AdultAllOf1Children",
+      "referencePath": "#/components/schemas/AdultAllOf1Children",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Child"
@@ -182,20 +182,20 @@
     },
     {
       "kind": "union",
-      "name": "AdultallOf1NullableChildrenVariant2",
-      "referencePath": "#/components/schemas/AdultallOf1NullableChildrenVariant2",
+      "name": "AdultAllOf1NullableChildrenVariant2",
+      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2",
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AdultallOf1NullableChildrenVariant2oneOf1"
+          "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1"
         }
       ],
       "nullable": true
     },
     {
       "kind": "array",
-      "name": "AdultallOf1NullableChildrenVariant2oneOf1",
-      "referencePath": "#/components/schemas/AdultallOf1NullableChildrenVariant2oneOf1",
+      "name": "AdultAllOf1NullableChildrenVariant2OneOf1",
+      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Child"
@@ -208,7 +208,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/ChildallOf0"
+          "name": "#/components/schemas/ChildAllOf0"
         },
         {
           "kind": "ref",
@@ -219,8 +219,8 @@
     },
     {
       "kind": "object",
-      "name": "ChildallOf0",
-      "referencePath": "#/components/schemas/ChildallOf0",
+      "name": "ChildAllOf0",
+      "referencePath": "#/components/schemas/ChildAllOf0",
       "properties": [
         {
           "name": "age",

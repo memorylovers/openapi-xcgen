@@ -15,14 +15,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperBabyallOf1"
+          "name": "#/components/schemas/SuperBabyAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "SuperBabyallOf1",
-      "referencePath": "#/components/schemas/SuperBabyallOf1",
+      "name": "SuperBabyAllOf1",
+      "referencePath": "#/components/schemas/SuperBabyAllOf1",
       "properties": [
         {
           "name": "gender",
@@ -45,14 +45,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperBoyallOf1"
+          "name": "#/components/schemas/SuperBoyAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "SuperBoyallOf1",
-      "referencePath": "#/components/schemas/SuperBoyallOf1",
+      "name": "SuperBoyAllOf1",
+      "referencePath": "#/components/schemas/SuperBoyAllOf1",
       "properties": [
         {
           "name": "category",
@@ -80,14 +80,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperManallOf2"
+          "name": "#/components/schemas/SuperManAllOf2"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "SuperManallOf2",
-      "referencePath": "#/components/schemas/SuperManallOf2",
+      "name": "SuperManAllOf2",
+      "referencePath": "#/components/schemas/SuperManAllOf2",
       "properties": [
         {
           "name": "category",

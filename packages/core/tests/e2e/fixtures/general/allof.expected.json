@@ -34,14 +34,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/UserallOf1"
+          "name": "#/components/schemas/UserAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "UserallOf1",
-      "referencePath": "#/components/schemas/UserallOf1",
+      "name": "UserAllOf1",
+      "referencePath": "#/components/schemas/UserAllOf1",
       "properties": [
         {
           "name": "name",
@@ -90,21 +90,21 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AuditableUserallOf2"
+          "name": "#/components/schemas/AuditableUserAllOf2"
         }
       ],
       "description": "User with audit timestamps"
     },
     {
       "kind": "object",
-      "name": "AuditableUserallOf2",
-      "referencePath": "#/components/schemas/AuditableUserallOf2",
+      "name": "AuditableUserAllOf2",
+      "referencePath": "#/components/schemas/AuditableUserAllOf2",
       "properties": [
         {
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AuditableUserallOf2Role"
+            "name": "#/components/schemas/AuditableUserAllOf2Role"
           },
           "required": true
         }
@@ -112,8 +112,8 @@
     },
     {
       "kind": "enum",
-      "name": "AuditableUserallOf2Role",
-      "referencePath": "#/components/schemas/AuditableUserallOf2Role",
+      "name": "AuditableUserAllOf2Role",
+      "referencePath": "#/components/schemas/AuditableUserAllOf2Role",
       "type": "string",
       "values": [
         {

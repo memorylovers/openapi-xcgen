@@ -102,14 +102,14 @@
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazallOf1"
+          "name": "#/components/schemas/BazAllOf1"
         }
       ]
     },
     {
       "kind": "object",
-      "name": "BazallOf1",
-      "referencePath": "#/components/schemas/BazallOf1",
+      "name": "BazAllOf1",
+      "referencePath": "#/components/schemas/BazAllOf1",
       "properties": [
         {
           "name": "foo",
@@ -126,7 +126,7 @@
           "name": "baz",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BazallOf1Baz"
+            "name": "#/components/schemas/BazAllOf1Baz"
           }
         },
         {
@@ -140,8 +140,8 @@
     },
     {
       "kind": "enum",
-      "name": "BazallOf1Baz",
-      "referencePath": "#/components/schemas/BazallOf1Baz",
+      "name": "BazAllOf1Baz",
+      "referencePath": "#/components/schemas/BazAllOf1Baz",
       "type": "string",
       "values": [
         {
