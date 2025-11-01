@@ -3,8 +3,8 @@
  * Auto-generated from OpenAPI specification
  */
 
-import type { Category } from './Category';
-import type { Status } from './Status';
+import type { GetTest1ParametersIdParamsCategory } from './GetTest1ParametersIdParamsCategory';
+import type { GetTest1ParametersIdParamsStatus } from './GetTest1ParametersIdParamsStatus';
 
 /**
  * Parameters for GET /test-1-parameters/{id}
@@ -21,8 +21,8 @@ export interface GetTest1ParametersIdParams {
     /** Path parameter - always required */ id: string;
   };
   query: {
-    /** Optional enum query parameter */ category?: Category | undefined;
-    /** Required enum query parameter */ status: Status;
+    /** Optional enum query parameter */ category?: GetTest1ParametersIdParamsCategory | undefined;
+    /** Required enum query parameter */ status: GetTest1ParametersIdParamsStatus;
     /** Optional integer parameter with default value */ limit?: number | undefined;
     /** Optional boolean parameter with default value */ includeDetails?: boolean | undefined;
   };

@@ -7,7 +7,7 @@
   "models": [
     {
       "kind": "array",
-      "name": "schema",
+      "name": "UserArray",
       "referencePath": "#/components/requestBodies/UserArray/content/application/json/schema",
       "itemType": {
         "kind": "ref",

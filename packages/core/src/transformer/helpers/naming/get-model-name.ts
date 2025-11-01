@@ -10,6 +10,8 @@ import {
 import type {
   AllOfContext,
   AnyOfContext,
+  ComponentsRequestBodyContext,
+  ComponentsResponseContext,
   OneOfContext,
   ParameterContext,
   RequestBodyContext,
@@ -67,8 +69,10 @@ export function getModelName(context: VisitorContext): string {
     if (isPathsResponseContext(context)) {
       return buildResponseModelName(context);
     }
-    // components.responsesの場合はdocumentPathの最後の要素を返す
-    return context.documentPath.at(-1) ?? "";
+    // components.responsesの場合はコンポーネント名(documentPath[2])を返す
+    // 例: ["components", "responses", "BadRequest", "content", "application/json", "schema"]
+    //      [0]          [1]          [2] ← これ
+    return context.documentPath[2] ?? "";
   }
 
   // paths配下のRequestBody
@@ -76,8 +80,10 @@ export function getModelName(context: VisitorContext): string {
     if (isPathsRequestBodyContext(context)) {
       return buildRequestBodyModelName(context);
     }
-    // components.requestBodiesの場合はdocumentPathの最後の要素を返す
-    return context.documentPath.at(-1) ?? "";
+    // components.requestBodiesの場合はコンポーネント名(documentPath[2])を返す
+    // 例: ["components", "requestBodies", "UserArray", "content", "application/json", "schema"]
+    //      [0]          [1]               [2] ← これ
+    return context.documentPath[2] ?? "";
   }
 
   // Composition型（allOf/oneOf/anyOf）
@@ -168,6 +174,80 @@ if (import.meta.vitest) {
           schemaPath: ["content", "application/json", "schema"],
         };
         expect(getModelName(context)).toBe("GetUsersId404Response");
+      });
+    });
+
+    describe("Components contexts", () => {
+      it("should extract component name for components.responses inline schema", () => {
+        const context: ComponentsResponseContext = {
+          kind: "componentsResponse",
+          documentPath: [
+            "components",
+            "responses",
+            "BadRequest",
+            "content",
+            "application/json",
+            "schema",
+          ],
+          rootSegment: "components",
+          contentType: "application/json",
+          schemaPath: ["content", "application/json", "schema"],
+        };
+        expect(getModelName(context)).toBe("BadRequest");
+      });
+
+      it("should extract component name for components.responses with different name", () => {
+        const context: ComponentsResponseContext = {
+          kind: "componentsResponse",
+          documentPath: [
+            "components",
+            "responses",
+            "NotFound",
+            "content",
+            "application/json",
+            "schema",
+          ],
+          rootSegment: "components",
+          contentType: "application/json",
+          schemaPath: ["content", "application/json", "schema"],
+        };
+        expect(getModelName(context)).toBe("NotFound");
+      });
+
+      it("should extract component name for components.requestBodies inline schema", () => {
+        const context: ComponentsRequestBodyContext = {
+          kind: "componentsRequestBody",
+          documentPath: [
+            "components",
+            "requestBodies",
+            "UserArray",
+            "content",
+            "application/json",
+            "schema",
+          ],
+          rootSegment: "components",
+          contentType: "application/json",
+          schemaPath: ["content", "application/json", "schema"],
+        };
+        expect(getModelName(context)).toBe("UserArray");
+      });
+
+      it("should extract component name for components.requestBodies with different name", () => {
+        const context: ComponentsRequestBodyContext = {
+          kind: "componentsRequestBody",
+          documentPath: [
+            "components",
+            "requestBodies",
+            "CreateUserRequest",
+            "content",
+            "application/json",
+            "schema",
+          ],
+          rootSegment: "components",
+          contentType: "application/json",
+          schemaPath: ["content", "application/json", "schema"],
+        };
+        expect(getModelName(context)).toBe("CreateUserRequest");
       });
     });
 

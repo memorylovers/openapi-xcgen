@@ -109,7 +109,7 @@ export function traverseContent(
         schemaPath: ["content", mimeType, "schema"],
       } as PathsRequestBodyContext;
     } else if (
-      context.documentPath.includes("requestBody") &&
+      context.documentPath.some((p) => p === "requestBodies") &&
       context.rootSegment === "components"
     ) {
       schemaContext = {

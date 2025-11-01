@@ -3,7 +3,7 @@
  * Auto-generated from OpenAPI specification
  */
 
-import type { Format } from './Format';
+import type { GetUsersUserIdParamsFormat } from './GetUsersUserIdParamsFormat';
 
 /**
  * Parameters for GET /users/{userId}
@@ -15,6 +15,6 @@ export interface GetUsersUserIdParams {
     /** User ID (PathItem level) */ userId: string;
   };
   query: {
-    /** Response format (Operation level - extended) */ format?: Format | undefined;
+    /** Response format (Operation level - extended) */ format?: GetUsersUserIdParamsFormat | undefined;
   };
 }

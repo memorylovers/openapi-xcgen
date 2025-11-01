@@ -4,5 +4,5 @@
  */
 
 export * from './GetPetsId200ResponseSchema';
-export * from './FormatSchema';
+export * from './GetUsersUserIdParamsFormatSchema';
 export * from './GetUsersUserId200ResponseSchema';
