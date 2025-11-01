@@ -4,10 +4,10 @@
  */
 
 import * as v from "valibot";
-import { BazallOf1Schema } from './BazallOf1Schema';
+import { BazAllOf1Schema } from './BazAllOf1Schema';
 import { FooSchema } from './FooSchema';
 
 /**
  * Schema for Baz
  */
-export const BazSchema = v.intersect([FooSchema, BazallOf1Schema]);
+export const BazSchema = v.intersect([FooSchema, BazAllOf1Schema]);

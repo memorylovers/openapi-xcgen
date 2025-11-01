@@ -1,9 +1,9 @@
 /**
- * UserallOf1 model
+ * UserAllOf1 model
  * Auto-generated from OpenAPI specification
  */
 
-export interface UserallOf1 {
+export interface UserAllOf1 {
   /** User name */ name: string;
   /** Email address */ email: string;
 }

@@ -3,7 +3,7 @@
  * Auto-generated from OpenAPI specification
  */
 
-import type { BazallOf1 } from './BazallOf1';
+import type { BazAllOf1 } from './BazAllOf1';
 import type { Foo } from './Foo';
 
-export type Baz = Foo & BazallOf1;
+export type Baz = Foo & BazAllOf1;

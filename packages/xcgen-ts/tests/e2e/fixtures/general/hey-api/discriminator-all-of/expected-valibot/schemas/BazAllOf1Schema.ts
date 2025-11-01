@@ -1,13 +1,13 @@
 /**
- * Valibot validation schema for BazallOf1
+ * Valibot validation schema for BazAllOf1
  * Auto-generated from OpenAPI specification
  */
 
 import * as v from "valibot";
 
 /**
- * Schema for BazallOf1
+ * Schema for BazAllOf1
  */
-export const BazallOf1Schema = v.object({
+export const BazAllOf1Schema = v.object({
   baz: v.optional(v.string()),
 });

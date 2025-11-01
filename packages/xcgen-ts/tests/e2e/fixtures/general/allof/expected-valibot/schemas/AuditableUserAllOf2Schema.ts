@@ -1,14 +1,14 @@
 /**
- * Valibot validation schema for AuditableUserallOf2
+ * Valibot validation schema for AuditableUserAllOf2
  * Auto-generated from OpenAPI specification
  */
 
 import * as v from "valibot";
-import { AuditableUserallOf2RoleSchema } from './AuditableUserallOf2RoleSchema';
+import { AuditableUserAllOf2RoleSchema } from './AuditableUserAllOf2RoleSchema';
 
 /**
- * Schema for AuditableUserallOf2
+ * Schema for AuditableUserAllOf2
  */
-export const AuditableUserallOf2Schema = v.object({
-  role: AuditableUserallOf2RoleSchema,
+export const AuditableUserAllOf2Schema = v.object({
+  role: AuditableUserAllOf2RoleSchema,
 });

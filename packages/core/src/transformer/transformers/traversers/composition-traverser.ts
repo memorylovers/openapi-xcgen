@@ -51,10 +51,18 @@ export function traverseComposition(
 
   // 各サブスキーマを訪問
   schemas.forEach((subSchema, index) => {
+    // compositionTypeをPascalCaseに変換 (allOf → AllOf)
+    const kindSuffix =
+      compositionType === "allOf"
+        ? "AllOf"
+        : compositionType === "anyOf"
+          ? "AnyOf"
+          : "OneOf";
+
     const subContext: VisitorContext = {
       documentPath: [
         ...context.documentPath.slice(0, -1),
-        `${context.documentPath[context.documentPath.length - 1]}${compositionType}${index}`,
+        `${context.documentPath[context.documentPath.length - 1]}${kindSuffix}${index}`,
       ],
       rootSegment: context.rootSegment,
     };

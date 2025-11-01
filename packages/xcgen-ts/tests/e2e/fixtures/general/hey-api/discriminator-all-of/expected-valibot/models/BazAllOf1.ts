@@ -1,8 +1,8 @@
 /**
- * BazallOf1 model
+ * BazAllOf1 model
  * Auto-generated from OpenAPI specification
  */
 
-export interface BazallOf1 {
+export interface BazAllOf1 {
   baz?: string | undefined;
 }

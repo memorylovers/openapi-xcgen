@@ -1,8 +1,8 @@
 /**
- * BazMappedallOf1 model
+ * BazMappedAllOf1 model
  * Auto-generated from OpenAPI specification
  */
 
-export interface BazMappedallOf1 {
+export interface BazMappedAllOf1 {
   baz?: string | undefined;
 }
