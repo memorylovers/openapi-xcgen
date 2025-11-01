@@ -203,7 +203,10 @@
         {
           "name": "email",
           "type": "string",
-          "required": true
+          "required": true,
+          "validation": {
+            "format": "email"
+          }
         },
         {
           "name": "nested",
@@ -389,7 +392,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -398,7 +400,8 @@
               "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {

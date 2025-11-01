@@ -138,17 +138,30 @@
       "properties": [
         {
           "name": "title",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "title-field",
+            "x-min-length": 1,
+            "x-max-length": 200
+          }
         },
         {
           "name": "content",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "content-field",
+            "x-format": "markdown"
+          }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
             "name": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags"
+          },
+          "extensions": {
+            "x-property-extension": "tags-field",
+            "x-max-items": 10
           }
         }
       ]
@@ -209,7 +222,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -218,7 +230,8 @@
               "name": "#/paths/::posts/post/requestBody/content/application::json/schema"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {

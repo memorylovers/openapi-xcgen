@@ -1022,7 +1022,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1031,7 +1030,8 @@
               "name": "#/components/schemas/BookingRequest"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {
@@ -1187,7 +1187,6 @@
       },
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1196,7 +1195,8 @@
               "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {

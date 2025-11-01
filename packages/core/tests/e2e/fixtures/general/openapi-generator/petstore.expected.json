@@ -625,6 +625,13 @@
         "pet"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/Pet"
+        }
+      },
       "responses": [
         {
           "kind": "content",
@@ -672,6 +679,13 @@
         "pet"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/Pet"
+        }
+      },
       "responses": [
         {
           "kind": "content",
@@ -1036,8 +1050,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
-        "description": "order placed for purchasing the pet",
         "content": [
           {
             "mimeType": "application/json",
@@ -1046,7 +1058,9 @@
               "name": "#/components/schemas/Order"
             }
           }
-        ]
+        ],
+        "required": true,
+        "description": "order placed for purchasing the pet"
       },
       "responses": [
         {
@@ -1162,8 +1176,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
-        "description": "Created user object",
         "content": [
           {
             "mimeType": "application/json",
@@ -1172,7 +1184,9 @@
               "name": "#/components/schemas/User"
             }
           }
-        ]
+        ],
+        "required": true,
+        "description": "Created user object"
       },
       "responses": [
         {
@@ -1196,6 +1210,13 @@
         "user"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/UserArray"
+        }
+      },
       "responses": [
         {
           "kind": "content",
@@ -1218,6 +1239,13 @@
         "user"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "ref",
+        "ref": {
+          "kind": "ref",
+          "name": "#/components/requestBodies/UserArray"
+        }
+      },
       "responses": [
         {
           "kind": "content",
@@ -1366,8 +1394,6 @@
       },
       "requestBody": {
         "kind": "content",
-        "required": true,
-        "description": "Updated user object",
         "content": [
           {
             "mimeType": "application/json",
@@ -1376,7 +1402,9 @@
               "name": "#/components/schemas/User"
             }
           }
-        ]
+        ],
+        "required": true,
+        "description": "Updated user object"
       },
       "responses": [
         {

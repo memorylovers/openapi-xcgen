@@ -255,7 +255,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -264,7 +263,8 @@
               "name": "#/components/schemas/Order"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {

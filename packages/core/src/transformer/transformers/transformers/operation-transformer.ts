@@ -14,7 +14,6 @@ import type {
   IRParameter,
   IRRef,
   IRRequestBody,
-  IRRequestContent,
   IRResponse,
   IRResponseContent,
   IRResponseHeader,
@@ -32,6 +31,7 @@ import type {
   OperationTraversalResult,
   ParametersTraversalResult,
 } from "../types";
+import { transformRequestBody } from "./request-body-transformer";
 
 /**
  * Operation変換の結果
@@ -223,22 +223,24 @@ export function transformOperation(
   // ========================================
   let endpointRequestBody: IRRequestBody | undefined;
 
-  if (traversalResult?.requestBodyResult) {
-    const { required, description, content } =
-      traversalResult.requestBodyResult;
-
-    // IRRequestContentに変換
-    const irRequestContent: IRRequestContent[] = content.content.map((c) => ({
-      mimeType: c.mimeType as MimeType,
-      schema: c.schema,
-    }));
-
-    endpointRequestBody = {
-      kind: "content",
-      ...(required && { required: true }),
-      ...(description && { description }),
-      content: irRequestContent,
+  if (operation.requestBody && traversalResult?.requestBodyResult) {
+    const requestBodyContext: VisitorContext = {
+      documentPath: [...context.documentPath, "requestBody"],
+      rootSegment: context.rootSegment,
     };
+
+    // transformRequestBody()を呼び出して、$ref/inlineを正しく判定
+    const requestBodyTransformResult = transformRequestBody(
+      operation.requestBody, // ReferenceObject | RequestBodyObject
+      requestBodyContext,
+      traversalResult.requestBodyResult.content,
+    );
+
+    if (requestBodyTransformResult.type) {
+      // NOTE: IRRequestBodyはIRTypeに含まれないが、Operation系の特別な型として扱う
+      endpointRequestBody =
+        requestBodyTransformResult.type as unknown as IRRequestBody;
+    }
 
     // NOTE: content.childModelsはtraversalResult.childModelsに既に含まれているため、
     // ここでは追加しない（重複を防ぐため）
@@ -536,9 +538,18 @@ if (import.meta.vitest) {
       expect(result.endpoint?.parameters).toEqual([]);
     });
 
-    it("should process requestBody", () => {
+    it("should process requestBody with inline content", () => {
       const operation: OperationObject = {
         summary: "Create user",
+        requestBody: {
+          required: true,
+          description: "User data",
+          content: {
+            "application/json": {
+              schema: { type: "object" },
+            },
+          },
+        },
         responses: {
           "201": {
             description: "Created",
@@ -586,6 +597,56 @@ if (import.meta.vitest) {
         expect(result.endpoint.requestBody.required).toBe(true);
         expect(result.endpoint.requestBody.description).toBe("User data");
         expect(result.endpoint.requestBody.content).toHaveLength(1);
+      }
+    });
+
+    it("should process requestBody with $ref", () => {
+      const operation: OperationObject = {
+        summary: "Create pet",
+        requestBody: {
+          $ref: "#/components/requestBodies/Pet",
+        },
+        responses: {
+          "201": {
+            description: "Created",
+          },
+        },
+      };
+
+      const traversalResult: OperationTraversalResult = {
+        requestBodyResult: {
+          content: {
+            content: [],
+            childModels: [],
+            requiresSpecialModel: false,
+          },
+        },
+        childModels: [],
+      };
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/pet", "post"],
+        rootSegment: "paths",
+      };
+
+      const result = transformOperation(
+        operation,
+        "/pet",
+        "post",
+        context,
+        undefined,
+        traversalResult,
+      );
+
+      expect(result.endpoint?.requestBody).toBeDefined();
+      if (
+        result.endpoint?.requestBody &&
+        result.endpoint.requestBody.kind === "ref"
+      ) {
+        expect(result.endpoint.requestBody.ref).toEqual({
+          kind: "ref",
+          name: "#/components/requestBodies/Pet",
+        });
       }
     });
 

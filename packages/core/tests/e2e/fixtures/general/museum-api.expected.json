@@ -1410,7 +1410,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1419,7 +1418,8 @@
               "name": "#/components/schemas/SpecialEventRequest"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {
@@ -1577,7 +1577,6 @@
       },
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1586,7 +1585,8 @@
               "name": "#/components/schemas/SpecialEventUpdate"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {
@@ -1654,7 +1654,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -1663,7 +1662,8 @@
               "name": "#/components/schemas/TicketPurchaseRequest"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {

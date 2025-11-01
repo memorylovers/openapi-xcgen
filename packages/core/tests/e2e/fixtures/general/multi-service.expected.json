@@ -184,7 +184,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -193,7 +192,8 @@
               "name": "#/components/schemas/NewPost"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {

@@ -100,17 +100,20 @@ export function traverseOperation(
   // 2. requestBodyを処理
   let requestBodyResult = undefined;
   if (operation.requestBody) {
-    // ReferenceObjectの場合は現時点でスキップ
+    const requestBodyContext: VisitorContext = {
+      documentPath: [...context.documentPath, "requestBody"],
+      rootSegment: context.rootSegment,
+    };
+
+    // ReferenceObjectの場合もサポート（transformRequestBodyが$refを処理）
     if (isReferenceObject(operation.requestBody)) {
-      consola.debug(
-        `RequestBody reference not fully supported yet at: ${buildReferencePath(context.documentPath)}`,
-      );
+      // $ref の場合はcontent traversalなしで空の結果を設定
+      // transformRequestBody が operation.requestBody の $ref を参照して IRRequestBody を生成
+      requestBodyResult = {
+        content: { content: [], childModels: [], requiresSpecialModel: false },
+      };
     } else {
       const requestBodyObj = operation.requestBody as RequestBodyObject;
-      const requestBodyContext: VisitorContext = {
-        documentPath: [...context.documentPath, "requestBody"],
-        rootSegment: context.rootSegment,
-      };
 
       const contentResult = traverseContent(
         requestBodyObj.content,
@@ -325,6 +328,31 @@ if (import.meta.vitest) {
       expect(result.requestBodyResult?.content.content).toHaveLength(1);
     });
 
+    it("should process operation with $ref requestBody", () => {
+      const operation: OperationObject = {
+        requestBody: {
+          $ref: "#/components/requestBodies/UserCreateBody",
+        },
+        responses: {},
+      };
+
+      const mockVisitSchema = vi.fn();
+
+      const context: VisitorContext = {
+        documentPath: ["paths", "/users", "post"],
+        rootSegment: "paths",
+      };
+
+      const result = traverseOperation(operation, context, mockVisitSchema);
+
+      // $ref requestBody の場合もresultが設定される
+      expect(result.requestBodyResult).toBeDefined();
+      // contentは空だが、transformRequestBodyが$refを処理する
+      expect(result.requestBodyResult?.content.content).toEqual([]);
+      // visitSchemaは呼ばれない（$refなのでcontent traversalが不要）
+      expect(mockVisitSchema).not.toHaveBeenCalled();
+    });
+
     it("should process operation with responses", () => {
       const operation: OperationObject = {
         responses: {
@@ -419,26 +447,6 @@ if (import.meta.vitest) {
       expect(modelKinds).toContain("array"); // from parameter
       expect(modelKinds).toContain("requestBody"); // from requestBody
       expect(modelKinds).toContain("response"); // from response
-    });
-
-    it("should skip requestBody reference", () => {
-      const operation: OperationObject = {
-        requestBody: {
-          $ref: "#/components/requestBodies/UserInput",
-        },
-        responses: {},
-      };
-
-      const mockVisitSchema = vi.fn();
-
-      const context: VisitorContext = {
-        documentPath: ["paths", "/users", "post"],
-        rootSegment: "paths",
-      };
-
-      const result = traverseOperation(operation, context, mockVisitSchema);
-
-      expect(result.requestBodyResult).toBeUndefined();
     });
 
     it("should handle operation without optional fields", () => {

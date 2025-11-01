@@ -174,7 +174,6 @@
       "parameters": [],
       "requestBody": {
         "kind": "content",
-        "required": true,
         "content": [
           {
             "mimeType": "application/json",
@@ -183,7 +182,8 @@
               "name": "#/paths/::pets/post/requestBody/content/application::json/schema"
             }
           }
-        ]
+        ],
+        "required": true
       },
       "responses": [
         {
