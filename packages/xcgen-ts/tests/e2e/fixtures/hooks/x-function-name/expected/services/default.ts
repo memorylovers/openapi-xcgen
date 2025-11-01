@@ -14,7 +14,7 @@ export type { GetUsers200Response, CreateUserRequest, User, GetUsersUserIdParams
  * @returns GetUsers200Response
  * @throws {_XcgenApiError} API error with status and response details
  */
-export async function getUsers(
+export async function listAllUsers(
   init?: RequestInit,
 ): Promise<GetUsers200Response> {
   return request({
@@ -32,7 +32,7 @@ export async function getUsers(
  * @returns User
  * @throws {_XcgenApiError} API error with status and response details
  */
-export async function createUser(
+export async function addNewUser(
   options: CreateUserRequest,
   init?: RequestInit,
 ): Promise<User> {

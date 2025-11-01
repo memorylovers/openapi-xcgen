@@ -10,13 +10,13 @@ import { ProductTagsSchema } from './ProductTagsSchema';
  * Schema for Product
  */
 export const ProductSchema = v.object({
-  name: v.optional(v.string()),
-  code: v.optional(v.string()),
-  userId: v.optional(v.string()),
-  email: v.optional(v.string()),
-  website: v.optional(v.string()),
+  name: v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(100))),
+  code: v.optional(v.pipe(v.string(), v.regex(/^[A-Z]{3}$/))),
+  userId: v.optional(v.pipe(v.string(), v.uuid())),
+  email: v.optional(v.pipe(v.string(), v.email())),
+  website: v.optional(v.pipe(v.string(), v.url())),
   ipAddress: v.optional(v.string()),
-  price: v.optional(v.number()),
-  quantity: v.optional(v.number()),
+  price: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1000))),
+  quantity: v.optional(v.pipe(v.number(), v.minValue(1))),
   tags: v.optional(ProductTagsSchema),
 });

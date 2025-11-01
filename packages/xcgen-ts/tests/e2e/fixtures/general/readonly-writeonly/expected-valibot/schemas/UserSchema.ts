@@ -10,9 +10,9 @@ import * as v from "valibot";
  * User model with readOnly fields
  */
 export const UserSchema = v.object({
-  id: v.string(),
+  id: v.string(), // readOnly
   username: v.string(),
-  email: v.string(),
-  createdAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
-  updatedAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))),
+  email: v.pipe(v.string(), v.email()),
+  createdAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))), // readOnly
+  updatedAt: v.optional(v.pipe(v.string(), v.isoDateTime(), v.transform((val) => new Date(val)))), // readOnly
 });

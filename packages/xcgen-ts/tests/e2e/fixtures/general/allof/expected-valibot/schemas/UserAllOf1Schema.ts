@@ -10,5 +10,5 @@ import * as v from "valibot";
  */
 export const UserallOf1Schema = v.object({
   name: v.string(),
-  email: v.string(),
+  email: v.pipe(v.string(), v.email()),
 });

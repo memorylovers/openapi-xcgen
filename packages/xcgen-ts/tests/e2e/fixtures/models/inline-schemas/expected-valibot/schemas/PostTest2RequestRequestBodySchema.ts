@@ -11,6 +11,6 @@ import { PostTest2RequestRequestBodyNestedSchema } from './PostTest2RequestReque
  */
 export const PostTest2RequestRequestBodySchema = v.object({
   name: v.string(),
-  email: v.string(),
+  email: v.pipe(v.string(), v.email()),
   nested: v.optional(PostTest2RequestRequestBodyNestedSchema),
 });

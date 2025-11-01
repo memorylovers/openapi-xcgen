@@ -10,7 +10,7 @@ export interface Article {
   /** Name description */ name?: string | undefined;
   code?: string | undefined;
   status?: string | undefined;
-  createdAt?: string | undefined;
+  readonly createdAt?: string | undefined;
   password?: string | undefined;
   oldId?: string | undefined;
 }

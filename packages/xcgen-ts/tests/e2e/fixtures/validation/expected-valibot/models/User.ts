@@ -4,7 +4,7 @@
  */
 
 export interface User {
-  /** Unique user identifier */ id: string;
+  /** Unique user identifier */ readonly id: string;
   /** Username (3-20 chars, alphanumeric and underscore) */ username: string;
   /** User email address */ email: string;
   /** User age (0-150 years) */ age?: number | null | undefined;
