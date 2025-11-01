@@ -245,7 +245,7 @@
           "name": "sortBy",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::users/get/parameters/2/schema/SortBy"
+            "name": "#/paths/::users/get/parameters/2/schema/GetUsersParamsSortBy"
           },
           "in": "query",
           "description": "Field to sort by",
@@ -258,7 +258,7 @@
           "name": "order",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::users/get/parameters/3/schema/Order"
+            "name": "#/paths/::users/get/parameters/3/schema/GetUsersParamsOrder"
           },
           "in": "query",
           "description": "Sort order",
@@ -272,8 +272,8 @@
     },
     {
       "kind": "enum",
-      "name": "SortBy",
-      "referencePath": "#/paths/::users/get/parameters/2/schema/SortBy",
+      "name": "GetUsersParamsSortBy",
+      "referencePath": "#/paths/::users/get/parameters/2/schema/GetUsersParamsSortBy",
       "type": "string",
       "values": [
         {
@@ -296,8 +296,8 @@
     },
     {
       "kind": "enum",
-      "name": "Order",
-      "referencePath": "#/paths/::users/get/parameters/3/schema/Order",
+      "name": "GetUsersParamsOrder",
+      "referencePath": "#/paths/::users/get/parameters/3/schema/GetUsersParamsOrder",
       "type": "string",
       "values": [
         {

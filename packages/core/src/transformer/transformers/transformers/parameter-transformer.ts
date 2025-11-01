@@ -12,12 +12,13 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import {
+  buildParameterSchemaModelName,
   extractExtensions,
   extractValidation,
   isNullable,
   toIRParameterInType,
 } from "../../helpers";
-import type { VisitorContext } from "../../types";
+import type { ParameterContext, VisitorContext } from "../../types";
 import { dispatchSchema } from "../dispatchers/schema-dispatcher";
 import { createParameterErrorResult } from "../errors";
 import type { ParameterTransformResult } from "../types";
@@ -79,9 +80,19 @@ export function transformParameter(
   const parameterIn = toIRParameterInType(parameter.in)!;
 
   // スキーマを変換（dispatchSchemaに委譲）
-  // buildParameterSchemaModelNameとbuildInlineSchemaPathは旧コンテキスト形式を期待するため、
-  // v2では documentPath を直接操作
-  const inlineModelName = `${parameter.name.charAt(0).toUpperCase()}${parameter.name.slice(1)}`;
+  // ParameterContext を構築して適切な命名を生成
+  const parameterContext: ParameterContext = {
+    documentPath: context.documentPath,
+    rootSegment: "paths", // パラメータは常に paths 配下
+    kind: "parameter",
+    parameterName: parameter.name,
+    in: parameterIn,
+  };
+
+  // 既存のヘルパーを使用して適切なモデル名を生成
+  // 例: "GetUsersParamsFilter", "GetPostsParamsXApiKey"
+  const inlineModelName = buildParameterSchemaModelName(parameterContext);
+
   const schemaDocumentPath = [
     ...context.documentPath,
     "schema",

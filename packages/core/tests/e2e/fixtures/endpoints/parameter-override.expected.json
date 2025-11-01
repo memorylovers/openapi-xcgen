@@ -52,7 +52,7 @@
           "name": "format",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::users::{userId}/get/parameters/1/schema/Format"
+            "name": "#/paths/::users::{userId}/get/parameters/1/schema/GetUsersUserIdParamsFormat"
           },
           "in": "query",
           "description": "Response format (Operation level - extended)"
@@ -62,8 +62,8 @@
     },
     {
       "kind": "enum",
-      "name": "Format",
-      "referencePath": "#/paths/::users::{userId}/get/parameters/1/schema/Format",
+      "name": "GetUsersUserIdParamsFormat",
+      "referencePath": "#/paths/::users::{userId}/get/parameters/1/schema/GetUsersUserIdParamsFormat",
       "type": "string",
       "values": [
         {

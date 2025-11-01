@@ -90,7 +90,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-1-parameters::{id}/get/parameters/1/schema/Category"
+            "name": "#/paths/::test-1-parameters::{id}/get/parameters/1/schema/GetTest1ParametersIdParamsCategory"
           },
           "in": "query",
           "description": "Optional enum query parameter"
@@ -99,7 +99,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-1-parameters::{id}/get/parameters/2/schema/Status"
+            "name": "#/paths/::test-1-parameters::{id}/get/parameters/2/schema/GetTest1ParametersIdParamsStatus"
           },
           "in": "query",
           "required": true,
@@ -140,8 +140,8 @@
     },
     {
       "kind": "enum",
-      "name": "Category",
-      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/1/schema/Category",
+      "name": "GetTest1ParametersIdParamsCategory",
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/1/schema/GetTest1ParametersIdParamsCategory",
       "type": "string",
       "values": [
         {
@@ -160,8 +160,8 @@
     },
     {
       "kind": "enum",
-      "name": "Status",
-      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/2/schema/Status",
+      "name": "GetTest1ParametersIdParamsStatus",
+      "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/2/schema/GetTest1ParametersIdParamsStatus",
       "type": "string",
       "values": [
         {

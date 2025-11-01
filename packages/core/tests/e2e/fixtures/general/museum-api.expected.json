@@ -1070,7 +1070,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::special-events/get/parameters/2/schema/Category"
+            "name": "#/paths/::special-events/get/parameters/2/schema/GetSpecialEventsParamsCategory"
           },
           "in": "query",
           "description": "Filter by event category"
@@ -1101,8 +1101,8 @@
     },
     {
       "kind": "enum",
-      "name": "Category",
-      "referencePath": "#/paths/::special-events/get/parameters/2/schema/Category",
+      "name": "GetSpecialEventsParamsCategory",
+      "referencePath": "#/paths/::special-events/get/parameters/2/schema/GetSpecialEventsParamsCategory",
       "type": "string",
       "values": [
         {
@@ -1273,7 +1273,7 @@
           "name": "format",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/Format"
+            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/GetTicketsConfirmationIdQrCodeParamsFormat"
           },
           "in": "query",
           "description": "QR code format",
@@ -1284,8 +1284,8 @@
     },
     {
       "kind": "enum",
-      "name": "Format",
-      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/Format",
+      "name": "GetTicketsConfirmationIdQrCodeParamsFormat",
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/GetTicketsConfirmationIdQrCodeParamsFormat",
       "type": "string",
       "values": [
         {

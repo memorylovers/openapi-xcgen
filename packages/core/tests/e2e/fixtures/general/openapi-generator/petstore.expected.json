@@ -288,7 +288,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::pet::findByStatus/get/parameters/0/schema/Status"
+            "name": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatus"
           },
           "in": "query",
           "required": true,
@@ -300,17 +300,17 @@
     },
     {
       "kind": "array",
-      "name": "Status",
-      "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/Status",
+      "name": "GetPetFindByStatusParamsStatus",
+      "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatus",
       "itemType": {
         "kind": "ref",
-        "name": "#/paths/::pet::findByStatus/get/parameters/0/schema/StatusItem"
+        "name": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatusItem"
       }
     },
     {
       "kind": "enum",
-      "name": "StatusItem",
-      "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/StatusItem",
+      "name": "GetPetFindByStatusParamsStatusItem",
+      "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatusItem",
       "type": "string",
       "values": [
         {
@@ -354,7 +354,7 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::pet::findByTags/get/parameters/0/schema/Tags"
+            "name": "#/paths/::pet::findByTags/get/parameters/0/schema/GetPetFindByTagsParamsTags"
           },
           "in": "query",
           "required": true,
@@ -365,8 +365,8 @@
     },
     {
       "kind": "array",
-      "name": "Tags",
-      "referencePath": "#/paths/::pet::findByTags/get/parameters/0/schema/Tags",
+      "name": "GetPetFindByTagsParamsTags",
+      "referencePath": "#/paths/::pet::findByTags/get/parameters/0/schema/GetPetFindByTagsParamsTags",
       "itemType": "string"
     },
     {
