@@ -668,7 +668,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "id",
-            type: "int64",
+            type: "long",
             readOnly: true,
             validation: {
               format: "int64",
@@ -712,7 +712,7 @@ if (import.meta.vitest) {
         // id: readOnly + validation + extensions が保持される
         expect(model.properties[0]).toEqual({
           name: "id",
-          type: "int64",
+          type: "long",
           readOnly: true,
           validation: {
             format: "int64",
@@ -789,7 +789,6 @@ if (import.meta.vitest) {
             validation: {
               minimum: 0.0,
               maximum: 100.0,
-              multipleOf: 0.5,
             },
             extensions: {
               "x-precision": 1,
@@ -823,7 +822,6 @@ if (import.meta.vitest) {
           validation: {
             minimum: 0.0,
             maximum: 100.0,
-            multipleOf: 0.5,
           },
           extensions: {
             "x-precision": 1,

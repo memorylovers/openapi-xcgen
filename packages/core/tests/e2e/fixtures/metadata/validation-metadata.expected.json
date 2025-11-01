@@ -1,0 +1,474 @@
+{
+  "metadata": {
+    "title": "Validation and Metadata Test API",
+    "version": "1.0.0",
+    "description": "Test API for validation constraints, x-extensions, and metadata on properties and parameters"
+  },
+  "models": [
+    {
+      "kind": "object",
+      "name": "UserProfile",
+      "referencePath": "#/components/schemas/UserProfile",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "description": "Unique user identifier",
+          "readOnly": true,
+          "validation": {
+            "format": "int64"
+          },
+          "extensions": {
+            "x-database-column": "user_id",
+            "x-primary-key": true
+          }
+        },
+        {
+          "name": "username",
+          "type": "string",
+          "required": true,
+          "description": "Username for login",
+          "validation": {
+            "minLength": 3,
+            "maxLength": 20,
+            "pattern": "^[a-zA-Z0-9_]+$"
+          },
+          "extensions": {
+            "x-validation-message": "Username must be 3-20 alphanumeric characters or underscore"
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "description": "User email address",
+          "validation": {
+            "maxLength": 100,
+            "format": "email"
+          },
+          "extensions": {
+            "x-unique": true,
+            "x-format": "rfc5322"
+          }
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "description": "User age",
+          "defaultValue": 18,
+          "validation": {
+            "minimum": 0,
+            "maximum": 150
+          },
+          "extensions": {
+            "x-unit": "years"
+          }
+        },
+        {
+          "name": "score",
+          "type": "double",
+          "description": "User score",
+          "validation": {
+            "minimum": 0,
+            "maximum": 100,
+            "format": "double"
+          },
+          "extensions": {
+            "x-precision": 1
+          }
+        },
+        {
+          "name": "bio",
+          "type": "string",
+          "description": "User biography",
+          "writeOnly": true,
+          "validation": {
+            "maxLength": 500
+          },
+          "extensions": {
+            "x-encrypted": true
+          }
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/UserProfileStatus"
+          },
+          "description": "Account status",
+          "defaultValue": "active",
+          "deprecated": true,
+          "extensions": {
+            "x-deprecated-reason": "Use accountState instead"
+          }
+        },
+        {
+          "name": "accountState",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/UserProfileAccountState"
+          },
+          "description": "Current account state",
+          "defaultValue": "active"
+        }
+      ],
+      "description": "User profile with comprehensive metadata"
+    },
+    {
+      "kind": "enum",
+      "name": "UserProfileStatus",
+      "referencePath": "#/components/schemas/UserProfileStatus",
+      "type": "string",
+      "values": [
+        {
+          "value": "active",
+          "name": "ACTIVE"
+        },
+        {
+          "value": "inactive",
+          "name": "INACTIVE"
+        },
+        {
+          "value": "suspended",
+          "name": "SUSPENDED"
+        }
+      ],
+      "description": "Account status",
+      "extensions": {
+        "x-deprecated-reason": "Use accountState instead"
+      }
+    },
+    {
+      "kind": "enum",
+      "name": "UserProfileAccountState",
+      "referencePath": "#/components/schemas/UserProfileAccountState",
+      "type": "string",
+      "values": [
+        {
+          "value": "active",
+          "name": "ACTIVE"
+        },
+        {
+          "value": "inactive",
+          "name": "INACTIVE"
+        },
+        {
+          "value": "suspended",
+          "name": "SUSPENDED"
+        },
+        {
+          "value": "deleted",
+          "name": "DELETED"
+        }
+      ],
+      "description": "Current account state"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUsersIdParams",
+      "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams",
+      "properties": [
+        {
+          "name": "id",
+          "type": "long",
+          "in": "path",
+          "required": true,
+          "description": "User ID",
+          "validation": {
+            "minimum": 1,
+            "format": "int64"
+          },
+          "extensions": {
+            "x-route-param": true
+          }
+        },
+        {
+          "name": "fields",
+          "type": "string",
+          "in": "query",
+          "description": "Comma-separated list of fields to include",
+          "defaultValue": "id,username,email",
+          "validation": {
+            "pattern": "^[a-z,]+$"
+          },
+          "extensions": {
+            "x-example": "id,username,email,age"
+          }
+        },
+        {
+          "name": "includeDeleted",
+          "type": "boolean",
+          "in": "query",
+          "description": "Include deleted users",
+          "defaultValue": false,
+          "deprecated": true,
+          "extensions": {
+            "x-deprecated-since": "1.5.0"
+          }
+        }
+      ],
+      "description": "Parameters for GET /users/{id}\nid: User ID\nfields: Comma-separated list of fields to include\nincludeDeleted: Include deleted users"
+    },
+    {
+      "kind": "parameter",
+      "name": "GetUsersParams",
+      "referencePath": "#/paths/::users/get/GetUsersParams",
+      "properties": [
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "Maximum number of results",
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          },
+          "extensions": {
+            "x-pagination": true
+          }
+        },
+        {
+          "name": "offset",
+          "type": "int",
+          "in": "query",
+          "description": "Pagination offset",
+          "defaultValue": 0,
+          "validation": {
+            "minimum": 0
+          },
+          "extensions": {
+            "x-pagination": true
+          }
+        },
+        {
+          "name": "sortBy",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::users/get/parameters/2/schema/SortBy"
+          },
+          "in": "query",
+          "description": "Field to sort by",
+          "defaultValue": "id",
+          "extensions": {
+            "x-sort-field": true
+          }
+        },
+        {
+          "name": "order",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::users/get/parameters/3/schema/Order"
+          },
+          "in": "query",
+          "description": "Sort order",
+          "defaultValue": "asc",
+          "extensions": {
+            "x-sort-order": true
+          }
+        }
+      ],
+      "description": "Parameters for GET /users\nlimit: Maximum number of results\noffset: Pagination offset\nsortBy: Field to sort by\norder: Sort order"
+    },
+    {
+      "kind": "enum",
+      "name": "SortBy",
+      "referencePath": "#/paths/::users/get/parameters/2/schema/SortBy",
+      "type": "string",
+      "values": [
+        {
+          "value": "id",
+          "name": "ID"
+        },
+        {
+          "value": "username",
+          "name": "USERNAME"
+        },
+        {
+          "value": "email",
+          "name": "EMAIL"
+        },
+        {
+          "value": "created_at",
+          "name": "CREATED_AT"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "Order",
+      "referencePath": "#/paths/::users/get/parameters/3/schema/Order",
+      "type": "string",
+      "values": [
+        {
+          "value": "asc",
+          "name": "ASC"
+        },
+        {
+          "value": "desc",
+          "name": "DESC"
+        }
+      ]
+    },
+    {
+      "kind": "array",
+      "name": "GetUsers200Response",
+      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/UserProfile"
+      }
+    },
+    {
+      "kind": "requestBody",
+      "name": "PostUsersRequestBody",
+      "referencePath": "#/paths/::users/post/requestBody/content/application::json/schema",
+      "properties": [
+        {
+          "name": "username",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 20,
+            "pattern": "^[a-zA-Z0-9_]+$"
+          },
+          "extensions": {
+            "x-validation-message": "Username must be 3-20 characters"
+          }
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "validation": {
+            "maxLength": 100,
+            "format": "email"
+          },
+          "extensions": {
+            "x-unique": true
+          }
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "defaultValue": 18,
+          "validation": {
+            "minimum": 0,
+            "maximum": 150
+          }
+        },
+        {
+          "name": "bio",
+          "type": "string",
+          "writeOnly": true,
+          "validation": {
+            "maxLength": 500
+          }
+        }
+      ]
+    }
+  ],
+  "tags": [],
+  "endpoints": [
+    {
+      "path": "/users/{id}",
+      "method": "get",
+      "operationId": "getUserById",
+      "summary": "Get user by ID",
+      "description": "Retrieves a user profile by ID",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "User found",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/UserProfile"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "content",
+          "statusCode": "404",
+          "description": "User not found"
+        }
+      ]
+    },
+    {
+      "path": "/users",
+      "method": "get",
+      "operationId": "listUsers",
+      "summary": "List users",
+      "description": "List all users with pagination",
+      "tags": [],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::users/get/GetUsersParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "200",
+          "description": "User list",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/paths/::users/get/responses/200/content/application::json/schema"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users",
+      "method": "post",
+      "operationId": "createUser",
+      "summary": "Create user",
+      "description": "Create a new user",
+      "tags": [],
+      "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::users/post/requestBody/content/application::json/schema"
+            }
+          }
+        ],
+        "required": true
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "User created",
+          "content": [
+            {
+              "mimeType": "application/json",
+              "schema": {
+                "kind": "ref",
+                "name": "#/components/schemas/UserProfile"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

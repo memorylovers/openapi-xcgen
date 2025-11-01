@@ -75,6 +75,8 @@ const testCases = [
   "endpoints/path-structure",
   "endpoints/endpoint-metadata",
   "endpoints/parameter-override",
+  // metadata/
+  "metadata/validation-metadata",
 ];
 
 async function generateAll() {
