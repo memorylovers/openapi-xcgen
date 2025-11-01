@@ -34,6 +34,11 @@
       "dependsOn": ["^lint:fix"],
       "cache": false
     },
+    "regenerate:expected": {
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["tests/**/expected*/**"],
+      "cache": false
+    },
     "clean": {
       "cache": false
     }

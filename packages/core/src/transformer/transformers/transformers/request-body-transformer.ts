@@ -490,5 +490,216 @@ if (import.meta.vitest) {
       expect(result.models).toHaveLength(2); // requestBody + nested
       expect(result.models[1]).toBe(mockChildModel);
     });
+
+    it("should preserve all property metadata (validation, extensions, readOnly, etc.)", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          username: {
+            type: "string",
+            minLength: 3,
+            maxLength: 20,
+          },
+          bio: {
+            type: "string",
+            writeOnly: true,
+          },
+          createdAt: {
+            type: "string",
+            readOnly: true,
+          },
+        },
+        required: ["username"],
+        description: "Request with metadata",
+      };
+
+      const context: VisitorContext = {
+        kind: "requestBody",
+        documentPath: [
+          "paths",
+          "/users",
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          {
+            name: "username",
+            type: "string",
+            required: true,
+            validation: {
+              minLength: 3,
+              maxLength: 20,
+              pattern: "^[a-zA-Z0-9_]+$",
+            },
+            extensions: {
+              "x-validation-message": "Username must be 3-20 characters",
+            },
+          },
+          {
+            name: "bio",
+            type: "string",
+            writeOnly: true,
+            validation: {
+              maxLength: 500,
+            },
+          },
+          {
+            name: "createdAt",
+            type: "string",
+            readOnly: true,
+            deprecated: true,
+          },
+        ],
+        childModels: [],
+      };
+
+      const result = transformRequestBodyObject(
+        schema,
+        context,
+        propertyResult,
+      );
+
+      expect(result.models).toHaveLength(1);
+      const model = result.models[0];
+
+      if (model.kind === "requestBody") {
+        // username: validation + extensions が保持される
+        expect(model.properties[0]).toEqual({
+          name: "username",
+          type: "string",
+          required: true,
+          validation: {
+            minLength: 3,
+            maxLength: 20,
+            pattern: "^[a-zA-Z0-9_]+$",
+          },
+          extensions: {
+            "x-validation-message": "Username must be 3-20 characters",
+          },
+        });
+
+        // bio: writeOnly + validation が保持される
+        expect(model.properties[1]).toEqual({
+          name: "bio",
+          type: "string",
+          writeOnly: true,
+          validation: {
+            maxLength: 500,
+          },
+        });
+
+        // createdAt: readOnly + deprecated が保持される
+        expect(model.properties[2]).toEqual({
+          name: "createdAt",
+          type: "string",
+          readOnly: true,
+          deprecated: true,
+        });
+      }
+    });
+
+    it("should preserve defaultValue and complex validation metadata", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          age: {
+            type: "integer",
+            default: 18,
+          },
+          email: {
+            type: "string",
+            format: "email",
+          },
+        },
+      };
+
+      const context: VisitorContext = {
+        kind: "requestBody",
+        documentPath: [
+          "paths",
+          "/users",
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          {
+            name: "age",
+            type: "int",
+            defaultValue: 18,
+            validation: {
+              minimum: 0,
+              maximum: 150,
+            },
+            extensions: {
+              "x-unit": "years",
+            },
+          },
+          {
+            name: "email",
+            type: "string",
+            validation: {
+              format: "email",
+              maxLength: 100,
+            },
+            extensions: {
+              "x-unique": true,
+            },
+          },
+        ],
+        childModels: [],
+      };
+
+      const result = transformRequestBodyObject(
+        schema,
+        context,
+        propertyResult,
+      );
+
+      expect(result.models).toHaveLength(1);
+      const model = result.models[0];
+
+      if (model.kind === "requestBody") {
+        // age: defaultValue + validation + extensions が保持される
+        expect(model.properties[0]).toEqual({
+          name: "age",
+          type: "int",
+          defaultValue: 18,
+          validation: {
+            minimum: 0,
+            maximum: 150,
+          },
+          extensions: {
+            "x-unit": "years",
+          },
+        });
+
+        // email: validation（format含む）+ extensions が保持される
+        expect(model.properties[1]).toEqual({
+          name: "email",
+          type: "string",
+          validation: {
+            format: "email",
+            maxLength: 100,
+          },
+          extensions: {
+            "x-unique": true,
+          },
+        });
+      }
+    });
   });
 }

@@ -629,5 +629,219 @@ if (import.meta.vitest) {
         statusCode: "404",
       });
     });
+
+    it("should preserve all property metadata (validation, extensions, readOnly, etc.)", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          id: {
+            type: "integer",
+            readOnly: true,
+          },
+          username: {
+            type: "string",
+          },
+          createdAt: {
+            type: "string",
+            deprecated: true,
+          },
+        },
+        description: "Response with metadata",
+      };
+
+      const context: VisitorContext = {
+        kind: "response",
+        documentPath: [
+          "paths",
+          "/users/{id}",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          {
+            name: "id",
+            type: "int64",
+            readOnly: true,
+            validation: {
+              format: "int64",
+            },
+            extensions: {
+              "x-database-column": "user_id",
+              "x-primary-key": true,
+            },
+          },
+          {
+            name: "username",
+            type: "string",
+            required: true,
+            validation: {
+              minLength: 3,
+              maxLength: 20,
+              pattern: "^[a-zA-Z0-9_]+$",
+            },
+            extensions: {
+              "x-validation-message": "Username must be 3-20 characters",
+            },
+          },
+          {
+            name: "createdAt",
+            type: "string",
+            deprecated: true,
+            extensions: {
+              "x-deprecated-reason": "Use createdAtUtc instead",
+            },
+          },
+        ],
+        childModels: [],
+      };
+
+      const result = transformResponseObject(schema, context, propertyResult);
+
+      expect(result.models).toHaveLength(1);
+      const model = result.models[0];
+
+      if (model.kind === "response") {
+        // id: readOnly + validation + extensions が保持される
+        expect(model.properties[0]).toEqual({
+          name: "id",
+          type: "int64",
+          readOnly: true,
+          validation: {
+            format: "int64",
+          },
+          extensions: {
+            "x-database-column": "user_id",
+            "x-primary-key": true,
+          },
+        });
+
+        // username: required + validation + extensions が保持される
+        expect(model.properties[1]).toEqual({
+          name: "username",
+          type: "string",
+          required: true,
+          validation: {
+            minLength: 3,
+            maxLength: 20,
+            pattern: "^[a-zA-Z0-9_]+$",
+          },
+          extensions: {
+            "x-validation-message": "Username must be 3-20 characters",
+          },
+        });
+
+        // createdAt: deprecated + extensions が保持される
+        expect(model.properties[2]).toEqual({
+          name: "createdAt",
+          type: "string",
+          deprecated: true,
+          extensions: {
+            "x-deprecated-reason": "Use createdAtUtc instead",
+          },
+        });
+      }
+    });
+
+    it("should preserve defaultValue and writeOnly in response metadata", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          score: {
+            type: "number",
+            default: 0.0,
+          },
+          email: {
+            type: "string",
+            writeOnly: true,
+          },
+        },
+      };
+
+      const context: VisitorContext = {
+        kind: "response",
+        documentPath: [
+          "paths",
+          "/users",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "paths",
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          {
+            name: "score",
+            type: "double",
+            defaultValue: 0.0,
+            validation: {
+              minimum: 0.0,
+              maximum: 100.0,
+              multipleOf: 0.5,
+            },
+            extensions: {
+              "x-precision": 1,
+            },
+          },
+          {
+            name: "email",
+            type: "string",
+            nullable: true,
+            writeOnly: true,
+            validation: {
+              format: "email",
+              maxLength: 100,
+            },
+          },
+        ],
+        childModels: [],
+      };
+
+      const result = transformResponseObject(schema, context, propertyResult);
+
+      expect(result.models).toHaveLength(1);
+      const model = result.models[0];
+
+      if (model.kind === "response") {
+        // score: defaultValue + validation + extensions が保持される
+        expect(model.properties[0]).toEqual({
+          name: "score",
+          type: "double",
+          defaultValue: 0.0,
+          validation: {
+            minimum: 0.0,
+            maximum: 100.0,
+            multipleOf: 0.5,
+          },
+          extensions: {
+            "x-precision": 1,
+          },
+        });
+
+        // email: nullable + writeOnly + validation が保持される
+        expect(model.properties[1]).toEqual({
+          name: "email",
+          type: "string",
+          nullable: true,
+          writeOnly: true,
+          validation: {
+            format: "email",
+            maxLength: 100,
+          },
+        });
+      }
+    });
   });
 }
