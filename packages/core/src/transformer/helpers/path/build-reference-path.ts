@@ -42,8 +42,15 @@ export function buildReferencePath(documentPath: string[]): string {
     return `#/paths/${convertedPath}`;
   }
 
-  // それ以外（components等）はそのまま結合
-  return `#/${documentPath.join("/")}`;
+  // それ以外（components等）
+  // MIMEタイプなどスラッシュを含むセグメントは::でエンコード
+  const encodedPath = documentPath.map((segment) => {
+    if (segment.includes("/")) {
+      return segment.replace(/\//g, "::");
+    }
+    return segment;
+  });
+  return `#/${encodedPath.join("/")}`;
 }
 
 /**
@@ -157,6 +164,34 @@ if (import.meta.vitest) {
       ]);
       expect(result).toBe(
         "#/paths/::api::v1::users/get/responses/200/content/application::json/schema/properties/data",
+      );
+    });
+
+    it("should encode MIME types in components paths", () => {
+      const result = buildReferencePath([
+        "components",
+        "responses",
+        "BadRequest",
+        "content",
+        "application/json",
+        "schema",
+      ]);
+      expect(result).toBe(
+        "#/components/responses/BadRequest/content/application::json/schema",
+      );
+    });
+
+    it("should encode MIME types in components requestBodies", () => {
+      const result = buildReferencePath([
+        "components",
+        "requestBodies",
+        "UserArray",
+        "content",
+        "application/xml",
+        "schema",
+      ]);
+      expect(result).toBe(
+        "#/components/requestBodies/UserArray/content/application::xml/schema",
       );
     });
   });

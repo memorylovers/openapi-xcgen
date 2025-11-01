@@ -8,7 +8,7 @@
     {
       "kind": "array",
       "name": "UserArray",
-      "referencePath": "#/components/requestBodies/UserArray/content/application/json/schema",
+      "referencePath": "#/components/requestBodies/UserArray/content/application::json/schema",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/User"
@@ -1497,7 +1497,7 @@
           "mimeType": "application/json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/requestBodies/UserArray/content/application/json/schema"
+            "name": "#/components/requestBodies/UserArray/content/application::json/schema"
           }
         }
       ],

@@ -171,10 +171,21 @@ export function transformResponseObject(
   const referencePath = buildReferencePath(context.documentPath);
 
   // ステータスコードを取得（documentPathから）
-  const responsesIndex = context.documentPath.findIndex(
-    (p) => p === "responses",
-  );
-  const statusCode = context.documentPath[responsesIndex + 1] as string;
+  // components.responsesの場合は空文字列、paths.responsesの場合はHTTPステータスコードを取得
+  let statusCode: string;
+
+  if (context.kind === "componentsResponse") {
+    // components.responsesはHTTPステータスコードを持たない
+    // documentPath例: ["components", "responses", "BadRequest", "content", ...]
+    statusCode = "";
+  } else {
+    // paths.responsesはHTTPステータスコードを持つ
+    // documentPath例: ["paths", "/users", "get", "responses", "200", "content", ...]
+    const responsesIndex = context.documentPath.findIndex(
+      (p) => p === "responses",
+    );
+    statusCode = context.documentPath[responsesIndex + 1] as string;
+  }
 
   // プロパティをIRProperty形式に変換
   const properties: IRProperty[] = propertyTraversalResult.properties.map(
@@ -497,6 +508,59 @@ if (import.meta.vitest) {
         ],
         statusCode: "200",
         description: "Success response",
+      });
+    });
+
+    it("should handle components.responses inline object with empty statusCode", () => {
+      const schema: SchemaObject = {
+        type: "object",
+        properties: {
+          error: { type: "string" },
+          message: { type: "string" },
+        },
+        required: ["error", "message"],
+        description: "Bad Request Error",
+      };
+
+      const context: VisitorContext = {
+        kind: "componentsResponse",
+        documentPath: [
+          "components",
+          "responses",
+          "BadRequest",
+          "content",
+          "application/json",
+          "schema",
+        ],
+        rootSegment: "components",
+      };
+
+      const propertyResult: PropertyTraversalResult = {
+        properties: [
+          { name: "error", type: "string", required: true },
+          { name: "message", type: "string", required: true },
+        ],
+        childModels: [],
+      };
+
+      const result = transformResponseObject(schema, context, propertyResult);
+
+      expect(result.type).toEqual({
+        kind: "ref",
+        name: "#/components/responses/BadRequest/content/application::json/schema",
+      });
+      expect(result.models).toHaveLength(1);
+      expect(result.models[0]).toEqual({
+        kind: "response",
+        name: "BadRequest",
+        referencePath:
+          "#/components/responses/BadRequest/content/application::json/schema",
+        properties: [
+          { name: "error", type: "string", required: true },
+          { name: "message", type: "string", required: true },
+        ],
+        statusCode: "", // NOT "BadRequest"!
+        description: "Bad Request Error",
       });
     });
 
