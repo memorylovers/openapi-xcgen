@@ -72,11 +72,30 @@ export function traverseOperation(
   const allChildModels: IRModel[] = [];
 
   // 1. parametersを処理（PathItemとOperationレベルをマージ）
+  // PathItem レベルのパラメータ（$ref は警告してスキップ）
   const filteredPathParams = (pathItemParameters || []).filter(
-    (p): p is ParameterObject => !("$ref" in p),
+    (p): p is ParameterObject => {
+      if ("$ref" in p) {
+        consola.warn(
+          `Parameter reference not supported yet: ${(p as ReferenceObject).$ref}`,
+        );
+        return false;
+      }
+      return true;
+    },
   );
+
+  // Operation レベルのパラメータ（$ref は警告してスキップ）
   const filteredOpParams = (operation.parameters || []).filter(
-    (p): p is ParameterObject => !("$ref" in p),
+    (p): p is ParameterObject => {
+      if ("$ref" in p) {
+        consola.warn(
+          `Parameter reference not supported yet: ${(p as ReferenceObject).$ref}`,
+        );
+        return false;
+      }
+      return true;
+    },
   );
 
   // name+inの組み合わせでMap化し、operation側を優先（OpenAPI仕様準拠）

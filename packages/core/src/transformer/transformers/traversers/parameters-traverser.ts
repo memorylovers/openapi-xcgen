@@ -7,8 +7,12 @@
  */
 
 import { consola } from "consola";
-import type { IRModel, IRParameter, ParameterObject } from "../../../types";
-import { buildReferencePath } from "../../helpers";
+import type {
+  IRModel,
+  IRParameter,
+  ParameterObject,
+  ReferenceObject,
+} from "../../../types";
 import type { VisitorContext } from "../../types";
 import { transformParameter } from "../transformers/parameter-transformer";
 import type { ParametersTraversalResult } from "../types";
@@ -54,8 +58,8 @@ export function traverseParameters(
   parameters.forEach((param, index) => {
     // ReferenceObjectの場合は現時点でスキップ
     if ("$ref" in param) {
-      consola.debug(
-        `Parameter reference not supported yet at ${buildReferencePath(context.documentPath)}/parameters[${index}]`,
+      consola.warn(
+        `Parameter reference not supported yet: ${(param as ReferenceObject).$ref}`,
       );
       return;
     }
