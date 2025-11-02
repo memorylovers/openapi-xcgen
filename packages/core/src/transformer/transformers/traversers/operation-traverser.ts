@@ -136,7 +136,12 @@ export function traverseOperation(
 
       const contentResult = traverseContent(
         requestBodyObj.content,
-        requestBodyContext,
+        {
+          ...requestBodyContext,
+          ...(requestBodyObj.required !== undefined && {
+            required: requestBodyObj.required,
+          }),
+        },
         visitSchema,
       );
 

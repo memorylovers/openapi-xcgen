@@ -107,6 +107,9 @@ export function traverseContent(
         rootSegment: "paths",
         contentType: mimeType as MimeType,
         schemaPath: ["content", mimeType, "schema"],
+        // 親コンテキストからrequiredを継承
+        ...("required" in context &&
+          context.required !== undefined && { required: context.required }),
       } as PathsRequestBodyContext;
     } else if (
       context.documentPath.some((p) => p === "requestBodies") &&
@@ -118,6 +121,9 @@ export function traverseContent(
         rootSegment: "components",
         contentType: mimeType as MimeType,
         schemaPath: ["content", mimeType, "schema"],
+        // 親コンテキストからrequiredを継承
+        ...("required" in context &&
+          context.required !== undefined && { required: context.required }),
       } as ComponentsRequestBodyContext;
     } else if (
       context.documentPath.some((p) => p === "responses") &&
@@ -130,6 +136,10 @@ export function traverseContent(
         rootSegment: "paths",
         contentType: mimeType as MimeType,
         schemaPath: ["content", mimeType, "schema"],
+        // 親コンテキストからheadersを継承
+        ...("headers" in context && context.headers
+          ? { headers: context.headers }
+          : {}),
       } as PathsResponseContext;
     } else if (
       context.documentPath.some((p) => p === "responses") &&
@@ -141,6 +151,10 @@ export function traverseContent(
         rootSegment: "components",
         contentType: mimeType as MimeType,
         schemaPath: ["content", mimeType, "schema"],
+        // 親コンテキストからheadersを継承
+        ...("headers" in context && context.headers
+          ? { headers: context.headers }
+          : {}),
       } as ComponentsResponseContext;
     } else {
       // その他の場合は基本的なVisitorContext

@@ -366,7 +366,8 @@
             "maxLength": 500
           }
         }
-      ]
+      ],
+      "required": true
     }
   ],
   "tags": [],

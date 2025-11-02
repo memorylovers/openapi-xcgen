@@ -60,18 +60,12 @@ export {
   type PathsTransformResult,
 } from "./transformers/paths-transformer";
 export { transformPrimitive } from "./transformers/primitive-transformer";
-export {
-  transformRequestBody,
-  transformRequestBodyObject,
-} from "./transformers/request-body-transformer";
-export {
-  transformResponse,
-  transformResponseObject,
-} from "./transformers/response-transformer";
-export {
-  transformSecurityScheme,
-  transformSecuritySchemes,
-} from "./transformers/security-schemes-transformer";
+export { transformRequestBody } from "./transformers/request-body-transformer";
+export { transformRequestBodyObject } from "./transformers/request-body-object-transformer";
+export { transformResponse } from "./transformers/response-transformer";
+export { transformResponseObject } from "./transformers/response-object-transformer";
+export { transformSecurityScheme } from "./transformers/security-scheme-transformer";
+export { transformSecuritySchemes } from "./transformers/security-schemes-transformer";
 export {
   transformServers,
   type ServersTransformResult,

@@ -84,23 +84,28 @@ export function traverseResponses(
 
     const responseObj = response as ResponseObject;
 
-    // レスポンスコンテキストを作成
-    const responseContext: VisitorContext = {
+    // レスポンスコンテキストを作成（まず基本コンテキスト）
+    const baseResponseContext: VisitorContext = {
       documentPath: [...context.documentPath, "responses", statusCode],
       rootSegment: context.rootSegment,
     };
 
-    // contentを処理
-    const contentResult = traverseContent(
-      responseObj.content,
-      responseContext,
+    // headersを先に処理（contentに渡すため）
+    const headersResult = traverseHeaders(
+      responseObj.headers,
+      baseResponseContext,
       visitSchema,
     );
 
-    // headersを処理
-    const headersResult = traverseHeaders(
-      responseObj.headers,
-      responseContext,
+    // headersをcontextに含めてcontentを処理
+    const contentResult = traverseContent(
+      responseObj.content,
+      {
+        ...baseResponseContext,
+        ...(headersResult.headers.length > 0 && {
+          headers: headersResult.headers,
+        }),
+      },
       visitSchema,
     );
 
@@ -280,11 +285,11 @@ if (import.meta.vitest) {
       const mockVisitSchema = vi
         .fn()
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/components/schemas/User" },
+          type: "int",
           models: [],
         })
         .mockReturnValueOnce({
-          type: "int",
+          type: { kind: "ref", name: "#/components/schemas/User" },
           models: [],
         });
 

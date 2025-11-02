@@ -215,7 +215,8 @@
             "name": "#/paths/::test-2-request/post/requestBody/content/application::json/PostTest2RequestRequestBodyNested"
           }
         }
-      ]
+      ],
+      "required": true
     },
     {
       "kind": "object",

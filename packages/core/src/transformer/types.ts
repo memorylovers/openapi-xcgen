@@ -2,6 +2,7 @@ import type {
   IRExtensions,
   IRHttpMethod,
   IRModel,
+  IRResponseHeader,
   IRType,
   MimeType,
   ParameterObject,
@@ -205,6 +206,8 @@ export interface PathsRequestBodyContext extends VisitorContext {
   contentType?: MimeType;
   /** スキーマパス（contentの中のネストしたスキーマパス） */
   schemaPath?: string[];
+  /** RequestBodyの必須フラグ */
+  required?: boolean;
 }
 
 /**
@@ -219,6 +222,8 @@ export interface ComponentsRequestBodyContext extends VisitorContext {
   contentType?: MimeType;
   /** スキーマパス（contentの中のネストしたスキーマパス） */
   schemaPath?: string[];
+  /** RequestBodyの必須フラグ */
+  required?: boolean;
 }
 
 /**
@@ -263,6 +268,8 @@ export interface PathsResponseContext extends VisitorContext {
   contentType?: MimeType;
   /** スキーマパス（contentの中のネストしたスキーマパス） */
   schemaPath?: string[];
+  /** レスポンスヘッダー */
+  headers?: IRResponseHeader[];
 }
 
 /**
@@ -277,6 +284,8 @@ export interface ComponentsResponseContext extends VisitorContext {
   contentType?: MimeType;
   /** スキーマパス（contentの中のネストしたスキーマパス） */
   schemaPath?: string[];
+  /** レスポンスヘッダー */
+  headers?: IRResponseHeader[];
 }
 
 /**
