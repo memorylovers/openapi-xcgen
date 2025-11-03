@@ -100,9 +100,17 @@ export function transformPaths(
         pathTemplate,
         method,
         operationContext,
-        pathItem.parameters?.filter(
-          (p): p is ParameterObject => !("$ref" in p),
-        ), // PathItem レベルのパラメータ（ReferenceObjectを除外）
+        pathItem.parameters
+          ?.map((p) => {
+            if ("$ref" in p) {
+              consola.warn(
+                `PathItem-level parameter reference not supported yet: ${p.$ref}`,
+              );
+              return null;
+            }
+            return p;
+          })
+          .filter((p): p is ParameterObject => p !== null), // PathItem レベルのパラメータ（ReferenceObjectを除外、警告あり）
         pathItem, // PathItemObject全体を渡す（security/extensions用）
       );
 
