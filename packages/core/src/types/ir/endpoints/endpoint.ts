@@ -4,7 +4,7 @@
 
 import type { IRExtensions } from "../common/extensions";
 import type { IRType } from "../common/type";
-import type { IRSecurityRequirement } from "../security";
+import type { IRSecurityRequirement } from "../security/security-requirement";
 import type { IRParameter } from "./parameter";
 import type { IRRequestBody } from "./request";
 import type { IRResponse } from "./response";
