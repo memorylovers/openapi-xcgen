@@ -405,7 +405,7 @@ IRArraySchema {
 
 IRArraySchema {
   name: "UserList",
-  itemType: { kind: "ref", name: "User" },
+  itemType: { kind: "ref", referencePath: "#/components/schemas/User" },
   validation: { minItems: 1 }
 }
 
@@ -598,7 +598,7 @@ export interface IRComponentRef {
      };
 
      return {
-       type: { kind: "ref", name: referencePath },
+       type: { kind: "ref", referencePath },
        components: [arrayModel, ...traversalResult.components],
      };
    }
@@ -628,7 +628,7 @@ export interface IRComponentRef {
      };
 
      return {
-       type: { kind: "ref", name: referencePath },
+       type: { kind: "ref", referencePath },
        components: [mapModel, ...traversalResult.components],
      };
    }
