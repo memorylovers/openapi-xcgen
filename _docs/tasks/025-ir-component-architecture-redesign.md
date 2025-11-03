@@ -324,21 +324,48 @@ function isSimpleType(type: IRType): boolean {
 #### プロパティ生成での適用
 
 ```typescript
+// packages/xcgen-ts/src/generators/types/generation-context.ts（新規作成）
+
+import type { XcgenIR, IRComponent } from "@openapi-xcgen/core";
+import type { HookableInstance } from "../../hooks";
+
+/**
+ * 型生成時のコンテキスト
+ * IR全体、Hook、設定などを保持し、生成関数間で共有する
+ */
+export interface TypeGenerationContext {
+  ir: XcgenIR;
+  hooks?: HookableInstance;
+}
+
+/**
+ * IRから参照パスでコンポーネントを検索
+ */
+export function resolveComponent(
+  ctx: TypeGenerationContext,
+  referencePath: string,
+): IRComponent | undefined {
+  return ctx.ir.components.find(c => c.referencePath === referencePath);
+}
+```
+
+```typescript
 // packages/xcgen-ts/src/generators/types/types-property.ts を更新
 
+import type { TypeGenerationContext } from "./generation-context";
+import { resolveComponent } from "./generation-context";
 import { shouldInlineArrayAtUsage, shouldInlineMapAtUsage } from "./helpers/inline-strategy";
 
 export function generateProperty(
   prop: IRProperty,
-  parentModel: IRComponent,
-  hooks?: HookableInstance,
+  model: IRModel,
+  ctx: TypeGenerationContext,  // ← IR、Hooksを含むコンテキスト
 ): string {
-  // 型解決時に inline 化判定
   let typeStr: string;
 
   if (typeof prop.type !== "string" && prop.type.kind === "ref") {
-    // IR から component を検索
-    const component = findComponent(ir, prop.type.name);
+    // コンテキストから component を検索
+    const component = resolveComponent(ctx, prop.type.referencePath);
 
     if (component?.kind === "array" && shouldInlineArrayAtUsage(component)) {
       // inline 化: Array<...> 形式
@@ -354,6 +381,11 @@ export function generateProperty(
     }
   } else {
     typeStr = irTypeToTsType(prop.type);
+  }
+
+  // Hook 呼び出し
+  if (ctx.hooks) {
+    ctx.hooks.callHook("property:generate", { /* ... */ });
   }
 
   // ...
@@ -458,11 +490,12 @@ type IRType = IRScalarType | IRComponentRef;
 
 /**
  * IRComponentRef: Componentへの参照
- * IRComponentに定義された名前付き型定義への参照
+ * OpenAPIの$refを表現し、コンポーネントへの参照パスを保持する。
+ * xcgen-ts/xcgen-dartは参照パスから型名を抽出して使用する。
  */
 export interface IRComponentRef {
   kind: "ref";
-  name: string;  // 参照先のComponent名
+  referencePath: string;  // "#/components/schemas/User" など
 }
 ```
 
@@ -497,6 +530,12 @@ export interface IRComponentRef {
 
    **型参照（Ref → ComponentRef）**:
    - `IRRef` → `IRComponentRef`
+   - `IRComponentRef.name` → `IRComponentRef.referencePath` フィールド名変更
+
+   **影響範囲**:
+   - **Core**: 型定義（1箇所）、全transformer（約20箇所で `name:` → `referencePath:` に変更）
+   - **xcgen-ts**: `type-mapper.ts`, `extract-dependencies.ts`（`irType.name` → `irType.referencePath`）
+   - 機械的な置換で対応可能
 
 2. validation フィールドの追加（2時間）
 
@@ -703,13 +742,50 @@ pnpm test       # 全テスト実行
 
 **目的**: TypeScript生成時のinline化判断ロジックを実装（使用箇所で判定）
 
-**推定時間**: 8-10 hours
+**推定時間**: 10-13 hours（TypeGenerationContext導入 2-3h + inline化戦略 8-10h）
 
 **重要**: 詳細な設計は上記「生成器でのinline化戦略（TypeScript） - 修正版」セクション（257-414行）を参照
 
 **タスク**:
 
-1. inline化戦略モジュールの作成（新規ファイル）
+1. TypeGenerationContext 導入（2-3時間）
+
+   **packages/xcgen-ts/src/generators/types/generation-context.ts（新規作成）**:
+
+   ```typescript
+   import type { XcgenIR, IRComponent } from "@openapi-xcgen/core";
+   import type { HookableInstance } from "../../hooks";
+
+   /**
+    * 型生成時のコンテキスト
+    * IR全体、Hook、設定などを保持し、生成関数間で共有する
+    */
+   export interface TypeGenerationContext {
+     ir: XcgenIR;
+     hooks?: HookableInstance;
+   }
+
+   /**
+    * IRから参照パスでコンポーネントを検索
+    */
+   export function resolveComponent(
+     ctx: TypeGenerationContext,
+     referencePath: string,
+   ): IRComponent | undefined {
+     return ctx.ir.components.find(c => c.referencePath === referencePath);
+   }
+   ```
+
+   **全生成関数のシグネチャ変更**（影響: 約15ファイル）:
+   - `generateProperty(prop, model, hooks)` → `generateProperty(prop, model, ctx)`
+   - `generateObjectType(model, hooks)` → `generateObjectType(model, ctx)`
+   - その他の生成関数も同様に `hooks` 引数を `ctx` に置き換え
+
+   **エントリーポイントの更新** (`types.ts`):
+   - `TypeGenerationContext` の初期化: `const ctx = { ir, hooks };`
+   - 全生成関数に `ctx` を渡す
+
+2. inline化戦略モジュールの作成（新規ファイル）
 
    **packages/xcgen-ts/src/generators/types/helpers/inline-strategy.ts**:
 
@@ -748,20 +824,21 @@ pnpm test       # 全テスト実行
    }
    ```
 
-2. プロパティ生成での inline 化判定の実装
+3. プロパティ生成での inline 化判定の実装
 
    **packages/xcgen-ts/src/generators/types/types-property.ts を更新**:
+   - `TypeGenerationContext`, `resolveComponent()` を import
    - `shouldInlineArrayAtUsage()`, `shouldInlineMapAtUsage()` を import
-   - プロパティの型解決時に IR から component を検索
+   - プロパティの型解決時に `resolveComponent(ctx, ...)` で component を検索
    - inline 化条件を満たす場合は `Array<...>` または `Record<string, ...>` 形式で生成
    - それ以外は通常の参照型として生成
 
-3. パラメータ/レスポンス型でも同様に適用
+4. パラメータ/レスポンス型でも同様に適用
 
    - `types-parameter-property.ts` を更新
    - `services-response-type.ts` を更新
 
-4. 設定ファイルでの制御（将来拡張）
+5. 設定ファイルでの制御（将来拡張）
 
    ```typescript
    // xcgen.config.ts (Phase 2 後半または Phase 3 で実装)
@@ -963,15 +1040,20 @@ IRModelは以下の種類がある
   - 期間: 3-4日
   - 主な作業:
     - IRModel→IRComponent リネーム
+    - **IRRef.name → IRComponentRef.referencePath** フィールド名変更
+    - Core全体（約20箇所）+ xcgen-ts（type-mapper.ts等）を更新
     - IRArraySchema/IRMapSchema に validation フィールド追加
     - array-transformer.ts/map-transformer.ts を更新して validation 収集
     - helper関数リネーム（get-model-name → get-component-name など）
     - JSDocコメント更新
 
 - [ ] Phase 2: 生成器のinline化戦略実装（再設計版）
-  - 影響: xcgen-tsのみ（types-property.ts、inline-strategy.ts新規作成）
-  - 期間: 2-3日
+  - 影響: xcgen-tsのみ（generation-context.ts、inline-strategy.ts新規作成、全生成関数のシグネチャ変更）
+  - 期間: 3-4日（TypeGenerationContext導入含む）
   - 主な作業:
+    - **TypeGenerationContext パターン導入**（generation-context.ts新規作成）
+    - 全生成関数のシグネチャ変更（hooks → ctx、約15ファイル）
+    - resolveComponent() ヘルパー実装（IR参照解決用）
     - 使用箇所でのinline化判断ロジック実装（types-property.ts更新）
     - inline-strategy.ts モジュール新規作成（shouldInlineArrayAtUsage など）
     - 設定オプション追加
