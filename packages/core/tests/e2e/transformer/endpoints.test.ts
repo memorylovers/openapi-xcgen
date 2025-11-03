@@ -19,4 +19,10 @@ describe("E2E: Transformer - Endpoints", () => {
       await compareWithExpected("endpoints/endpoint-metadata");
     });
   });
+
+  describe("Parameter Override", () => {
+    it("should override PathItem-level parameters with Operation-level parameters", async () => {
+      await compareWithExpected("endpoints/parameter-override");
+    });
+  });
 });

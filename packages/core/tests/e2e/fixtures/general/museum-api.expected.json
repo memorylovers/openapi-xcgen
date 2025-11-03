@@ -641,13 +641,6 @@
       "kind": "union",
       "name": "TicketPurchaseRequestPaymentMethod",
       "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod",
-      "discriminator": {
-        "propertyName": "type",
-        "mapping": {
-          "credit_card": "#/components/schemas/CreditCardPayment",
-          "paypal": "#/components/schemas/PayPalPayment"
-        }
-      },
       "types": [
         {
           "kind": "ref",
@@ -657,7 +650,14 @@
           "kind": "ref",
           "name": "#/components/schemas/PayPalPayment"
         }
-      ]
+      ],
+      "discriminator": {
+        "propertyName": "type",
+        "mapping": {
+          "credit_card": "#/components/schemas/CreditCardPayment",
+          "paypal": "#/components/schemas/PayPalPayment"
+        }
+      }
     },
     {
       "kind": "object",
@@ -1000,38 +1000,9 @@
       ]
     },
     {
-      "kind": "response",
-      "name": "GetMuseumHours200Response",
-      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200Response",
-      "properties": [
-        {
-          "name": "timezone",
-          "type": "string",
-          "description": "Timezone used for the hours"
-        },
-        {
-          "name": "daily_hours",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours"
-          }
-        }
-      ],
-      "statusCode": "200"
-    },
-    {
-      "kind": "array",
-      "name": "GetMuseumHours200ResponseDailyHours",
-      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours",
-      "itemType": {
-        "kind": "ref",
-        "name": "#/components/schemas/DailyHours"
-      }
-    },
-    {
       "kind": "parameter",
       "name": "GetMuseumHoursParams",
-      "description": "Parameters for GET /museum-hours\ndate: Specific date to retrieve hours for (ISO 8601 format)\ntimezone: Timezone for displaying hours (IANA timezone format)",
+      "referencePath": "#/paths/::museum-hours/get/GetMuseumHoursParams",
       "properties": [
         {
           "name": "date",
@@ -1047,25 +1018,23 @@
           "defaultValue": "America/New_York"
         }
       ],
-      "referencePath": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
+      "description": "Parameters for GET /museum-hours\ndate: Specific date to retrieve hours for (ISO 8601 format)\ntimezone: Timezone for displaying hours (IANA timezone format)"
     },
     {
       "kind": "response",
-      "name": "GetSpecialEvents200Response",
-      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200Response",
+      "name": "GetMuseumHours200Response",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema",
       "properties": [
         {
-          "name": "events",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents"
-          }
+          "name": "timezone",
+          "type": "string",
+          "description": "Timezone used for the hours"
         },
         {
-          "name": "pagination",
+          "name": "daily_hours",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Pagination"
+            "name": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours"
           }
         }
       ],
@@ -1073,17 +1042,67 @@
     },
     {
       "kind": "array",
-      "name": "GetSpecialEvents200ResponseEvents",
-      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents",
+      "name": "GetMuseumHours200ResponseDailyHours",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/SpecialEvent"
+        "name": "#/components/schemas/DailyHours"
       }
+    },
+    {
+      "kind": "parameter",
+      "name": "GetSpecialEventsParams",
+      "referencePath": "#/paths/::special-events/get/GetSpecialEventsParams",
+      "properties": [
+        {
+          "name": "start_date",
+          "type": "date",
+          "in": "query",
+          "description": "Filter events starting from this date"
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "in": "query",
+          "description": "Filter events until this date"
+        },
+        {
+          "name": "category",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::special-events/get/parameters/2/schema/GetSpecialEventsParamsCategory"
+          },
+          "in": "query",
+          "description": "Filter by event category"
+        },
+        {
+          "name": "limit",
+          "type": "int",
+          "in": "query",
+          "description": "Maximum number of events to return",
+          "defaultValue": 20,
+          "validation": {
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        {
+          "name": "offset",
+          "type": "int",
+          "in": "query",
+          "description": "Number of events to skip (for pagination)",
+          "defaultValue": 0,
+          "validation": {
+            "minimum": 0
+          }
+        }
+      ],
+      "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)"
     },
     {
       "kind": "enum",
       "name": "GetSpecialEventsParamsCategory",
-      "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParamsCategory",
+      "referencePath": "#/paths/::special-events/get/parameters/2/schema/GetSpecialEventsParamsCategory",
       "type": "string",
       "values": [
         {
@@ -1113,59 +1132,40 @@
       ]
     },
     {
-      "kind": "parameter",
-      "name": "GetSpecialEventsParams",
-      "description": "Parameters for GET /special-events\nstart_date: Filter events starting from this date\nend_date: Filter events until this date\ncategory: Filter by event category\nlimit: Maximum number of events to return\noffset: Number of events to skip (for pagination)",
+      "kind": "response",
+      "name": "GetSpecialEvents200Response",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema",
       "properties": [
         {
-          "name": "start_date",
-          "type": "date",
-          "in": "query",
-          "description": "Filter events starting from this date"
-        },
-        {
-          "name": "end_date",
-          "type": "date",
-          "in": "query",
-          "description": "Filter events until this date"
-        },
-        {
-          "name": "category",
+          "name": "events",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParamsCategory"
-          },
-          "in": "query",
-          "description": "Filter by event category"
-        },
-        {
-          "name": "limit",
-          "type": "int",
-          "in": "query",
-          "description": "Maximum number of events to return",
-          "defaultValue": 20,
-          "validation": {
-            "minimum": 1,
-            "maximum": 100
+            "name": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents"
           }
         },
         {
-          "name": "offset",
-          "type": "int",
-          "in": "query",
-          "description": "Number of events to skip (for pagination)",
-          "defaultValue": 0,
-          "validation": {
-            "minimum": 0
+          "name": "pagination",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/Pagination"
           }
         }
       ],
-      "referencePath": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
+      "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetSpecialEvents200ResponseEvents",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/SpecialEvent"
+      }
     },
     {
       "kind": "parameter",
       "name": "GetSpecialEventsEventIdParams",
-      "description": "Parameters for GET /special-events/{eventId}\neventId: Unique identifier of the special event",
+      "referencePath": "#/paths/::special-events::{eventId}/get/GetSpecialEventsEventIdParams",
       "properties": [
         {
           "name": "eventId",
@@ -1178,30 +1178,12 @@
           }
         }
       ],
-      "referencePath": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
-    },
-    {
-      "kind": "parameter",
-      "name": "PatchSpecialEventsEventIdParams",
-      "description": "Parameters for PATCH /special-events/{eventId}\neventId: Unique identifier of the special event",
-      "properties": [
-        {
-          "name": "eventId",
-          "type": "string",
-          "in": "path",
-          "required": true,
-          "description": "Unique identifier of the special event",
-          "validation": {
-            "format": "uuid"
-          }
-        }
-      ],
-      "referencePath": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
+      "description": "Parameters for GET /special-events/{eventId}\neventId: Unique identifier of the special event"
     },
     {
       "kind": "parameter",
       "name": "DeleteSpecialEventsEventIdParams",
-      "description": "Parameters for DELETE /special-events/{eventId}\neventId: Unique identifier of the special event",
+      "referencePath": "#/paths/::special-events::{eventId}/delete/DeleteSpecialEventsEventIdParams",
       "properties": [
         {
           "name": "eventId",
@@ -1214,12 +1196,30 @@
           }
         }
       ],
-      "referencePath": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
+      "description": "Parameters for DELETE /special-events/{eventId}\neventId: Unique identifier of the special event"
+    },
+    {
+      "kind": "parameter",
+      "name": "PatchSpecialEventsEventIdParams",
+      "referencePath": "#/paths/::special-events::{eventId}/patch/PatchSpecialEventsEventIdParams",
+      "properties": [
+        {
+          "name": "eventId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "description": "Unique identifier of the special event",
+          "validation": {
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Parameters for PATCH /special-events/{eventId}\neventId: Unique identifier of the special event"
     },
     {
       "kind": "parameter",
       "name": "GetTicketsConfirmationIdParams",
-      "description": "Parameters for GET /tickets/{confirmationId}\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase",
+      "referencePath": "#/paths/::tickets::{confirmationId}/get/GetTicketsConfirmationIdParams",
       "properties": [
         {
           "name": "confirmationId",
@@ -1242,28 +1242,12 @@
           }
         }
       ],
-      "referencePath": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
-    },
-    {
-      "kind": "enum",
-      "name": "GetTicketsConfirmationIdQrCodeParamsFormat",
-      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParamsFormat",
-      "type": "string",
-      "values": [
-        {
-          "value": "png",
-          "name": "PNG"
-        },
-        {
-          "value": "svg",
-          "name": "SVG"
-        }
-      ]
+      "description": "Parameters for GET /tickets/{confirmationId}\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase"
     },
     {
       "kind": "parameter",
       "name": "GetTicketsConfirmationIdQrCodeParams",
-      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase\nformat: QR code format",
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/GetTicketsConfirmationIdQrCodeParams",
       "properties": [
         {
           "name": "confirmationId",
@@ -1289,14 +1273,30 @@
           "name": "format",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParamsFormat"
+            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/GetTicketsConfirmationIdQrCodeParamsFormat"
           },
           "in": "query",
           "description": "QR code format",
           "defaultValue": "png"
         }
       ],
-      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
+      "description": "Parameters for GET /tickets/{confirmationId}/qr-code\nconfirmationId: Ticket purchase confirmation ID\nemail: Email address used for the purchase\nformat: QR code format"
+    },
+    {
+      "kind": "enum",
+      "name": "GetTicketsConfirmationIdQrCodeParamsFormat",
+      "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/GetTicketsConfirmationIdQrCodeParamsFormat",
+      "type": "string",
+      "values": [
+        {
+          "value": "png",
+          "name": "PNG"
+        },
+        {
+          "value": "svg",
+          "name": "SVG"
+        }
+      ]
     }
   ],
   "tags": [
@@ -1315,14 +1315,17 @@
   ],
   "endpoints": [
     {
-      "method": "get",
       "path": "/museum-hours",
+      "method": "get",
+      "operationId": "getMuseumHours",
+      "summary": "Get museum operating hours",
+      "description": "Returns the operating hours for the museum for the next seven days.",
       "tags": [
         "Operations"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::museum-hours/get/parameters/GetMuseumHoursParams"
+        "name": "#/paths/::museum-hours/get/GetMuseumHoursParams"
       },
       "responses": [
         {
@@ -1334,7 +1337,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200Response"
+                "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1355,20 +1358,20 @@
             "name": "#/components/responses/InternalServerError"
           }
         }
-      ],
-      "operationId": "getMuseumHours",
-      "summary": "Get museum operating hours",
-      "description": "Returns the operating hours for the museum for the next seven days."
+      ]
     },
     {
-      "method": "get",
       "path": "/special-events",
+      "method": "get",
+      "operationId": "listSpecialEvents",
+      "summary": "List special events",
+      "description": "Get a list of upcoming special events at the museum",
       "tags": [
         "Events"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events/get/parameters/GetSpecialEventsParams"
+        "name": "#/paths/::special-events/get/GetSpecialEventsParams"
       },
       "responses": [
         {
@@ -1380,7 +1383,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200Response"
+                "name": "#/paths/::special-events/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1393,18 +1396,31 @@
             "name": "#/components/responses/BadRequest"
           }
         }
-      ],
-      "operationId": "listSpecialEvents",
-      "summary": "List special events",
-      "description": "Get a list of upcoming special events at the museum"
+      ]
     },
     {
-      "method": "post",
       "path": "/special-events",
+      "method": "post",
+      "operationId": "createSpecialEvent",
+      "summary": "Create a new special event",
+      "description": "Create a new special event (requires admin privileges)",
       "tags": [
         "Events"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventRequest"
+            }
+          }
+        ],
+        "required": true
+      },
       "responses": [
         {
           "kind": "content",
@@ -1452,22 +1468,6 @@
           }
         }
       ],
-      "operationId": "createSpecialEvent",
-      "summary": "Create a new special event",
-      "description": "Create a new special event (requires admin privileges)",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/SpecialEventRequest"
-            }
-          }
-        ],
-        "required": true
-      },
       "security": [
         {
           "scheme": "ApiKey"
@@ -1475,14 +1475,17 @@
       ]
     },
     {
-      "method": "get",
       "path": "/special-events/{eventId}",
+      "method": "get",
+      "operationId": "getSpecialEvent",
+      "summary": "Get special event details",
+      "description": "Get details about a specific special event",
       "tags": [
         "Events"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/get/parameters/GetSpecialEventsEventIdParams"
+        "name": "#/paths/::special-events::{eventId}/get/GetSpecialEventsEventIdParams"
       },
       "responses": [
         {
@@ -1507,20 +1510,83 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getSpecialEvent",
-      "summary": "Get special event details",
-      "description": "Get details about a specific special event"
+      ]
     },
     {
-      "method": "patch",
       "path": "/special-events/{eventId}",
+      "method": "delete",
+      "operationId": "deleteSpecialEvent",
+      "summary": "Delete special event",
+      "description": "Delete a special event (requires admin privileges)",
       "tags": [
         "Events"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/patch/parameters/PatchSpecialEventsEventIdParams"
+        "name": "#/paths/::special-events::{eventId}/delete/DeleteSpecialEventsEventIdParams"
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "204",
+          "description": "Event deleted successfully"
+        },
+        {
+          "kind": "ref",
+          "statusCode": "401",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Unauthorized"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "403",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/Forbidden"
+          }
+        },
+        {
+          "kind": "ref",
+          "statusCode": "404",
+          "ref": {
+            "kind": "ref",
+            "name": "#/components/responses/NotFound"
+          }
+        }
+      ],
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
+      ]
+    },
+    {
+      "path": "/special-events/{eventId}",
+      "method": "patch",
+      "operationId": "updateSpecialEvent",
+      "summary": "Update special event",
+      "description": "Update a special event (requires admin privileges)",
+      "tags": [
+        "Events"
+      ],
+      "parameters": {
+        "kind": "ref",
+        "name": "#/paths/::special-events::{eventId}/patch/PatchSpecialEventsEventIdParams"
+      },
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/SpecialEventUpdate"
+            }
+          }
+        ],
+        "required": true
       },
       "responses": [
         {
@@ -1570,9 +1636,22 @@
           }
         }
       ],
-      "operationId": "updateSpecialEvent",
-      "summary": "Update special event",
-      "description": "Update a special event (requires admin privileges)",
+      "security": [
+        {
+          "scheme": "ApiKey"
+        }
+      ]
+    },
+    {
+      "path": "/tickets",
+      "method": "post",
+      "operationId": "purchaseTickets",
+      "summary": "Purchase museum tickets",
+      "description": "Purchase tickets for museum admission",
+      "tags": [
+        "Tickets"
+      ],
+      "parameters": [],
       "requestBody": {
         "kind": "content",
         "content": [
@@ -1580,75 +1659,12 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/SpecialEventUpdate"
+              "name": "#/components/schemas/TicketPurchaseRequest"
             }
           }
         ],
         "required": true
       },
-      "security": [
-        {
-          "scheme": "ApiKey"
-        }
-      ]
-    },
-    {
-      "method": "delete",
-      "path": "/special-events/{eventId}",
-      "tags": [
-        "Events"
-      ],
-      "parameters": {
-        "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/delete/parameters/DeleteSpecialEventsEventIdParams"
-      },
-      "responses": [
-        {
-          "kind": "content",
-          "statusCode": "204",
-          "description": "Event deleted successfully"
-        },
-        {
-          "kind": "ref",
-          "statusCode": "401",
-          "ref": {
-            "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
-          }
-        },
-        {
-          "kind": "ref",
-          "statusCode": "403",
-          "ref": {
-            "kind": "ref",
-            "name": "#/components/responses/Forbidden"
-          }
-        },
-        {
-          "kind": "ref",
-          "statusCode": "404",
-          "ref": {
-            "kind": "ref",
-            "name": "#/components/responses/NotFound"
-          }
-        }
-      ],
-      "operationId": "deleteSpecialEvent",
-      "summary": "Delete special event",
-      "description": "Delete a special event (requires admin privileges)",
-      "security": [
-        {
-          "scheme": "ApiKey"
-        }
-      ]
-    },
-    {
-      "method": "post",
-      "path": "/tickets",
-      "tags": [
-        "Tickets"
-      ],
-      "parameters": [],
       "responses": [
         {
           "kind": "content",
@@ -1700,33 +1716,20 @@
             }
           ]
         }
-      ],
-      "operationId": "purchaseTickets",
-      "summary": "Purchase museum tickets",
-      "description": "Purchase tickets for museum admission",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/TicketPurchaseRequest"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     },
     {
-      "method": "get",
       "path": "/tickets/{confirmationId}",
+      "method": "get",
+      "operationId": "getTicket",
+      "summary": "Retrieve ticket details",
+      "description": "Get details of a ticket purchase",
       "tags": [
         "Tickets"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}/get/parameters/GetTicketsConfirmationIdParams"
+        "name": "#/paths/::tickets::{confirmationId}/get/GetTicketsConfirmationIdParams"
       },
       "responses": [
         {
@@ -1759,20 +1762,20 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getTicket",
-      "summary": "Retrieve ticket details",
-      "description": "Get details of a ticket purchase"
+      ]
     },
     {
-      "method": "get",
       "path": "/tickets/{confirmationId}/qr-code",
+      "method": "get",
+      "operationId": "getTicketQRCode",
+      "summary": "Generate QR code for tickets",
+      "description": "Generate a QR code for ticket validation at the museum entrance",
       "tags": [
         "Tickets"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/GetTicketsConfirmationIdQrCodeParams"
+        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/GetTicketsConfirmationIdQrCodeParams"
       },
       "responses": [
         {
@@ -1806,10 +1809,7 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getTicketQRCode",
-      "summary": "Generate QR code for tickets",
-      "description": "Generate a QR code for ticket validation at the museum entrance"
+      ]
     }
   ],
   "servers": [

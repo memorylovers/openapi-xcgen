@@ -245,12 +245,27 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "post",
       "path": "/orders",
+      "method": "post",
+      "operationId": "createOrder",
+      "summary": "Create a new order",
       "tags": [
         "orders"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/Order"
+            }
+          }
+        ],
+        "required": true
+      },
       "responses": [
         {
           "kind": "content",
@@ -266,22 +281,7 @@
             }
           ]
         }
-      ],
-      "operationId": "createOrder",
-      "summary": "Create a new order",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/Order"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     }
   ]
 }

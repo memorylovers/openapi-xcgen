@@ -138,7 +138,7 @@
     {
       "kind": "parameter",
       "name": "GetUsersUserIdParams",
-      "description": "Parameters for GET /users/{userId}",
+      "referencePath": "#/paths/::users::{userId}/get/GetUsersUserIdParams",
       "properties": [
         {
           "name": "userId",
@@ -147,12 +147,12 @@
           "required": true
         }
       ],
-      "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
+      "description": "Parameters for GET /users/{userId}"
     },
     {
       "kind": "parameter",
       "name": "PatchUsersUserIdParams",
-      "description": "Parameters for PATCH /users/{userId}",
+      "referencePath": "#/paths/::users::{userId}/patch/PatchUsersUserIdParams",
       "properties": [
         {
           "name": "userId",
@@ -161,16 +161,30 @@
           "required": true
         }
       ],
-      "referencePath": "#/paths/::users::{userId}/patch/parameters/PatchUsersUserIdParams"
+      "description": "Parameters for PATCH /users/{userId}"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "post",
       "path": "/users",
+      "method": "post",
+      "operationId": "createUser",
+      "summary": "Create a new user",
       "tags": [],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/UserCreate"
+            }
+          }
+        ]
+      },
       "responses": [
         {
           "kind": "content",
@@ -186,29 +200,17 @@
             }
           ]
         }
-      ],
-      "operationId": "createUser",
-      "summary": "Create a new user",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/UserCreate"
-            }
-          }
-        ]
-      }
+      ]
     },
     {
-      "method": "get",
       "path": "/users/{userId}",
+      "method": "get",
+      "operationId": "getUser",
+      "summary": "Get user by ID",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
+        "name": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
       },
       "responses": [
         {
@@ -225,17 +227,29 @@
             }
           ]
         }
-      ],
-      "operationId": "getUser",
-      "summary": "Get user by ID"
+      ]
     },
     {
-      "method": "patch",
       "path": "/users/{userId}",
+      "method": "patch",
+      "operationId": "updateUser",
+      "summary": "Update user",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/patch/parameters/PatchUsersUserIdParams"
+        "name": "#/paths/::users::{userId}/patch/PatchUsersUserIdParams"
+      },
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/UserUpdate"
+            }
+          }
+        ]
       },
       "responses": [
         {
@@ -252,21 +266,7 @@
             }
           ]
         }
-      ],
-      "operationId": "updateUser",
-      "summary": "Update user",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/UserUpdate"
-            }
-          }
-        ]
-      }
+      ]
     }
   ]
 }

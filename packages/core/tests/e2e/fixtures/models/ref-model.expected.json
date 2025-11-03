@@ -60,7 +60,7 @@
     {
       "kind": "array",
       "name": "GetCustomers200Response",
-      "referencePath": "#/paths/::customers/get/responses/200/content/application::json/schema/GetCustomers200Response",
+      "referencePath": "#/paths/::customers/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Customer"
@@ -70,8 +70,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/orders",
+      "method": "get",
+      "summary": "Get orders",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -89,12 +90,12 @@
             }
           ]
         }
-      ],
-      "summary": "Get orders"
+      ]
     },
     {
-      "method": "get",
       "path": "/customers",
+      "method": "get",
+      "summary": "Get customers",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -107,13 +108,12 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::customers/get/responses/200/content/application::json/schema/GetCustomers200Response"
+                "name": "#/paths/::customers/get/responses/200/content/application::json/schema"
               }
             }
           ]
         }
-      ],
-      "summary": "Get customers"
+      ]
     }
   ]
 }

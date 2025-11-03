@@ -188,13 +188,6 @@
       "kind": "union",
       "name": "FooUnion",
       "referencePath": "#/components/schemas/FooUnion",
-      "discriminator": {
-        "propertyName": "id",
-        "mapping": {
-          "bar": "#/components/schemas/BarUnion",
-          "baz": "#/components/schemas/BazUnion"
-        }
-      },
       "types": [
         {
           "kind": "ref",
@@ -204,7 +197,14 @@
           "kind": "ref",
           "name": "#/components/schemas/BazUnion"
         }
-      ]
+      ],
+      "discriminator": {
+        "propertyName": "id",
+        "mapping": {
+          "bar": "#/components/schemas/BarUnion",
+          "baz": "#/components/schemas/BazUnion"
+        }
+      }
     },
     {
       "kind": "object",
@@ -251,8 +251,8 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/foo",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [

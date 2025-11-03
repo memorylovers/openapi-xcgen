@@ -46,8 +46,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/articles",
+      "method": "get",
+      "summary": "Get articles",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -65,8 +66,7 @@
             }
           ]
         }
-      ],
-      "summary": "Get articles"
+      ]
     }
   ]
 }

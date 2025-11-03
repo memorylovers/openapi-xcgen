@@ -613,40 +613,9 @@
       ]
     },
     {
-      "kind": "response",
-      "name": "GetStations200Response",
-      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response",
-      "properties": [
-        {
-          "name": "data",
-          "type": {
-            "kind": "ref",
-            "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData"
-          }
-        },
-        {
-          "name": "links",
-          "type": {
-            "kind": "ref",
-            "name": "#/components/schemas/PaginationLinks"
-          }
-        }
-      ],
-      "statusCode": "200"
-    },
-    {
-      "kind": "array",
-      "name": "GetStations200ResponseData",
-      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200ResponseData",
-      "itemType": {
-        "kind": "ref",
-        "name": "#/components/schemas/Station"
-      }
-    },
-    {
       "kind": "parameter",
       "name": "GetStationsParams",
-      "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results",
+      "referencePath": "#/paths/::stations/get/GetStationsParams",
       "properties": [
         {
           "name": "coordinates",
@@ -688,18 +657,18 @@
           }
         }
       ],
-      "referencePath": "#/paths/::stations/get/parameters/GetStationsParams"
+      "description": "Parameters for GET /stations\ncoordinates: Find stations close to a location.\nsearch: Search for stations by name or code\ncountry: Filter by country code (ISO 3166-1 alpha-2)\nlimit: Maximum number of results"
     },
     {
       "kind": "response",
-      "name": "GetTrips200Response",
-      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response",
+      "name": "GetStations200Response",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema",
       "properties": [
         {
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData"
+            "name": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData"
           }
         },
         {
@@ -714,17 +683,17 @@
     },
     {
       "kind": "array",
-      "name": "GetTrips200ResponseData",
-      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200ResponseData",
+      "name": "GetStations200ResponseData",
+      "referencePath": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Trip"
+        "name": "#/components/schemas/Station"
       }
     },
     {
       "kind": "parameter",
       "name": "GetTripsParams",
-      "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs",
+      "referencePath": "#/paths/::trips/get/GetTripsParams",
       "properties": [
         {
           "name": "origin",
@@ -766,18 +735,49 @@
           "description": "Only return trips that allow dogs"
         }
       ],
-      "referencePath": "#/paths/::trips/get/parameters/GetTripsParams"
+      "description": "Parameters for GET /trips\norigin: The ID of the origin station\ndestination: The ID of the destination station\ndate: Date of travel (ISO 8601)\nbicycles: Only return trips that allow bicycles\ndogs: Only return trips that allow dogs"
     },
     {
       "kind": "response",
-      "name": "GetBookings200Response",
-      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response",
+      "name": "GetTrips200Response",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema",
       "properties": [
         {
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData"
+            "name": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData"
+          }
+        },
+        {
+          "name": "links",
+          "type": {
+            "kind": "ref",
+            "name": "#/components/schemas/PaginationLinks"
+          }
+        }
+      ],
+      "statusCode": "200"
+    },
+    {
+      "kind": "array",
+      "name": "GetTrips200ResponseData",
+      "referencePath": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData",
+      "itemType": {
+        "kind": "ref",
+        "name": "#/components/schemas/Trip"
+      }
+    },
+    {
+      "kind": "response",
+      "name": "GetBookings200Response",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema",
+      "properties": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "ref",
+            "name": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData"
           }
         },
         {
@@ -793,7 +793,7 @@
     {
       "kind": "array",
       "name": "GetBookings200ResponseData",
-      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200ResponseData",
+      "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/Booking"
@@ -802,7 +802,7 @@
     {
       "kind": "parameter",
       "name": "GetBookingsBookingIdParams",
-      "description": "Parameters for GET /bookings/{bookingId}",
+      "referencePath": "#/paths/::bookings::{bookingId}/get/GetBookingsBookingIdParams",
       "properties": [
         {
           "name": "bookingId",
@@ -814,12 +814,12 @@
           }
         }
       ],
-      "referencePath": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+      "description": "Parameters for GET /bookings/{bookingId}"
     },
     {
       "kind": "parameter",
       "name": "DeleteBookingsBookingIdParams",
-      "description": "Parameters for DELETE /bookings/{bookingId}",
+      "referencePath": "#/paths/::bookings::{bookingId}/delete/DeleteBookingsBookingIdParams",
       "properties": [
         {
           "name": "bookingId",
@@ -831,19 +831,29 @@
           }
         }
       ],
-      "referencePath": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+      "description": "Parameters for DELETE /bookings/{bookingId}"
+    },
+    {
+      "kind": "parameter",
+      "name": "PostBookingsBookingIdPaymentParams",
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/PostBookingsBookingIdPaymentParams",
+      "properties": [
+        {
+          "name": "bookingId",
+          "type": "string",
+          "in": "path",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Parameters for POST /bookings/{bookingId}/payment"
     },
     {
       "kind": "union",
       "name": "PostBookingsBookingIdPaymentRequestBody",
-      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody",
-      "discriminator": {
-        "propertyName": "method",
-        "mapping": {
-          "card": "#/components/schemas/CardPayment",
-          "bank_transfer": "#/components/schemas/BankTransferPayment"
-        }
-      },
+      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
       "types": [
         {
           "kind": "ref",
@@ -853,37 +863,30 @@
           "kind": "ref",
           "name": "#/components/schemas/BankTransferPayment"
         }
-      ]
-    },
-    {
-      "kind": "parameter",
-      "name": "PostBookingsBookingIdPaymentParams",
-      "description": "Parameters for POST /bookings/{bookingId}/payment",
-      "properties": [
-        {
-          "name": "bookingId",
-          "type": "string",
-          "in": "path",
-          "required": true,
-          "validation": {
-            "format": "uuid"
-          }
-        }
       ],
-      "referencePath": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+      "discriminator": {
+        "propertyName": "method",
+        "mapping": {
+          "card": "#/components/schemas/CardPayment",
+          "bank_transfer": "#/components/schemas/BankTransferPayment"
+        }
+      }
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/stations",
+      "method": "get",
+      "operationId": "getStations",
+      "summary": "Get a list of train stations",
+      "description": "Returns a list of all train stations in the system.",
       "tags": [
         "Stations"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::stations/get/parameters/GetStationsParams"
+        "name": "#/paths/::stations/get/GetStationsParams"
       },
       "responses": [
         {
@@ -895,7 +898,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::stations/get/responses/200/content/application::json/schema/GetStations200Response"
+                "name": "#/paths/::stations/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -924,20 +927,20 @@
             "name": "#/components/responses/InternalServerError"
           }
         }
-      ],
-      "operationId": "getStations",
-      "summary": "Get a list of train stations",
-      "description": "Returns a list of all train stations in the system."
+      ]
     },
     {
-      "method": "get",
       "path": "/trips",
+      "method": "get",
+      "operationId": "getTrips",
+      "summary": "Get available train trips",
+      "description": "Returns a list of available trips between stations",
       "tags": [
         "Trips"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::trips/get/parameters/GetTripsParams"
+        "name": "#/paths/::trips/get/GetTripsParams"
       },
       "responses": [
         {
@@ -949,7 +952,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::trips/get/responses/200/content/application::json/schema/GetTrips200Response"
+                "name": "#/paths/::trips/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -970,14 +973,14 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getTrips",
-      "summary": "Get available train trips",
-      "description": "Returns a list of available trips between stations"
+      ]
     },
     {
-      "method": "get",
       "path": "/bookings",
+      "method": "get",
+      "operationId": "getBookings",
+      "summary": "List bookings for the authenticated user",
+      "description": "Returns a list of bookings for the authenticated user",
       "tags": [
         "Bookings"
       ],
@@ -992,7 +995,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema/GetBookings200Response"
+                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1005,18 +1008,31 @@
             "name": "#/components/responses/Unauthorized"
           }
         }
-      ],
-      "operationId": "getBookings",
-      "summary": "List bookings for the authenticated user",
-      "description": "Returns a list of bookings for the authenticated user"
+      ]
     },
     {
-      "method": "post",
       "path": "/bookings",
+      "method": "post",
+      "operationId": "createBooking",
+      "summary": "Create a new booking",
+      "description": "Book a trip for one or more passengers",
       "tags": [
         "Bookings"
       ],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/components/schemas/BookingRequest"
+            }
+          }
+        ],
+        "required": true
+      },
       "responses": [
         {
           "kind": "content",
@@ -1063,33 +1079,20 @@
             "name": "#/components/responses/Conflict"
           }
         }
-      ],
-      "operationId": "createBooking",
-      "summary": "Create a new booking",
-      "description": "Book a trip for one or more passengers",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/components/schemas/BookingRequest"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     },
     {
-      "method": "get",
       "path": "/bookings/{bookingId}",
+      "method": "get",
+      "operationId": "getBooking",
+      "summary": "Get booking details",
+      "description": "Returns details of a specific booking",
       "tags": [
         "Bookings"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}/get/parameters/GetBookingsBookingIdParams"
+        "name": "#/paths/::bookings::{bookingId}/get/GetBookingsBookingIdParams"
       },
       "responses": [
         {
@@ -1122,20 +1125,20 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "getBooking",
-      "summary": "Get booking details",
-      "description": "Returns details of a specific booking"
+      ]
     },
     {
-      "method": "delete",
       "path": "/bookings/{bookingId}",
+      "method": "delete",
+      "operationId": "cancelBooking",
+      "summary": "Cancel a booking",
+      "description": "Cancel an existing booking",
       "tags": [
         "Bookings"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}/delete/parameters/DeleteBookingsBookingIdParams"
+        "name": "#/paths/::bookings::{bookingId}/delete/DeleteBookingsBookingIdParams"
       },
       "responses": [
         {
@@ -1167,20 +1170,33 @@
             "name": "#/components/responses/Conflict"
           }
         }
-      ],
-      "operationId": "cancelBooking",
-      "summary": "Cancel a booking",
-      "description": "Cancel an existing booking"
+      ]
     },
     {
-      "method": "post",
       "path": "/bookings/{bookingId}/payment",
+      "method": "post",
+      "operationId": "payForBooking",
+      "summary": "Pay for a booking",
+      "description": "Process payment for a booking",
       "tags": [
         "Payments"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}::payment/post/parameters/PostBookingsBookingIdPaymentParams"
+        "name": "#/paths/::bookings::{bookingId}::payment/post/PostBookingsBookingIdPaymentParams"
+      },
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema"
+            }
+          }
+        ],
+        "required": true
       },
       "responses": [
         {
@@ -1235,23 +1251,7 @@
             "name": "#/components/responses/NotFound"
           }
         }
-      ],
-      "operationId": "payForBooking",
-      "summary": "Pay for a booking",
-      "description": "Process payment for a booking",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema/PostBookingsBookingIdPaymentRequestBody"
-            }
-          }
-        ],
-        "required": true
-      }
+      ]
     }
   ],
   "servers": [

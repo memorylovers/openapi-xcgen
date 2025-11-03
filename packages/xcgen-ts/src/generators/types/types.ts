@@ -6,6 +6,7 @@
 
 import type { XcgenIR } from "@openapi-xcgen/core";
 import type { IFileWriter } from "../../helpers/file-writer";
+import { toTypeName } from "../../helpers/naming";
 import { runInParallel } from "../../helpers/parallel";
 import type { HookableInstance } from "../../hooks";
 import type { GeneratorResult } from "../../types";
@@ -60,7 +61,7 @@ export async function generateTypes(
         : undefined;
 
       return {
-        path: `models/${model.name}.ts`,
+        path: `models/${toTypeName(model.name)}.ts`,
         content: generateModelFile(model, requestBodyTypeName, _hooks),
       };
     })

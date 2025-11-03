@@ -17,7 +17,7 @@
     "test": {
       "dependsOn": ["build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["coverage/**"],
+      "outputs": ["coverage/**", "generated/**"],
       "cache": true
     },
     "typecheck": {
@@ -32,6 +32,11 @@
     },
     "lint:fix": {
       "dependsOn": ["^lint:fix"],
+      "cache": false
+    },
+    "regenerate:expected": {
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["tests/**/expected*/**"],
       "cache": false
     },
     "clean": {

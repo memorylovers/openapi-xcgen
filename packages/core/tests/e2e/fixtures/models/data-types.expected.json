@@ -110,8 +110,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/data",
+      "method": "get",
+      "summary": "Get data",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -129,8 +130,7 @@
             }
           ]
         }
-      ],
-      "summary": "Get data"
+      ]
     }
   ]
 }

@@ -180,6 +180,8 @@ async function main() {
       "models/validation-model",
       "models/metadata-model",
       "models/inline-schemas",
+      // Endpoints fixtures
+      "endpoints/parameter-override",
       // Validation fixture
       "validation",
       // Hooks fixtures (valibot only)
@@ -191,8 +193,6 @@ async function main() {
     // Generate without validator
     consola.info("Generating fixtures (without validator)...");
     for (const fixture of fixtures) {
-      // Skip hooks fixtures for non-validator mode
-      if (fixture.startsWith("hooks/")) continue;
       consola.info(`  - ${fixture}`);
       await generateExpectedForFixture(fixture);
     }

@@ -96,7 +96,7 @@ export async function getPets(
         },
       });
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toEqual(expected);
     });
@@ -125,7 +125,7 @@ export async function getPets(
         responses: [],
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toEqual(`/**
  * @param init - Additional fetch options
@@ -162,7 +162,7 @@ export async function getUsers(
         responses: [],
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toEqual(
         `export const getTest = () => { return 'mocked'; };`,
@@ -196,7 +196,7 @@ export async function getUsers(
         responses: [],
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(calls).toEqual(["hook1", "hook2"]);
       expect(result).toEqual(`/**
@@ -249,7 +249,7 @@ export async function modified1AndMore(
         extensions: { "x-function-name": "listUsers" },
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toEqual(`/**
  * @param init - Additional fetch options
@@ -298,7 +298,7 @@ export async function listUsers(
       };
 
       // hooks なしで呼び出し
-      const result = generateEndpoint(endpoint);
+      const result = generateEndpoint(endpoint, []);
 
       expect(result).toEqual(`/**
  * Get all users
@@ -342,7 +342,7 @@ export async function getUsers(
         extensions: { "x-function-name": "addUser" },
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toContain("export async function addUser");
       expect(result).toContain('method: "POST"');
@@ -358,7 +358,7 @@ export async function getUsers(
         responses: [],
       };
 
-      const result = generateEndpoint(endpoint);
+      const result = generateEndpoint(endpoint, []);
 
       expect(result).toContain("export async function deleteUser");
       expect(result).toContain('method: "DELETE"');
@@ -387,7 +387,7 @@ export async function getUsers(
         extensions: { "x-function-name": "fetchUserById" },
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toContain("export async function fetchUserById");
       expect(result).toContain('path: "/users/{userId}"');
@@ -433,7 +433,7 @@ export async function getUsers(
         extensions: { "x-function-name": "listAllUsers" },
       };
 
-      const result = generateEndpoint(endpoint, hooks);
+      const result = generateEndpoint(endpoint, [], hooks);
 
       expect(result).toEqual(`/**
  * Get all users
@@ -465,7 +465,7 @@ export async function listAllUsers(
         responses: [],
       };
 
-      const result = generateEndpoint(endpoint);
+      const result = generateEndpoint(endpoint, []);
 
       expect(result).toContain("@deprecated");
       expect(result).toContain("export async function getLegacyUsers");

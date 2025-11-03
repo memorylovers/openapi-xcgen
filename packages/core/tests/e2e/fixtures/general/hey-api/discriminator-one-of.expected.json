@@ -8,9 +8,6 @@
       "kind": "union",
       "name": "Foo",
       "referencePath": "#/components/schemas/Foo",
-      "discriminator": {
-        "propertyName": "type"
-      },
       "types": [
         {
           "kind": "ref",
@@ -20,7 +17,10 @@
           "kind": "ref",
           "name": "#/components/schemas/Baz"
         }
-      ]
+      ],
+      "discriminator": {
+        "propertyName": "type"
+      }
     },
     {
       "kind": "allOf",
@@ -95,14 +95,6 @@
       "kind": "union",
       "name": "Quuz",
       "referencePath": "#/components/schemas/Quuz",
-      "discriminator": {
-        "propertyName": "type",
-        "mapping": {
-          "bar": "#/components/schemas/Bar",
-          "baz": "#/components/schemas/Baz",
-          "non-ascii": "#/components/schemas/Spæcial"
-        }
-      },
       "types": [
         {
           "kind": "ref",
@@ -116,14 +108,22 @@
           "kind": "ref",
           "name": "#/components/schemas/Sp%C3%A6cial"
         }
-      ]
+      ],
+      "discriminator": {
+        "propertyName": "type",
+        "mapping": {
+          "bar": "#/components/schemas/Bar",
+          "baz": "#/components/schemas/Baz",
+          "non-ascii": "#/components/schemas/Spæcial"
+        }
+      }
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/foo",
+      "method": "get",
       "tags": [],
       "parameters": [],
       "responses": [

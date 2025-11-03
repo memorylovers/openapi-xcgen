@@ -8,7 +8,7 @@
     {
       "kind": "parameter",
       "name": "GetUsersIdParams",
-      "description": "Parameters for GET /users/{id}",
+      "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams",
       "properties": [
         {
           "name": "id",
@@ -17,12 +17,12 @@
           "required": true
         }
       ],
-      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+      "description": "Parameters for GET /users/{id}"
     },
     {
       "kind": "parameter",
       "name": "GetOrgOrgIdProjectsProjectIdParams",
-      "description": "Parameters for GET /org/{orgId}/projects/{projectId}",
+      "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/GetOrgOrgIdProjectsProjectIdParams",
       "properties": [
         {
           "name": "orgId",
@@ -37,14 +37,15 @@
           "required": true
         }
       ],
-      "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgOrgIdProjectsProjectIdParams"
+      "description": "Parameters for GET /org/{orgId}/projects/{projectId}"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/",
+      "method": "get",
+      "operationId": "root",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -59,12 +60,12 @@
             }
           ]
         }
-      ],
-      "operationId": "root"
+      ]
     },
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "operationId": "users",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -79,16 +80,16 @@
             }
           ]
         }
-      ],
-      "operationId": "users"
+      ]
     },
     {
-      "method": "get",
       "path": "/users/{id}",
+      "method": "get",
+      "operationId": "userById",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -102,16 +103,16 @@
             }
           ]
         }
-      ],
-      "operationId": "userById"
+      ]
     },
     {
-      "method": "get",
       "path": "/org/{orgId}/projects/{projectId}",
+      "method": "get",
+      "operationId": "projectInOrg",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::org::{orgId}::projects::{projectId}/get/parameters/GetOrgOrgIdProjectsProjectIdParams"
+        "name": "#/paths/::org::{orgId}::projects::{projectId}/get/GetOrgOrgIdProjectsProjectIdParams"
       },
       "responses": [
         {
@@ -125,12 +126,12 @@
             }
           ]
         }
-      ],
-      "operationId": "projectInOrg"
+      ]
     },
     {
-      "method": "get",
       "path": "/api-gateway/health_check",
+      "method": "get",
+      "operationId": "healthCheck",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -145,8 +146,7 @@
             }
           ]
         }
-      ],
-      "operationId": "healthCheck"
+      ]
     }
   ]
 }

@@ -46,12 +46,7 @@
             "x-max": 150
           }
         }
-      ],
-      "extensions": {
-        "x-model-extension": "User-model",
-        "x-table-name": "users",
-        "x-primary-key": "id"
-      }
+      ]
     },
     {
       "kind": "object",
@@ -80,11 +75,7 @@
             "x-foreign-key": "users.id"
           }
         }
-      ],
-      "extensions": {
-        "x-model-extension": "Post-model",
-        "x-table-name": "posts"
-      }
+      ]
     },
     {
       "kind": "enum",
@@ -113,7 +104,7 @@
     {
       "kind": "parameter",
       "name": "GetUsersIdParams",
-      "description": "Parameters for GET /users/{id}",
+      "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams",
       "properties": [
         {
           "name": "id",
@@ -138,26 +129,39 @@
           }
         }
       ],
-      "referencePath": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+      "description": "Parameters for GET /users/{id}"
     },
     {
       "kind": "requestBody",
       "name": "PostPostsRequestBody",
-      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBody",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema",
       "properties": [
         {
           "name": "title",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "title-field",
+            "x-min-length": 1,
+            "x-max-length": 200
+          }
         },
         {
           "name": "content",
-          "type": "string"
+          "type": "string",
+          "extensions": {
+            "x-property-extension": "content-field",
+            "x-format": "markdown"
+          }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags"
+            "name": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags"
+          },
+          "extensions": {
+            "x-property-extension": "tags-field",
+            "x-max-items": 10
           }
         }
       ],
@@ -166,19 +170,21 @@
     {
       "kind": "array",
       "name": "PostPostsRequestBodyTags",
-      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags",
       "itemType": "string"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users/{id}",
+      "method": "get",
+      "operationId": "getUser",
+      "summary": "Get user by ID",
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/parameters/GetUsersIdParams"
+        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -201,8 +207,6 @@
           "description": "User not found"
         }
       ],
-      "operationId": "getUser",
-      "summary": "Get user by ID",
       "extensions": {
         "x-path-item-extension": "Path Item Level",
         "x-path-custom": true,
@@ -211,10 +215,25 @@
       }
     },
     {
-      "method": "post",
       "path": "/posts",
+      "method": "post",
+      "operationId": "createPost",
+      "summary": "Create a new post",
       "tags": [],
       "parameters": [],
+      "requestBody": {
+        "kind": "content",
+        "content": [
+          {
+            "mimeType": "application/json",
+            "schema": {
+              "kind": "ref",
+              "name": "#/paths/::posts/post/requestBody/content/application::json/schema"
+            }
+          }
+        ],
+        "required": true
+      },
       "responses": [
         {
           "kind": "content",
@@ -231,21 +250,6 @@
           ]
         }
       ],
-      "operationId": "createPost",
-      "summary": "Create a new post",
-      "requestBody": {
-        "kind": "content",
-        "content": [
-          {
-            "mimeType": "application/json",
-            "schema": {
-              "kind": "ref",
-              "name": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBody"
-            }
-          }
-        ],
-        "required": true
-      },
       "extensions": {
         "x-auth-required": true,
         "x-scopes": [

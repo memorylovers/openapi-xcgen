@@ -8,7 +8,7 @@
     {
       "kind": "response",
       "name": "GetHealth200Response",
-      "referencePath": "#/paths/::health/get/responses/200/content/application::json/schema/GetHealth200Response",
+      "referencePath": "#/paths/::health/get/responses/200/content/application::json/schema",
       "properties": [
         {
           "name": "status",
@@ -21,8 +21,10 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/health",
+      "method": "get",
+      "operationId": "getHealth",
+      "summary": "Health check endpoint",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -35,14 +37,12 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::health/get/responses/200/content/application::json/schema/GetHealth200Response"
+                "name": "#/paths/::health/get/responses/200/content/application::json/schema"
               }
             }
           ]
         }
-      ],
-      "operationId": "getHealth",
-      "summary": "Health check endpoint"
+      ]
     }
   ],
   "servers": [

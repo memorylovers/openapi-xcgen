@@ -23,14 +23,14 @@ export type {
 // Helper functions
 export { extractValidation, generateEnumName, toIRScalarType } from "./helpers";
 
-// Visitor functions
+// v2 Transformer functions (public API)
 export {
-  visitComponents,
-  visitEnum,
-  visitObject,
-  visitSchema,
-  visitType,
-  type ComponentsResult,
-  type ObjectVisitorResult,
-  type SchemaVisitorResult,
-} from "./visitors";
+  transformComponents,
+  transformEnum,
+  transformMetadata,
+  transformObject,
+  transformTags,
+  dispatchSchema,
+  type ComponentsTransformResult,
+  type TransformResult,
+} from "./transformers";

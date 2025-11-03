@@ -27,28 +27,16 @@
             }
           }
         }
-      ],
-      "extensions": {
-        "x-string": "model extension",
-        "x-number": 999,
-        "x-boolean": false,
-        "x-null": null,
-        "x-array": [
-          "a",
-          "b",
-          "c"
-        ],
-        "x-object": {
-          "nested": "value"
-        }
-      }
+      ]
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/test",
+      "method": "get",
+      "operationId": "testExtensionTypes",
+      "summary": "Test various extension value types",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -58,8 +46,6 @@
           "description": "Success"
         }
       ],
-      "operationId": "testExtensionTypes",
-      "summary": "Test various extension value types",
       "extensions": {
         "x-string-extension": "simple string",
         "x-string-empty": "",

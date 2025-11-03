@@ -78,7 +78,7 @@
     {
       "kind": "array",
       "name": "GetUsers200Response",
-      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response",
+      "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
         "name": "#/components/schemas/User"
@@ -87,7 +87,7 @@
     {
       "kind": "parameter",
       "name": "GetUsersUserIdParams",
-      "description": "Parameters for GET /users/{userId}",
+      "referencePath": "#/paths/::users::{userId}/get/GetUsersUserIdParams",
       "properties": [
         {
           "name": "userId",
@@ -96,14 +96,16 @@
           "required": true
         }
       ],
-      "referencePath": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
+      "description": "Parameters for GET /users/{userId}"
     }
   ],
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "operationId": "listUsers",
+      "summary": "List all users",
       "tags": [
         "users"
       ],
@@ -118,24 +120,24 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::users/get/responses/200/content/application::json/schema/GetUsers200Response"
+                "name": "#/paths/::users/get/responses/200/content/application::json/schema"
               }
             }
           ]
         }
-      ],
-      "operationId": "listUsers",
-      "summary": "List all users"
+      ]
     },
     {
-      "method": "get",
       "path": "/users/{userId}",
+      "method": "get",
+      "operationId": "getUser",
+      "summary": "Get user by ID",
       "tags": [
         "users"
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/get/parameters/GetUsersUserIdParams"
+        "name": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
       },
       "responses": [
         {
@@ -152,13 +154,13 @@
             }
           ]
         }
-      ],
-      "operationId": "getUser",
-      "summary": "Get user by ID"
+      ]
     },
     {
-      "method": "get",
       "path": "/posts",
+      "method": "get",
+      "operationId": "listPosts",
+      "summary": "List all posts",
       "tags": [
         "posts"
       ],
@@ -169,26 +171,17 @@
           "statusCode": "200",
           "description": "List of posts"
         }
-      ],
-      "operationId": "listPosts",
-      "summary": "List all posts"
+      ]
     },
     {
-      "method": "post",
       "path": "/posts",
+      "method": "post",
+      "operationId": "createPost",
+      "summary": "Create a new post",
       "tags": [
         "posts"
       ],
       "parameters": [],
-      "responses": [
-        {
-          "kind": "content",
-          "statusCode": "201",
-          "description": "Post created"
-        }
-      ],
-      "operationId": "createPost",
-      "summary": "Create a new post",
       "requestBody": {
         "kind": "content",
         "content": [
@@ -201,11 +194,20 @@
           }
         ],
         "required": true
-      }
+      },
+      "responses": [
+        {
+          "kind": "content",
+          "statusCode": "201",
+          "description": "Post created"
+        }
+      ]
     },
     {
-      "method": "get",
       "path": "/admin/settings",
+      "method": "get",
+      "operationId": "getSettings",
+      "summary": "Get admin settings",
       "tags": [
         "admin"
       ],
@@ -216,13 +218,13 @@
           "statusCode": "200",
           "description": "Settings retrieved"
         }
-      ],
-      "operationId": "getSettings",
-      "summary": "Get admin settings"
+      ]
     },
     {
-      "method": "get",
       "path": "/health",
+      "method": "get",
+      "operationId": "healthCheck",
+      "summary": "Health check endpoint",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -231,9 +233,7 @@
           "statusCode": "200",
           "description": "Service is healthy"
         }
-      ],
-      "operationId": "healthCheck",
-      "summary": "Health check endpoint"
+      ]
     }
   ]
 }

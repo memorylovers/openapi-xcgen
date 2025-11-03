@@ -1,0 +1,83 @@
+openapi: 3.0.0
+info:
+  title: Parameter Override Test API
+  version: 1.0.0
+  description: Test PathItem-level parameters being overridden by Operation-level parameters
+
+paths:
+  /pets/{id}:
+    # PathItem-level parameter (string型)
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Pet ID (PathItem level - string)
+
+    get:
+      operationId: getPet
+      summary: Get pet by ID
+      description: Operation-level parameter overrides PathItem-level parameter
+      # Operation-level parameter (integer型) - これが優先される
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Pet ID (Operation level - integer, overrides PathItem)
+      responses:
+        '200':
+          description: Pet found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+        '404':
+          description: Pet not found
+
+  /users/{userId}:
+    # PathItem-level parameter
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: User ID (PathItem level)
+      - name: format
+        in: query
+        schema:
+          type: string
+          enum: [json, xml]
+        description: Response format (PathItem level)
+
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      # Operation-level で format のみ上書き、userId は PathItem から継承
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, xml, yaml]  # yaml追加（Operation側で拡張）
+          description: Response format (Operation level - extended)
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string

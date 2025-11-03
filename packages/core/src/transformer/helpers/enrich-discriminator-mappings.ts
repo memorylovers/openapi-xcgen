@@ -43,6 +43,8 @@ export function enrichDiscriminatorMappings(ir: XcgenIR): void {
       !model.discriminator.mapping
     ) {
       const mapping: Record<string, string> = {};
+      // 型の絞り込みを保持するため、変数に保存
+      const discriminatorPropertyName = model.discriminator.propertyName;
 
       for (const type of model.types) {
         if (typeof type !== "string" && type.kind === "ref") {
@@ -55,8 +57,7 @@ export function enrichDiscriminatorMappings(ir: XcgenIR): void {
           ) {
             // Find discriminator property
             const prop = refModel.properties.find(
-              (p) =>
-                p.name === (model as IRUnionModel).discriminator!.propertyName,
+              (p) => p.name === discriminatorPropertyName,
             );
 
             // Extract const value from validation

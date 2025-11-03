@@ -8,8 +8,9 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/health",
+      "method": "get",
+      "operationId": "health",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -24,12 +25,12 @@
             }
           ]
         }
-      ],
-      "operationId": "health"
+      ]
     },
     {
-      "method": "get",
       "path": "/version",
+      "method": "get",
+      "operationId": "version",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -44,12 +45,12 @@
             }
           ]
         }
-      ],
-      "operationId": "version"
+      ]
     },
     {
-      "method": "get",
       "path": "/ping",
+      "method": "get",
+      "operationId": "ping",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -64,8 +65,7 @@
             }
           ]
         }
-      ],
-      "operationId": "ping"
+      ]
     }
   ]
 }

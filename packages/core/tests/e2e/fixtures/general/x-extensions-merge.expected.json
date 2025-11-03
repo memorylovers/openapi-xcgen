@@ -8,7 +8,7 @@
     {
       "kind": "response",
       "name": "GetItemsId200Response",
-      "referencePath": "#/paths/::items::{id}/get/responses/200/content/application::json/schema/GetItemsId200Response",
+      "referencePath": "#/paths/::items::{id}/get/responses/200/content/application::json/schema",
       "properties": [
         {
           "name": "id",
@@ -25,8 +25,10 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/items/{id}",
+      "method": "get",
+      "operationId": "getItem",
+      "summary": "Get item by ID",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -39,14 +41,12 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::items::{id}/get/responses/200/content/application::json/schema/GetItemsId200Response"
+                "name": "#/paths/::items::{id}/get/responses/200/content/application::json/schema"
               }
             }
           ]
         }
       ],
-      "operationId": "getItem",
-      "summary": "Get item by ID",
       "extensions": {
         "x-shared-extension": "path-item-value",
         "x-priority-test": "operation-priority",
@@ -56,8 +56,10 @@
       }
     },
     {
-      "method": "put",
       "path": "/items/{id}",
+      "method": "put",
+      "operationId": "updateItem",
+      "summary": "Update item",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -67,8 +69,6 @@
           "description": "Item updated"
         }
       ],
-      "operationId": "updateItem",
-      "summary": "Update item",
       "extensions": {
         "x-shared-extension": "path-item-value",
         "x-priority-test": "path-item-priority",
@@ -77,8 +77,10 @@
       }
     },
     {
-      "method": "post",
       "path": "/products",
+      "method": "post",
+      "operationId": "createProduct",
+      "summary": "Create product",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -88,8 +90,6 @@
           "description": "Product created"
         }
       ],
-      "operationId": "createProduct",
-      "summary": "Create product",
       "extensions": {
         "x-object-extension": {
           "nested": {
@@ -110,8 +110,10 @@
       }
     },
     {
-      "method": "get",
       "path": "/metadata",
+      "method": "get",
+      "operationId": "getMetadata",
+      "summary": "Get metadata",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -121,8 +123,6 @@
           "description": "Metadata retrieved"
         }
       ],
-      "operationId": "getMetadata",
-      "summary": "Get metadata",
       "extensions": {
         "x-path-metadata": "metadata-value"
       }

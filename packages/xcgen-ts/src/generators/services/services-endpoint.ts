@@ -2,7 +2,7 @@
  * API関数生成
  */
 
-import type { IREndpoint } from "@openapi-xcgen/core";
+import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
 import { toFunctionName } from "../../helpers/naming";
 import type { HookableInstance, TsCodeEndpoint } from "../../hooks";
 import { getResponseType } from "./services-response-type";
@@ -11,11 +11,13 @@ import { getEndpointDataTypes } from "./services-data-types";
 /**
  * IREndpointからAPI関数を生成
  * @param endpoint - IRエンドポイント
+ * @param models - IRモデルリスト（型名解決用）
  * @param hooks - Hook instance（オプション）
  * @returns TypeScript関数コード（null: 生成スキップ）
  */
 export function generateEndpoint(
   endpoint: IREndpoint,
+  models: readonly IRModel[],
   hooks?: HookableInstance,
 ): string | null {
   if (!endpoint.operationId) {
@@ -24,14 +26,14 @@ export function generateEndpoint(
 
   // 1. 関数コードを生成
   const functionName = toFunctionName(endpoint.operationId);
-  const functionCode = generateFunctionCode(endpoint, functionName);
+  const functionCode = generateFunctionCode(endpoint, functionName, models);
 
   // 2. TsCodeEndpoint を初期化（Hookが変更可能）
   const tsCode: TsCodeEndpoint = {
     functionName,
     code: functionCode,
     imports: [],
-    comment: generateJSDocComment(endpoint),
+    comment: generateJSDocComment(endpoint, models),
   };
 
   // 3. endpoint:generate Hook を呼び出し
@@ -58,10 +60,13 @@ export function generateEndpoint(
 /**
  * JSDocコメントを生成
  */
-function generateJSDocComment(endpoint: IREndpoint): string {
+function generateJSDocComment(
+  endpoint: IREndpoint,
+  models: readonly IRModel[],
+): string {
   const lines: string[] = [];
-  const dataTypes = getEndpointDataTypes(endpoint);
-  const responseType = getResponseType(endpoint);
+  const dataTypes = getEndpointDataTypes(endpoint, models);
+  const responseType = getResponseType(endpoint, models);
 
   if (endpoint.summary) {
     lines.push(endpoint.summary);
@@ -93,10 +98,11 @@ function generateJSDocComment(endpoint: IREndpoint): string {
 function generateFunctionCode(
   endpoint: IREndpoint,
   functionName: string,
+  models: readonly IRModel[],
 ): string {
   const lines: string[] = [];
-  const dataTypes = getEndpointDataTypes(endpoint);
-  const responseType = getResponseType(endpoint);
+  const dataTypes = getEndpointDataTypes(endpoint, models);
+  const responseType = getResponseType(endpoint, models);
 
   // JSDocコメント
   lines.push("/**");
@@ -166,6 +172,16 @@ if (import.meta.vitest) {
   describe("services-endpoint", () => {
     describe("generateEndpoint", () => {
       it("should generate function with operationId", () => {
+        const models: IRModel[] = [
+          {
+            kind: "array",
+            name: "GetUsers200Response",
+            referencePath:
+              "#/paths/::users/get/responses/200/content/application::json/schema",
+            itemType: { kind: "ref", name: "#/components/schemas/User" },
+          },
+        ];
+
         const endpoint: IREndpoint = {
           path: "/users",
           method: "get",
@@ -183,7 +199,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::users/get/responses/200/GetUsers200Response",
+                    name: "#/paths/::users/get/responses/200/content/application::json/schema",
                   },
                 },
               ],
@@ -191,7 +207,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateEndpoint(endpoint);
+        const result = generateEndpoint(endpoint, models);
 
         expect(result).toEqual(
           `
@@ -224,7 +240,7 @@ export async function getUsers(
           responses: [],
         };
 
-        const result = generateEndpoint(endpoint);
+        const result = generateEndpoint(endpoint, []);
 
         expect(result).toBeNull();
       });
@@ -245,7 +261,7 @@ export async function getUsers(
           ],
         };
 
-        const result = generateEndpoint(endpoint);
+        const result = generateEndpoint(endpoint, []);
 
         expect(result).toEqual(
           `

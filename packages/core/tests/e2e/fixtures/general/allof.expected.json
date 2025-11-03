@@ -79,7 +79,6 @@
       "kind": "allOf",
       "name": "AuditableUser",
       "referencePath": "#/components/schemas/AuditableUser",
-      "description": "User with audit timestamps",
       "schemas": [
         {
           "kind": "ref",
@@ -93,7 +92,8 @@
           "kind": "ref",
           "name": "#/components/schemas/AuditableUserAllOf2"
         }
-      ]
+      ],
+      "description": "User with audit timestamps"
     },
     {
       "kind": "object",
@@ -134,8 +134,10 @@
   "tags": [],
   "endpoints": [
     {
-      "method": "get",
       "path": "/users",
+      "method": "get",
+      "operationId": "getUsers",
+      "summary": "Get users",
       "tags": [],
       "parameters": [],
       "responses": [
@@ -153,9 +155,7 @@
             }
           ]
         }
-      ],
-      "operationId": "getUsers",
-      "summary": "Get users"
+      ]
     }
   ]
 }
