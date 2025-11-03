@@ -1,11 +1,11 @@
 /**
  * OneOf Transformer - v2 Transformer Architecture
  *
- * oneOfスキーマをIRUnionModelに変換します。
+ * oneOfスキーマをIRUnionSchemaに変換します。
  * トラバーサル（各サブスキーマ訪問）は composition-traverser に委譲します。
  */
 
-import type { IRUnionModel, SchemaObject } from "../../../types";
+import type { IRUnionSchema, SchemaObject } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
@@ -21,7 +21,7 @@ interface DiscriminatorObject {
 }
 
 /**
- * oneOfスキーマをIRUnionModelに変換
+ * oneOfスキーマをIRUnionSchemaに変換
  *
  * @param schema - oneOfスキーマ
  * @param context - Visitorコンテキスト
@@ -77,8 +77,8 @@ export function transformOneOf(
     }
   ).discriminator;
 
-  // IRUnionModelを作成
-  const unionModel: IRUnionModel = {
+  // IRUnionSchemaを作成
+  const unionModel: IRUnionSchema = {
     kind: "union",
     name,
     referencePath,

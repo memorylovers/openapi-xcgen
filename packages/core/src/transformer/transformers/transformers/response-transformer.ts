@@ -129,7 +129,7 @@ export function transformResponse(
 }
 
 /**
- * インラインobjectスキーマからIRResponseModelを生成
+ * インラインobjectスキーマからIRResponseComponentを生成
  *
  * 3層アーキテクチャに準拠: SchemaObject と PropertyTraversalResult を受け取り、
  * TransformResult を返します。
@@ -157,7 +157,7 @@ export function transformResponse(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  type IRModel = import("../../../types").IRModel;
+  type IRComponent = import("../../../types").IRComponent;
 
   describe("transformResponse", () => {
     it("should handle reference response", () => {
@@ -334,14 +334,14 @@ if (import.meta.vitest) {
         rootSegment: "paths",
       };
 
-      const mockContentModel: IRModel = {
+      const mockContentModel: IRComponent = {
         kind: "object",
         name: "ContentModel",
         referencePath: "#/content",
         properties: [],
       };
 
-      const mockHeaderModel: IRModel = {
+      const mockHeaderModel: IRComponent = {
         kind: "object",
         name: "HeaderModel",
         referencePath: "#/header",

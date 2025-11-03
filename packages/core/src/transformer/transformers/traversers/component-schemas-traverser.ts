@@ -8,7 +8,7 @@
 import { consola } from "consola";
 import { buildComponentSchemaPath } from "../../helpers";
 import type {
-  IRModel,
+  IRComponent,
   ReferenceObject,
   SchemaObject,
   SchemaObjectWithNullable,
@@ -22,14 +22,14 @@ import type { TransformContext } from "../context";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable,
   context: TransformContext,
-) => { type: unknown; models: IRModel[] };
+) => { type: unknown; models: IRComponent[] };
 
 /**
  * ComponentSchemas走査結果
  */
 export interface ComponentSchemasTraversalResult {
   /** 抽出されたモデル */
-  models: IRModel[];
+  models: IRComponent[];
 }
 
 /**
@@ -59,7 +59,7 @@ export function traverseComponentSchemas(
   context: TransformContext,
   visitSchema: VisitSchemaFn,
 ): ComponentSchemasTraversalResult {
-  const models: IRModel[] = [];
+  const models: IRComponent[] = [];
 
   for (const [name, schema] of Object.entries(schemas)) {
     // null/undefinedチェック

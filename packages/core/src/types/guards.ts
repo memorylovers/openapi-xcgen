@@ -12,8 +12,8 @@ import type {
 } from "../transformer/types";
 import type {
   ArraySchemaObject,
-  IRAllOfModel,
-  IRModel,
+  IRAllOfSchema,
+  IRComponent,
   NonArraySchemaObject,
   ReferenceObject,
   SchemaObject,
@@ -32,9 +32,9 @@ export function isReferenceObject(obj: unknown): obj is ReferenceObject {
 }
 
 /**
- * IRModelがIRAllOfModelかどうかを判定
+ * IRComponentがIRAllOfSchemaかどうかを判定
  */
-export function isIRAllOfModel(model: IRModel): model is IRAllOfModel {
+export function isIRAllOfModel(model: IRComponent): model is IRAllOfSchema {
   return model.kind === "allOf";
 }
 
@@ -281,7 +281,7 @@ if (import.meta.vitest) {
 
     describe("isIRAllOfModel", () => {
       it("should identify allOf model", () => {
-        const allOfModel: IRModel = {
+        const allOfModel: IRComponent = {
           kind: "allOf",
           name: "Extended",
           referencePath: "#/components/schemas/Extended",
@@ -291,7 +291,7 @@ if (import.meta.vitest) {
       });
 
       it("should return false for other model types", () => {
-        const objectModel: IRModel = {
+        const objectModel: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -299,7 +299,7 @@ if (import.meta.vitest) {
         };
         expect(isIRAllOfModel(objectModel)).toBe(false);
 
-        const enumModel: IRModel = {
+        const enumModel: IRComponent = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",

@@ -9,7 +9,7 @@ import { consola } from "consola";
 import type {
   IREndpoint,
   IRHttpMethod,
-  IRModel,
+  IRComponent,
   ParameterObject,
   PathsObject,
 } from "../../../types";
@@ -23,7 +23,7 @@ export interface PathsTransformResult {
   /** 抽出されたエンドポイントの配列 */
   endpoints: IREndpoint[];
   /** 抽出されたモデルの配列 */
-  models: IRModel[];
+  models: IRComponent[];
 }
 
 /**
@@ -72,7 +72,7 @@ export function transformPaths(
   rootContext: VisitorContext,
 ): PathsTransformResult {
   const endpoints: IREndpoint[] = [];
-  const models: IRModel[] = [];
+  const models: IRComponent[] = [];
 
   // 各パステンプレートを処理
   for (const [pathTemplate, pathItem] of Object.entries(paths)) {

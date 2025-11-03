@@ -1,11 +1,11 @@
 /**
  * Map Transformer - v2 Transformer Architecture
  *
- * Map型スキーマ（additionalPropertiesのみ）をIRMapModelに変換します。
+ * Map型スキーマ（additionalPropertiesのみ）をIRMapSchemaに変換します。
  * トラバーサル（値訪問）は map-traverser に委譲します。
  */
 
-import type { IRMapModel, SchemaObject } from "../../../types";
+import type { IRMapSchema, SchemaObject } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
@@ -15,7 +15,7 @@ import type {
 } from "../types";
 
 /**
- * Map型スキーマをIRMapModelに変換
+ * Map型スキーマをIRMapSchemaに変換
  *
  * @param schema - Mapスキーマ
  * @param context - Visitorコンテキスト
@@ -48,8 +48,8 @@ export function transformMap(
     );
   }
 
-  // IRMapModelを作成
-  const mapModel: IRMapModel = {
+  // IRMapSchemaを作成
+  const mapModel: IRMapSchema = {
     kind: "map",
     name,
     referencePath,

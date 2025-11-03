@@ -8,7 +8,7 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
+  IRComponent,
   IRType,
   ReferenceObject,
   SchemaObject,
@@ -24,7 +24,7 @@ import type { HeadersTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRModel[] };
+) => { type: IRType | null; models: IRComponent[] };
 
 /**
  * HeaderObject型（OpenAPI 3.x）
@@ -79,7 +79,7 @@ export function traverseHeaders(
   }
 
   const visitedHeaders: HeadersTraversalResult["headers"] = [];
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
 
   // 各ヘッダーを訪問
   Object.entries(headers).forEach(([headerName, headerObject]) => {
@@ -378,7 +378,7 @@ if (import.meta.vitest) {
     });
 
     it("should collect child models from schema resolution", () => {
-      const mockModel: IRModel = {
+      const mockModel: IRComponent = {
         kind: "object",
         name: "HeaderModel",
         referencePath: "#/test",

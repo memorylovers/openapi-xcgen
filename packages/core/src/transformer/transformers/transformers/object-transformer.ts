@@ -1,11 +1,11 @@
 /**
  * Object Transformer - v2 Transformer Architecture
  *
- * ObjectスキーマをIRObjectModelに変換します。
+ * ObjectスキーマをIRObjectSchemaに変換します。
  * トラバーサル（properties/additionalProperties訪問）は object-traverser に委譲します。
  */
 
-import type { IRObjectModel, IRProperty, SchemaObject } from "../../../types";
+import type { IRObjectSchema, IRProperty, SchemaObject } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import type {
@@ -15,7 +15,7 @@ import type {
 } from "../types";
 
 /**
- * ObjectスキーマをIRObjectModelに変換
+ * ObjectスキーマをIRObjectSchemaに変換
  *
  * @param schema - Objectスキーマ
  * @param context - Visitorコンテキスト
@@ -85,8 +85,8 @@ export function transformObject(
     ...(additionalPropertiesResult?.models || []),
   ];
 
-  // IRObjectModelを作成
-  const objectModel: IRObjectModel = {
+  // IRObjectSchemaを作成
+  const objectModel: IRObjectSchema = {
     kind: "object",
     name,
     referencePath,

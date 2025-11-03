@@ -11,7 +11,7 @@
 import { consola } from "consola";
 import type {
   ComponentsObject,
-  IRModel,
+  IRComponent,
   IRRequestBody,
   IRResponse,
   IRSecurityScheme,
@@ -34,7 +34,7 @@ import { transformSecuritySchemes } from "./security-schemes-transformer";
  */
 export interface ComponentsTransformResult {
   /** 抽出されたモデル（オブジェクト、列挙型、配列、マップを統一的に管理） */
-  models: IRModel[];
+  models: IRComponent[];
   /** セキュリティスキーム定義 */
   securitySchemes?: Record<string, IRSecurityScheme>;
   /** 共通レスポンス定義 */

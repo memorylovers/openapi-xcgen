@@ -8,7 +8,7 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
+  IRComponent,
   IRParameter,
   ParameterObject,
   ReferenceObject,
@@ -52,7 +52,7 @@ export function traverseParameters(
   }
 
   const visitedParameters: ParametersTraversalResult["parameters"] = [];
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
 
   // 各パラメータを訪問
   parameters.forEach((param, index) => {

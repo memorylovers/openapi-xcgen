@@ -7,7 +7,7 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
+  IRComponent,
   IRType,
   OperationObject,
   ParameterObject,
@@ -29,7 +29,7 @@ import { traverseResponses } from "./responses-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRModel[] };
+) => { type: IRType | null; models: IRComponent[] };
 
 /**
  * OperationObjectを訪問し、parameters、requestBody、responsesを処理
@@ -69,7 +69,7 @@ export function traverseOperation(
     `Traversing operation at: ${buildReferencePath(context.documentPath)}`,
   );
 
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
 
   // 1. parametersを処理（PathItemとOperationレベルをマージ）
   // PathItem レベルのパラメータ（$ref は警告してスキップ）

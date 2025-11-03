@@ -146,7 +146,7 @@ export function dispatchSchema(
       dispatchSchema,
     );
 
-    // requestBody文脈の場合、TransformerにIRRequestBodyModel生成を委譲
+    // requestBody文脈の場合、TransformerにIRRequestBodyComponent生成を委譲
     if (
       context.kind === "requestBody" ||
       context.kind === "componentsRequestBody"
@@ -159,7 +159,7 @@ export function dispatchSchema(
       );
     }
 
-    // response文脈の場合、TransformerにIRResponseModel生成を委譲
+    // response文脈の場合、TransformerにIRResponseComponent生成を委譲
     if (context.kind === "response" || context.kind === "componentsResponse") {
       return transformResponseObject(
         schema as SchemaObject,
@@ -422,7 +422,7 @@ if (import.meta.vitest) {
       expect(result.models[0].kind).toBe("object");
     });
 
-    it("should dispatch object in requestBody context to IRRequestBodyModel", () => {
+    it("should dispatch object in requestBody context to IRRequestBodyComponent", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -459,7 +459,7 @@ if (import.meta.vitest) {
       }
     });
 
-    it("should dispatch object in componentsRequestBody context to IRRequestBodyModel", () => {
+    it("should dispatch object in componentsRequestBody context to IRRequestBodyComponent", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -485,7 +485,7 @@ if (import.meta.vitest) {
       expect(result.models[0].kind).toBe("requestBody");
     });
 
-    it("should dispatch object in response context to IRResponseModel", () => {
+    it("should dispatch object in response context to IRResponseComponent", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -524,7 +524,7 @@ if (import.meta.vitest) {
       }
     });
 
-    it("should dispatch object in componentsResponse context to IRResponseModel", () => {
+    it("should dispatch object in componentsResponse context to IRResponseComponent", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {

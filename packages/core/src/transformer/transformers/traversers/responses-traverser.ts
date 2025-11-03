@@ -7,7 +7,7 @@
  */
 
 import type {
-  IRModel,
+  IRComponent,
   IRType,
   ReferenceObject,
   ResponseObject,
@@ -28,7 +28,7 @@ import { traverseHeaders } from "./headers-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRModel[] };
+) => { type: IRType | null; models: IRComponent[] };
 
 /**
  * responsesフィールド（ステータスコードとResponseObjectのマップ）を訪問
@@ -69,7 +69,7 @@ export function traverseResponses(
   }
 
   const visitedResponses: ResponsesTraversalResult["responses"] = [];
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
 
   // 各ステータスコードのレスポンスを訪問
   Object.entries(responses).forEach(([statusCode, response]) => {
@@ -380,14 +380,14 @@ if (import.meta.vitest) {
     });
 
     it("should collect child models from content and headers", () => {
-      const mockContentModel: IRModel = {
+      const mockContentModel: IRComponent = {
         kind: "object",
         name: "ContentModel",
         referencePath: "#/content",
         properties: [],
       };
 
-      const mockHeaderModel: IRModel = {
+      const mockHeaderModel: IRComponent = {
         kind: "object",
         name: "HeaderModel",
         referencePath: "#/header",

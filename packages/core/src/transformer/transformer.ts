@@ -15,7 +15,7 @@ import type {
   ComponentsObject,
   IREndpoint,
   IRMetadata,
-  IRModel,
+  IRComponent,
   IRRequestBody,
   IRResponse,
   IRSecurityRequirement,
@@ -70,7 +70,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   }
 
   // Components処理（schemas, securitySchemes, responses, requestBodies）
-  let models: IRModel[] = [];
+  let models: IRComponent[] = [];
   let securitySchemes: Record<string, IRSecurityScheme> | undefined;
   let commonResponses: Record<string, IRResponse> | undefined;
   let commonRequestBodies: Record<string, IRRequestBody> | undefined;

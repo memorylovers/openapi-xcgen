@@ -8,7 +8,7 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
+  IRComponent,
   IRType,
   MimeType,
   ReferenceObject,
@@ -31,7 +31,7 @@ import type { ContentTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRModel[] };
+) => { type: IRType | null; models: IRComponent[] };
 
 /**
  * contentフィールド（MIMEタイプとMediaTypeObjectのマップ）を訪問
@@ -79,7 +79,7 @@ export function traverseContent(
   }
 
   const visitedContent: ContentTraversalResult["content"] = [];
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
   let hasInlineObject = false;
 
   // 各MIMEタイプを訪問
@@ -391,7 +391,7 @@ if (import.meta.vitest) {
     });
 
     it("should collect child models from schema resolution", () => {
-      const mockModel: IRModel = {
+      const mockModel: IRComponent = {
         kind: "object",
         name: "NestedModel",
         referencePath: "#/test",

@@ -1,13 +1,13 @@
 /**
  * Response Object Transformer - v2 Transformer Architecture
  *
- * Inline Response ObjectをIRResponseModelに変換します。
+ * Inline Response ObjectをIRResponseComponentに変換します。
  */
 
 import type {
-  IRModel,
+  IRComponent,
   IRProperty,
-  IRResponseModel,
+  IRResponseComponent,
   SchemaObject,
 } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
@@ -19,7 +19,7 @@ import type {
 } from "../types";
 
 /**
- * Inline Response ObjectをIRResponseModelに変換
+ * Inline Response ObjectをIRResponseComponentに変換
  *
  * @param schema - SchemaObject (inline object)
  * @param context - Visitorコンテキスト
@@ -101,7 +101,7 @@ export function transformResponseObject(
     ...(additionalPropertiesResult?.models || []),
   ];
 
-  // IRResponseModelを作成
+  // IRResponseComponentを作成
   // contextからheadersを取得（ResponseContextの場合）
   const contextHeaders =
     (context.kind === "response" || context.kind === "componentsResponse") &&
@@ -111,7 +111,7 @@ export function transformResponseObject(
       ? context.headers
       : undefined;
 
-  const responseModel: IRResponseModel = {
+  const responseModel: IRResponseComponent = {
     kind: "response",
     name,
     referencePath,
@@ -141,7 +141,7 @@ if (import.meta.vitest) {
   type IRType = import("../../../types").IRType;
 
   describe("transformResponseObject", () => {
-    it("should create IRResponseModel from schema and traversal result", () => {
+    it("should create IRResponseComponent from schema and traversal result", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -249,7 +249,7 @@ if (import.meta.vitest) {
       });
     });
 
-    it("should include headers in IRResponseModel when provided in context", () => {
+    it("should include headers in IRResponseComponent when provided in context", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -381,7 +381,7 @@ if (import.meta.vitest) {
         rootSegment: "paths",
       };
 
-      const mockChildModel: IRModel = {
+      const mockChildModel: IRComponent = {
         kind: "object",
         name: "NestedModel",
         referencePath: "#/nested",

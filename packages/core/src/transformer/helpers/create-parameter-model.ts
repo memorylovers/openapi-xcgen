@@ -1,7 +1,7 @@
 /**
  * create-parameter-model.ts - パラメータの統合モデル生成
  *
- * 複数のパラメータを1つのIRModelにまとめる。
+ * 複数のパラメータを1つのIRComponentにまとめる。
  * パラメータがある場合に、GetUsersParamsのような統合モデルを生成する。
  *
  * 責務:
@@ -13,7 +13,7 @@
 import { pascalCase } from "es-toolkit/string";
 import type {
   IRParameter,
-  IRParameterModel,
+  IRParameterComponent,
   IRParameterProperty,
 } from "../../types";
 import { buildReferencePath } from "./path/build-reference-path";
@@ -48,7 +48,7 @@ export function createParameterModel(
   pathTemplate: string,
   method: string,
   documentPath: string[],
-): IRParameterModel | null {
+): IRParameterComponent | null {
   // パラメータがない場合はnull
   if (parameters.length === 0) {
     return null;
@@ -72,7 +72,7 @@ export function createParameterModel(
       : `Parameters for ${method.toUpperCase()} ${pathTemplate}`;
 
   // 統合モデルを生成
-  const model: IRParameterModel = {
+  const model: IRParameterComponent = {
     kind: "parameter",
     name: componentName,
     description,

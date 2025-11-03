@@ -14,7 +14,7 @@ import type { IRServer, ServerObject } from "../../../types";
  * Servers変換の結果
  *
  * 統一インターフェースとは異なり、serversはIRServerの配列を直接返します。
- * （IRTypeやIRModelとは性質が異なるため）
+ * （IRTypeやIRComponentとは性質が異なるため）
  */
 export interface ServersTransformResult {
   /** 変換されたサーバー定義の配列 */

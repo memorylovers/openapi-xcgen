@@ -1,18 +1,18 @@
 /**
  * AnyOf Transformer - v2 Transformer Architecture
  *
- * anyOfスキーマをIRAnyOfModelに変換します。
+ * anyOfスキーマをIRAnyOfSchemaに変換します。
  * トラバーサル（各サブスキーマ訪問）は composition-traverser に委譲します。
  */
 
-import type { IRAnyOfModel, SchemaObject } from "../../../types";
+import type { IRAnyOfSchema, SchemaObject } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
 import type { CompositionTraversalResult, TransformResult } from "../types";
 
 /**
- * anyOfスキーマをIRAnyOfModelに変換
+ * anyOfスキーマをIRAnyOfSchemaに変換
  *
  * @param schema - anyOfスキーマ
  * @param context - Visitorコンテキスト
@@ -59,8 +59,8 @@ export function transformAnyOf(
   // nullを除外した型配列
   const schemas = traversalResult.schemas.filter((type) => type !== "null");
 
-  // IRAnyOfModelを作成
-  const anyOfModel: IRAnyOfModel = {
+  // IRAnyOfSchemaを作成
+  const anyOfModel: IRAnyOfSchema = {
     kind: "anyOf",
     name,
     referencePath,

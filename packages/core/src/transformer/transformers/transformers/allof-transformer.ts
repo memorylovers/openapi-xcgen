@@ -1,18 +1,18 @@
 /**
  * AllOf Transformer - v2 Transformer Architecture
  *
- * allOfスキーマをIRAllOfModelに変換します。
+ * allOfスキーマをIRAllOfSchemaに変換します。
  * トラバーサル（各サブスキーマ訪問）は composition-traverser に委譲します。
  */
 
-import type { IRAllOfModel, SchemaObject } from "../../../types";
+import type { IRAllOfSchema, SchemaObject } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
 import type { CompositionTraversalResult, TransformResult } from "../types";
 
 /**
- * allOfスキーマをIRAllOfModelに変換
+ * allOfスキーマをIRAllOfSchemaに変換
  *
  * @param schema - allOfスキーマ
  * @param context - Visitorコンテキスト
@@ -48,8 +48,8 @@ export function transformAllOf(
     );
   }
 
-  // IRAllOfModelを作成
-  const allOfModel: IRAllOfModel = {
+  // IRAllOfSchemaを作成
+  const allOfModel: IRAllOfSchema = {
     kind: "allOf",
     name,
     referencePath,

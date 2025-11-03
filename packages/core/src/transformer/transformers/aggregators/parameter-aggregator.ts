@@ -1,7 +1,7 @@
 /**
  * Parameter Aggregator - v2 Transformer Architecture
  *
- * 複数のパラメータを1つの統合モデル（IRParameterModel）に集約します。
+ * 複数のパラメータを1つの統合モデル（IRParameterComponent）に集約します。
  * Aggregatorレイヤーは、Transformerで生成されたIRParameterを受け取り、
  * それらをまとめてパラメータ統合モデルを生成する責務を持ちます。
  */
@@ -9,7 +9,7 @@
 import { pascalCase } from "es-toolkit/string";
 import type {
   IRParameter,
-  IRParameterModel,
+  IRParameterComponent,
   IRParameterProperty,
   IRRef,
 } from "../../../types";
@@ -75,7 +75,7 @@ export function aggregateParameters(
   const description = generateDescription(parameters, pathTemplate, method);
 
   // 統合モデルを生成
-  const model: IRParameterModel = {
+  const model: IRParameterComponent = {
     kind: "parameter",
     name: modelName,
     referencePath,

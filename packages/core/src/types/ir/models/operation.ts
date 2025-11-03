@@ -5,22 +5,22 @@
 import type { IRType } from "../common/type";
 import type { IRResponseHeader } from "../endpoints/response";
 import type {
-  IRAllOfModel,
-  IRAnyOfModel,
-  IRArrayModel,
-  IREnumModel,
-  IRMapModel,
-  IRObjectModel,
-  IRUnionModel,
+  IRAllOfSchema,
+  IRAnyOfSchema,
+  IRArraySchema,
+  IREnumSchema,
+  IRMapSchema,
+  IRObjectSchema,
+  IRUnionSchema,
 } from "./base";
 import type { IRParameterProperty, IRProperty } from "./property";
 
 /**
- * IRParameterModel - パラメータ統合モデル定義
- * APIエンドポイントのパラメータを統合したモデル（GetUsersParamsなど）
+ * IRParameterComponent - パラメータ統合コンポーネント定義
+ * APIエンドポイントのパラメータを統合したコンポーネント（GetUsersParamsなど）
  * @example
  * ```yaml
- * # OpenAPI parameters → IRParameterModel
+ * # OpenAPI parameters → IRParameterComponent
  * parameters:
  *   - name: id
  *     in: path
@@ -32,29 +32,29 @@ import type { IRParameterProperty, IRProperty } from "./property";
  *     schema:
  *       type: integer
  *       default: 10
- * # → GetUsersParams model with IRParameterProperty
+ * # → GetUsersParams component with IRParameterProperty
  * ```
  */
-export interface IRParameterModel {
+export interface IRParameterComponent {
   /** 型種別 */
   kind: "parameter";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
   /** パラメータプロパティの配列（in情報を含む） */
   properties: IRParameterProperty[];
 }
 
 /**
- * IRRequestBodyModel - リクエストボディ専用モデル定義
- * インラインスキーマから抽出されたrequestBodyモデル（PostUsersRequestBodyなど）
- * IRObjectModelの性質を継承し、リクエストボディ固有の文脈情報を追加
+ * IRRequestBodyComponent - リクエストボディ専用コンポーネント定義
+ * インラインスキーマから抽出されたrequestBodyコンポーネント（PostUsersRequestBodyなど）
+ * IRObjectSchemaの性質を継承し、リクエストボディ固有の文脈情報を追加
  * @example
  * ```yaml
- * # OpenAPI requestBody → IRRequestBodyModel
+ * # OpenAPI requestBody → IRRequestBodyComponent
  * requestBody:
  *   required: true
  *   content:
@@ -66,19 +66,19 @@ export interface IRParameterModel {
  *             type: string
  *           email:
  *             type: string
- * # → PostUsersRequestBody model (kind="requestBody")
+ * # → PostUsersRequestBody component (kind="requestBody")
  * ```
  */
-export interface IRRequestBodyModel {
+export interface IRRequestBodyComponent {
   /** 型種別（objectのサブタイプ） */
   kind: "requestBody";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
-  /** プロパティ配列（IRObjectModelから継承） */
+  /** プロパティ配列（IRObjectSchemaから継承） */
   properties: IRProperty[];
   /** 必須フラグ（リクエストボディ固有） */
   required?: true;
@@ -87,12 +87,12 @@ export interface IRRequestBodyModel {
 }
 
 /**
- * IRResponseModel - レスポンス専用モデル定義
- * インラインスキーマから抽出されたresponseモデル（GetUsers200Responseなど）
- * IRObjectModelの性質を継承し、レスポンス固有の文脈情報を追加
+ * IRResponseComponent - レスポンス専用コンポーネント定義
+ * インラインスキーマから抽出されたresponseコンポーネント（GetUsers200Responseなど）
+ * IRObjectSchemaの性質を継承し、レスポンス固有の文脈情報を追加
  * @example
  * ```yaml
- * # OpenAPI responses → IRResponseModel
+ * # OpenAPI responses → IRResponseComponent
  * responses:
  *   '200':
  *     description: Success
@@ -105,19 +105,19 @@ export interface IRRequestBodyModel {
  *               type: string
  *             count:
  *               type: integer
- * # → GetUsers200Response model (kind="response")
+ * # → GetUsers200Response component (kind="response")
  * ```
  */
-export interface IRResponseModel {
+export interface IRResponseComponent {
   /** 型種別（objectのサブタイプ） */
   kind: "response";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
-  /** プロパティ配列（IRObjectModelから継承） */
+  /** プロパティ配列（IRObjectSchemaから継承） */
   properties: IRProperty[];
   /** HTTPステータスコード（レスポンス固有） */
   statusCode: string;
@@ -128,47 +128,59 @@ export interface IRResponseModel {
 }
 
 /**
- * IRModel - 統一されたモデル定義
- * 全てのデータモデルを統一的に表現する判別共用体
+ * IRSchema - スキーマ型の統合
+ * OpenAPIのschemas配下で定義される型の統合
+ */
+export type IRSchema =
+  | IRObjectSchema
+  | IREnumSchema
+  | IRArraySchema
+  | IRMapSchema
+  | IRAllOfSchema
+  | IRAnyOfSchema
+  | IRUnionSchema;
+
+/**
+ * IROperationComponent - 操作固有コンポーネントの統合
+ * エンドポイント操作に関連するコンポーネントの統合
+ */
+export type IROperationComponent =
+  | IRParameterComponent
+  | IRRequestBodyComponent
+  | IRResponseComponent;
+
+/**
+ * IRComponent - 統一されたコンポーネント定義
+ * 全てのデータコンポーネントを統一的に表現する判別共用体
  *
  * @example
  * ```typescript
  * // 使用例：型安全なswitch文
- * function processModel(model: IRModel) {
- *   switch (model.kind) {
+ * function processComponent(component: IRComponent) {
+ *   switch (component.kind) {
  *     case "object":
- *       // model.propertiesにアクセス可能
+ *       // component.propertiesにアクセス可能
  *       break;
  *     case "enum":
- *       // model.valuesにアクセス可能
+ *       // component.valuesにアクセス可能
  *       break;
  *     case "array":
- *       // model.itemTypeにアクセス可能
+ *       // component.itemTypeにアクセス可能
  *       break;
  *     case "map":
- *       // model.valueTypeにアクセス可能
+ *       // component.valueTypeにアクセス可能
  *       break;
  *     case "parameter":
- *       // model.propertiesにアクセス可能（IRParameterProperty[]）
+ *       // component.propertiesにアクセス可能（IRParameterProperty[]）
  *       break;
  *     case "requestBody":
- *       // model.contentにアクセス可能（IRRequestContent[]）
+ *       // component.propertiesにアクセス可能
  *       break;
  *     case "response":
- *       // model.contentにアクセス可能（IRResponseContent[]）
+ *       // component.propertiesにアクセス可能
  *       break;
  *   }
  * }
  * ```
  */
-export type IRModel =
-  | IRObjectModel
-  | IREnumModel
-  | IRAllOfModel
-  | IRAnyOfModel
-  | IRUnionModel
-  | IRArrayModel
-  | IRMapModel
-  | IRParameterModel
-  | IRRequestBodyModel
-  | IRResponseModel;
+export type IRComponent = IRSchema | IROperationComponent;

@@ -1,12 +1,12 @@
 /**
  * Array Transformer - v2 Transformer Architecture
  *
- * 配列スキーマをIRArrayModelに変換します。
+ * 配列スキーマをIRArraySchemaに変換します。
  * トラバーサル（items訪問）は array-traverser に委譲します。
  */
 
 import type {
-  IRArrayModel,
+  IRArraySchema,
   ReferenceObject,
   SchemaObject,
 } from "../../../types";
@@ -16,7 +16,7 @@ import { createErrorResult } from "../errors";
 import type { ArrayItemTraversalResult, TransformResult } from "../types";
 
 /**
- * 配列スキーマをIRArrayModelに変換
+ * 配列スキーマをIRArraySchemaに変換
  *
  * @param schema - 配列スキーマ
  * @param context - Visitorコンテキスト
@@ -51,8 +51,8 @@ export function transformArray(
     );
   }
 
-  // IRArrayModelを作成
-  const arrayModel: IRArrayModel = {
+  // IRArraySchemaを作成
+  const arrayModel: IRArraySchema = {
     kind: "array",
     name,
     referencePath,

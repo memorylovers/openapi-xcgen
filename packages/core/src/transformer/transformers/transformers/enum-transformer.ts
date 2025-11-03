@@ -1,7 +1,7 @@
 /**
  * Enum Transformer - v2 Transformer Architecture
  *
- * Enum型スキーマをIREnumModelに変換します。
+ * Enum型スキーマをIREnumSchemaに変換します。
  * トラバーサルは不要（リーフノード）のため、純粋な変換処理のみを行います。
  *
  * @bnf-target <schema-object> with enum array
@@ -9,7 +9,7 @@
  */
 
 import { consola } from "consola";
-import type { IREnumModel, IREnumValue, SchemaObject } from "../../../types";
+import type { IREnumSchema, IREnumValue, SchemaObject } from "../../../types";
 import {
   buildReferencePath,
   extractExtensions,
@@ -22,7 +22,7 @@ import { createErrorResult } from "../errors";
 import type { TransformResult } from "../types";
 
 /**
- * Enum型スキーマをIREnumModelに変換
+ * Enum型スキーマをIREnumSchemaに変換
  *
  * @bnf <schema-object> - enum配列を持つスキーマオブジェクト
  * @bnf-ref _docs/900_openapi_v3.1_BNF_spec.md:325
@@ -33,7 +33,7 @@ import type { TransformResult } from "../types";
  *
  * @param schema - OpenAPI SchemaObject
  * @param context - Visitor context (Phase 1では既存のVisitorContextを使用)
- * @returns 変換結果（type: ref型, models: [IREnumModel]）
+ * @returns 変換結果（type: ref型, models: [IREnumSchema]）
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -131,9 +131,9 @@ export function transformEnum(
   // 拡張フィールドを抽出
   const extensions = extractExtensions(schema);
 
-  // IREnumModelを作成
+  // IREnumSchemaを作成
   const referencePath = buildReferencePath(context.documentPath);
-  const enumModel: IREnumModel = {
+  const enumModel: IREnumSchema = {
     kind: "enum",
     name,
     referencePath,

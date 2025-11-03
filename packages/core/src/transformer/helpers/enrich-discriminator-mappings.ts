@@ -1,10 +1,10 @@
 import { consola } from "consola";
-import type { IRUnionModel, XcgenIR } from "../../types/index";
+import type { IRUnionSchema, XcgenIR } from "../../types/index";
 
 /**
  * discriminator.mappingを自動生成（Phase 2 post-processing）
  *
- * IRUnionModelでdiscriminatorがありmappingが無い場合、
+ * IRUnionSchemaでdiscriminatorがありmappingが無い場合、
  * 参照先モデルのconst値からmappingを生成する。
  *
  * @param ir - 変換対象のIR
@@ -134,7 +134,7 @@ if (import.meta.vitest) {
 
       const unionModel = ir.models.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       expect(unionModel.discriminator?.mapping).toEqual({
         card: "#/components/schemas/CardPayment",
@@ -169,7 +169,7 @@ if (import.meta.vitest) {
 
       const unionModel = ir.models.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       expect(unionModel.discriminator?.mapping).toEqual({
         custom: "#/components/schemas/CustomPayment",
@@ -195,7 +195,7 @@ if (import.meta.vitest) {
 
       const unionModel = ir.models.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       expect(unionModel.discriminator).toBeUndefined();
     });
@@ -233,7 +233,7 @@ if (import.meta.vitest) {
 
       const unionModel = ir.models.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       // mappingは生成されない（const値が無いため）
       expect(unionModel.discriminator?.mapping).toBeUndefined();

@@ -108,7 +108,7 @@ export function transformRequestBody(
 }
 
 /**
- * インラインobjectスキーマからIRRequestBodyModelを生成
+ * インラインobjectスキーマからIRRequestBodyComponentを生成
  *
  * 3層アーキテクチャに準拠: SchemaObject と PropertyTraversalResult を受け取り、
  * TransformResult を返します。
@@ -135,7 +135,7 @@ export function transformRequestBody(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  type IRModel = import("../../../types").IRModel;
+  type IRComponent = import("../../../types").IRComponent;
 
   describe("transformRequestBody", () => {
     it("should handle reference request body", () => {
@@ -252,7 +252,7 @@ if (import.meta.vitest) {
         rootSegment: "paths",
       };
 
-      const mockModel: IRModel = {
+      const mockModel: IRComponent = {
         kind: "object",
         name: "TestModel",
         referencePath: "#/test",

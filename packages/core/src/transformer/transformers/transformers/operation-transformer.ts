@@ -10,7 +10,7 @@ import type {
   IREndpoint,
   IRExtensions,
   IRHttpMethod,
-  IRModel,
+  IRComponent,
   IRParameter,
   IRRef,
   IRRequestBody,
@@ -40,7 +40,7 @@ export interface OperationTransformResult {
   /** 生成されたエンドポイント（失敗時はnull） */
   endpoint: IREndpoint | null;
   /** 抽出されたモデルの配列 */
-  models: IRModel[];
+  models: IRComponent[];
 }
 
 /**
@@ -183,7 +183,7 @@ export function transformOperation(
     `Transforming operation: ${method.toUpperCase()} ${pathTemplate}`,
   );
 
-  const allModels: IRModel[] = [];
+  const allModels: IRComponent[] = [];
 
   // ========================================
   // 1. Parametersの処理
@@ -703,21 +703,21 @@ if (import.meta.vitest) {
         responses: {},
       };
 
-      const mockParamModel: IRModel = {
+      const mockParamModel: IRComponent = {
         kind: "array",
         name: "Tags",
         referencePath: "#/param",
         itemType: "string",
       };
 
-      const mockRequestModel: IRModel = {
+      const mockRequestModel: IRComponent = {
         kind: "object",
         name: "RequestModel",
         referencePath: "#/request",
         properties: [],
       };
 
-      const mockResponseModel: IRModel = {
+      const mockResponseModel: IRComponent = {
         kind: "object",
         name: "ResponseModel",
         referencePath: "#/response",

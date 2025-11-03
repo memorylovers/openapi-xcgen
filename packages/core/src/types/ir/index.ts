@@ -9,7 +9,7 @@ import type { IREndpoint } from "./endpoints/endpoint";
 import type { IRRequestBody } from "./endpoints/request";
 import type { IRResponse } from "./endpoints/response";
 import type { IRMetadata } from "./metadata";
-import type { IRModel } from "./models/operation";
+import type { IRComponent } from "./models/operation";
 import type { IRSecurityRequirement } from "./security/security-requirement";
 import type { IRSecurityScheme } from "./security/security-scheme";
 import type { IRServer } from "./servers";
@@ -23,7 +23,7 @@ export interface XcgenIR {
   /** API基本情報 */
   metadata: IRMetadata;
   /** データモデルの配列（オブジェクト、列挙型、配列、マップを統一的に管理） */
-  models: IRModel[];
+  models: IRComponent[];
   /** タグ定義の配列 */
   tags: IRTag[];
   /** APIエンドポイントの配列 */
@@ -49,21 +49,23 @@ export type { IRRef, IRScalarType, IRType } from "./common/type";
 export type { IRMetadata } from "./metadata";
 // models (直接ファイルから)
 export type {
-  IRAllOfModel,
-  IRAnyOfModel,
-  IRArrayModel,
+  IRAllOfSchema,
+  IRAnyOfSchema,
+  IRArraySchema,
   IRDiscriminator,
-  IREnumModel,
+  IREnumSchema,
   IREnumValue,
-  IRMapModel,
-  IRObjectModel,
-  IRUnionModel,
+  IRMapSchema,
+  IRObjectSchema,
+  IRUnionSchema,
 } from "./models/base";
 export type {
-  IRModel,
-  IRParameterModel,
-  IRRequestBodyModel,
-  IRResponseModel,
+  IRComponent,
+  IROperationComponent,
+  IRParameterComponent,
+  IRRequestBodyComponent,
+  IRResponseComponent,
+  IRSchema,
 } from "./models/operation";
 export type { IRParameterProperty, IRProperty } from "./models/property";
 export type { IRValidation } from "./models/validation";

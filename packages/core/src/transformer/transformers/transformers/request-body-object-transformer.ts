@@ -1,13 +1,13 @@
 /**
  * Request Body Object Transformer - v2 Transformer Architecture
  *
- * Inline RequestBody ObjectをIRRequestBodyModelに変換します。
+ * Inline RequestBody ObjectをIRRequestBodyComponentに変換します。
  */
 
 import type {
-  IRModel,
+  IRComponent,
   IRProperty,
-  IRRequestBodyModel,
+  IRRequestBodyComponent,
   SchemaObject,
 } from "../../../types";
 import { buildReferencePath, getModelName } from "../../helpers";
@@ -19,7 +19,7 @@ import type {
 } from "../types";
 
 /**
- * Inline RequestBody ObjectをIRRequestBodyModelに変換
+ * Inline RequestBody ObjectをIRRequestBodyComponentに変換
  *
  * @param schema - SchemaObject (inline object)
  * @param context - Visitorコンテキスト
@@ -79,7 +79,7 @@ export function transformRequestBodyObject(
     ...(additionalPropertiesResult?.models || []),
   ];
 
-  // IRRequestBodyModelを作成
+  // IRRequestBodyComponentを作成
   // contextからrequiredを取得（RequestBodyContextの場合）
   const hasRequired =
     (context.kind === "requestBody" ||
@@ -87,7 +87,7 @@ export function transformRequestBodyObject(
     "required" in context &&
     context.required;
 
-  const requestBodyModel: IRRequestBodyModel = {
+  const requestBodyModel: IRRequestBodyComponent = {
     kind: "requestBody",
     name,
     referencePath,
@@ -113,7 +113,7 @@ if (import.meta.vitest) {
   type PathsRequestBodyContext = import("../../types").PathsRequestBodyContext;
 
   describe("transformRequestBodyObject", () => {
-    it("should create IRRequestBodyModel from schema and traversal result", () => {
+    it("should create IRRequestBodyComponent from schema and traversal result", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
@@ -238,7 +238,7 @@ if (import.meta.vitest) {
         rootSegment: "paths",
       };
 
-      const mockChildModel: IRModel = {
+      const mockChildModel: IRComponent = {
         kind: "object",
         name: "NestedModel",
         referencePath: "#/nested",
@@ -476,7 +476,7 @@ if (import.meta.vitest) {
       }
     });
 
-    it("should include required field in IRRequestBodyModel when provided in context", () => {
+    it("should include required field in IRRequestBodyComponent when provided in context", () => {
       const schema: SchemaObject = {
         type: "object",
         properties: {
