@@ -2,7 +2,7 @@
  * エンドポイントのデータ型情報を抽出
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { resolveModelName } from "../../helpers/model-resolver";
 
 /**
@@ -30,7 +30,7 @@ export interface EndpointDataTypes {
  *   parameters: { kind: "ref", name: "#/paths/.../GetPetsParams" },
  *   ...
  * };
- * const models: IRModel[] = [...];
+ * const models: IRComponent[] = [...];
  * const result = getEndpointDataTypes(endpoint, models);
  * // => { parameterType: "GetPetsParams", needsDataType: true }
  *
@@ -45,7 +45,7 @@ export interface EndpointDataTypes {
  */
 export function getEndpointDataTypes(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): EndpointDataTypes {
   let parameterType: string | undefined;
   let requestBodyType: string | undefined;

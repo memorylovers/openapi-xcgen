@@ -1,21 +1,21 @@
 /**
  * TypeScript AllOf型生成
  *
- * IRAllOfModelからTypeScriptのintersection typeを生成する
+ * IRAllOfSchemaからTypeScriptのintersection typeを生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
- * IRAllOfModelからTypeScript intersection typeを生成
- * @param model - IRAllOfModel
+ * IRAllOfSchemaからTypeScript intersection typeを生成
+ * @param model - IRAllOfSchema
  * @returns TypeScript intersection type定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "allOf",
  *   name: "Admin",
  *   referencePath: "#/components/schemas/Admin",
@@ -28,7 +28,9 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  * // => "export type Admin = User & Permissions;"
  * ```
  */
-export function generateAllOfType(model: IRModel & { kind: "allOf" }): string {
+export function generateAllOfType(
+  model: IRComponent & { kind: "allOf" },
+): string {
   const typeName = toTypeName(model.name);
   const types = model.schemas.map((schema) => irTypeToTsType(schema));
 
@@ -52,7 +54,7 @@ if (import.meta.vitest) {
   describe("types-allof", () => {
     describe("generateAllOfType", () => {
       it("should generate basic allOf type", () => {
-        const model: IRModel & { kind: "allOf" } = {
+        const model: IRComponent & { kind: "allOf" } = {
           kind: "allOf",
           name: "Admin",
           referencePath: "#/components/schemas/Admin",
@@ -74,7 +76,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate allOf with description", () => {
-        const model: IRModel & { kind: "allOf" } = {
+        const model: IRComponent & { kind: "allOf" } = {
           kind: "allOf",
           name: "SuperUser",
           referencePath: "#/components/schemas/SuperUser",
@@ -104,7 +106,7 @@ export type SuperUser = User & SuperPermissions;
       });
 
       it("should generate allOf with multiple schemas", () => {
-        const model: IRModel & { kind: "allOf" } = {
+        const model: IRComponent & { kind: "allOf" } = {
           kind: "allOf",
           name: "FullAccess",
           referencePath: "#/components/schemas/FullAccess",

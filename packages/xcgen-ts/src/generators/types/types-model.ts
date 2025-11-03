@@ -1,10 +1,10 @@
 /**
- * IRModel → TypeScript型変換
+ * IRComponent → TypeScript型変換
  *
- * IRModelをTypeScript型定義コード（interface, type, enum）に変換する
+ * IRComponentをTypeScript型定義コード（interface, type, enum）に変換する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import type { HookableInstance } from "../../hooks";
 import { generateAllOfType } from "./types-allof";
 import { generateAnyOfType } from "./types-anyof";
@@ -16,7 +16,7 @@ import { generateParameterType } from "./types-parameter";
 import { generateUnionType } from "./types-union";
 
 /**
- * IRModelをTypeScript型定義に変換
+ * IRComponentをTypeScript型定義に変換
  *
  * @param model - IRモデル
  * @param hooks - Hook instance（オプション）
@@ -24,7 +24,7 @@ import { generateUnionType } from "./types-union";
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   properties: [{ name: "email", type: "string", required: true }]
@@ -34,7 +34,7 @@ import { generateUnionType } from "./types-union";
  * ```
  */
 export function generateModel(
-  model: IRModel,
+  model: IRComponent,
   hooks?: HookableInstance,
 ): string | null {
   switch (model.kind) {
@@ -79,7 +79,7 @@ if (import.meta.vitest) {
 
   describe("generateModel", () => {
     it("should generate object type", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "User",
         referencePath: "#/components/schemas/User",
@@ -104,7 +104,7 @@ export interface User {
     });
 
     it("should generate enum type", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "enum",
         name: "Status",
         referencePath: "#/components/schemas/Status",
@@ -121,7 +121,7 @@ export interface User {
     });
 
     it("should generate array type", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "array",
         name: "UserList",
         referencePath: "#/components/schemas/UserList",
@@ -134,7 +134,7 @@ export interface User {
     });
 
     it("should generate map type", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "map",
         name: "UserMap",
         referencePath: "#/components/schemas/UserMap",
@@ -147,7 +147,7 @@ export interface User {
     });
 
     it("should generate parameter type", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "parameter",
         name: "GetUserParams",
         referencePath: "#/paths/~1users~1{userId}/get/parameters",
@@ -172,7 +172,7 @@ export interface User {
       // Exhaustive checkのテスト - 実際には到達しないコード
       const model = {
         kind: "unsupported",
-      } as unknown as IRModel;
+      } as unknown as IRComponent;
 
       const result = generateModel(model);
 

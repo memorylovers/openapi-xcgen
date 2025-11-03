@@ -4,18 +4,18 @@
  * 全モデルを再エクスポートするindex.tsファイルの生成
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../../helpers/naming";
 
 /**
- * 純粋関数: IRModel[] → models/index.ts コード
+ * 純粋関数: IRComponent[] → models/index.ts コード
  *
- * @param models - IRModel配列
+ * @param models - IRComponent配列
  * @returns index.tsのコード
  *
  * @example
  * ```typescript
- * const models: IRModel[] = [
+ * const models: IRComponent[] = [
  *   { kind: "object", name: "User", ... },
  *   { kind: "object", name: "Product", ... }
  * ];
@@ -23,7 +23,7 @@ import { toTypeName } from "../../../helpers/naming";
  * // => "/**\n * Model type definitions\n * ...\n *\/\n\nexport * from './User';\nexport * from './Product';"
  * ```
  */
-export function generateModelsIndex(models: IRModel[]): string {
+export function generateModelsIndex(models: IRComponent[]): string {
   const lines: string[] = [];
   lines.push("/**");
   lines.push(" * Model type definitions");
@@ -44,7 +44,7 @@ if (import.meta.vitest) {
 
   describe("generateModelsIndex", () => {
     it("should generate index file with exports", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "User",
@@ -70,7 +70,7 @@ if (import.meta.vitest) {
     });
 
     it("should generate empty exports for empty models array", () => {
-      const models: IRModel[] = [];
+      const models: IRComponent[] = [];
 
       const result = generateModelsIndex(models);
 
@@ -80,7 +80,7 @@ if (import.meta.vitest) {
     });
 
     it("should preserve model order", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "Zebra",
@@ -112,7 +112,7 @@ if (import.meta.vitest) {
     });
 
     it("should handle special characters in model names", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "User_Profile",

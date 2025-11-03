@@ -1,21 +1,21 @@
 /**
  * TypeScript Map型生成
  *
- * IRMapModelからTypeScriptのRecord type aliasを生成する
+ * IRMapSchemaからTypeScriptのRecord type aliasを生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
- * IRMapModelからTypeScript type aliasを生成
- * @param model - IRMapModel
+ * IRMapSchemaからTypeScript type aliasを生成
+ * @param model - IRMapSchema
  * @returns TypeScript Record type alias定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "map",
  *   name: "UserMap",
  *   referencePath: "#/components/schemas/UserMap",
@@ -25,7 +25,7 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  * // => "export type UserMap = Record<string, User>;"
  * ```
  */
-export function generateMapType(model: IRModel & { kind: "map" }): string {
+export function generateMapType(model: IRComponent & { kind: "map" }): string {
   const typeName = toTypeName(model.name);
   const valueType = irTypeToTsType(model.valueType);
 
@@ -49,7 +49,7 @@ if (import.meta.vitest) {
   describe("types-map", () => {
     describe("generateMapType", () => {
       it("should generate basic map type", () => {
-        const model: IRModel & { kind: "map" } = {
+        const model: IRComponent & { kind: "map" } = {
           kind: "map",
           name: "NumberMap",
           referencePath: "#/components/schemas/NumberMap",
@@ -64,7 +64,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate map with description", () => {
-        const model: IRModel & { kind: "map" } = {
+        const model: IRComponent & { kind: "map" } = {
           kind: "map",
           name: "StringMap",
           referencePath: "#/components/schemas/StringMap",
@@ -85,7 +85,7 @@ export type StringMap = Record<string, string>;
       });
 
       it("should generate map of reference type", () => {
-        const model: IRModel & { kind: "map" } = {
+        const model: IRComponent & { kind: "map" } = {
           kind: "map",
           name: "UserMap",
           referencePath: "#/components/schemas/UserMap",

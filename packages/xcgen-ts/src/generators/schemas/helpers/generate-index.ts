@@ -4,20 +4,20 @@
  * 全スキーマを再エクスポートするindex.tsファイルの生成
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../../helpers/naming";
 
 /**
- * 純粋関数: IRModel[] → schemas/index.ts コード
+ * 純粋関数: IRComponent[] → schemas/index.ts コード
  *
  * parameterモデルはスキーマを生成しないため除外される。
  *
- * @param models - IRModel配列
+ * @param models - IRComponent配列
  * @returns index.tsのコード
  *
  * @example
  * ```typescript
- * const models: IRModel[] = [
+ * const models: IRComponent[] = [
  *   { kind: "object", name: "User", ... },
  *   { kind: "parameter", name: "GetUserParams", ... }  // 除外される
  * ];
@@ -25,7 +25,7 @@ import { toTypeName } from "../../../helpers/naming";
  * // => "/**\n * Valibot validation schemas\n * ...\n *\/\n\nexport * from './UserSchema';"
  * ```
  */
-export function generateSchemasIndex(models: IRModel[]): string {
+export function generateSchemasIndex(models: IRComponent[]): string {
   const lines: string[] = [];
   lines.push("/**");
   lines.push(" * Valibot validation schemas");
@@ -49,7 +49,7 @@ if (import.meta.vitest) {
 
   describe("generateSchemasIndex", () => {
     it("should generate index file with exports", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "User",
@@ -75,7 +75,7 @@ if (import.meta.vitest) {
     });
 
     it("should exclude parameter models", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "User",
@@ -105,7 +105,7 @@ if (import.meta.vitest) {
     });
 
     it("should generate empty exports for empty models array", () => {
-      const models: IRModel[] = [];
+      const models: IRComponent[] = [];
 
       const result = generateSchemasIndex(models);
 
@@ -115,7 +115,7 @@ if (import.meta.vitest) {
     });
 
     it("should preserve model order", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "Zebra",
@@ -147,7 +147,7 @@ if (import.meta.vitest) {
     });
 
     it("should handle mixed model types", () => {
-      const models: IRModel[] = [
+      const models: IRComponent[] = [
         {
           kind: "object",
           name: "User",

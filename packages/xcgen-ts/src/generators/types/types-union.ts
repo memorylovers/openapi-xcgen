@@ -1,21 +1,21 @@
 /**
  * TypeScript Union型生成
  *
- * IRUnionModelからTypeScriptのdiscriminated unionを生成する
+ * IRUnionSchemaからTypeScriptのdiscriminated unionを生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
- * IRUnionModelからTypeScript discriminated unionを生成
- * @param model - IRUnionModel
+ * IRUnionSchemaからTypeScript discriminated unionを生成
+ * @param model - IRUnionSchema
  * @returns TypeScript discriminated union定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "union",
  *   name: "Shape",
  *   referencePath: "#/components/schemas/Shape",
@@ -29,7 +29,9 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  * // => "export type Shape = Circle | Square;"
  * ```
  */
-export function generateUnionType(model: IRModel & { kind: "union" }): string {
+export function generateUnionType(
+  model: IRComponent & { kind: "union" },
+): string {
   const typeName = toTypeName(model.name);
   const types = model.types.map((type) => irTypeToTsType(type));
 
@@ -56,7 +58,7 @@ if (import.meta.vitest) {
   describe("types-union", () => {
     describe("generateUnionType", () => {
       it("should generate basic union type", () => {
-        const model: IRModel & { kind: "union" } = {
+        const model: IRComponent & { kind: "union" } = {
           kind: "union",
           name: "Shape",
           referencePath: "#/components/schemas/Shape",
@@ -78,7 +80,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate union with description", () => {
-        const model: IRModel & { kind: "union" } = {
+        const model: IRComponent & { kind: "union" } = {
           kind: "union",
           name: "Vehicle",
           referencePath: "#/components/schemas/Vehicle",
@@ -108,7 +110,7 @@ export type Vehicle = Car | Bike;
       });
 
       it("should generate union with discriminator", () => {
-        const model: IRModel & { kind: "union" } = {
+        const model: IRComponent & { kind: "union" } = {
           kind: "union",
           name: "Event",
           referencePath: "#/components/schemas/Event",

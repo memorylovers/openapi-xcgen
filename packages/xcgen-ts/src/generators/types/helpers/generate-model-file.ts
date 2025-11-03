@@ -1,10 +1,10 @@
 /**
  * モデルファイル生成
  *
- * IRModel → TypeScript型定義コード（個別ファイル）への変換
+ * IRComponent → TypeScript型定義コード（個別ファイル）への変換
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import {
   processImports,
   generateTypeImports,
@@ -16,18 +16,18 @@ import { generateUnifiedParameterType } from "../types-parameter-unified";
 import { extractTypeDependencies } from "./extract-dependencies";
 
 /**
- * 純粋関数: IRModel → TypeScript型定義コード
+ * 純粋関数: IRComponent → TypeScript型定義コード
  *
  * 個別のモデルファイルを生成する。依存する他の型のimport文も自動生成される。
  *
- * @param model - IRModel
+ * @param model - IRComponent
  * @param requestBodyTypeName - 統合パラメータ型の場合のrequestBody型名（オプション）
  * @param hooks - Hook instance（オプション）
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   properties: [...]
@@ -37,7 +37,7 @@ import { extractTypeDependencies } from "./extract-dependencies";
  * ```
  */
 export function generateModelFile(
-  model: IRModel,
+  model: IRComponent,
   requestBodyTypeName?: string,
   hooks?: HookableInstance,
 ): string | null {
@@ -142,7 +142,7 @@ if (import.meta.vitest) {
 
   describe("generateModelFile", () => {
     it("should generate model file with header", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "User",
         referencePath: "#/components/schemas/User",
@@ -170,7 +170,7 @@ export interface User {
     });
 
     it("should generate imports for referenced types", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
@@ -207,7 +207,7 @@ export interface Order {
     });
 
     it("should not import self-reference", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "TreeNode",
         referencePath: "#/components/schemas/TreeNode",
@@ -245,7 +245,7 @@ export interface TreeNode {
     });
 
     it("should generate unified parameter type with imports", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "parameter",
         name: "UpdateUserParams",
         referencePath: "#/paths/~1users~1{userId}/patch/parameters",
@@ -279,7 +279,7 @@ export interface UpdateUserParams {
     });
 
     it("should return null for models that generate no code", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Empty",
         referencePath: "#/components/schemas/Empty",
@@ -295,7 +295,7 @@ export interface UpdateUserParams {
     });
 
     it("should sort imports alphabetically", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",

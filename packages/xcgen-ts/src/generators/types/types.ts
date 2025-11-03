@@ -1,7 +1,7 @@
 /**
  * TypeScript型定義生成器
  *
- * IRModelからTypeScriptの型定義（interface, type, enum）を生成する
+ * IRComponentからTypeScriptの型定義（interface, type, enum）を生成する
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";

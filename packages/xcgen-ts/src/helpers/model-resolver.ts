@@ -4,7 +4,7 @@
  * IRRefからモデル名を逆引きする
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "./naming";
 
 /**
@@ -16,7 +16,7 @@ import { toTypeName } from "./naming";
  *
  * @example
  * ```typescript
- * const models: IRModel[] = [
+ * const models: IRComponent[] = [
  *   {
  *     kind: "array",
  *     name: "GetPets200Response",
@@ -31,7 +31,7 @@ import { toTypeName } from "./naming";
  */
 export function resolveModelName(
   referencePath: string,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   // モデルリストから referencePath が一致するものを探す
   const model = models.find((m) => m.referencePath === referencePath);
@@ -52,7 +52,7 @@ if (import.meta.vitest) {
   describe("model-resolver", () => {
     describe("resolveModelName", () => {
       it("should resolve model name from referencePath", () => {
-        const models: IRModel[] = [
+        const models: IRComponent[] = [
           {
             kind: "array",
             name: "GetPets200Response",
@@ -71,7 +71,7 @@ if (import.meta.vitest) {
       });
 
       it("should return last segment as fallback when model not found", () => {
-        const models: IRModel[] = [];
+        const models: IRComponent[] = [];
 
         const result = resolveModelName("#/components/schemas/Pet", models);
 
@@ -79,7 +79,7 @@ if (import.meta.vitest) {
       });
 
       it("should handle snake_case in fallback", () => {
-        const models: IRModel[] = [];
+        const models: IRComponent[] = [];
 
         const result = resolveModelName(
           "#/components/schemas/user_profile",
@@ -90,7 +90,7 @@ if (import.meta.vitest) {
       });
 
       it("should resolve complex inline schema paths", () => {
-        const models: IRModel[] = [
+        const models: IRComponent[] = [
           {
             kind: "object",
             name: "GetUsers200Response",

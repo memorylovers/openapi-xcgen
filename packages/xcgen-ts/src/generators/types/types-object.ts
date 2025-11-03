@@ -1,24 +1,24 @@
 /**
  * TypeScript Object型生成
  *
- * IRObjectModelからTypeScriptのinterfaceを生成する
+ * IRObjectSchemaからTypeScriptのinterfaceを生成する
  */
 
-import type { IRModel, IRProperty } from "@openapi-xcgen/core";
+import type { IRComponent, IRProperty } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 import type { HookableInstance } from "../../hooks";
 import { generateProperty } from "./types-property";
 
 /**
- * IRObjectModelからTypeScript interfaceを生成
- * @param model - IRObjectModel (properties を持つモデル)
+ * IRObjectSchemaからTypeScript interfaceを生成
+ * @param model - IRObjectSchema (properties を持つモデル)
  * @param hooks - Hook instance（オプション）
  * @returns TypeScript interface定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   referencePath: "#/components/schemas/User",
@@ -31,7 +31,7 @@ import { generateProperty } from "./types-property";
  * ```
  */
 export function generateObjectType(
-  model: IRModel & { properties: IRProperty[] },
+  model: IRComponent & { properties: IRProperty[] },
   hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
@@ -71,7 +71,7 @@ if (import.meta.vitest) {
   describe("types-object", () => {
     describe("generateObjectType", () => {
       it("should generate basic object type", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -102,7 +102,7 @@ export interface User {
       });
 
       it("should generate object with description", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -131,7 +131,7 @@ export interface User {
       });
 
       it("should generate object with additionalProperties", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "Config",
           referencePath: "#/components/schemas/Config",
@@ -158,7 +158,7 @@ export interface Config {
       });
 
       it("should generate object with optional properties", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "Profile",
           referencePath: "#/components/schemas/Profile",

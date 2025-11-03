@@ -8,7 +8,7 @@
 import type {
   IRExtensions,
   IREndpoint,
-  IRModel,
+  IRComponent,
   IRParameter,
   IRProperty,
   IRType,
@@ -44,7 +44,7 @@ export interface PropertyGenerateContext {
   /** IR プロパティ定義 */
   property: IRProperty;
   /** 所属モデル */
-  model: IRModel;
+  model: IRComponent;
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeProperty;
   /** x-extensions（存在する場合） */
@@ -111,7 +111,7 @@ export interface TsCodeParameter {
  */
 export interface ModelGenerateContext {
   /** IR モデル定義 */
-  model: IRModel;
+  model: IRComponent;
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeModel;
   /** x-extensions（存在する場合） */

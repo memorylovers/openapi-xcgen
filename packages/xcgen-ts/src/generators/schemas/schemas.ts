@@ -1,7 +1,7 @@
 /**
  * Valibot スキーマ生成器（Orchestrator）
  *
- * IRModelからValibotのバリデーションスキーマを生成する
+ * IRComponentからValibotのバリデーションスキーマを生成する
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";

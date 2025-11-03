@@ -2,7 +2,7 @@
  * レスポンス型取得
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 import { resolveModelName } from "../../helpers/model-resolver";
 
@@ -14,7 +14,7 @@ import { resolveModelName } from "../../helpers/model-resolver";
  */
 export function getResponseType(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   // 成功レスポンス（2xx）を探す
   const successResponse = endpoint.responses.find((r) =>
@@ -121,7 +121,7 @@ if (import.meta.vitest) {
       });
 
       it("should return type name for array model ref", () => {
-        const models: IRModel[] = [
+        const models: IRComponent[] = [
           {
             kind: "array",
             name: "GetUsers200Response",
@@ -157,7 +157,7 @@ if (import.meta.vitest) {
 
         const result = getResponseType(endpoint, models);
 
-        // IRRef to IRArrayModel returns the model name (not "Array<T>")
+        // IRRef to IRArraySchema returns the model name (not "Array<T>")
         // Array formatting should be done at a higher level that has access to models
         expect(result).toBe("GetUsers200Response");
       });

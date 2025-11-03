@@ -1,10 +1,10 @@
 /**
- * IRModelからValibotスキーマ定義への変換
+ * IRComponentからValibotスキーマ定義への変換
  *
- * 各IRModel型に応じたValibotスキーマ定義を生成する
+ * 各IRComponent型に応じたValibotスキーマ定義を生成する
  */
 
-import type { IRExtensions, IRModel } from "@openapi-xcgen/core";
+import type { IRExtensions, IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { generateAllOfSchema } from "./schemas-allof";
 import { generateAnyOfSchema } from "./schemas-anyof";
@@ -17,14 +17,14 @@ import { generateUnionSchema } from "./schemas-union";
 import type { HookableInstance } from "../../hooks";
 
 /**
- * IRModelをValibotスキーマ定義に変換
+ * IRComponentをValibotスキーマ定義に変換
  * @param model - IRモデル
  * @param hooks - Hook instance（オプション）
  * @returns Valibotスキーマ定義コード
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "Pet",
  *   referencePath: "#/components/schemas/Pet",
@@ -46,7 +46,7 @@ import type { HookableInstance } from "../../hooks";
  * ```
  */
 export function generateSchemaModel(
-  model: IRModel,
+  model: IRComponent,
   hooks?: HookableInstance,
 ): string | null {
   // スキーマ名: {ModelName}Schema
@@ -67,7 +67,7 @@ export function generateSchemaModel(
     case "object":
     case "requestBody":
     case "response": {
-      // IRObjectModel → PropertySchema[] → v.object()
+      // IRObjectSchema → PropertySchema[] → v.object()
       const propertySchemas: PropertySchema[] = model.properties.map(
         (prop) => ({
           name: prop.name,
@@ -101,7 +101,7 @@ export function generateSchemaModel(
         hooks,
         modelExtensions,
       );
-      // IRArrayModelにはvalidationプロパティがないため、undefinedを渡す
+      // IRArraySchemaにはvalidationプロパティがないため、undefinedを渡す
       schemaExpression = generateArraySchema(
         itemSchema,
         undefined,
@@ -221,7 +221,7 @@ if (import.meta.vitest) {
   describe("schemas-model", () => {
     describe("generateSchemaModel", () => {
       it("should generate object schema", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -249,7 +249,7 @@ export const UserSchema = v.object({
       });
 
       it("should generate enum schema", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",
@@ -273,7 +273,7 @@ export const StatusSchema = v.picklist(["active", "inactive"]);
       });
 
       it("should return null for parameter model", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "parameter",
           name: "GetPetData",
           referencePath: "#/paths/~1pets~1{petId}/get/parameters",

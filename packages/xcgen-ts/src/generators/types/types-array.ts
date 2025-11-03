@@ -1,21 +1,21 @@
 /**
  * TypeScript Array型生成
  *
- * IRArrayModelからTypeScriptのArray type aliasを生成する
+ * IRArraySchemaからTypeScriptのArray type aliasを生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
- * IRArrayModelからTypeScript type aliasを生成
- * @param model - IRArrayModel
+ * IRArraySchemaからTypeScript type aliasを生成
+ * @param model - IRArraySchema
  * @returns TypeScript Array type alias定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "array",
  *   name: "UserList",
  *   referencePath: "#/components/schemas/UserList",
@@ -25,7 +25,9 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  * // => "export type UserList = Array<User>;"
  * ```
  */
-export function generateArrayType(model: IRModel & { kind: "array" }): string {
+export function generateArrayType(
+  model: IRComponent & { kind: "array" },
+): string {
   const typeName = toTypeName(model.name);
   const itemType = irTypeToTsType(model.itemType);
 
@@ -49,7 +51,7 @@ if (import.meta.vitest) {
   describe("types-array", () => {
     describe("generateArrayType", () => {
       it("should generate basic array type", () => {
-        const model: IRModel & { kind: "array" } = {
+        const model: IRComponent & { kind: "array" } = {
           kind: "array",
           name: "NumberList",
           referencePath: "#/components/schemas/NumberList",
@@ -62,7 +64,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate array with description", () => {
-        const model: IRModel & { kind: "array" } = {
+        const model: IRComponent & { kind: "array" } = {
           kind: "array",
           name: "StringList",
           referencePath: "#/components/schemas/StringList",
@@ -83,7 +85,7 @@ export type StringList = Array<string>;
       });
 
       it("should generate array of reference type", () => {
-        const model: IRModel & { kind: "array" } = {
+        const model: IRComponent & { kind: "array" } = {
           kind: "array",
           name: "UserList",
           referencePath: "#/components/schemas/UserList",

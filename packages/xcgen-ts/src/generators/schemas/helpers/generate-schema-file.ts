@@ -1,10 +1,10 @@
 /**
  * スキーマファイル生成
  *
- * IRModel → Valibotスキーマコード（個別ファイル）への変換
+ * IRComponent → Valibotスキーマコード（個別ファイル）への変換
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import {
   generateTypeImports,
   processImports,
@@ -15,18 +15,18 @@ import { generateSchemaModel } from "../schemas-model";
 import { extractSchemaDependencies } from "./extract-dependencies";
 
 /**
- * 純粋関数: IRModel → Valibotスキーマコード
+ * 純粋関数: IRComponent → Valibotスキーマコード
  *
  * 個別のスキーマファイルを生成する。依存する他のスキーマのimport文も自動生成される。
  *
- * @param model - IRModel
+ * @param model - IRComponent
  * @param hooks - Hook instance（オプション）
  * @param schemaImports - Hook経由で追加されたimport（オプション）
  * @returns Valibotスキーマコード（null: 生成スキップ）
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   properties: [...]
@@ -36,7 +36,7 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  * ```
  */
 export function generateSchemaFile(
-  model: IRModel,
+  model: IRComponent,
   hooks?: HookableInstance,
   schemaImports?: string[],
 ): string | null {
@@ -105,7 +105,7 @@ if (import.meta.vitest) {
 
   describe("generateSchemaFile", () => {
     it("should generate schema file with header", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "User",
         referencePath: "#/components/schemas/User",
@@ -129,7 +129,7 @@ if (import.meta.vitest) {
     });
 
     it("should generate imports for referenced schemas", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
@@ -157,7 +157,7 @@ if (import.meta.vitest) {
     });
 
     it("should not import self-reference", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "TreeNode",
         referencePath: "#/components/schemas/TreeNode",
@@ -184,7 +184,7 @@ if (import.meta.vitest) {
     });
 
     it("should return null for parameter models", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "parameter",
         name: "GetUserParams",
         referencePath: "#/paths/~1users~1{userId}/get/parameters",
@@ -205,7 +205,7 @@ if (import.meta.vitest) {
     });
 
     it("should sort imports alphabetically", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",

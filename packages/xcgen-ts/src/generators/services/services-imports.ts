@@ -2,7 +2,7 @@
  * サービスインポート文生成
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { getEndpointDataTypes } from "./services-data-types";
 import { resolveModelName } from "../../helpers/model-resolver";
 
@@ -14,7 +14,7 @@ import { resolveModelName } from "../../helpers/model-resolver";
  */
 export function generateServicesImports(
   endpoints: IREndpoint[],
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   const lines: string[] = [];
 

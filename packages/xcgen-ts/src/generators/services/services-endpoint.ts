@@ -2,7 +2,7 @@
  * API関数生成
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { toFunctionName } from "../../helpers/naming";
 import type { HookableInstance, TsCodeEndpoint } from "../../hooks";
 import { getResponseType } from "./services-response-type";
@@ -17,7 +17,7 @@ import { getEndpointDataTypes } from "./services-data-types";
  */
 export function generateEndpoint(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
   hooks?: HookableInstance,
 ): string | null {
   if (!endpoint.operationId) {
@@ -62,7 +62,7 @@ export function generateEndpoint(
  */
 function generateJSDocComment(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   const lines: string[] = [];
   const dataTypes = getEndpointDataTypes(endpoint, models);
@@ -98,7 +98,7 @@ function generateJSDocComment(
 function generateFunctionCode(
   endpoint: IREndpoint,
   functionName: string,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   const lines: string[] = [];
   const dataTypes = getEndpointDataTypes(endpoint, models);
@@ -172,7 +172,7 @@ if (import.meta.vitest) {
   describe("services-endpoint", () => {
     describe("generateEndpoint", () => {
       it("should generate function with operationId", () => {
-        const models: IRModel[] = [
+        const models: IRComponent[] = [
           {
             kind: "array",
             name: "GetUsers200Response",

@@ -4,7 +4,7 @@
  * IRPropertyからTypeScriptのプロパティ定義を生成する
  */
 
-import type { IRModel, IRProperty } from "@openapi-xcgen/core";
+import type { IRComponent, IRProperty } from "@openapi-xcgen/core";
 import { toPropertyName } from "../../helpers/naming";
 import { applyTypeModifiers, irTypeToTsType } from "../../helpers/type-mapper";
 import type { HookableInstance } from "../../hooks/create-hooks";
@@ -23,7 +23,7 @@ import type { HookableInstance } from "../../hooks/create-hooks";
  *   type: "string",
  *   required: true,
  * };
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   referencePath: "#/components/schemas/User",
@@ -35,7 +35,7 @@ import type { HookableInstance } from "../../hooks/create-hooks";
  */
 export function generateProperty(
   prop: IRProperty,
-  model: IRModel,
+  model: IRComponent,
   hooks?: HookableInstance,
 ): string {
   const propName = toPropertyName(prop.name);
@@ -84,7 +84,7 @@ export function generateProperty(
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  const mockModel: IRModel = {
+  const mockModel: IRComponent = {
     kind: "object",
     name: "TestModel",
     referencePath: "#/components/schemas/TestModel",

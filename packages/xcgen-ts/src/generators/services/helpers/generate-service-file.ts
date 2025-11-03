@@ -4,7 +4,7 @@
  * タグ別のエンドポイントグループからサービスファイルを生成
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { processImports } from "../../../helpers/import-handler";
 import type { HookableInstance } from "../../../hooks";
 import { generateServicesImports } from "../services-imports";
@@ -25,7 +25,7 @@ import { generateEndpoint } from "../services-endpoint";
  *   { operationId: "getPet", ... },
  *   { operationId: "createPet", ... }
  * ];
- * const models: IRModel[] = [...];
+ * const models: IRComponent[] = [...];
  * generateServiceFile("pets", endpoints, models);
  * // => "/**\n * pets service functions\n * ...\n *\/\n\nimport { request } from '../client';\n\nexport async function getPet(...) { ... }"
  * ```
@@ -33,7 +33,7 @@ import { generateEndpoint } from "../services-endpoint";
 export function generateServiceFile(
   tag: string,
   endpoints: IREndpoint[],
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
   hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];

@@ -1,24 +1,24 @@
 /**
  * TypeScript Parameter型生成
  *
- * IRParameterModelからTypeScriptのinterfaceを生成する
+ * IRParameterComponentからTypeScriptのinterfaceを生成する
  * {OperationId}Data形式で、path/query/header/bodyを構造化
  */
 
-import type { IRParameterModel } from "@openapi-xcgen/core";
+import type { IRParameterComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import type { HookableInstance } from "../../hooks";
 import { generateParameterProperty } from "./types-parameter-property";
 
 /**
- * IRParameterModelからTypeScript interfaceを生成
- * @param model - IRParameterModel
+ * IRParameterComponentからTypeScript interfaceを生成
+ * @param model - IRParameterComponent
  * @param hooks - Hook instance（オプション）
  * @returns TypeScript interface定義文字列
  *
  * @example
  * ```typescript
- * const model: IRParameterModel = {
+ * const model: IRParameterComponent = {
  *   kind: "parameter",
  *   name: "GetUserData",
  *   referencePath: "#/paths/~1users~1{id}/get/parameters",
@@ -32,7 +32,7 @@ import { generateParameterProperty } from "./types-parameter-property";
  * ```
  */
 export function generateParameterType(
-  model: IRParameterModel,
+  model: IRParameterComponent,
   hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
@@ -78,7 +78,7 @@ if (import.meta.vitest) {
   describe("types-parameter", () => {
     describe("generateParameterType", () => {
       it("should generate parameter type with path params", () => {
-        const model: IRParameterModel = {
+        const model: IRParameterComponent = {
           kind: "parameter",
           name: "GetUserData",
           referencePath: "#/paths/~1users~1{id}/get/parameters",
@@ -106,7 +106,7 @@ export interface GetUserData {
       });
 
       it("should generate parameter type with multiple groups", () => {
-        const model: IRParameterModel = {
+        const model: IRParameterComponent = {
           kind: "parameter",
           name: "SearchData",
           referencePath: "#/paths/~1search/get/parameters",
@@ -140,7 +140,7 @@ export interface SearchData {
       });
 
       it("should generate parameter type with description", () => {
-        const model: IRParameterModel = {
+        const model: IRParameterComponent = {
           kind: "parameter",
           name: "UpdateUserData",
           referencePath: "#/paths/~1users~1{id}/put/parameters",
