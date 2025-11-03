@@ -10,7 +10,8 @@ import type { IRRequestBody } from "./endpoints/request";
 import type { IRResponse } from "./endpoints/response";
 import type { IRMetadata } from "./metadata";
 import type { IRModel } from "./models/operation";
-import type { IRSecurityRequirement, IRSecurityScheme } from "./security";
+import type { IRSecurityRequirement } from "./security/security-requirement";
+import type { IRSecurityScheme } from "./security/security-scheme";
 import type { IRServer } from "./servers";
 import type { IRTag } from "./tags";
 
@@ -40,18 +41,13 @@ export interface XcgenIR {
 }
 
 // Re-export all types from sub-modules
-// common
-export type {
-  IRExtensions,
-  IRExtensionValue,
-  IRRef,
-  IRScalarType,
-  IRType,
-  MimeType,
-} from "./common";
-// metadata
+// common (直接ファイルから)
+export type { IRExtensions, IRExtensionValue } from "./common/extensions";
+export type { MimeType } from "./common/mime-type";
+export type { IRRef, IRScalarType, IRType } from "./common/type";
+// metadata (inline定義なのでそのまま)
 export type { IRMetadata } from "./metadata";
-// models
+// models (直接ファイルから)
 export type {
   IRAllOfModel,
   IRAnyOfModel,
@@ -60,34 +56,35 @@ export type {
   IREnumModel,
   IREnumValue,
   IRMapModel,
-  IRModel,
   IRObjectModel,
+  IRUnionModel,
+} from "./models/base";
+export type {
+  IRModel,
   IRParameterModel,
-  IRParameterProperty,
-  IRProperty,
   IRRequestBodyModel,
   IRResponseModel,
-  IRUnionModel,
-  IRValidation,
-} from "./models";
-// tags
+} from "./models/operation";
+export type { IRParameterProperty, IRProperty } from "./models/property";
+export type { IRValidation } from "./models/validation";
+// tags (inline定義なのでそのまま)
 export type { IRTag, IRTagExternalDocs } from "./tags";
-// endpoints
-export { isIRRequestBodyWithContent } from "./endpoints";
+// endpoints (直接ファイルから)
+export type { IREndpoint, IRHttpMethod } from "./endpoints/endpoint";
+export type { IRParameter, IRParameterInType } from "./endpoints/parameter";
+export { isIRRequestBodyWithContent } from "./endpoints/request";
 export type {
-  IREndpoint,
-  IRHttpMethod,
-  IRParameter,
-  IRParameterInType,
   IRRequestBody,
   IRRequestBodyWithContent,
   IRRequestBodyWithRef,
   IRRequestContent,
+} from "./endpoints/request";
+export type {
   IRResponse,
   IRResponseContent,
   IRResponseHeader,
-} from "./endpoints";
-// security
+} from "./endpoints/response";
+// security (直接ファイルから)
 export type {
   IRApiKeySecurityScheme,
   IRHttpSecurityScheme,
@@ -95,8 +92,8 @@ export type {
   IROAuthFlow,
   IROAuthFlows,
   IROpenIdConnectSecurityScheme,
-  IRSecurityRequirement,
   IRSecurityScheme,
-} from "./security";
-// servers
+} from "./security/security-scheme";
+export type { IRSecurityRequirement } from "./security/security-requirement";
+// servers (inline定義なのでそのまま)
 export type { IRServer, IRServerVariable } from "./servers";
