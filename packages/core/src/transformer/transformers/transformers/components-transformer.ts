@@ -115,10 +115,11 @@ export function transformComponents(
         ? traverseHeaders(responseObj.headers, responseContext, dispatchSchema)
         : undefined;
 
-      // transformResponseを呼び出し（statusCodeは空文字列）
+      // transformResponseを呼び出し（statusCodeはデフォルト値"200"）
+      // 下流でstatusCode.startsWith("2")等の判定が使われるため、互換性のため"200"を設定
       const responseResult = transformResponse(
         responseObj,
-        "", // components.responsesではstatusCodeは不要
+        "200", // components.responsesはHTTPステータスコードを持たないが、デフォルト値として"200"を設定
         responseContext,
         contentResult,
         headersResult,
@@ -159,7 +160,12 @@ export function transformComponents(
       const contentResult = requestBodyObj.content
         ? traverseContent(
             requestBodyObj.content,
-            requestBodyContext,
+            {
+              ...requestBodyContext,
+              ...(requestBodyObj.required !== undefined && {
+                required: requestBodyObj.required,
+              }),
+            },
             dispatchSchema,
           )
         : { content: [], childModels: [], requiresSpecialModel: false };

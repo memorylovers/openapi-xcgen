@@ -1284,7 +1284,7 @@
   "commonResponses": {
     "BadRequest": {
       "kind": "content",
-      "statusCode": "",
+      "statusCode": "200",
       "description": "Bad Request - Invalid input",
       "content": [
         {
@@ -1298,7 +1298,7 @@
     },
     "Unauthorized": {
       "kind": "content",
-      "statusCode": "",
+      "statusCode": "200",
       "description": "Unauthorized - Authentication required",
       "content": [
         {
@@ -1312,7 +1312,7 @@
     },
     "NotFound": {
       "kind": "content",
-      "statusCode": "",
+      "statusCode": "200",
       "description": "Not Found - Resource not found",
       "content": [
         {
@@ -1326,7 +1326,7 @@
     },
     "Conflict": {
       "kind": "content",
-      "statusCode": "",
+      "statusCode": "200",
       "description": "Conflict - Resource state conflict",
       "content": [
         {
@@ -1340,7 +1340,7 @@
     },
     "TooManyRequests": {
       "kind": "content",
-      "statusCode": "",
+      "statusCode": "200",
       "description": "Too Many Requests - Rate limit exceeded",
       "content": [
         {
@@ -1371,7 +1371,7 @@
     },
     "InternalServerError": {
       "kind": "content",
-      "statusCode": "",
+      "statusCode": "200",
       "description": "Internal Server Error",
       "content": [
         {
