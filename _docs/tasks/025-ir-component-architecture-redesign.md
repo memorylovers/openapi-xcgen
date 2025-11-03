@@ -254,41 +254,121 @@ class User {
 2. **生成器側**: 言語特性に応じた最適化
 3. **変換不可逆性**: Component → inline（可能） / inline → Component（困難）
 
-### 生成器でのinline化戦略（TypeScript）
+### 生成器でのinline化戦略（TypeScript） - 修正版
+
+**⚠️ 重要な設計判断**:
+
+**❌ 誤った理解（削除された旧提案）**:
 
 ```typescript
-// xcgen-ts/src/generators/types/inline-strategy.ts
+// generateArrayType() を変更して型定義自体を消す提案は誤り
+function generateArrayType(component: IRArraySchema): string {
+  if (shouldInlineArray(component)) {
+    // ❌ 型定義を返さない（これでは export type が生成されない）
+    return `Array<${resolveType(component.itemType)}>`;
+  }
+}
+```
+
+**問題点**:
+
+- `export type UserList = Array<User>;` という型定義が失われる
+- `components/schemas/UserIds` のように単体公開されている配列型が外部から参照できなくなる
+- OpenAPI の公開 API として定義された型が TypeScript で表現されない
+
+**✅ 正しい設計**:
+
+inline化は「使用箇所」で判定し、**型定義自体は常にエクスポート**する。
+
+#### 型定義の生成（常にエクスポート）
+
+```typescript
+// packages/xcgen-ts/src/generators/types/types-array.ts
+// ← 変更なし、常に型定義をエクスポート
+
+export function generateArrayType(model: IRArraySchema): string {
+  const typeName = toTypeName(model.name);
+  const itemType = irTypeToTsType(model.itemType);
+
+  // 常に型定義を生成
+  return `export type ${typeName} = Array<${itemType}>;`;
+}
+```
+
+#### 使用箇所での inline 化判定
+
+```typescript
+// packages/xcgen-ts/src/generators/types/helpers/inline-strategy.ts（新規作成）
 
 /**
- * TypeScript生成時のinline化判断
+ * Array型を使用箇所で inline 化すべきか判定
  */
-function shouldInlineArray(component: IRArraySchema): boolean {
+export function shouldInlineArrayAtUsage(
+  component: IRArraySchema
+): boolean {
   return (
-    !component.validation &&           // validationなし
-    !component.description &&          // ドキュメントなし
-    isSimpleType(component.itemType)   // 参照先がシンプル
+    !component.validation &&          // バリデーションなし
+    !component.description &&         // ドキュメントなし
+    isSimpleType(component.itemType)  // 単純な型（primitive or simple ref）
   );
 }
 
-function generateArrayType(component: IRArraySchema): string {
-  if (shouldInlineArray(component)) {
-    // inline化
-    return `Array<${resolveType(component.itemType)}>`;
+function isSimpleType(type: IRType): boolean {
+  // primitive型はシンプル
+  if (typeof type === "string") return true;
+  // ref型は一旦非シンプルとする（将来拡張可能）
+  return false;
+}
+```
+
+#### プロパティ生成での適用
+
+```typescript
+// packages/xcgen-ts/src/generators/types/types-property.ts を更新
+
+import { shouldInlineArrayAtUsage, shouldInlineMapAtUsage } from "./helpers/inline-strategy";
+
+export function generateProperty(
+  prop: IRProperty,
+  parentModel: IRComponent,
+  hooks?: HookableInstance,
+): string {
+  // 型解決時に inline 化判定
+  let typeStr: string;
+
+  if (typeof prop.type !== "string" && prop.type.kind === "ref") {
+    // IR から component を検索
+    const component = findComponent(ir, prop.type.name);
+
+    if (component?.kind === "array" && shouldInlineArrayAtUsage(component)) {
+      // inline 化: Array<...> 形式
+      const itemType = irTypeToTsType(component.itemType);
+      typeStr = `Array<${itemType}>`;
+    } else if (component?.kind === "map" && shouldInlineMapAtUsage(component)) {
+      // inline 化: Record<string, ...> 形式
+      const valueType = irTypeToTsType(component.valueType);
+      typeStr = `Record<string, ${valueType}>`;
+    } else {
+      // 通常の参照型
+      typeStr = irTypeToTsType(prop.type);
+    }
   } else {
-    // 独立した型定義
-    return `export type ${component.name} = Array<${resolveType(component.itemType)}>;`;
+    typeStr = irTypeToTsType(prop.type);
   }
+
+  // ...
 }
 ```
 
 **生成例**:
 
 ```typescript
-// IR定義（全て名前付き）
+// === IR定義（全て名前付き） ===
 IRArraySchema {
   name: "UserIds",
   itemType: "string",
-  validation: undefined
+  validation: undefined,
+  description: undefined
 }
 
 IRArraySchema {
@@ -297,13 +377,17 @@ IRArraySchema {
   validation: { minItems: 1 }
 }
 
-// TypeScript生成結果
-interface SomeResponse {
-  userIds: string[];        // ← inline化（シンプル）
-  users: UserList;          // ← 名前付き（validation有り）
-}
+// === TypeScript生成結果 ===
 
+// 1. 型定義は常に生成される
+export type UserIds = Array<string>;
 export type UserList = Array<User>;
+
+// 2. 使用箇所で inline 化判定
+interface SomeResponse {
+  userIds: Array<string>;  // ← inline化（validation/descriptionなし）
+  users: UserList;         // ← 参照型（validationあり）
+}
 ```
 
 **Dart生成結果**:
@@ -319,10 +403,17 @@ class UserList {
 }
 
 class SomeResponse {
-  final UserIds userIds;
+  final UserIds userIds;  // ← Dart は常に参照型
   final UserList users;
 }
 ```
+
+**設計原則**:
+
+1. **型定義は常にエクスポート**: 外部参照、ドキュメント生成、型の再利用のため
+2. **inline化は使用箇所で判定**: プロパティ、パラメータ、レスポンス型で個別に判断
+3. **設定で制御可能**: 将来的に `xcgen.config.ts` で inline 化の挙動を変更可能
+4. **情報の保持**: validation や description がある場合は参照型を維持
 
 ---
 
@@ -379,13 +470,15 @@ export interface IRComponentRef {
 
 ## 実装計画
 
-### Phase 1: 型定義の整理とリネーム
+### Phase 1: 型定義の整理とリネーム + validation 追加（拡張版）
 
-**目的**: IRModelをIRComponentに変更し、構造を分離
+**目的**: IRModelをIRComponentに変更し、構造を分離、validation フィールドを追加
+
+**推定時間**: 6-8 hours
 
 **タスク**:
 
-1. 型定義のリネーム
+1. 型定義のリネーム（4時間）
 
    **Schema系（Model → Schema）**:
    - `IRModel` → `IRComponent`
@@ -405,7 +498,104 @@ export interface IRComponentRef {
    **型参照（Ref → ComponentRef）**:
    - `IRRef` → `IRComponentRef`
 
-2. 型階層の分離
+2. validation フィールドの追加（2時間）
+
+   **IRArraySchema に追加**:
+
+   ```typescript
+   export interface IRArraySchema {
+     kind: "array";
+     name: string;
+     referencePath: string;
+     description?: string;
+     itemType: IRType;
+     validation?: IRValidation;  // ← 追加（minItems, maxItems, uniqueItems）
+   }
+   ```
+
+   **IRMapSchema に追加**:
+
+   ```typescript
+   export interface IRMapSchema {
+     kind: "map";
+     name: string;
+     referencePath: string;
+     description?: string;
+     valueType: IRType;
+     validation?: IRValidation;  // ← 追加（minProperties, maxProperties）
+   }
+   ```
+
+   **既存の `extractValidation` ヘルパー関数**:
+   - `packages/core/src/transformer/helpers/extract-validation.ts` は既に実装済み
+   - 配列バリデーション（minItems, maxItems, uniqueItems）に対応済み
+   - オブジェクトバリデーション（minProperties, maxProperties）に対応済み
+
+3. Transformer での validation 収集（2時間）
+
+   **array-transformer.ts を更新**:
+
+   ```typescript
+   import { extractValidation } from "../../helpers";
+
+   export function transformArray(
+     schema: SchemaObject & {
+       items?: SchemaObject | ReferenceObject;
+     },
+     context: VisitorContext,
+     traversalResult: ArrayItemTraversalResult,
+   ): TransformResult {
+     const name = getComponentName(context);
+     const referencePath = buildReferencePath(context.documentPath);
+     const validation = extractValidation(schema);  // ← 追加
+
+     const arrayModel: IRArraySchema = {
+       kind: "array",
+       name,
+       referencePath,
+       itemType: traversalResult.itemType,
+       ...(schema.description && { description: schema.description }),
+       ...(validation && { validation }),  // ← 追加
+     };
+
+     return {
+       type: { kind: "ref", name: referencePath },
+       components: [arrayModel, ...traversalResult.components],
+     };
+   }
+   ```
+
+   **map-transformer.ts を更新**:
+
+   ```typescript
+   import { extractValidation } from "../../helpers";
+
+   export function transformMap(
+     schema: SchemaObject,
+     context: VisitorContext,
+     traversalResult: AdditionalPropertiesTraversalResult,
+   ): TransformResult {
+     const name = getComponentName(context);
+     const referencePath = buildReferencePath(context.documentPath);
+     const validation = extractValidation(schema);  // ← 追加
+
+     const mapModel: IRMapSchema = {
+       kind: "map",
+       name,
+       referencePath,
+       valueType: traversalResult.valueType,
+       ...(schema.description && { description: schema.description }),
+       ...(validation && { validation }),  // ← 追加
+     };
+
+     return {
+       type: { kind: "ref", name: referencePath },
+       components: [mapModel, ...traversalResult.components],
+     };
+   }
+   ```
+
+4. 型階層の分離
 
    ```typescript
    // packages/core/src/types/ir/components/index.ts
@@ -427,7 +617,7 @@ export interface IRComponentRef {
    export type IRComponent = IRSchema | IROperationComponent;
    ```
 
-3. XcgenIRフィールドの変更
+5. XcgenIRフィールドの変更
 
    ```typescript
    // packages/core/src/types/ir/index.ts
@@ -441,7 +631,7 @@ export interface IRComponentRef {
    }
    ```
 
-4. 型ガード関数の更新
+6. 型ガード関数の追加
 
    ```typescript
    // packages/core/src/types/guards.ts
@@ -455,7 +645,7 @@ export interface IRComponentRef {
    }
    ```
 
-5. Helper関数のリネーム ← **Task 022/022.5との整合性**
+7. Helper関数のリネーム ← **Task 022/022.5との整合性**
 
    Task 022/022.5で整理された`helpers/`配下の命名関数も"Model"から"Component"へ変更:
 
@@ -509,47 +699,87 @@ pnpm typecheck  # 型チェック
 pnpm test       # 全テスト実行
 ```
 
-### Phase 2: 生成器のinline化戦略実装（xcgen-ts）
+### Phase 2: 生成器のinline化戦略実装（再設計版）
 
-**目的**: TypeScript生成時のinline化判断ロジックを実装
+**目的**: TypeScript生成時のinline化判断ロジックを実装（使用箇所で判定）
+
+**推定時間**: 8-10 hours
+
+**重要**: 詳細な設計は上記「生成器でのinline化戦略（TypeScript） - 修正版」セクション（257-414行）を参照
 
 **タスク**:
 
-1. inline化戦略モジュールの作成
+1. inline化戦略モジュールの作成（新規ファイル）
+
+   **packages/xcgen-ts/src/generators/types/helpers/inline-strategy.ts**:
 
    ```typescript
-   // packages/xcgen-ts/src/generators/types/inline-strategy.ts
+   import type { IRArraySchema, IRMapSchema, IRType } from "@openapi-xcgen/core";
 
-   export interface InlineConfig {
-     arrays: boolean | "simple-only";  // true/false/"simple-only"
-     maps: boolean | "simple-only";
+   /**
+    * Array型を使用箇所で inline 化すべきか判定
+    */
+   export function shouldInlineArrayAtUsage(
+     component: IRArraySchema
+   ): boolean {
+     return (
+       !component.validation &&          // バリデーションなし
+       !component.description &&         // ドキュメントなし
+       isSimpleType(component.itemType)  // 単純な型
+     );
    }
 
-   export function shouldInlineArray(
-     component: IRArraySchema,
-     config: InlineConfig
+   /**
+    * Map型を使用箇所で inline 化すべきか判定
+    */
+   export function shouldInlineMapAtUsage(
+     component: IRMapSchema
    ): boolean {
-     // 判断ロジック
+     return (
+       !component.validation &&
+       !component.description &&
+       isSimpleType(component.valueType)
+     );
+   }
+
+   function isSimpleType(type: IRType): boolean {
+     if (typeof type === "string") return true;
+     return false;  // ref型は一旦非シンプル
    }
    ```
 
-2. 既存の型生成ロジックの更新
-   - `types-array.ts` - inline化判断を追加
-   - `types-map.ts` - inline化判断を追加
+2. プロパティ生成での inline 化判定の実装
 
-3. 設定ファイルでの制御（将来拡張）
+   **packages/xcgen-ts/src/generators/types/types-property.ts を更新**:
+   - `shouldInlineArrayAtUsage()`, `shouldInlineMapAtUsage()` を import
+   - プロパティの型解決時に IR から component を検索
+   - inline 化条件を満たす場合は `Array<...>` または `Record<string, ...>` 形式で生成
+   - それ以外は通常の参照型として生成
+
+3. パラメータ/レスポンス型でも同様に適用
+
+   - `types-parameter-property.ts` を更新
+   - `services-response-type.ts` を更新
+
+4. 設定ファイルでの制御（将来拡張）
 
    ```typescript
-   // xcgen.config.ts (将来実装)
+   // xcgen.config.ts (Phase 2 後半または Phase 3 で実装)
    export default {
      typescript: {
        inline: {
-         arrays: "simple-only",
-         maps: false
+         arrays: "simple-only",  // "always" | "never" | "simple-only"
+         maps: "simple-only",
        }
      }
    }
    ```
+
+**重要な原則**:
+
+- ✅ 型定義（types-array.ts, types-map.ts）は**変更しない**
+- ✅ 型定義は常にエクスポートされる
+- ✅ inline 化は「使用箇所」で判定される
 
 **検証**:
 
@@ -557,6 +787,7 @@ pnpm test       # 全テスト実行
 cd packages/xcgen-ts
 pnpm test
 pnpm regenerate:expected  # E2E期待値再生成
+git diff tests/  # 生成結果の差分確認（inline化された箇所を確認）
 ```
 
 ### Phase 3: ドキュメント更新
@@ -727,15 +958,24 @@ IRModelは以下の種類がある
 
 ## 実装ステータス
 
-- [ ] Phase 1: 型定義の整理とリネーム
-  - 影響: 73ファイル + テスト
-  - 期間: 2-3日
-  - 主な作業: IRModel→IRComponent、helper関数リネーム、JSDocコメント更新
+- [ ] Phase 1: 型定義の整理とリネーム + validation 追加（拡張版）
+  - 影響: ~80ファイル + テスト
+  - 期間: 3-4日
+  - 主な作業:
+    - IRModel→IRComponent リネーム
+    - IRArraySchema/IRMapSchema に validation フィールド追加
+    - array-transformer.ts/map-transformer.ts を更新して validation 収集
+    - helper関数リネーム（get-model-name → get-component-name など）
+    - JSDocコメント更新
 
-- [ ] Phase 2: 生成器のinline化戦略実装
-  - 影響: xcgen-tsのみ（types-array.ts、types-map.ts）
-  - 期間: 1-2日
-  - 主な作業: inline化判断ロジック実装、設定オプション追加
+- [ ] Phase 2: 生成器のinline化戦略実装（再設計版）
+  - 影響: xcgen-tsのみ（types-property.ts、inline-strategy.ts新規作成）
+  - 期間: 2-3日
+  - 主な作業:
+    - 使用箇所でのinline化判断ロジック実装（types-property.ts更新）
+    - inline-strategy.ts モジュール新規作成（shouldInlineArrayAtUsage など）
+    - 設定オプション追加
+    - **重要**: types-array.ts/types-map.ts は変更なし（型定義は常にエクスポート）
 
 - [ ] Phase 3: ドキュメント更新
   - 影響: _docs/配下の4ファイル
