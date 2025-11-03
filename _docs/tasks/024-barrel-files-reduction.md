@@ -2,9 +2,7 @@
 
 ## 概要
 
-packages/core に存在する21個のバレルファイル（index.ts）のうち、冗長な14個を削除してTree-shakingの効率を向上させる。
-
-**更新**: Task 022.5でhelpers配下に2個のバレルファイルが追加されたため、削除対象を12個→14個に更新。
+packages/core に存在する16個のバレルファイル（index.ts）のうち、冗長な9個を削除してTree-shakingの効率を向上させる。
 
 ## 背景
 
@@ -25,36 +23,29 @@ Task 022.5でhelpers配下に2個のバレルファイルが追加されまし�
 
 ## 目標
 
-**21個 → 7個に削減**（14個削除）
+**16個 → 7個に削減**（9個削除）
 
-- 当初: 19個
-- Task 022.5で追加: +2個
-- 削除対象: 14個（当初12個 + 追加2個）
+削除内訳：
 
-### 削除対象（14個）
+- helpers配下: 2個
+- types/ir配下: 7個
 
-#### transformer/helpers/ 配下（2個） ← **Task 022.5で追加**
+### 削除対象（9個）
+
+#### transformer/helpers/ 配下（2個）
 
 1. `src/transformer/helpers/naming/index.ts` - 10ファイルの再エクスポートのみ
 2. `src/transformer/helpers/path/index.ts` - 4ファイルの再エクスポートのみ
 
 #### types/ir/ 配下（7個）
 
-1. `src/types/ir/common/index.ts` - 3ファイルの再エクスポートのみ
-2. `src/types/ir/endpoints/index.ts` - 4ファイルの再エクスポートのみ
-3. `src/types/ir/models/index.ts` - 3ファイルの再エクスポートのみ
-4. `src/types/ir/security/index.ts` - 2ファイルの再エクスポートのみ
+1. `src/types/ir/common/index.ts` - 3ファイルの再エクスポート
+2. `src/types/ir/endpoints/index.ts` - 4ファイルの再エクスポート
+3. `src/types/ir/models/index.ts` - 3ファイルの再エクスポート
+4. `src/types/ir/security/index.ts` - 2ファイルの再エクスポート
 5. `src/types/ir/tags/index.ts` - たった1つのinterface定義のみ
 6. `src/types/ir/metadata/index.ts` - たった1つのinterface定義のみ
 7. `src/types/ir/servers/index.ts` - 2つのinterface定義のみ
-
-#### transformer/visitors/ 配下（5個）
-
-8. `src/transformer/visitors/schema/index.ts`
-9. `src/transformer/visitors/components/index.ts` - たった1つの関数のみ
-10. `src/transformer/visitors/operations/index.ts`
-11. `src/transformer/visitors/paths/index.ts` - 2つの関数のみ
-12. `src/transformer/visitors/metadata/index.ts` - 2つの関数のみ
 
 ### 残すファイル（7個）
 
@@ -65,12 +56,12 @@ Task 022.5でhelpers配下に2個のバレルファイルが追加されまし�
 3. `src/types/ir/index.ts` - IR型の集約（ここで直接ファイルからexport）
 4. `src/parser/index.ts` - パーサーモジュール
 5. `src/transformer/index.ts` - transformerモジュール
-6. `src/transformer/visitors/index.ts` - visitorsの集約（ここで直接ファイルからexport）
+6. `src/transformer/transformers/index.ts` - 3層アーキテクチャの統一エクスポートポイント（59エクスポート）
 7. `src/transformer/helpers/index.ts` - helpersの集約
 
 ## 実装手順
 
-### 0. transformer/helpers/ 配下の削除と修正 ← **Task 022.5対応**
+### 0. transformer/helpers/ 配下の削除と修正
 
 #### 0-1. バレルファイルの削除（2個）
 
@@ -209,69 +200,7 @@ export type { IRSecurityRequirement } from "./security/security-requirement";
 export type { IRServer, IRServerVariable } from "./servers";
 ```
 
-### 2. transformer/visitors/ 配下の削除と修正
-
-#### 2-1. バレルファイルの削除（5個）
-
-```bash
-rm src/transformer/visitors/schema/index.ts
-rm src/transformer/visitors/components/index.ts
-rm src/transformer/visitors/operations/index.ts
-rm src/transformer/visitors/paths/index.ts
-rm src/transformer/visitors/metadata/index.ts
-```
-
-#### 2-2. transformer/visitors/index.ts の修正
-
-削除前のimport:
-
-```typescript
-export { visitSchema, visitType, visitEnum, visitObject, /* ... */ } from "./schema";
-export { visitComponents, type ComponentsResult } from "./components";
-```
-
-修正後（直接ファイルからimport）:
-
-```typescript
-// Schema visitors
-export { visitSchema, type SchemaVisitorResult } from "./schema/schema-visitor";
-export { visitType } from "./schema/type-visitor";
-export { visitEnum, type EnumVisitorResult } from "./schema/enum-visitor";
-export {
-  visitObject,
-  visitRequestBodyObject,
-  visitResponseObject,
-  type ObjectVisitorResult,
-} from "./schema/object-visitor";
-export { visitAdditionalProperties } from "./schema/additional-properties-visitor";
-export { visitArray } from "./schema/array-visitor";
-export { visitMap } from "./schema/map-visitor";
-export type { SchemaTransformationResult } from "../types";
-
-// Components visitors
-export { visitComponents, type ComponentsResult } from "./components/components-visitor";
-
-// Paths visitors
-export { visitPaths, type PathsResult } from "./paths/paths-visitor";
-export { visitPathItem, type PathItemResult } from "./paths/path-item-visitor";
-
-// Operations visitors
-export { visitOperation, type OperationResult } from "./operations/operation-visitor";
-export { visitParameter } from "./operations/parameter-visitor";
-export { visitParameters, type ParametersResult } from "./operations/parameters-visitor";
-export { visitRequestBody, type RequestBodyResult } from "./operations/request-body-visitor";
-export { visitResponse, type ResponseResult } from "./operations/response-visitor";
-export { visitResponses, type ResponsesResult } from "./operations/responses-visitor";
-
-// Metadata visitors
-export { visitMetadata } from "./metadata/metadata-visitor";
-export { visitTags } from "./metadata/tags-visitor";
-
-// Servers visitors
-export { visitServers } from "./servers-visitor";
-```
-
-### 3. 検証
+### 2. 検証
 
 ```bash
 cd packages/core
@@ -321,12 +250,10 @@ pnpm check
 
 ## 完了条件
 
-- [ ] transformer/helpers/ 配下の2個のバレルファイルを削除（Task 022.5対応）
+- [ ] transformer/helpers/ 配下の2個のバレルファイルを削除
 - [ ] transformer/helpers/index.ts を修正（直接ファイルからexport）
 - [ ] types/ir/ 配下の7個のバレルファイルを削除
 - [ ] types/ir/index.ts を修正（直接ファイルからexport）
-- [ ] transformer/visitors/ 配下の5個のバレルファイルを削除
-- [ ] transformer/visitors/index.ts を修正（直接ファイルからexport）
 - [ ] `pnpm typecheck` が成功
 - [ ] `pnpm test` が成功
 - [ ] `pnpm lint` が成功

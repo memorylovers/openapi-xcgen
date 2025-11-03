@@ -475,14 +475,32 @@ export interface IRComponentRef {
    - `helpers/naming/get-model-name.ts` - メイン関数名変更
    - `helpers/naming/build-*-model-name.ts` (7ファイル) - 関数名とコメント変更
    - `helpers/create-parameter-model.ts` - 関数名変更
-   - 全visitorファイル - import文と関数呼び出しを更新
+   - 全transformerファイル - import文と関数呼び出しを更新
 
 **影響範囲**:
 
-- `packages/core/src/types/ir/` - 型定義全体
-- `packages/core/src/transformer/` - Transformer全体
-- `packages/xcgen-ts/src/` - TypeScript生成器全体
-- `packages/xcgen-dart/src/` - Dart生成器全体（未実装）
+- `packages/core/src/types/ir/models/` - **型定義 (4ファイル)**
+  - base.ts, operation.ts, property.ts, validation.ts
+
+- `packages/core/src/transformer/transformers/` - **変換ロジック (34ファイル)**
+  - transformers/*.ts (21ファイル) - 各型のIR変換
+  - traversers/*.ts (10ファイル) - 子要素の訪問処理
+  - dispatchers/*.ts (2ファイル) - 型判定とルーティング
+  - aggregators/*.ts (1ファイル) - パラメータ集約
+
+- `packages/core/src/transformer/helpers/` - **ヘルパー関数 (8ファイル)**
+  - naming/*.ts (7ファイル) - 命名関数
+  - create-parameter-model.ts (1ファイル)
+
+- `packages/xcgen-ts/src/` - **TypeScript生成器 (27ファイル)**
+  - generators/types/*.ts - 型定義生成
+  - generators/schemas/*.ts - Valibotスキーマ生成
+  - generators/services/*.ts - サービス生成
+  - helpers/model-resolver.ts - モデル名解決
+
+- `packages/xcgen-dart/src/` - **Dart生成器（未実装）**
+
+**合計**: 約73ファイル + テストファイル
 
 **検証**:
 
@@ -577,11 +595,52 @@ pnpm lint:md  # markdownlint
 
 **目的**: 破壊的変更として適切にリリース
 
+**破壊的変更の詳細**:
+
+1. **Public API型名変更** (packages/core):
+
+   ```typescript
+   // Before
+   import type { IRModel, IRObjectModel, IREnumModel } from '@openapi-xcgen/core';
+
+   // After
+   import type { IRComponent, IRObjectSchema, IREnumSchema } from '@openapi-xcgen/core';
+   ```
+
+2. **XcgenIRフィールド名変更**:
+
+   ```typescript
+   // Before
+   const ir: XcgenIR = { models: [...], endpoints: [...], ... };
+
+   // After
+   const ir: XcgenIR = { components: [...], endpoints: [...], ... };
+   ```
+
+3. **型ガード関数**（新規追加が必要）:
+
+   ```typescript
+   // 新規追加
+   export function isIRSchema(component: IRComponent): component is IRSchema {
+     return ['object', 'enum', 'array', 'map', 'allOf', 'anyOf', 'union']
+       .includes(component.kind);
+   }
+
+   export function isIROperationComponent(c: IRComponent): c is IROperationComponent {
+     return ['parameter', 'requestBody', 'response'].includes(c.kind);
+   }
+   ```
+
+**影響を受けるユーザー**:
+
+- ✅ **ほぼゼロ** - 現在外部利用者がいない（開発初期段階）
+- ⚠️ 将来的な外部利用に備えたドキュメント整備が重要
+
 **タスク**:
 
 1. CHANGELOG.md の作成
    - Breaking Changes セクションに記載
-   - 移行ガイドの提供
+   - 移行ガイドの提供（上記コード例含む）
 
 2. バージョニング
    - 0.x.x → 0.y.0 (minor bump)
@@ -589,7 +648,7 @@ pnpm lint:md  # markdownlint
 
 3. リリースノート
    - GitHub Releaseで告知
-   - 移行方法の説明
+   - 移行方法の詳細説明
 
 ---
 
@@ -669,6 +728,22 @@ IRModelは以下の種類がある
 ## 実装ステータス
 
 - [ ] Phase 1: 型定義の整理とリネーム
+  - 影響: 73ファイル + テスト
+  - 期間: 2-3日
+  - 主な作業: IRModel→IRComponent、helper関数リネーム、JSDocコメント更新
+
 - [ ] Phase 2: 生成器のinline化戦略実装
+  - 影響: xcgen-tsのみ（types-array.ts、types-map.ts）
+  - 期間: 1-2日
+  - 主な作業: inline化判断ロジック実装、設定オプション追加
+
 - [ ] Phase 3: ドキュメント更新
+  - 影響: _docs/配下の4ファイル
+  - 期間: 半日
+  - 主な作業: IR設計、アーキテクチャ、Transformer設計、CLAUDE.mdの更新
+
 - [ ] Phase 4: Breaking Changes対応
+  - CHANGELOG.md作成
+  - バージョンバンプ
+  - GitHub Release作成
+  - 期間: 半日
