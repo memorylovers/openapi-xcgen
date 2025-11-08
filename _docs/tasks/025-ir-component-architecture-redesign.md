@@ -254,7 +254,13 @@ class User {
 2. **生成器側**: 言語特性に応じた最適化
 3. **変換不可逆性**: Component → inline（可能） / inline → Component（困難）
 
-### 生成器でのinline化戦略（TypeScript） - 修正版
+### 生成器でのinline化戦略（TypeScript） - ⚠️ ARCHIVED
+
+> **⚠️ このセクションは古い設計提案であり、実装されませんでした。**
+>
+> **決定日:** 2025-11-09
+> **理由:** inline化の複雑さが利益を上回ると判断。全ての型を名前付きコンポーネントとして一貫して生成する方針に統一。
+> **詳細:** 本ドキュメント末尾の「設計決定の記録 (ADR-001)」を参照
 
 **⚠️ 重要な設計判断**:
 
@@ -738,19 +744,21 @@ pnpm typecheck  # 型チェック
 pnpm test       # 全テスト実行
 ```
 
-### Phase 2: 生成器のinline化戦略実装（再設計版）
+### Phase 2: TypeGenerationContext 導入（実装完了、inline化は削除）
 
-**目的**: TypeScript生成時のinline化判断ロジックを実装（使用箇所で判定）
+**⚠️ 注意**: 当初計画されていたinline化機能は実装されませんでした（ADR-001参照）
 
-**推定時間**: 10-13 hours（TypeGenerationContext導入 2-3h + inline化戦略 8-10h）
+**目的**: 型生成時のコンテキスト管理インフラを構築（inline化なし）
 
-**重要**: 詳細な設計は上記「生成器でのinline化戦略（TypeScript） - 修正版」セクション（257-414行）を参照
+**推定時間**: 2-3 hours
 
-**タスク**:
+**実装内容**: TypeGenerationContext の導入のみ（inline化戦略は削除）
 
-1. TypeGenerationContext 導入（2-3時間）
+**タスク（完了済み）**:
 
-   **packages/xcgen-ts/src/generators/types/generation-context.ts（新規作成）**:
+1. TypeGenerationContext 導入（✅ 完了）
+
+   **packages/xcgen-ts/src/generators/types/generation-context.ts（作成済み）**:
 
    ```typescript
    import type { XcgenIR, IRComponent } from "@openapi-xcgen/core";
@@ -776,95 +784,28 @@ pnpm test       # 全テスト実行
    }
    ```
 
-   **全生成関数のシグネチャ変更**（影響: 約15ファイル）:
-   - `generateProperty(prop, model, hooks)` → `generateProperty(prop, model, ctx)`
-   - `generateObjectType(model, hooks)` → `generateObjectType(model, ctx)`
-   - その他の生成関数も同様に `hooks` 引数を `ctx` に置き換え
+**⚠️ inline化戦略タスク（削除）**:
 
-   **エントリーポイントの更新** (`types.ts`):
-   - `TypeGenerationContext` の初期化: `const ctx = { ir, hooks };`
-   - 全生成関数に `ctx` を渡す
+以下のタスクは実装されませんでした（ADR-001参照）:
 
-2. inline化戦略モジュールの作成（新規ファイル）
+- ~~inline化戦略モジュールの作成~~ → **削除**
+- ~~プロパティ生成での inline 化判定の実装~~ → **削除**
+- ~~パラメータ/レスポンス型での適用~~ → **削除**
+- ~~設定ファイルでの制御~~ → **削除**
 
-   **packages/xcgen-ts/src/generators/types/helpers/inline-strategy.ts**:
+**実装方針**:
 
-   ```typescript
-   import type { IRArraySchema, IRMapSchema, IRType } from "@openapi-xcgen/core";
+全ての Array/Map 型は名前付きコンポーネントとして一貫して生成されます。
 
-   /**
-    * Array型を使用箇所で inline 化すべきか判定
-    */
-   export function shouldInlineArrayAtUsage(
-     component: IRArraySchema
-   ): boolean {
-     return (
-       !component.validation &&          // バリデーションなし
-       !component.description &&         // ドキュメントなし
-       isSimpleType(component.itemType)  // 単純な型
-     );
-   }
+```typescript
+// 全ての型が名前付きで生成される
+export type UserIds = Array<string>;
+export type UserList = Array<User>;
 
-   /**
-    * Map型を使用箇所で inline 化すべきか判定
-    */
-   export function shouldInlineMapAtUsage(
-     component: IRMapSchema
-   ): boolean {
-     return (
-       !component.validation &&
-       !component.description &&
-       isSimpleType(component.valueType)
-     );
-   }
-
-   function isSimpleType(type: IRType): boolean {
-     if (typeof type === "string") return true;
-     return false;  // ref型は一旦非シンプル
-   }
-   ```
-
-3. プロパティ生成での inline 化判定の実装
-
-   **packages/xcgen-ts/src/generators/types/types-property.ts を更新**:
-   - `TypeGenerationContext`, `resolveComponent()` を import
-   - `shouldInlineArrayAtUsage()`, `shouldInlineMapAtUsage()` を import
-   - プロパティの型解決時に `resolveComponent(ctx, ...)` で component を検索
-   - inline 化条件を満たす場合は `Array<...>` または `Record<string, ...>` 形式で生成
-   - それ以外は通常の参照型として生成
-
-4. パラメータ/レスポンス型でも同様に適用
-
-   - `types-parameter-property.ts` を更新
-   - `services-response-type.ts` を更新
-
-5. 設定ファイルでの制御（将来拡張）
-
-   ```typescript
-   // xcgen.config.ts (Phase 2 後半または Phase 3 で実装)
-   export default {
-     typescript: {
-       inline: {
-         arrays: "simple-only",  // "always" | "never" | "simple-only"
-         maps: "simple-only",
-       }
-     }
-   }
-   ```
-
-**重要な原則**:
-
-- ✅ 型定義（types-array.ts, types-map.ts）は**変更しない**
-- ✅ 型定義は常にエクスポートされる
-- ✅ inline 化は「使用箇所」で判定される
-
-**検証**:
-
-```bash
-cd packages/xcgen-ts
-pnpm test
-pnpm regenerate:expected  # E2E期待値再生成
-git diff tests/  # 生成結果の差分確認（inline化された箇所を確認）
+interface SomeResponse {
+  userIds: UserIds;    // ← 参照型（inline化なし）
+  users: UserList;     // ← 参照型（inline化なし）
+}
 ```
 
 ### Phase 3: ドキュメント更新
@@ -1035,37 +976,145 @@ IRModelは以下の種類がある
 
 ## 実装ステータス
 
-- [ ] Phase 1: 型定義の整理とリネーム + validation 追加（拡張版）
-  - 影響: ~80ファイル + テスト
-  - 期間: 3-4日
-  - 主な作業:
-    - IRModel→IRComponent リネーム
-    - **IRRef.name → IRComponentRef.referencePath** フィールド名変更
-    - Core全体（約20箇所）+ xcgen-ts（type-mapper.ts等）を更新
-    - IRArraySchema/IRMapSchema に validation フィールド追加
-    - array-transformer.ts/map-transformer.ts を更新して validation 収集
-    - helper関数リネーム（get-model-name → get-component-name など）
-    - JSDocコメント更新
+### ✅ Phase 1: 型定義の整理とリネーム + validation 追加（拡張版） - 完了
 
-- [ ] Phase 2: 生成器のinline化戦略実装（再設計版）
-  - 影響: xcgen-tsのみ（generation-context.ts、inline-strategy.ts新規作成、全生成関数のシグネチャ変更）
-  - 期間: 3-4日（TypeGenerationContext導入含む）
-  - 主な作業:
-    - **TypeGenerationContext パターン導入**（generation-context.ts新規作成）
-    - 全生成関数のシグネチャ変更（hooks → ctx、約15ファイル）
-    - resolveComponent() ヘルパー実装（IR参照解決用）
-    - 使用箇所でのinline化判断ロジック実装（types-property.ts更新）
-    - inline-strategy.ts モジュール新規作成（shouldInlineArrayAtUsage など）
-    - 設定オプション追加
-    - **重要**: types-array.ts/types-map.ts は変更なし（型定義は常にエクスポート）
+**完了日**: 2025-11-09
+**コミット**: d6d78fe, a9e3ca4, e735fba, 07701e8
 
-- [ ] Phase 3: ドキュメント更新
-  - 影響: _docs/配下の4ファイル
-  - 期間: 半日
-  - 主な作業: IR設計、アーキテクチャ、Transformer設計、CLAUDE.mdの更新
+**実装内容**:
 
-- [ ] Phase 4: Breaking Changes対応
-  - CHANGELOG.md作成
-  - バージョンバンプ
-  - GitHub Release作成
-  - 期間: 半日
+- ✅ IRModel→IRComponent リネーム（全10種類）
+- ✅ IRRef.name → IRComponentRef.referencePath フィールド名変更
+- ✅ Core transformer 約20箇所更新（name → referencePath）
+- ✅ xcgen-ts 更新（type-mapper.ts, model-resolver.ts等）
+- ✅ IRArraySchema/IRMapSchema に validation フィールド追加
+- ✅ array-transformer.ts/map-transformer.ts で validation 収集実装
+- ✅ Helper関数リネーム（7ファイル）:
+  - `getModelName` → `getComponentName`
+  - `buildInlineModelName` → `buildInlineComponentName`
+  - `buildParameterModelName` → `buildParameterComponentName`
+  - `buildParameterSchemaModelName` → `buildParameterSchemaComponentName`
+  - `buildRequestBodyModelName` → `buildRequestBodyComponentName`
+  - `buildResponseModelName` → `buildResponseComponentName`
+  - `buildAdditionalPropertiesModelName` → `buildAdditionalPropertiesComponentName`
+- ✅ XcgenIR.models → XcgenIR.components フィールド変更
+- ✅ JSDocコメント更新
+- ✅ 後方互換性エイリアス追加（@openapi-xcgen/core/src/index.ts）
+- ✅ E2E期待値ファイル再生成（43ファイル）
+- ✅ 全テスト通過（433/433 passing）
+
+**影響ファイル**: 131ファイル変更、7ファイルリネーム、1ファイル新規作成
+
+**未実装項目**:
+
+- ⚠️ 型ガード関数（`isIRSchema`, `isIROperationComponent`）- 将来実装予定
+
+---
+
+### ⏭️ Phase 2: TypeGenerationContext 導入 - 部分完了（inline化は削除）
+
+**完了日**: 2025-11-09
+**ステータス**: TypeGenerationContext のみ実装、inline化機能は**削除**
+
+**実装内容**:
+
+- ✅ TypeGenerationContext 作成（generation-context.ts）
+- ✅ resolveComponent() ヘルパー実装
+- ❌ inline化戦略 → **削除**（ADR-001参照）
+- ❌ inline-strategy.ts → **作成されず**
+- ❌ 生成関数シグネチャ変更 → **実施されず**（hooks 引数のまま）
+
+**設計決定**: 全ての Array/Map 型を名前付きコンポーネントとして一貫して生成
+
+---
+
+### ⏳ Phase 3: ドキュメント更新 - TODO
+
+**ステータス**: 未着手
+
+**主な作業**:
+
+- [ ] IR設計ドキュメントの更新（`_docs/003_core_ir_design.md`）
+- [ ] アーキテクチャドキュメントの更新（`_docs/002_core_architecture.md`）
+- [ ] Transformer設計の更新（`_docs/004_core_parser_transformer.md`）
+- [ ] プロジェクトガイドラインの更新（`CLAUDE.md`）
+
+**推定時間**: 半日
+
+---
+
+### ⏳ Phase 4: Breaking Changes対応 - TODO
+
+**ステータス**: 未着手
+
+**主な作業**:
+
+- [ ] CHANGELOG.md 作成
+- [ ] バージョンバンプ（0.x.x → 0.y.0）
+- [ ] GitHub Release 作成
+
+**推定時間**: 半日
+
+---
+
+## 設計決定の記録 (ADR)
+
+### ADR-001: inline化機能の削除（2025-11-09）
+
+**決定**: Phase 2 の inline化機能を実装せず、全ての型を名前付きコンポーネントとして生成する
+
+**背景**:
+
+当初、TypeScript生成時に単純な Array/Map 型（例: `Array<string>`, `Record<string, number>`）を使用箇所で inline 化する機能を計画していた。
+
+**理由**:
+
+1. **シンプルさ優先**: 一貫した設計で学習コストを低減
+   - 全ての型が名前付きコンポーネント
+   - 「いつ inline 化するか」の判断ロジックが不要
+   - 生成コードの予測可能性が向上
+
+2. **保守性向上**: inline化判断ロジックの複雑さを回避
+   - TypeGenerationContext 経由での component 検索
+   - shouldInlineArrayAtUsage() などの判定関数
+   - 使用箇所ごとの条件分岐
+   - これらの実装・テスト・保守コストが高い
+
+3. **言語間の一貫性**: Dart は全てクラス化するため、TypeScript も統一
+   - TypeScript: 名前付き型エイリアス
+   - Dart: 名前付きクラス
+   - 両方とも同じ IR から一貫して生成
+
+4. **機能的な問題なし**: inline 化しなくても実用上の問題はない
+   - 型定義は常にエクスポートされる
+   - 外部から参照可能
+   - Tree-shaking で未使用の型は削除される
+   - バンドルサイズへの影響は軽微
+
+**影響**:
+
+- ✅ TypeGenerationContext インフラは作成済み（将来の拡張に活用可能）
+- ✅ 全テスト通過（inline 化なしで E2E 期待値再生成済み）
+- ❌ inline-strategy.ts は作成されず
+- ❌ 生成関数のシグネチャ変更は実施されず（hooks 引数のまま維持）
+
+**生成例**:
+
+```typescript
+// IR定義（全て名前付き）
+IRArraySchema { name: "UserIds", itemType: "string" }
+IRArraySchema { name: "UserList", itemType: { kind: "ref", ... } }
+
+// TypeScript生成結果（一貫して参照型）
+export type UserIds = Array<string>;
+export type UserList = Array<User>;
+
+interface SomeResponse {
+  userIds: UserIds;   // ← 名前付き型参照
+  users: UserList;    // ← 名前付き型参照
+}
+```
+
+**将来の拡張性**:
+
+必要になった場合、TypeGenerationContext インフラを活用して inline 化機能を追加可能。ただし、現時点では YAGNI 原則に従い実装しない。

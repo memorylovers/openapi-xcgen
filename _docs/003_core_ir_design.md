@@ -29,14 +29,14 @@ XcgenIR（Intermediate Representation: 中間表現）は、OpenAPI仕様とコ�
 IR型システムは、以下の4つのレイヤーで構成されています。各レイヤーは明確な役割を持ち、上位レイヤーが下位レイヤーを参照する構造になっています。
 
 - **Layer 1: XcgenIR**
-  - ルートコンテナとその主要フィールド（`models: IRModel[]`、`endpoints: IREndpoint[]`）
+  - ルートコンテナとその主要フィールド（`components: IRComponent[]`、`endpoints: IREndpoint[]`）
 - **Layer 2: 具体的な型**
-  - `IRModel`（9種類の判別共用体）
+  - `IRComponent`（9種類の判別共用体）
   - `IREndpoint`
 - **Layer 3: 型表現（再帰的）**
   - `IRType`（4種類の判別共用体）
 - **Layer 4: 基底型・補助型**
-  - `IRScalarType`、`IRRef`
+  - `IRScalarType`、`IRComponentRef`
   - `IRValidation`、`IRExtensions`
 
 ## Layer 1: XcgenIR
@@ -46,42 +46,42 @@ IR型システムは、以下の4つのレイヤーで構成されています�
 ```
 XcgenIR
 ─ metadata: IRMetadata    ... API基本情報（titleなど）
-─ models: IRModel[]       ... すべてのデータモデル
+─ components: IRComponent[]       ... すべてのデータコンポーネント
 ─ tags: IRTag[]           ... タグ定義
 ─ endpoints: IREndpoint[] ... すべてのエンドポイント
 ─ servers?: IRServer[]    ... サーバー定義
 ─ securitySchemes?: SecuritySchemeObject[]   ... セキュリティスキーム定義
 ─ globalSecurity?: SecurityRequirement[]     ... グローバルセキュリティ要件
-─ commonResponses?: IRResponseModel[]        ... 共通レスポンス定義
-─ commonRequestBodies?: IRRequestBodyModel[] ... 共通リクエストボディ定義
+─ commonResponses?: IRResponseComponent[]        ... 共通レスポンス定義
+─ commonRequestBodies?: IRRequestBodyComponent[] ... 共通リクエストボディ定義
 ```
 
-## Layer 2-A: IRModel（OpenAPI視点での分類）
+## Layer 2-A: IRComponent（OpenAPI視点での分類）
 
-OpenAPIから抽出されたすべてのデータモデルを統一的に管理:
+OpenAPIから抽出されたすべてのデータコンポーネントを統一的に管理:
 
-- **components/schemas**から生成されるモデル（schema系）
-- **paths内のインラインスキーマ**から生成されるモデル（operation系）
-- **allOf/anyOf**などの合成モデル（composition系）
+- **components/schemas**から生成されるコンポーネント（schema系）
+- **paths内のインラインスキーマ**から生成されるコンポーネント（operation系）
+- **allOf/anyOf**などの合成コンポーネント（composition系）
 
-### IRModel
+### IRComponent
 
-IRModelは以下の種類がある
+IRComponentは以下の種類がある
 
-- IRObjectModel
-- IREnumModel
-- IRArrayModel
-- IRMapModel
-- IRParameterModel
-- IRRequestBodyModel
-- IRResponseModel
-- IRAllOfModel
-- IRAnyOfModel
-- IRUnionModel
+- IRObjectSchema
+- IREnumSchema
+- IRArraySchema
+- IRMapSchema
+- IRParameterComponent
+- IRRequestBodyComponent
+- IRResponseComponent
+- IRAllOfSchema
+- IRAnyOfSchema
+- IRUnionSchema
 
 ### components/schemasから生成（schema系）
 
-#### IRObjectModel - object型スキーマ
+#### IRObjectSchema - object型スキーマ
 
 OpenAPIの`type: object`から生成されます。
 
@@ -98,7 +98,7 @@ IRObjectModel
 
 **用途**: User、Post、Commentなどのエンティティモデル
 
-#### IREnumModel - enum型スキーマ
+#### IREnumSchema - enum型スキーマ
 
 OpenAPIの`enum`から生成されます。
 
@@ -113,7 +113,7 @@ IREnumModel
 
 **用途**: Status、Role、CategoryなどのEnum型
 
-#### IRArrayModel - array型スキーマ
+#### IRArraySchema - array型スキーマ
 
 OpenAPIの`type: array`から生成されます。
 
@@ -124,7 +124,7 @@ IRArrayModel
 
 **用途**: Users[]、Tags[]などの配列型
 
-#### IRMapModel - map型スキーマ
+#### IRMapSchema - map型スキーマ
 
 OpenAPIの`type: object` + `additionalProperties`から生成されます。
 
@@ -137,13 +137,13 @@ IRMapModel
 
 ### paths内のインラインスキーマから生成（operation系）
 
-#### IRParameterModel - parameters配下
+#### IRParameterComponent - parameters配下
 
-pathsのparameters配下から生成される統合パラメータモデル。
-複数のパラメータを1つのモデルに統合します（例: GetUsersParams）。
+pathsのparameters配下から生成される統合パラメータコンポーネント。
+複数のパラメータを1つのコンポーネントに統合します（例: GetUsersParams）。
 
 ```
-IRParameterModel
+IRParameterComponent
 └── properties: IRParameterProperty[]
     └── IRProperty + in: IRParameterInType
         └── "query" | "path" | "header" | "cookie"
@@ -151,54 +151,54 @@ IRParameterModel
 
 **用途**: エンドポイントの全パラメータを統合した型（GetUsersParams等）
 
-#### IRRequestBodyModel - requestBody配下
+#### IRRequestBodyComponent - requestBody配下
 
 pathsのrequestBody配下のインラインスキーマから生成されます。
-IRObjectModelの性質を継承し、リクエストボディ固有の情報を追加します。
+IRObjectSchemaの性質を継承し、リクエストボディ固有の情報を追加します。
 
 ```
-IRRequestBodyModel
+IRRequestBodyComponent
 ├── properties: IRProperty[]
 └── additionalProperties?: IRType
 ```
 
-**用途**: インラインrequestBodyスキーマのモデル化（PostUsersRequestBody等）
+**用途**: インラインrequestBodyスキーマのコンポーネント化（PostUsersRequestBody等）
 
-#### IRResponseModel - responses配下
+#### IRResponseComponent - responses配下
 
 pathsのresponses配下のインラインスキーマから生成されます。
-IRObjectModelの性質を継承し、レスポンス固有の情報を追加します。
+IRObjectSchemaの性質を継承し、レスポンス固有の情報を追加します。
 
 ```
-IRResponseModel
+IRResponseComponent
 ├── properties: IRProperty[]
 ├── statusCode: string
 ├── headers?: IRResponseHeader[]
 └── additionalProperties?: IRType
 ```
 
-**用途**: インラインresponseスキーマのモデル化（GetUsers200Response等）
+**用途**: インラインresponseスキーマのコンポーネント化（GetUsers200Response等）
 
 ### スキーマ合成（composition系）
 
-#### IRAllOfModel - allOf
+#### IRAllOfSchema - allOf
 
 OpenAPIの`allOf`から生成されます。
 
 ```
-IRAllOfModel
+IRAllOfSchema
 ├── schemas: IRType[]
 └── extensions?: IRExtensions
 ```
 
 **用途**: スキーママージ、継承の表現
 
-#### IRAnyOfModel - anyOf
+#### IRAnyOfSchema - anyOf
 
 OpenAPIの`anyOf`から生成されます。
 
 ```
-IRAnyOfModel
+IRAnyOfSchema
 ├── schemas: IRType[]
 └── extensions?: IRExtensions
 ```
@@ -207,12 +207,12 @@ IRAnyOfModel
 
 **用途**: Union型、ポリモーフィズムの表現
 
-#### IRUnionModel - oneOf
+#### IRUnionSchema - oneOf
 
 OpenAPIの`oneOf`から生成されます。
 
 ```
-IRUnionModel
+IRUnionSchema
 ├── types: IRType[]
 ├── discriminator?: IRDiscriminator
 │   ├── propertyName: string
@@ -261,7 +261,7 @@ IRTypeは、すべてのモデルから参照される型表現です。再帰�
 ### IRType (判別共用体 - いずれか1つ、再帰的構造)
 
 - IRScalarType
-- IRRef
+- IRComponentRef
 - IRArray
 - IRMap
 
@@ -276,11 +276,11 @@ IRScalarType
 
 **用途**: string、number、booleanなどの基本型
 
-### IRRef - コンポーネント参照
+### IRComponentRef - コンポーネント参照
 
 ```
-IRRef
-├── modelName
+IRComponentRef
+├── referencePath
 └── nullable?: boolean
 ```
 
