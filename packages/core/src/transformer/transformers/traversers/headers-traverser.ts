@@ -24,7 +24,7 @@ import type { HeadersTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRComponent[] };
+) => { type: IRType | null; components: IRComponent[] };
 
 /**
  * HeaderObject型（OpenAPI 3.x）
@@ -126,7 +126,7 @@ export function traverseHeaders(
       ...(header.deprecated && { deprecated: true }),
     });
 
-    allChildModels.push(...result.models);
+    allChildModels.push(...result.components);
   });
 
   return {
@@ -173,7 +173,7 @@ if (import.meta.vitest) {
     it("should process single header with integer schema", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "int",
-        models: [],
+        components: [],
       });
 
       const headers = {
@@ -221,11 +221,11 @@ if (import.meta.vitest) {
         .fn()
         .mockReturnValueOnce({
           type: "int",
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         });
 
       const headers = {
@@ -260,7 +260,7 @@ if (import.meta.vitest) {
     it("should handle deprecated header", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const headers = {
@@ -288,7 +288,7 @@ if (import.meta.vitest) {
     it("should handle header with default value", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "int",
-        models: [],
+        components: [],
       });
 
       const headers = {
@@ -335,7 +335,7 @@ if (import.meta.vitest) {
     it("should skip header when schema resolution fails", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: null,
-        models: [],
+        components: [],
       });
 
       const headers = {
@@ -386,8 +386,8 @@ if (import.meta.vitest) {
       };
 
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/test" },
-        models: [mockModel],
+        type: { kind: "ref", referencePath: "#/test" },
+        components: [mockModel],
       });
 
       const headers = {

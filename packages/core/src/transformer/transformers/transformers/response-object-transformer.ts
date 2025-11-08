@@ -10,7 +10,7 @@ import type {
   IRResponseComponent,
   SchemaObject,
 } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import type {
   AdditionalPropertiesTraversalResult,
@@ -56,7 +56,7 @@ export function transformResponseObject(
   propertyTraversalResult: PropertyTraversalResult,
   additionalPropertiesResult?: AdditionalPropertiesTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // ステータスコードを取得（documentPathから）
@@ -98,7 +98,7 @@ export function transformResponseObject(
   // 子モデルの収集
   const childModels = [
     ...propertyTraversalResult.childModels,
-    ...(additionalPropertiesResult?.models || []),
+    ...(additionalPropertiesResult?.components || []),
   ];
 
   // IRResponseComponentを作成
@@ -128,8 +128,8 @@ export function transformResponseObject(
 
   // responseモデルと子要素から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [responseModel, ...childModels],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [responseModel, ...childModels],
   };
 }
 
@@ -179,10 +179,11 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/paths/::users/get/responses/200/content/application::json/schema",
+        referencePath:
+          "#/paths/::users/get/responses/200/content/application::json/schema",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0]).toEqual({
         kind: "response",
         name: "GetUsers200Response",
         referencePath:
@@ -232,10 +233,11 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/responses/BadRequest/content/application::json/schema",
+        referencePath:
+          "#/components/responses/BadRequest/content/application::json/schema",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0]).toEqual({
         kind: "response",
         name: "BadRequest",
         referencePath:
@@ -299,7 +301,7 @@ if (import.meta.vitest) {
 
       const result = transformResponseObject(schema, context, propertyResult);
 
-      expect(result.models[0]).toMatchObject({
+      expect(result.components[0]).toMatchObject({
         kind: "response",
         name: "PostUsers201Response",
         statusCode: "201",
@@ -342,7 +344,7 @@ if (import.meta.vitest) {
 
       const additionalResult: AdditionalPropertiesTraversalResult = {
         type: "double", // number -> double in IR
-        models: [],
+        components: [],
       };
 
       const result = transformResponseObject(
@@ -352,7 +354,7 @@ if (import.meta.vitest) {
         additionalResult,
       );
 
-      expect(result.models[0]).toMatchObject({
+      expect(result.components[0]).toMatchObject({
         kind: "response",
         additionalProperties: "double",
       });
@@ -392,7 +394,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "nested",
-            type: { kind: "ref", name: "#/nested" },
+            type: { kind: "ref", referencePath: "#/nested" },
           },
         ],
         childModels: [mockChildModel],
@@ -400,8 +402,8 @@ if (import.meta.vitest) {
 
       const result = transformResponseObject(schema, context, propertyResult);
 
-      expect(result.models).toHaveLength(2); // response + nested
-      expect(result.models[1]).toBe(mockChildModel);
+      expect(result.components).toHaveLength(2); // response + nested
+      expect(result.components[1]).toBe(mockChildModel);
     });
 
     it("should handle different status codes", () => {
@@ -434,7 +436,7 @@ if (import.meta.vitest) {
 
       const result = transformResponseObject(schema, context, propertyResult);
 
-      expect(result.models[0]).toMatchObject({
+      expect(result.components[0]).toMatchObject({
         kind: "response",
         name: "GetUsersId404Response",
         statusCode: "404",
@@ -516,8 +518,8 @@ if (import.meta.vitest) {
 
       const result = transformResponseObject(schema, context, propertyResult);
 
-      expect(result.models).toHaveLength(1);
-      const model = result.models[0];
+      expect(result.components).toHaveLength(1);
+      const model = result.components[0];
 
       if (model.kind === "response") {
         // id: readOnly + validation + extensions が保持される
@@ -621,8 +623,8 @@ if (import.meta.vitest) {
 
       const result = transformResponseObject(schema, context, propertyResult);
 
-      expect(result.models).toHaveLength(1);
-      const model = result.models[0];
+      expect(result.components).toHaveLength(1);
+      const model = result.components[0];
 
       if (model.kind === "response") {
         // score: defaultValue + validation + extensions が保持される

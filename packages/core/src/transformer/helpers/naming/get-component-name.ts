@@ -18,17 +18,17 @@ import type {
   ResponseContext,
   VisitorContext,
 } from "../../types";
-import { buildParameterModelName } from "./build-parameter-model-name";
-import { buildRequestBodyModelName } from "./build-request-body-model-name";
-import { buildResponseModelName } from "./build-response-model-name";
+import { buildParameterComponentName } from "./build-parameter-component-name";
+import { buildRequestBodyComponentName } from "./build-request-body-component-name";
+import { buildResponseComponentName } from "./build-response-component-name";
 
 /**
- * VisitorContextからモデル名を取得（中央ディスパッチャー）
+ * VisitorContextからコンポーネント名を取得（中央ディスパッチャー）
  *
  * コンテキストの種類に応じて適切なビルダー関数を呼び出します。
  *
  * @param context - Visitorコンテキスト
- * @returns モデル名
+ * @returns コンポーネント名
  *
  * @example
  * ```typescript
@@ -39,7 +39,7 @@ import { buildResponseModelName } from "./build-response-model-name";
  *   parameterName: "limit",
  *   ...
  * };
- * getModelName(paramCtx); // => "GetUsersParams"
+ * getComponentName(paramCtx); // => "GetUsersParams"
  *
  * // AllOfContext
  * const allOfCtx: AllOfContext = {
@@ -48,26 +48,26 @@ import { buildResponseModelName } from "./build-response-model-name";
  *   index: 0,
  *   ...
  * };
- * getModelName(allOfCtx); // => "ExtendedAllOf0"
+ * getComponentName(allOfCtx); // => "ExtendedAllOf0"
  *
  * // 通常のコンテキスト
  * const ctx: VisitorContext = {
  *   documentPath: ["components", "schemas", "User"],
  *   rootSegment: "components",
  * };
- * getModelName(ctx); // => "User"
+ * getComponentName(ctx); // => "User"
  * ```
  */
-export function getModelName(context: VisitorContext): string {
+export function getComponentName(context: VisitorContext): string {
   // paths配下のParameter
   if (isParameterContext(context)) {
-    return buildParameterModelName(context);
+    return buildParameterComponentName(context);
   }
 
   // paths配下のResponse
   if (isResponseContext(context)) {
     if (isPathsResponseContext(context)) {
-      return buildResponseModelName(context);
+      return buildResponseComponentName(context);
     }
     // components.responsesの場合はコンポーネント名(documentPath[2])を返す
     // 例: ["components", "responses", "BadRequest", "content", "application/json", "schema"]
@@ -78,7 +78,7 @@ export function getModelName(context: VisitorContext): string {
   // paths配下のRequestBody
   if (isRequestBodyContext(context)) {
     if (isPathsRequestBodyContext(context)) {
-      return buildRequestBodyModelName(context);
+      return buildRequestBodyComponentName(context);
     }
     // components.requestBodiesの場合はコンポーネント名(documentPath[2])を返す
     // 例: ["components", "requestBodies", "UserArray", "content", "application/json", "schema"]
@@ -106,7 +106,7 @@ export function getModelName(context: VisitorContext): string {
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("getModelName", () => {
+  describe("getComponentName", () => {
     describe("Paths contexts", () => {
       it("should generate name for ParameterContext", () => {
         const context: ParameterContext = {
@@ -116,7 +116,7 @@ if (import.meta.vitest) {
           parameterName: "limit",
           in: "query",
         };
-        expect(getModelName(context)).toBe("GetUsersParams");
+        expect(getComponentName(context)).toBe("GetUsersParams");
       });
 
       it("should generate name for ParameterContext with path params", () => {
@@ -127,7 +127,7 @@ if (import.meta.vitest) {
           parameterName: "id",
           in: "path",
         };
-        expect(getModelName(context)).toBe("GetUsersIdParams");
+        expect(getComponentName(context)).toBe("GetUsersIdParams");
       });
 
       it("should generate name for RequestBodyContext", () => {
@@ -138,7 +138,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("PostUsersRequestBody");
+        expect(getComponentName(context)).toBe("PostUsersRequestBody");
       });
 
       it("should generate name for RequestBodyContext with media type suffix", () => {
@@ -149,7 +149,7 @@ if (import.meta.vitest) {
           contentType: "multipart/form-data",
           schemaPath: ["content", "multipart/form-data", "schema"],
         };
-        expect(getModelName(context)).toBe(
+        expect(getComponentName(context)).toBe(
           "PostFilesMultipartFormDataRequestBody",
         );
       });
@@ -162,7 +162,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("GetUsers200Response");
+        expect(getComponentName(context)).toBe("GetUsers200Response");
       });
 
       it("should generate name for ResponseContext with different status code", () => {
@@ -173,7 +173,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("GetUsersId404Response");
+        expect(getComponentName(context)).toBe("GetUsersId404Response");
       });
     });
 
@@ -193,7 +193,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("BadRequest");
+        expect(getComponentName(context)).toBe("BadRequest");
       });
 
       it("should extract component name for components.responses with different name", () => {
@@ -211,7 +211,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("NotFound");
+        expect(getComponentName(context)).toBe("NotFound");
       });
 
       it("should extract component name for components.requestBodies inline schema", () => {
@@ -229,7 +229,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("UserArray");
+        expect(getComponentName(context)).toBe("UserArray");
       });
 
       it("should extract component name for components.requestBodies with different name", () => {
@@ -247,7 +247,7 @@ if (import.meta.vitest) {
           contentType: "application/json",
           schemaPath: ["content", "application/json", "schema"],
         };
-        expect(getModelName(context)).toBe("CreateUserRequest");
+        expect(getComponentName(context)).toBe("CreateUserRequest");
       });
     });
 
@@ -260,7 +260,7 @@ if (import.meta.vitest) {
           parentSchemaName: "Extended",
           index: 0,
         };
-        expect(getModelName(context)).toBe("ExtendedAllOf0");
+        expect(getComponentName(context)).toBe("ExtendedAllOf0");
       });
 
       it("should generate name for OneOfContext", () => {
@@ -271,7 +271,7 @@ if (import.meta.vitest) {
           parentSchemaName: "Pet",
           index: 1,
         };
-        expect(getModelName(context)).toBe("PetOneOf1");
+        expect(getComponentName(context)).toBe("PetOneOf1");
       });
 
       it("should generate name for AnyOfContext", () => {
@@ -282,7 +282,7 @@ if (import.meta.vitest) {
           parentSchemaName: "Item",
           index: 2,
         };
-        expect(getModelName(context)).toBe("ItemAnyOf2");
+        expect(getComponentName(context)).toBe("ItemAnyOf2");
       });
     });
 
@@ -292,7 +292,7 @@ if (import.meta.vitest) {
           documentPath: ["components", "schemas", "User"],
           rootSegment: "components",
         };
-        expect(getModelName(context)).toBe("User");
+        expect(getComponentName(context)).toBe("User");
       });
 
       it("should extract name from documentPath for schema context", () => {
@@ -301,7 +301,7 @@ if (import.meta.vitest) {
           documentPath: ["components", "schemas", "Product"],
           rootSegment: "components",
         };
-        expect(getModelName(context)).toBe("Product");
+        expect(getComponentName(context)).toBe("Product");
       });
 
       it("should handle empty documentPath", () => {
@@ -309,7 +309,7 @@ if (import.meta.vitest) {
           documentPath: [],
           rootSegment: "components",
         };
-        expect(getModelName(context)).toBe("");
+        expect(getComponentName(context)).toBe("");
       });
 
       it("should handle nested paths", () => {
@@ -323,7 +323,7 @@ if (import.meta.vitest) {
           ],
           rootSegment: "components",
         };
-        expect(getModelName(context)).toBe("address");
+        expect(getComponentName(context)).toBe("address");
       });
     });
   });

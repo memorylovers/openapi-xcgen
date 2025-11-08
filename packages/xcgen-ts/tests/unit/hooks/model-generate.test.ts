@@ -4,12 +4,20 @@
  * generateModelFile() と Hook 機構の統合動作を検証
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRModel, XcgenIR } from "@openapi-xcgen/core";
 import { describe, expect, it } from "vitest";
+import type { TypeGenerationContext } from "../../../src/generators/types/generation-context";
 import { generateModelFile } from "../../../src/generators/types/helpers/generate-model-file";
 import { createHooks } from "../../../src/hooks";
 
 describe("modelFile:generate hook", () => {
+  const mockIR: XcgenIR = {
+    metadata: { title: "Test API", version: "1.0.0" },
+    components: [],
+    tags: [],
+    endpoints: [],
+  };
+
   describe("Custom model name transformation (x-model-name)", () => {
     it.each([
       {
@@ -68,7 +76,8 @@ export interface Product {
         },
       });
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(expected);
     });
@@ -99,7 +108,8 @@ export interface Product {
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * User model
@@ -126,7 +136,8 @@ export interface User {
         properties: [],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * Simple model
@@ -160,7 +171,8 @@ export type Simple = { custom: true };`);
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * User model
@@ -189,13 +201,14 @@ export interface User {
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * Order model
@@ -232,7 +245,8 @@ export interface Order {
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * Custom model comment
@@ -265,7 +279,8 @@ export interface User {
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * User model
@@ -310,7 +325,8 @@ export interface User {
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(calls).toEqual(["hook1", "hook2"]);
       expect(result).toEqual(`/**
@@ -355,7 +371,8 @@ export interface Modified1AndMore {
         extensions: { "x-model-name": "CustomUser" },
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * User model
@@ -386,7 +403,8 @@ export interface CustomUser {
       };
 
       // hooks なしで呼び出し
-      const result = generateModelFile(model);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks: undefined };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * User model
@@ -418,7 +436,8 @@ export interface User {
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * Enum: Status
@@ -438,10 +457,11 @@ export type Status = "active" | "inactive";`);
         kind: "array",
         name: "UserList",
         referencePath: "#/components/schemas/UserList",
-        itemType: { kind: "ref", name: "#/components/schemas/User" },
+        itemType: { kind: "ref", referencePath: "#/components/schemas/User" },
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * UserList model
@@ -477,7 +497,8 @@ export type UserList = Array<User>;`);
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * Parameter model with custom hook
@@ -511,18 +532,22 @@ export interface GetUserParams {
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
       };
 
-      const result = generateModelFile(model, undefined, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, undefined, ctx);
 
       expect(result).toEqual(`/**
  * Enhanced version
@@ -562,7 +587,8 @@ export interface EnhancedOrder {
         ],
       };
 
-      const result = generateModelFile(model, "UserUpdate", hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateModelFile(model, "UserUpdate", ctx);
 
       expect(result).toEqual(`/**
  * Unified parameter type with request body

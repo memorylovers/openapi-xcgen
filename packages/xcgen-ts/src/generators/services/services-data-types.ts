@@ -20,14 +20,14 @@ export interface EndpointDataTypes {
 /**
  * IREndpointからデータ型情報を抽出
  * @param endpoint - IRエンドポイント
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @returns データ型情報
  *
  * @example
  * ```typescript
  * // パラメータのみ
  * const endpoint: IREndpoint = {
- *   parameters: { kind: "ref", name: "#/paths/.../GetPetsParams" },
+ *   parameters: { kind: "ref", referencePath: "#/paths/.../GetPetsParams" },
  *   ...
  * };
  * const models: IRComponent[] = [...];
@@ -57,8 +57,11 @@ export function getEndpointDataTypes(
       typeof endpoint.parameters !== "string" &&
       endpoint.parameters.kind === "ref"
     ) {
-      // IRモデルリストから正しいモデル名を逆引き
-      parameterType = resolveModelName(endpoint.parameters.name, models);
+      // IRコンポーネントリストから正しいモデル名を逆引き
+      parameterType = resolveModelName(
+        endpoint.parameters.referencePath,
+        models,
+      );
     }
   }
 
@@ -66,8 +69,11 @@ export function getEndpointDataTypes(
   if (endpoint.requestBody && endpoint.requestBody.kind === "content") {
     for (const content of endpoint.requestBody.content) {
       if (typeof content.schema !== "string" && content.schema.kind === "ref") {
-        // IRモデルリストから正しいモデル名を逆引き
-        requestBodyType = resolveModelName(content.schema.name, models);
+        // IRコンポーネントリストから正しいモデル名を逆引き
+        requestBodyType = resolveModelName(
+          content.schema.referencePath,
+          models,
+        );
         break; // 最初のスキーマのみ使用
       }
     }
@@ -95,7 +101,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: {
             kind: "ref",
-            name: "#/paths/::pets/get/parameters/GetPetsParams",
+            referencePath: "#/paths/::pets/get/parameters/GetPetsParams",
           },
           responses: [],
         };
@@ -138,7 +144,8 @@ if (import.meta.vitest) {
                 mimeType: "application/json",
                 schema: {
                   kind: "ref",
-                  name: "#/paths/::pets/post/requestBody/.../PostPetsRequestBody",
+                  referencePath:
+                    "#/paths/::pets/post/requestBody/.../PostPetsRequestBody",
                 },
               },
             ],
@@ -161,7 +168,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: {
             kind: "ref",
-            name: "#/paths/.../PutPetsIdParams",
+            referencePath: "#/paths/.../PutPetsIdParams",
           },
           requestBody: {
             kind: "content",
@@ -171,7 +178,7 @@ if (import.meta.vitest) {
                 mimeType: "application/json",
                 schema: {
                   kind: "ref",
-                  name: "#/paths/.../PutPetsIdRequestBody",
+                  referencePath: "#/paths/.../PutPetsIdRequestBody",
                 },
               },
             ],

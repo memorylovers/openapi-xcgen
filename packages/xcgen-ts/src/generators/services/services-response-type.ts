@@ -9,7 +9,7 @@ import { resolveModelName } from "../../helpers/model-resolver";
 /**
  * エンドポイントからレスポンス型を取得
  * @param endpoint - IRエンドポイント
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @returns TypeScript型文字列
  */
 export function getResponseType(
@@ -28,8 +28,8 @@ export function getResponseType(
 
   if (successResponse.kind === "ref") {
     // Core packageはreference path全体を保存: "#/components/schemas/User"
-    // IRモデルリストから正しいモデル名を逆引き
-    return resolveModelName(successResponse.ref.name, models);
+    // IRコンポーネントリストから正しいモデル名を逆引き
+    return resolveModelName(successResponse.ref.referencePath, models);
   }
 
   if (!successResponse.content || successResponse.content.length === 0) {
@@ -45,7 +45,7 @@ export function getResponseType(
 
   // IRRefの場合、モデルリストから正しいモデル名を逆引き
   if (typeof content.schema !== "string" && content.schema.kind === "ref") {
-    return resolveModelName(content.schema.name, models);
+    return resolveModelName(content.schema.referencePath, models);
   }
 
   return irTypeToTsType(content.schema);
@@ -108,7 +108,10 @@ if (import.meta.vitest) {
               content: [
                 {
                   mimeType: "application/json",
-                  schema: { kind: "ref", name: "#/components/schemas/User" },
+                  schema: {
+                    kind: "ref",
+                    referencePath: "#/components/schemas/User",
+                  },
                 },
               ],
             },
@@ -127,7 +130,10 @@ if (import.meta.vitest) {
             name: "GetUsers200Response",
             referencePath:
               "#/paths/::users/get/responses/200/content/application::json/schema",
-            itemType: { kind: "ref", name: "#/components/schemas/User" },
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
           },
         ];
 
@@ -147,7 +153,8 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::users/get/responses/200/content/application::json/schema",
+                    referencePath:
+                      "#/paths/::users/get/responses/200/content/application::json/schema",
                   },
                 },
               ],

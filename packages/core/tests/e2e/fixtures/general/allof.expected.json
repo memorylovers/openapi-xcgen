@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test allOf schema composition"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Base",
@@ -30,11 +30,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Base"
+          "referencePath": "#/components/schemas/Base"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/UserAllOf1"
+          "referencePath": "#/components/schemas/UserAllOf1"
         }
       ]
     },
@@ -82,15 +82,15 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Base"
+          "referencePath": "#/components/schemas/Base"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Timestamps"
+          "referencePath": "#/components/schemas/Timestamps"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AuditableUserAllOf2"
+          "referencePath": "#/components/schemas/AuditableUserAllOf2"
         }
       ],
       "description": "User with audit timestamps"
@@ -104,7 +104,7 @@
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AuditableUserAllOf2Role"
+            "referencePath": "#/components/schemas/AuditableUserAllOf2Role"
           },
           "required": true
         }
@@ -150,7 +150,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]

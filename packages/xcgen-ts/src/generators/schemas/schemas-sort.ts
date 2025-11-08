@@ -20,7 +20,8 @@ function extractTypeReferences(type: IRType): string[] {
   switch (type.kind) {
     case "ref": {
       // 参照パスから型名を抽出
-      const modelName = type.name.split("/").at(-1) ?? type.name;
+      const modelName =
+        type.referencePath.split("/").at(-1) ?? type.referencePath;
       references.push(modelName);
       break;
     }
@@ -31,7 +32,7 @@ function extractTypeReferences(type: IRType): string[] {
 
 /**
  * IRComponentが依存している他のモデル名を抽出
- * @param model - IRモデル
+ * @param model - IRコンポーネント
  * @returns 依存しているモデル名の配列
  */
 export function extractModelDependencies(model: IRComponent): string[] {
@@ -84,7 +85,8 @@ export function extractModelDependencies(model: IRComponent): string[] {
           continue;
         }
         if (type.kind === "ref") {
-          const modelName = type.name.split("/").at(-1) ?? type.name;
+          const modelName =
+            type.referencePath.split("/").at(-1) ?? type.referencePath;
           dependencies.add(modelName);
         }
       }
@@ -108,7 +110,7 @@ export function extractModelDependencies(model: IRComponent): string[] {
 
 /**
  * モデルをトポロジカルソート（依存先が先に来るように並べ替え）
- * @param models - IRモデル配列
+ * @param models - IRコンポーネント配列
  * @returns ソート済みモデル配列
  *
  * @example
@@ -199,8 +201,8 @@ if (import.meta.vitest) {
           name: "User",
           referencePath: "#/components/schemas/User",
           schemas: [
-            { kind: "ref", name: "#/components/schemas/Base" },
-            { kind: "ref", name: "#/components/schemas/UserAllOf1" },
+            { kind: "ref", referencePath: "#/components/schemas/Base" },
+            { kind: "ref", referencePath: "#/components/schemas/UserAllOf1" },
           ],
         };
 
@@ -217,7 +219,7 @@ if (import.meta.vitest) {
           properties: [
             {
               name: "author",
-              type: { kind: "ref", name: "#/components/schemas/User" },
+              type: { kind: "ref", referencePath: "#/components/schemas/User" },
               required: true,
             },
             {
@@ -272,8 +274,8 @@ if (import.meta.vitest) {
           name: "User",
           referencePath: "#/components/schemas/User",
           schemas: [
-            { kind: "ref", name: "#/components/schemas/Base" },
-            { kind: "ref", name: "#/components/schemas/UserAllOf1" },
+            { kind: "ref", referencePath: "#/components/schemas/Base" },
+            { kind: "ref", referencePath: "#/components/schemas/UserAllOf1" },
           ],
         };
 

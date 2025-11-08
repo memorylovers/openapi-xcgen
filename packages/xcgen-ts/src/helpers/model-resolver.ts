@@ -1,5 +1,5 @@
 /**
- * IRモデル解決ヘルパー
+ * IRコンポーネント解決ヘルパー
  *
  * IRRefからモデル名を逆引きする
  */
@@ -11,7 +11,7 @@ import { toTypeName } from "./naming";
  * IRRefのreferencePathからモデル名を解決
  *
  * @param referencePath - IRRefの参照パス (例: "#/paths/::pets/get/responses/200/content/application::json/schema")
- * @param models - IRモデルリスト
+ * @param models - IRコンポーネントリスト
  * @returns モデル名 (例: "GetPets200Response")、見つからない場合は参照パスの最後のセグメント
  *
  * @example
@@ -21,7 +21,7 @@ import { toTypeName } from "./naming";
  *     kind: "array",
  *     name: "GetPets200Response",
  *     referencePath: "#/paths/::pets/get/responses/200/content/application::json/schema",
- *     itemType: { kind: "ref", name: "#/components/schemas/Pet" }
+ *     itemType: { kind: "ref", referencePath: "#/components/schemas/Pet" }
  *   }
  * ];
  *
@@ -58,7 +58,10 @@ if (import.meta.vitest) {
             name: "GetPets200Response",
             referencePath:
               "#/paths/::pets/get/responses/200/content/application::json/schema",
-            itemType: { kind: "ref", name: "#/components/schemas/Pet" },
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Pet",
+            },
           },
         ];
 

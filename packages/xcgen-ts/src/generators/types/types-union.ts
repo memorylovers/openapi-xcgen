@@ -20,8 +20,8 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  *   name: "Shape",
  *   referencePath: "#/components/schemas/Shape",
  *   types: [
- *     { kind: "ref", name: "Circle", referencePath: "#/components/schemas/Circle" },
- *     { kind: "ref", name: "Square", referencePath: "#/components/schemas/Square" }
+ *     { kind: "ref", referencePath: "Circle", referencePath: "#/components/schemas/Circle" },
+ *     { kind: "ref", referencePath: "Square", referencePath: "#/components/schemas/Square" }
  *   ],
  *   discriminator: { propertyName: "type" }
  * };
@@ -65,11 +65,11 @@ if (import.meta.vitest) {
           types: [
             {
               kind: "ref",
-              name: "Circle",
+              referencePath: "Circle",
             },
             {
               kind: "ref",
-              name: "Square",
+              referencePath: "Square",
             },
           ],
         };
@@ -88,11 +88,11 @@ if (import.meta.vitest) {
           types: [
             {
               kind: "ref",
-              name: "Car",
+              referencePath: "Car",
             },
             {
               kind: "ref",
-              name: "Bike",
+              referencePath: "Bike",
             },
           ],
         };
@@ -121,11 +121,11 @@ export type Vehicle = Car | Bike;
           types: [
             {
               kind: "ref",
-              name: "ClickEvent",
+              referencePath: "ClickEvent",
             },
             {
               kind: "ref",
-              name: "ScrollEvent",
+              referencePath: "ScrollEvent",
             },
           ],
         };

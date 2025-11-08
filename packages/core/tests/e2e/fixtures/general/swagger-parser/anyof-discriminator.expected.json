@@ -3,7 +3,7 @@
     "title": "fruity",
     "version": "0.0.1"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "FruitType",
@@ -23,11 +23,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineDiscAnyOf0"
+          "referencePath": "#/components/schemas/FruitInlineDiscAnyOf0"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineDiscAnyOf1"
+          "referencePath": "#/components/schemas/FruitInlineDiscAnyOf1"
         }
       ]
     },
@@ -72,11 +72,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf0"
+          "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf0"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf1"
+          "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf1"
         }
       ]
     },
@@ -87,7 +87,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf0AnyOf0"
+          "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf0AnyOf0"
         }
       ]
     },
@@ -110,7 +110,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitInlineInlineDiscAnyOf1AnyOf0"
+          "referencePath": "#/components/schemas/FruitInlineInlineDiscAnyOf1AnyOf0"
         }
       ]
     },
@@ -133,11 +133,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AppleReqDisc"
+          "referencePath": "#/components/schemas/AppleReqDisc"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BananaReqDisc"
+          "referencePath": "#/components/schemas/BananaReqDisc"
         }
       ]
     },
@@ -182,11 +182,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AppleAllOfDisc"
+          "referencePath": "#/components/schemas/AppleAllOfDisc"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BananaAllOfDisc"
+          "referencePath": "#/components/schemas/BananaAllOfDisc"
         }
       ]
     },
@@ -197,7 +197,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     },
@@ -208,7 +208,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     },
@@ -219,11 +219,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AppleAnyOfDisc"
+          "referencePath": "#/components/schemas/AppleAnyOfDisc"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BananaAnyOfDisc"
+          "referencePath": "#/components/schemas/BananaAnyOfDisc"
         }
       ]
     },
@@ -234,7 +234,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     },
@@ -245,7 +245,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     },
@@ -256,11 +256,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AppleGrandparentDisc"
+          "referencePath": "#/components/schemas/AppleGrandparentDisc"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BananaGrandparentDisc"
+          "referencePath": "#/components/schemas/BananaGrandparentDisc"
         }
       ]
     },
@@ -271,7 +271,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     },
@@ -282,7 +282,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Parent"
+          "referencePath": "#/components/schemas/Parent"
         }
       ]
     },
@@ -293,7 +293,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Parent"
+          "referencePath": "#/components/schemas/Parent"
         }
       ]
     },
@@ -304,7 +304,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscMissingNoProperties"
+          "referencePath": "#/components/schemas/DiscMissingNoProperties"
         }
       ]
     },
@@ -321,7 +321,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscMissingFromProperties"
+          "referencePath": "#/components/schemas/DiscMissingFromProperties"
         }
       ]
     },
@@ -343,7 +343,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscOptionalTypeCorrect"
+          "referencePath": "#/components/schemas/DiscOptionalTypeCorrect"
         }
       ]
     },
@@ -365,7 +365,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscOptionalTypeIncorrect"
+          "referencePath": "#/components/schemas/DiscOptionalTypeIncorrect"
         }
       ]
     },
@@ -387,11 +387,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscOptionalTypeIncorrect"
+          "referencePath": "#/components/schemas/DiscOptionalTypeIncorrect"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscOptionalTypeCorrect"
+          "referencePath": "#/components/schemas/DiscOptionalTypeCorrect"
         }
       ]
     },
@@ -402,7 +402,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscTypeIncorrect"
+          "referencePath": "#/components/schemas/DiscTypeIncorrect"
         }
       ]
     },
@@ -425,11 +425,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscTypeIncorrect"
+          "referencePath": "#/components/schemas/DiscTypeIncorrect"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     },
@@ -440,11 +440,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/DiscOptionalTypeCorrect"
+          "referencePath": "#/components/schemas/DiscOptionalTypeCorrect"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/FruitType"
+          "referencePath": "#/components/schemas/FruitType"
         }
       ]
     }
@@ -466,7 +466,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/FruitAllOfDisc"
+                "referencePath": "#/components/schemas/FruitAllOfDisc"
               }
             }
           ]

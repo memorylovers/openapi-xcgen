@@ -41,7 +41,7 @@ export function createErrorResult(
 
   return {
     type: null,
-    models: [],
+    components: [],
     error: {
       code,
       message,
@@ -93,7 +93,7 @@ export function createParameterErrorResult(
 
   return {
     parameter: null,
-    models: [],
+    components: [],
     error: {
       code,
       message,
@@ -149,7 +149,7 @@ export function createAdditionalPropertiesTraversalError(
 
   return {
     type: undefined,
-    models: [],
+    components: [],
     error: {
       code,
       message,
@@ -175,7 +175,7 @@ export function createArrayItemTraversalError(
 
   return {
     itemType: null,
-    models: [],
+    components: [],
     error: {
       code,
       message,

@@ -10,7 +10,7 @@ import {
   processImports,
 } from "../../../helpers/import-handler";
 import { toTypeName } from "../../../helpers/naming";
-import type { HookableInstance } from "../../../hooks";
+import type { TypeGenerationContext } from "../../types/generation-context";
 import { generateSchemaModel } from "../schemas-model";
 import { extractSchemaDependencies } from "./extract-dependencies";
 
@@ -20,7 +20,7 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  * 個別のスキーマファイルを生成する。依存する他のスキーマのimport文も自動生成される。
  *
  * @param model - IRComponent
- * @param hooks - Hook instance（オプション）
+ * @param ctx - Type generation context
  * @param schemaImports - Hook経由で追加されたimport（オプション）
  * @returns Valibotスキーマコード（null: 生成スキップ）
  *
@@ -31,16 +31,16 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  *   name: "User",
  *   properties: [...]
  * };
- * generateSchemaFile(model);
+ * generateSchemaFile(model, ctx);
  * // => "/**\n * Valibot validation schema for User\n * ...\n *\/\n\nimport * as v from "valibot";\n\nexport const UserSchema = ..."
  * ```
  */
 export function generateSchemaFile(
   model: IRComponent,
-  hooks?: HookableInstance,
+  ctx: TypeGenerationContext,
   schemaImports?: string[],
 ): string | null {
-  const schemaCode = generateSchemaModel(model, hooks);
+  const schemaCode = generateSchemaModel(model, ctx);
 
   if (!schemaCode) {
     return null;
@@ -101,6 +101,14 @@ export function generateSchemaFile(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("generateSchemaFile", () => {
@@ -118,7 +126,7 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       expect(result).toContain("/**");
       expect(result).toContain(" * Valibot validation schema for User");
@@ -136,18 +144,21 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       expect(result).toContain(
         "import { ProductSchema } from './ProductSchema';",
@@ -171,13 +182,13 @@ if (import.meta.vitest) {
             name: "children",
             type: {
               kind: "ref",
-              name: "#/components/schemas/TreeNodeChildren", // 配列は独立したモデルとして抽出される
+              referencePath: "#/components/schemas/TreeNodeChildren", // 配列は独立したモデルとして抽出される
             },
           },
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       expect(result).not.toContain("import { TreeNodeSchema }");
       expect(result).toContain("export const TreeNodeSchema = v.object({");
@@ -198,7 +209,7 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       // generateSchemaModel() がparameterモデルに対してnullを返す
       expect(result).toBeNull();
@@ -212,23 +223,23 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "zzzItem",
-            type: { kind: "ref", name: "#/components/schemas/ZItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/ZItem" },
             required: true,
           },
           {
             name: "aaaItem",
-            type: { kind: "ref", name: "#/components/schemas/AItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/AItem" },
             required: true,
           },
           {
             name: "mmmItem",
-            type: { kind: "ref", name: "#/components/schemas/MItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/MItem" },
             required: true,
           },
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       const lines = result!.split("\n");
       const importLines = lines.filter(

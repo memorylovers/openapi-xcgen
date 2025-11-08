@@ -28,7 +28,7 @@ import { traverseHeaders } from "./headers-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRComponent[] };
+) => { type: IRType | null; components: IRComponent[] };
 
 /**
  * responsesフィールド（ステータスコードとResponseObjectのマップ）を訪問
@@ -205,7 +205,7 @@ if (import.meta.vitest) {
 
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const context: VisitorContext = {
@@ -242,7 +242,7 @@ if (import.meta.vitest) {
 
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "int",
-        models: [],
+        components: [],
       });
 
       const context: VisitorContext = {
@@ -286,11 +286,11 @@ if (import.meta.vitest) {
         .fn()
         .mockReturnValueOnce({
           type: "int",
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/components/schemas/User" },
-          models: [],
+          type: { kind: "ref", referencePath: "#/components/schemas/User" },
+          components: [],
         });
 
       const context: VisitorContext = {
@@ -307,7 +307,7 @@ if (import.meta.vitest) {
         content: [
           {
             mimeType: "application/json",
-            schema: { kind: "ref", name: "#/components/schemas/User" },
+            schema: { kind: "ref", referencePath: "#/components/schemas/User" },
           },
         ],
         headers: [
@@ -338,8 +338,8 @@ if (import.meta.vitest) {
       };
 
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/test" },
-        models: [],
+        type: { kind: "ref", referencePath: "#/test" },
+        components: [],
       });
 
       const context: VisitorContext = {
@@ -413,12 +413,12 @@ if (import.meta.vitest) {
       const mockVisitSchema = vi
         .fn()
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/content" },
-          models: [mockContentModel],
+          type: { kind: "ref", referencePath: "#/content" },
+          components: [mockContentModel],
         })
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/header" },
-          models: [mockHeaderModel],
+          type: { kind: "ref", referencePath: "#/header" },
+          components: [mockHeaderModel],
         });
 
       const context: VisitorContext = {

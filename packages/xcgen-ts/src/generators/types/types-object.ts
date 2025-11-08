@@ -7,13 +7,13 @@
 import type { IRComponent, IRProperty } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
-import type { HookableInstance } from "../../hooks";
+import type { TypeGenerationContext } from "./generation-context";
 import { generateProperty } from "./types-property";
 
 /**
  * IRObjectSchemaからTypeScript interfaceを生成
  * @param model - IRObjectSchema (properties を持つモデル)
- * @param hooks - Hook instance（オプション）
+ * @param ctx - Type generation context
  * @returns TypeScript interface定義文字列
  *
  * @example
@@ -26,13 +26,13 @@ import { generateProperty } from "./types-property";
  *     { name: "email", type: "string", required: true }
  *   ],
  * };
- * generateObjectType(model);
+ * generateObjectType(model, ctx);
  * // => "export interface User { ... }"
  * ```
  */
 export function generateObjectType(
   model: IRComponent & { properties: IRProperty[] },
-  hooks?: HookableInstance,
+  ctx: TypeGenerationContext,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
@@ -49,7 +49,7 @@ export function generateObjectType(
 
   // プロパティ生成
   for (const prop of model.properties) {
-    const propertyCode = generateProperty(prop, model, hooks);
+    const propertyCode = generateProperty(prop, model, ctx);
     lines.push(`  ${propertyCode}`);
   }
 
@@ -66,6 +66,14 @@ export function generateObjectType(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("types-object", () => {
@@ -89,7 +97,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -116,7 +124,7 @@ export interface User {
           ],
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -145,7 +153,7 @@ export interface User {
           additionalProperties: "string",
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -175,7 +183,7 @@ export interface Config {
           ],
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `

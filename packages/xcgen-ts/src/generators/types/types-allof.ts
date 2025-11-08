@@ -20,8 +20,8 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  *   name: "Admin",
  *   referencePath: "#/components/schemas/Admin",
  *   schemas: [
- *     { kind: "ref", name: "User", referencePath: "#/components/schemas/User" },
- *     { kind: "ref", name: "Permissions", referencePath: "#/components/schemas/Permissions" }
+ *     { kind: "ref", referencePath: "User", referencePath: "#/components/schemas/User" },
+ *     { kind: "ref", referencePath: "Permissions", referencePath: "#/components/schemas/Permissions" }
  *   ],
  * };
  * generateAllOfType(model);
@@ -61,11 +61,11 @@ if (import.meta.vitest) {
           schemas: [
             {
               kind: "ref",
-              name: "User",
+              referencePath: "User",
             },
             {
               kind: "ref",
-              name: "Permissions",
+              referencePath: "Permissions",
             },
           ],
         };
@@ -84,11 +84,11 @@ if (import.meta.vitest) {
           schemas: [
             {
               kind: "ref",
-              name: "User",
+              referencePath: "User",
             },
             {
               kind: "ref",
-              name: "SuperPermissions",
+              referencePath: "SuperPermissions",
             },
           ],
         };
@@ -113,15 +113,15 @@ export type SuperUser = User & SuperPermissions;
           schemas: [
             {
               kind: "ref",
-              name: "User",
+              referencePath: "User",
             },
             {
               kind: "ref",
-              name: "Admin",
+              referencePath: "Admin",
             },
             {
               kind: "ref",
-              name: "Owner",
+              referencePath: "Owner",
             },
           ],
         };

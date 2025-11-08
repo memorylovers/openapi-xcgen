@@ -12,7 +12,7 @@ import type {
   SchemaObject,
   SchemaObjectWithNullable,
 } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createAdditionalPropertiesTraversalError } from "../errors";
 import type { AdditionalPropertiesTraversalResult } from "../types";
@@ -23,7 +23,7 @@ import type { AdditionalPropertiesTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: unknown; models: unknown[] };
+) => { type: unknown; components: unknown[] };
 
 /**
  * Map型スキーマ（additionalPropertiesのみ）の値を訪問
@@ -46,7 +46,7 @@ export function traverseMapValue(
   if (additional === undefined) {
     return {
       type: undefined,
-      models: [],
+      components: [],
     };
   }
 
@@ -63,12 +63,12 @@ export function traverseMapValue(
   if (additional === false) {
     return {
       type: undefined,
-      models: [],
+      components: [],
     };
   }
 
   // additionalProperties にスキーマが指定されている場合
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const valueContext: VisitorContext = {
     documentPath: [...context.documentPath.slice(0, -1), `${name}Value`],
     rootSegment: context.rootSegment,
@@ -87,7 +87,8 @@ export function traverseMapValue(
 
   return {
     type: valueResult.type as AdditionalPropertiesTraversalResult["type"],
-    models: valueResult.models as AdditionalPropertiesTraversalResult["models"],
+    components:
+      valueResult.components as AdditionalPropertiesTraversalResult["components"],
   };
 }
 
@@ -99,7 +100,7 @@ if (import.meta.vitest) {
     it("should traverse map value with primitive type", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -116,7 +117,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: "string",
-        models: [],
+        components: [],
       });
 
       expect(mockVisitSchema).toHaveBeenCalledWith(
@@ -130,8 +131,11 @@ if (import.meta.vitest) {
 
     it("should traverse map value with complex type", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/components/schemas/ArrayMapValue" },
-        models: [
+        type: {
+          kind: "ref",
+          referencePath: "#/components/schemas/ArrayMapValue",
+        },
+        components: [
           {
             kind: "array",
             name: "ArrayMapValue",
@@ -158,10 +162,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/ArrayMapValue",
+        referencePath: "#/components/schemas/ArrayMapValue",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("array");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("array");
     });
 
     it("should return undefined when additionalProperties is missing", () => {
@@ -180,7 +184,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: undefined,
-        models: [],
+        components: [],
       });
       expect(mockVisitSchema).not.toHaveBeenCalled();
     });
@@ -203,7 +207,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: undefined,
-        models: [],
+        components: [],
         error: {
           code: "MAP_ANY_TYPE_NOT_SUPPORTED",
           message:
@@ -238,7 +242,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: undefined,
-        models: [],
+        components: [],
       });
       expect(mockVisitSchema).not.toHaveBeenCalled();
     });
@@ -247,7 +251,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: null,
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -265,7 +269,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         type: undefined,
-        models: [],
+        components: [],
         error: {
           code: "MAP_VALUE_RESOLUTION_FAILED",
           message:

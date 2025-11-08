@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test all supported data types"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "DataTypes",
@@ -38,35 +38,35 @@
           "name": "profile",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/DataTypesProfile"
+            "referencePath": "#/components/schemas/DataTypesProfile"
           }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/DataTypesTags"
+            "referencePath": "#/components/schemas/DataTypesTags"
           }
         },
         {
           "name": "numbers",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/DataTypesNumbers"
+            "referencePath": "#/components/schemas/DataTypesNumbers"
           }
         },
         {
           "name": "scores",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/DataTypesScores"
+            "referencePath": "#/components/schemas/DataTypesScores"
           }
         },
         {
           "name": "flags",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/DataTypesFlags"
+            "referencePath": "#/components/schemas/DataTypesFlags"
           }
         }
       ]
@@ -125,7 +125,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/DataTypes"
+                "referencePath": "#/components/schemas/DataTypes"
               }
             }
           ]

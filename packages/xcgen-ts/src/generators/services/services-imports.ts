@@ -9,7 +9,7 @@ import { resolveModelName } from "../../helpers/model-resolver";
 /**
  * サービスファイルのインポート文を生成
  * @param endpoints - エンドポイント配列
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @returns インポート文字列
  */
 export function generateServicesImports(
@@ -54,8 +54,11 @@ export function generateServicesImports(
             typeof content.schema !== "string" &&
             content.schema.kind === "ref"
           ) {
-            // IRモデルリストから正しいモデル名を逆引き
-            const modelName = resolveModelName(content.schema.name, models);
+            // IRコンポーネントリストから正しいモデル名を逆引き
+            const modelName = resolveModelName(
+              content.schema.referencePath,
+              models,
+            );
             importedTypes.add(modelName);
           }
         }
@@ -109,7 +112,7 @@ import type { XcgenApiError as _XcgenApiError } from "../client";
                 content: [
                   {
                     mimeType: "application/json",
-                    schema: { kind: "ref", name: "Pet" },
+                    schema: { kind: "ref", referencePath: "Pet" },
                   },
                 ],
               },
@@ -166,7 +169,10 @@ import type { XcgenApiError as _XcgenApiError } from "../client";
                 content: [
                   {
                     mimeType: "application/json",
-                    schema: { kind: "ref", name: "GetBookings200Response" },
+                    schema: {
+                      kind: "ref",
+                      referencePath: "GetBookings200Response",
+                    },
                   },
                 ],
               },
@@ -177,7 +183,7 @@ import type { XcgenApiError as _XcgenApiError } from "../client";
                 content: [
                   {
                     mimeType: "application/json",
-                    schema: { kind: "ref", name: "Problem" },
+                    schema: { kind: "ref", referencePath: "Problem" },
                   },
                 ],
               },

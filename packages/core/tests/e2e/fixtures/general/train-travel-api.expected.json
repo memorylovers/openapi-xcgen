@@ -4,7 +4,7 @@
     "version": "1.2.1",
     "description": "API for finding and booking train trips across Europe.\n\n## Run in Postman\n\nExperiment with this API in Postman, using our Postman Collection.\n\n[![Run In Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9265903-7a75a0d0-b108-4436-ba54-c6139698dc08?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D9265903-7a75a0d0-b108-4436-ba54-c6139698dc08%26entityType%3Dcollection%26workspaceId%3Df507f69d-9564-419c-89a2-cb8e4c8c7b8f)\n"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Station",
@@ -45,7 +45,7 @@
           "name": "coordinates",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/StationCoordinates"
+            "referencePath": "#/components/schemas/StationCoordinates"
           }
         }
       ]
@@ -91,7 +91,7 @@
           "name": "origin",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Station"
+            "referencePath": "#/components/schemas/Station"
           },
           "required": true
         },
@@ -99,7 +99,7 @@
           "name": "destination",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Station"
+            "referencePath": "#/components/schemas/Station"
           },
           "required": true
         },
@@ -122,7 +122,7 @@
           "name": "price",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Price"
+            "referencePath": "#/components/schemas/Price"
           },
           "required": true
         },
@@ -154,7 +154,7 @@
           "name": "passengers",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BookingRequestPassengers"
+            "referencePath": "#/components/schemas/BookingRequestPassengers"
           },
           "required": true,
           "validation": {
@@ -166,7 +166,7 @@
           "name": "seat_preferences",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BookingRequestSeatPreferences"
+            "referencePath": "#/components/schemas/BookingRequestSeatPreferences"
           }
         }
       ]
@@ -177,7 +177,11 @@
       "referencePath": "#/components/schemas/BookingRequestPassengers",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Passenger"
+        "referencePath": "#/components/schemas/Passenger"
+      },
+      "validation": {
+        "minItems": 1,
+        "maxItems": 10
       }
     },
     {
@@ -222,7 +226,7 @@
           "name": "trip",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Trip"
+            "referencePath": "#/components/schemas/Trip"
           },
           "required": true
         },
@@ -230,7 +234,7 @@
           "name": "passengers",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BookingPassengers"
+            "referencePath": "#/components/schemas/BookingPassengers"
           },
           "required": true
         },
@@ -238,7 +242,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BookingStatus"
+            "referencePath": "#/components/schemas/BookingStatus"
           },
           "required": true,
           "readOnly": true
@@ -247,7 +251,7 @@
           "name": "payment_status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BookingPaymentStatus"
+            "referencePath": "#/components/schemas/BookingPaymentStatus"
           },
           "readOnly": true
         },
@@ -261,7 +265,7 @@
           "name": "total_price",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Price"
+            "referencePath": "#/components/schemas/Price"
           },
           "required": true
         }
@@ -273,7 +277,7 @@
       "referencePath": "#/components/schemas/BookingPassengers",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Passenger"
+        "referencePath": "#/components/schemas/Passenger"
       }
     },
     {
@@ -483,7 +487,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PaymentConfirmationStatus"
+            "referencePath": "#/components/schemas/PaymentConfirmationStatus"
           },
           "required": true
         },
@@ -491,7 +495,7 @@
           "name": "amount",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Price"
+            "referencePath": "#/components/schemas/Price"
           },
           "required": true
         },
@@ -668,14 +672,14 @@
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData"
+            "referencePath": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData"
           }
         },
         {
           "name": "links",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PaginationLinks"
+            "referencePath": "#/components/schemas/PaginationLinks"
           }
         }
       ],
@@ -687,7 +691,7 @@
       "referencePath": "#/paths/::stations/get/responses/200/content/application::json/GetStations200ResponseData",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Station"
+        "referencePath": "#/components/schemas/Station"
       }
     },
     {
@@ -746,14 +750,14 @@
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData"
+            "referencePath": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData"
           }
         },
         {
           "name": "links",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PaginationLinks"
+            "referencePath": "#/components/schemas/PaginationLinks"
           }
         }
       ],
@@ -765,7 +769,7 @@
       "referencePath": "#/paths/::trips/get/responses/200/content/application::json/GetTrips200ResponseData",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Trip"
+        "referencePath": "#/components/schemas/Trip"
       }
     },
     {
@@ -777,14 +781,14 @@
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData"
+            "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData"
           }
         },
         {
           "name": "links",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PaginationLinks"
+            "referencePath": "#/components/schemas/PaginationLinks"
           }
         }
       ],
@@ -796,7 +800,7 @@
       "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/GetBookings200ResponseData",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Booking"
+        "referencePath": "#/components/schemas/Booking"
       }
     },
     {
@@ -857,11 +861,11 @@
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/CardPayment"
+          "referencePath": "#/components/schemas/CardPayment"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BankTransferPayment"
+          "referencePath": "#/components/schemas/BankTransferPayment"
         }
       ],
       "discriminator": {
@@ -886,7 +890,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::stations/get/GetStationsParams"
+        "referencePath": "#/paths/::stations/get/GetStationsParams"
       },
       "responses": [
         {
@@ -898,7 +902,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::stations/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::stations/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -908,7 +912,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -916,7 +920,7 @@
           "statusCode": "429",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/TooManyRequests"
+            "referencePath": "#/components/responses/TooManyRequests"
           }
         },
         {
@@ -924,7 +928,7 @@
           "statusCode": "500",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/InternalServerError"
+            "referencePath": "#/components/responses/InternalServerError"
           }
         }
       ]
@@ -940,7 +944,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::trips/get/GetTripsParams"
+        "referencePath": "#/paths/::trips/get/GetTripsParams"
       },
       "responses": [
         {
@@ -952,7 +956,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::trips/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::trips/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -962,7 +966,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -970,7 +974,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ]
@@ -995,7 +999,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::bookings/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::bookings/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1005,7 +1009,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         }
       ]
@@ -1027,7 +1031,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/BookingRequest"
+              "referencePath": "#/components/schemas/BookingRequest"
             }
           }
         ],
@@ -1043,7 +1047,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Booking"
+                "referencePath": "#/components/schemas/Booking"
               }
             }
           ],
@@ -1060,7 +1064,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -1068,7 +1072,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1076,7 +1080,7 @@
           "statusCode": "409",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Conflict"
+            "referencePath": "#/components/responses/Conflict"
           }
         }
       ]
@@ -1092,7 +1096,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}/get/GetBookingsBookingIdParams"
+        "referencePath": "#/paths/::bookings::{bookingId}/get/GetBookingsBookingIdParams"
       },
       "responses": [
         {
@@ -1104,7 +1108,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Booking"
+                "referencePath": "#/components/schemas/Booking"
               }
             }
           ]
@@ -1114,7 +1118,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1122,7 +1126,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ]
@@ -1138,7 +1142,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}/delete/DeleteBookingsBookingIdParams"
+        "referencePath": "#/paths/::bookings::{bookingId}/delete/DeleteBookingsBookingIdParams"
       },
       "responses": [
         {
@@ -1151,7 +1155,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1159,7 +1163,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         },
         {
@@ -1167,7 +1171,7 @@
           "statusCode": "409",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Conflict"
+            "referencePath": "#/components/responses/Conflict"
           }
         }
       ]
@@ -1183,7 +1187,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::bookings::{bookingId}::payment/post/PostBookingsBookingIdPaymentParams"
+        "referencePath": "#/paths/::bookings::{bookingId}::payment/post/PostBookingsBookingIdPaymentParams"
       },
       "requestBody": {
         "kind": "content",
@@ -1192,7 +1196,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema"
+              "referencePath": "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema"
             }
           }
         ],
@@ -1208,7 +1212,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/PaymentConfirmation"
+                "referencePath": "#/components/schemas/PaymentConfirmation"
               }
             }
           ]
@@ -1218,7 +1222,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -1226,7 +1230,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1238,7 +1242,7 @@
               "mimeType": "application/problem+json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Problem"
+                "referencePath": "#/components/schemas/Problem"
               }
             }
           ]
@@ -1248,7 +1252,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ]
@@ -1291,7 +1295,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1305,7 +1309,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1319,7 +1323,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1333,7 +1337,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1347,7 +1351,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ],
@@ -1378,7 +1382,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]

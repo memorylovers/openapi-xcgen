@@ -3,7 +3,7 @@
     "title": "OpenAPI 3.1.1 transformers all of example",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Foo",
@@ -13,7 +13,7 @@
           "name": "foo",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/FooFoo"
+            "referencePath": "#/components/schemas/FooFoo"
           },
           "required": true
         }
@@ -25,7 +25,7 @@
       "referencePath": "#/components/schemas/FooFoo",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Bar"
+        "referencePath": "#/components/schemas/Bar"
       }
     },
     {
@@ -37,7 +37,7 @@
           "name": "foo",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BarFoo"
+            "referencePath": "#/components/schemas/BarFoo"
           },
           "required": true
         },
@@ -45,7 +45,7 @@
           "name": "bar",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BarBar"
+            "referencePath": "#/components/schemas/BarBar"
           },
           "required": true
         }
@@ -57,7 +57,7 @@
       "referencePath": "#/components/schemas/BarFoo",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/BarFooItem"
+        "referencePath": "#/components/schemas/BarFooItem"
       }
     },
     {
@@ -67,7 +67,7 @@
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Baz"
+          "referencePath": "#/components/schemas/Baz"
         }
       ]
     },
@@ -98,11 +98,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Qux"
+          "referencePath": "#/components/schemas/Qux"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazAllOf1"
+          "referencePath": "#/components/schemas/BazAllOf1"
         }
       ]
     },
@@ -126,7 +126,7 @@
           "name": "baz",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/BazAllOf1Baz"
+            "referencePath": "#/components/schemas/BazAllOf1Baz"
           }
         },
         {
@@ -205,7 +205,7 @@
               "mimeType": "*/*",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Foo"
+                "referencePath": "#/components/schemas/Foo"
               }
             }
           ]

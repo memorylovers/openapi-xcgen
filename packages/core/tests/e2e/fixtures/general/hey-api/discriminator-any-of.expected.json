@@ -3,7 +3,7 @@
     "title": "OpenAPI 3.0.3 discriminator any of example",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "anyOf",
       "name": "Foo",
@@ -11,11 +11,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Bar"
+          "referencePath": "#/components/schemas/Bar"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Baz"
+          "referencePath": "#/components/schemas/Baz"
         }
       ]
     },
@@ -26,7 +26,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Qux"
+          "referencePath": "#/components/schemas/Qux"
         }
       ]
     },
@@ -37,7 +37,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Qux"
+          "referencePath": "#/components/schemas/Qux"
         }
       ]
     },
@@ -48,7 +48,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Qux"
+          "referencePath": "#/components/schemas/Qux"
         }
       ]
     },
@@ -66,7 +66,7 @@
           "name": "type",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Quux"
+            "referencePath": "#/components/schemas/Quux"
           },
           "required": true
         }
@@ -95,15 +95,15 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Bar"
+          "referencePath": "#/components/schemas/Bar"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Baz"
+          "referencePath": "#/components/schemas/Baz"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Sp%C3%A6cial"
+          "referencePath": "#/components/schemas/Sp%C3%A6cial"
         }
       ]
     }
@@ -125,7 +125,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Foo"
+                "referencePath": "#/components/schemas/Foo"
               }
             }
           ]

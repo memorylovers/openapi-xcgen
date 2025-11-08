@@ -4,12 +4,20 @@
  * generateProperty() と Hook 機構の統合動作を検証
  */
 
-import type { IRModel, IRProperty } from "@openapi-xcgen/core";
+import type { IRModel, IRProperty, XcgenIR } from "@openapi-xcgen/core";
 import { describe, expect, it } from "vitest";
+import type { TypeGenerationContext } from "../../../src/generators/types/generation-context";
 import { generateProperty } from "../../../src/generators/types/types-property";
 import { createHooks } from "../../../src/hooks";
 
 describe("property:generate hook", () => {
+  const mockIR: XcgenIR = {
+    metadata: { title: "Test API", version: "1.0.0" },
+    components: [],
+    tags: [],
+    endpoints: [],
+  };
+
   const mockModel: IRModel = {
     kind: "object",
     name: "User",
@@ -56,7 +64,8 @@ describe("property:generate hook", () => {
         },
       });
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual(expected);
     });
@@ -84,7 +93,8 @@ describe("property:generate hook", () => {
         type: "string",
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(calls).toEqual(["hook1", "hook2"]);
       expect(result).toEqual("data?: Type1 | Type2 | undefined;");
@@ -114,7 +124,8 @@ describe("property:generate hook", () => {
         extensions: { "x-type": "EmailAddress" },
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual(
         "/** Email address (RFC 5322) */ email?: EmailAddress | undefined;",
@@ -135,7 +146,8 @@ describe("property:generate hook", () => {
         type: "string",
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("requiredField: string;");
     });
@@ -153,7 +165,8 @@ describe("property:generate hook", () => {
         required: true,
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("nullableField: string | null;");
     });
@@ -172,7 +185,8 @@ describe("property:generate hook", () => {
         required: true,
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("field?: string | null | undefined;");
     });
@@ -192,7 +206,8 @@ describe("property:generate hook", () => {
         required: true,
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("/** Custom comment */ field: string;");
     });
@@ -213,7 +228,8 @@ describe("property:generate hook", () => {
         description: "Original description",
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual(
         "/** Original description (modified) */ field: string;",
@@ -229,7 +245,8 @@ describe("property:generate hook", () => {
       };
 
       // hooksなしで呼び出し
-      const result = generateProperty(property, mockModel);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks: undefined };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("email?: string | undefined;");
     });
@@ -253,7 +270,8 @@ describe("property:generate hook", () => {
         extensions: { "x-type": "ID" },
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("readonly id: ID;");
     });
@@ -272,7 +290,8 @@ describe("property:generate hook", () => {
         defaultValue: "active",
       };
 
-      const result = generateProperty(property, mockModel, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateProperty(property, mockModel, ctx);
 
       expect(result).toEqual("status?: CustomString | undefined;");
     });

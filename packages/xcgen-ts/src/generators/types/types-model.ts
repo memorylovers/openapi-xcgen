@@ -5,7 +5,7 @@
  */
 
 import type { IRComponent } from "@openapi-xcgen/core";
-import type { HookableInstance } from "../../hooks";
+import type { TypeGenerationContext } from "./generation-context";
 import { generateAllOfType } from "./types-allof";
 import { generateAnyOfType } from "./types-anyof";
 import { generateArrayType } from "./types-array";
@@ -18,8 +18,8 @@ import { generateUnionType } from "./types-union";
 /**
  * IRComponentをTypeScript型定義に変換
  *
- * @param model - IRモデル
- * @param hooks - Hook instance（オプション）
+ * @param model - IRコンポーネント
+ * @param ctx - Type generation context
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
@@ -29,19 +29,19 @@ import { generateUnionType } from "./types-union";
  *   name: "User",
  *   properties: [{ name: "email", type: "string", required: true }]
  * };
- * await generateModel(model);
+ * await generateModel(model, ctx);
  * // => "export interface User {\n  email: string;\n}"
  * ```
  */
 export function generateModel(
   model: IRComponent,
-  hooks?: HookableInstance,
+  ctx: TypeGenerationContext,
 ): string | null {
   switch (model.kind) {
     case "object":
     case "requestBody":
     case "response":
-      return generateObjectType(model, hooks);
+      return generateObjectType(model, ctx);
 
     case "enum":
       return generateEnumType(model);
@@ -62,7 +62,7 @@ export function generateModel(
       return generateUnionType(model);
 
     case "parameter":
-      return generateParameterType(model, hooks);
+      return generateParameterType(model, ctx);
 
     default: {
       // Exhaustive check
@@ -75,6 +75,14 @@ export function generateModel(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("generateModel", () => {
@@ -92,7 +100,7 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateModel(model);
+      const result = generateModel(model, mockCtx);
 
       expect(result).toEqual(
         `
@@ -115,7 +123,7 @@ export interface User {
         ],
       };
 
-      const result = generateModel(model);
+      const result = generateModel(model, mockCtx);
 
       expect(result).toEqual('export type Status = "active" | "inactive";');
     });
@@ -125,10 +133,10 @@ export interface User {
         kind: "array",
         name: "UserList",
         referencePath: "#/components/schemas/UserList",
-        itemType: { kind: "ref", name: "#/components/schemas/User" },
+        itemType: { kind: "ref", referencePath: "#/components/schemas/User" },
       };
 
-      const result = generateModel(model);
+      const result = generateModel(model, mockCtx);
 
       expect(result).toContain("export type UserList = Array<User>;");
     });
@@ -138,10 +146,10 @@ export interface User {
         kind: "map",
         name: "UserMap",
         referencePath: "#/components/schemas/UserMap",
-        valueType: { kind: "ref", name: "#/components/schemas/User" },
+        valueType: { kind: "ref", referencePath: "#/components/schemas/User" },
       };
 
-      const result = generateModel(model);
+      const result = generateModel(model, mockCtx);
 
       expect(result).toContain("export type UserMap = Record<string, User>;");
     });
@@ -161,7 +169,7 @@ export interface User {
         ],
       };
 
-      const result = generateModel(model);
+      const result = generateModel(model, mockCtx);
 
       expect(result).toContain("export interface GetUserParams {");
       expect(result).toContain("path: {");
@@ -174,7 +182,7 @@ export interface User {
         kind: "unsupported",
       } as unknown as IRComponent;
 
-      const result = generateModel(model);
+      const result = generateModel(model, mockCtx);
 
       expect(result).toBeNull();
     });

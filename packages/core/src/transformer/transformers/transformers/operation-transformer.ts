@@ -40,7 +40,7 @@ export interface OperationTransformResult {
   /** 生成されたエンドポイント（失敗時はnull） */
   endpoint: IREndpoint | null;
   /** 抽出されたモデルの配列 */
-  models: IRComponent[];
+  components: IRComponent[];
 }
 
 /**
@@ -195,7 +195,7 @@ export function transformOperation(
     const irParameters: IRParameter[] =
       traversalResult.parametersResult.parameters.map(convertToIRParameter);
 
-    // parameter-aggregatorで統合モデルを生成
+    // parameter-aggregatorで統合コンポーネントを生成
     const aggregationResult = aggregateParameters(
       irParameters,
       context,
@@ -204,7 +204,7 @@ export function transformOperation(
     );
 
     if (aggregationResult.model) {
-      // 統合モデルが生成された場合
+      // 統合コンポーネントが生成された場合
       allModels.push(aggregationResult.model);
       endpointParameters = aggregationResult.reference!;
     } else {
@@ -257,7 +257,7 @@ export function transformOperation(
         // 参照レスポンス
         const ref: IRRef = {
           kind: "ref",
-          name: response.ref,
+          referencePath: response.ref,
         };
         endpointResponses.push({
           kind: "ref",
@@ -339,7 +339,7 @@ export function transformOperation(
 
   return {
     endpoint,
-    models: allModels,
+    components: allModels,
   };
 }
 
@@ -490,17 +490,17 @@ if (import.meta.vitest) {
         traversalResult,
       );
 
-      // 統合モデルが生成される
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("parameter");
-      if (result.models[0].kind === "parameter") {
-        expect(result.models[0].name).toBe("GetUsersIdParams");
+      // 統合コンポーネントが生成される
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("parameter");
+      if (result.components[0].kind === "parameter") {
+        expect(result.components[0].name).toBe("GetUsersIdParams");
       }
 
       // endpoint.parametersは参照になる
       expect(result.endpoint?.parameters).toEqual({
         kind: "ref",
-        name: "#/paths/::users::{id}/get/GetUsersIdParams",
+        referencePath: "#/paths/::users::{id}/get/GetUsersIdParams",
       });
     });
 
@@ -532,7 +532,7 @@ if (import.meta.vitest) {
       );
 
       // パラメータモデルは生成されない
-      expect(result.models).toHaveLength(0);
+      expect(result.components).toHaveLength(0);
 
       // endpoint.parametersは空配列
       expect(result.endpoint?.parameters).toEqual([]);
@@ -565,7 +565,7 @@ if (import.meta.vitest) {
             content: [
               {
                 mimeType: "application/json",
-                schema: { kind: "ref", name: "#/test" },
+                schema: { kind: "ref", referencePath: "#/test" },
               },
             ],
             childModels: [],
@@ -645,7 +645,7 @@ if (import.meta.vitest) {
       ) {
         expect(result.endpoint.requestBody.ref).toEqual({
           kind: "ref",
-          name: "#/components/requestBodies/Pet",
+          referencePath: "#/components/requestBodies/Pet",
         });
       }
     });
@@ -759,10 +759,10 @@ if (import.meta.vitest) {
       );
 
       // すべての子モデルが収集される
-      expect(result.models).toHaveLength(3);
-      expect(result.models).toContain(mockParamModel);
-      expect(result.models).toContain(mockRequestModel);
-      expect(result.models).toContain(mockResponseModel);
+      expect(result.components).toHaveLength(3);
+      expect(result.components).toContain(mockParamModel);
+      expect(result.components).toContain(mockRequestModel);
+      expect(result.components).toContain(mockResponseModel);
     });
 
     it("should handle operation with security", () => {

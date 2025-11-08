@@ -4,7 +4,7 @@
     "version": "2.3.0",
     "description": "An imaginary, but delightful Museum API for interacting with museum services and information.\nBuilt with love by Redocly.\n"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "DailyHours",
@@ -98,7 +98,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/SpecialEventCategory"
+            "referencePath": "#/components/schemas/SpecialEventCategory"
           },
           "required": true
         },
@@ -106,7 +106,7 @@
           "name": "location",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/SpecialEventLocation"
+            "referencePath": "#/components/schemas/SpecialEventLocation"
           },
           "required": true
         },
@@ -114,7 +114,7 @@
           "name": "price",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Money"
+            "referencePath": "#/components/schemas/Money"
           }
         },
         {
@@ -265,7 +265,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/SpecialEventRequestCategory"
+            "referencePath": "#/components/schemas/SpecialEventRequestCategory"
           },
           "required": true
         },
@@ -273,7 +273,7 @@
           "name": "location",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/SpecialEventRequestLocation"
+            "referencePath": "#/components/schemas/SpecialEventRequestLocation"
           },
           "required": true
         },
@@ -281,7 +281,7 @@
           "name": "price",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Money"
+            "referencePath": "#/components/schemas/Money"
           }
         },
         {
@@ -418,21 +418,21 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/SpecialEventUpdateCategory"
+            "referencePath": "#/components/schemas/SpecialEventUpdateCategory"
           }
         },
         {
           "name": "location",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/SpecialEventUpdateLocation"
+            "referencePath": "#/components/schemas/SpecialEventUpdateLocation"
           }
         },
         {
           "name": "price",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Money"
+            "referencePath": "#/components/schemas/Money"
           }
         },
         {
@@ -575,7 +575,7 @@
           "name": "ticket_type",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/TicketPurchaseRequestTicketType"
+            "referencePath": "#/components/schemas/TicketPurchaseRequestTicketType"
           },
           "required": true
         },
@@ -599,7 +599,7 @@
           "name": "payment_method",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/TicketPurchaseRequestPaymentMethod"
+            "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod"
           },
           "required": true
         }
@@ -644,11 +644,11 @@
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/CreditCardPayment"
+          "referencePath": "#/components/schemas/CreditCardPayment"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/PayPalPayment"
+          "referencePath": "#/components/schemas/PayPalPayment"
         }
       ],
       "discriminator": {
@@ -706,7 +706,7 @@
           "name": "ticket_type",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/TicketPurchaseConfirmationTicketType"
+            "referencePath": "#/components/schemas/TicketPurchaseConfirmationTicketType"
           },
           "required": true
         },
@@ -719,7 +719,7 @@
           "name": "total_amount",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Money"
+            "referencePath": "#/components/schemas/Money"
           },
           "required": true
         },
@@ -727,7 +727,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/TicketPurchaseConfirmationStatus"
+            "referencePath": "#/components/schemas/TicketPurchaseConfirmationStatus"
           },
           "required": true,
           "readOnly": true
@@ -1034,7 +1034,7 @@
           "name": "daily_hours",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours"
+            "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours"
           }
         }
       ],
@@ -1046,7 +1046,7 @@
       "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/DailyHours"
+        "referencePath": "#/components/schemas/DailyHours"
       }
     },
     {
@@ -1070,7 +1070,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::special-events/get/parameters/2/schema/GetSpecialEventsParamsCategory"
+            "referencePath": "#/paths/::special-events/get/parameters/2/schema/GetSpecialEventsParamsCategory"
           },
           "in": "query",
           "description": "Filter by event category"
@@ -1140,14 +1140,14 @@
           "name": "events",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents"
+            "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents"
           }
         },
         {
           "name": "pagination",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Pagination"
+            "referencePath": "#/components/schemas/Pagination"
           }
         }
       ],
@@ -1159,7 +1159,7 @@
       "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/SpecialEvent"
+        "referencePath": "#/components/schemas/SpecialEvent"
       }
     },
     {
@@ -1273,7 +1273,7 @@
           "name": "format",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/GetTicketsConfirmationIdQrCodeParamsFormat"
+            "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/parameters/2/schema/GetTicketsConfirmationIdQrCodeParamsFormat"
           },
           "in": "query",
           "description": "QR code format",
@@ -1325,7 +1325,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::museum-hours/get/GetMuseumHoursParams"
+        "referencePath": "#/paths/::museum-hours/get/GetMuseumHoursParams"
       },
       "responses": [
         {
@@ -1337,7 +1337,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::museum-hours/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1347,7 +1347,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -1355,7 +1355,7 @@
           "statusCode": "500",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/InternalServerError"
+            "referencePath": "#/components/responses/InternalServerError"
           }
         }
       ]
@@ -1371,7 +1371,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events/get/GetSpecialEventsParams"
+        "referencePath": "#/paths/::special-events/get/GetSpecialEventsParams"
       },
       "responses": [
         {
@@ -1383,7 +1383,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::special-events/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1393,7 +1393,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         }
       ]
@@ -1415,7 +1415,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/SpecialEventRequest"
+              "referencePath": "#/components/schemas/SpecialEventRequest"
             }
           }
         ],
@@ -1431,7 +1431,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/SpecialEvent"
+                "referencePath": "#/components/schemas/SpecialEvent"
               }
             }
           ],
@@ -1448,7 +1448,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -1456,7 +1456,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1464,7 +1464,7 @@
           "statusCode": "403",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Forbidden"
+            "referencePath": "#/components/responses/Forbidden"
           }
         }
       ],
@@ -1485,7 +1485,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/get/GetSpecialEventsEventIdParams"
+        "referencePath": "#/paths/::special-events::{eventId}/get/GetSpecialEventsEventIdParams"
       },
       "responses": [
         {
@@ -1497,7 +1497,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/SpecialEvent"
+                "referencePath": "#/components/schemas/SpecialEvent"
               }
             }
           ]
@@ -1507,7 +1507,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ]
@@ -1523,7 +1523,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/delete/DeleteSpecialEventsEventIdParams"
+        "referencePath": "#/paths/::special-events::{eventId}/delete/DeleteSpecialEventsEventIdParams"
       },
       "responses": [
         {
@@ -1536,7 +1536,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1544,7 +1544,7 @@
           "statusCode": "403",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Forbidden"
+            "referencePath": "#/components/responses/Forbidden"
           }
         },
         {
@@ -1552,7 +1552,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ],
@@ -1573,7 +1573,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::special-events::{eventId}/patch/PatchSpecialEventsEventIdParams"
+        "referencePath": "#/paths/::special-events::{eventId}/patch/PatchSpecialEventsEventIdParams"
       },
       "requestBody": {
         "kind": "content",
@@ -1582,7 +1582,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/SpecialEventUpdate"
+              "referencePath": "#/components/schemas/SpecialEventUpdate"
             }
           }
         ],
@@ -1598,7 +1598,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/SpecialEvent"
+                "referencePath": "#/components/schemas/SpecialEvent"
               }
             }
           ]
@@ -1608,7 +1608,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -1616,7 +1616,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1624,7 +1624,7 @@
           "statusCode": "403",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Forbidden"
+            "referencePath": "#/components/responses/Forbidden"
           }
         },
         {
@@ -1632,7 +1632,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ],
@@ -1659,7 +1659,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/TicketPurchaseRequest"
+              "referencePath": "#/components/schemas/TicketPurchaseRequest"
             }
           }
         ],
@@ -1675,7 +1675,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/TicketPurchaseConfirmation"
+                "referencePath": "#/components/schemas/TicketPurchaseConfirmation"
               }
             }
           ]
@@ -1685,7 +1685,7 @@
           "statusCode": "400",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/BadRequest"
+            "referencePath": "#/components/responses/BadRequest"
           }
         },
         {
@@ -1697,7 +1697,7 @@
               "mimeType": "application/problem+json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Problem"
+                "referencePath": "#/components/schemas/Problem"
               }
             }
           ]
@@ -1711,7 +1711,7 @@
               "mimeType": "application/problem+json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Problem"
+                "referencePath": "#/components/schemas/Problem"
               }
             }
           ]
@@ -1729,7 +1729,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}/get/GetTicketsConfirmationIdParams"
+        "referencePath": "#/paths/::tickets::{confirmationId}/get/GetTicketsConfirmationIdParams"
       },
       "responses": [
         {
@@ -1741,7 +1741,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/TicketPurchaseConfirmation"
+                "referencePath": "#/components/schemas/TicketPurchaseConfirmation"
               }
             }
           ]
@@ -1751,7 +1751,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1759,7 +1759,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ]
@@ -1775,7 +1775,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::tickets::{confirmationId}::qr-code/get/GetTicketsConfirmationIdQrCodeParams"
+        "referencePath": "#/paths/::tickets::{confirmationId}::qr-code/get/GetTicketsConfirmationIdQrCodeParams"
       },
       "responses": [
         {
@@ -1798,7 +1798,7 @@
           "statusCode": "401",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/Unauthorized"
+            "referencePath": "#/components/responses/Unauthorized"
           }
         },
         {
@@ -1806,7 +1806,7 @@
           "statusCode": "404",
           "ref": {
             "kind": "ref",
-            "name": "#/components/responses/NotFound"
+            "referencePath": "#/components/responses/NotFound"
           }
         }
       ]
@@ -1840,7 +1840,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1854,7 +1854,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1868,7 +1868,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1882,7 +1882,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]
@@ -1896,7 +1896,7 @@
           "mimeType": "application/problem+json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Problem"
+            "referencePath": "#/components/schemas/Problem"
           }
         }
       ]

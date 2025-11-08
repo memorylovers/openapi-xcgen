@@ -19,7 +19,7 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  *   kind: "map",
  *   name: "UserMap",
  *   referencePath: "#/components/schemas/UserMap",
- *   valueType: { kind: "ref", name: "User", referencePath: "#/components/schemas/User" },
+ *   valueType: { kind: "ref", referencePath: "User", referencePath: "#/components/schemas/User" },
  * };
  * generateMapType(model);
  * // => "export type UserMap = Record<string, User>;"
@@ -91,7 +91,7 @@ export type StringMap = Record<string, string>;
           referencePath: "#/components/schemas/UserMap",
           valueType: {
             kind: "ref",
-            name: "User",
+            referencePath: "User",
           },
         };
 

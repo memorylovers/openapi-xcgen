@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "API for testing x-extensions support at various levels"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "User",
@@ -157,7 +157,7 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags"
+            "referencePath": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags"
           },
           "extensions": {
             "x-property-extension": "tags-field",
@@ -184,7 +184,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
+        "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -196,7 +196,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]
@@ -228,7 +228,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::posts/post/requestBody/content/application::json/schema"
+              "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema"
             }
           }
         ],
@@ -244,7 +244,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Post"
+                "referencePath": "#/components/schemas/Post"
               }
             }
           ]

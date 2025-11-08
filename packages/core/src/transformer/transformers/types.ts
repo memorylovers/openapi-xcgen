@@ -24,10 +24,10 @@ export interface TransformResult {
 
   /**
    * 抽出されたモデルの配列
-   * - オブジェクト、列挙型、配列、マップなどのIRモデル
+   * - オブジェクト、列挙型、配列、マップなどのIRコンポーネント
    * - 子要素から抽出されたモデルも含む
    */
-  models: IRComponent[];
+  components: IRComponent[];
 
   /**
    * エラー情報（オプショナル）
@@ -82,7 +82,7 @@ export interface AdditionalPropertiesTraversalResult {
   /** additionalPropertiesの型（未定義の場合はundefined） */
   type: IRType | undefined;
   /** 子要素から抽出されたモデル */
-  models: IRComponent[];
+  components: IRComponent[];
   /** エラー情報（オプショナル） */
   error?: TransformError;
 }
@@ -94,7 +94,7 @@ export interface ArrayItemTraversalResult {
   /** 配列要素の型 */
   itemType: IRType | null;
   /** 子要素から抽出されたモデル */
-  models: IRComponent[];
+  components: IRComponent[];
   /** エラー情報（オプショナル） */
   error?: TransformError;
 }
@@ -229,12 +229,12 @@ export interface OperationTraversalResult {
 /**
  * パラメータ集約の結果
  *
- * Aggregatorレイヤーでパラメータ統合モデルを生成した結果を表します。
+ * Aggregatorレイヤーでパラメータ統合コンポーネントを生成した結果を表します。
  */
 export interface ParameterAggregationResult {
-  /** パラメータ統合モデルへの参照（生成された場合） */
+  /** パラメータ統合コンポーネントへの参照（生成された場合） */
   reference: IRType | null;
-  /** パラメータ統合モデル（IRParameterComponent）*/
+  /** パラメータ統合コンポーネント（IRParameterComponent）*/
   model: IRComponent | null;
 }
 
@@ -247,7 +247,7 @@ export interface ParameterTransformResult {
   /** 変換されたパラメータ（失敗時はnull） */
   parameter: unknown | null;
   /** 子要素から抽出されたモデル */
-  models: IRComponent[];
+  components: IRComponent[];
   /** エラー情報（オプショナル） */
   error?: TransformError;
 }

@@ -31,7 +31,7 @@ import type { ContentTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRComponent[] };
+) => { type: IRType | null; components: IRComponent[] };
 
 /**
  * contentフィールド（MIMEタイプとMediaTypeObjectのマップ）を訪問
@@ -183,7 +183,7 @@ export function traverseContent(
       schema: result.type,
     });
 
-    allChildModels.push(...result.models);
+    allChildModels.push(...result.components);
   });
 
   return {
@@ -233,7 +233,7 @@ if (import.meta.vitest) {
     it("should process single mime type with primitive schema", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const content = {
@@ -281,12 +281,12 @@ if (import.meta.vitest) {
       const mockVisitSchema = vi
         .fn()
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/components/schemas/User" },
-          models: [],
+          type: { kind: "ref", referencePath: "#/components/schemas/User" },
+          components: [],
         })
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         });
 
       const content = {
@@ -308,7 +308,7 @@ if (import.meta.vitest) {
       expect(result.content).toHaveLength(2);
       expect(result.content[0]).toEqual({
         mimeType: "application/json",
-        schema: { kind: "ref", name: "#/components/schemas/User" },
+        schema: { kind: "ref", referencePath: "#/components/schemas/User" },
       });
       expect(result.content[1]).toEqual({
         mimeType: "application/xml",
@@ -319,8 +319,8 @@ if (import.meta.vitest) {
 
     it("should detect inline object schema and set requiresSpecialModel flag", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/test" },
-        models: [],
+        type: { kind: "ref", referencePath: "#/test" },
+        components: [],
       });
 
       const content = {
@@ -368,7 +368,7 @@ if (import.meta.vitest) {
     it("should skip mime type when schema resolution fails", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: null,
-        models: [],
+        components: [],
       });
 
       const content = {
@@ -399,8 +399,8 @@ if (import.meta.vitest) {
       };
 
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/test" },
-        models: [mockModel],
+        type: { kind: "ref", referencePath: "#/test" },
+        components: [mockModel],
       });
 
       const content = {
@@ -425,8 +425,8 @@ if (import.meta.vitest) {
 
     it("should not set requiresSpecialModel for ref schema", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/components/schemas/User" },
-        models: [],
+        type: { kind: "ref", referencePath: "#/components/schemas/User" },
+        components: [],
       });
 
       const content = {

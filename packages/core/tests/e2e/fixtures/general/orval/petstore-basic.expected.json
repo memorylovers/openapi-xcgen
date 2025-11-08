@@ -3,7 +3,7 @@
     "title": "Swagger Petstore",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Pet",
@@ -57,14 +57,14 @@
           "name": "callingCode",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PetCallingCode"
+            "referencePath": "#/components/schemas/PetCallingCode"
           }
         },
         {
           "name": "country",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PetCountry"
+            "referencePath": "#/components/schemas/PetCountry"
           }
         }
       ]
@@ -114,7 +114,7 @@
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PetsNestedArrayData"
+            "referencePath": "#/components/schemas/PetsNestedArrayData"
           }
         }
       ]
@@ -125,7 +125,7 @@
       "referencePath": "#/components/schemas/PetsNestedArrayData",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Pet"
+        "referencePath": "#/components/schemas/Pet"
       }
     },
     {
@@ -134,7 +134,11 @@
       "referencePath": "#/components/schemas/PetsArray",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Pet"
+        "referencePath": "#/components/schemas/Pet"
+      },
+      "validation": {
+        "minItems": 1,
+        "maxItems": 20
       }
     },
     {
@@ -238,7 +242,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets/get/GetPetsParams"
+        "referencePath": "#/paths/::pets/get/GetPetsParams"
       },
       "responses": [
         {
@@ -250,7 +254,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/PetsArray"
+                "referencePath": "#/components/schemas/PetsArray"
               }
             }
           ],
@@ -271,7 +275,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Error"
+                "referencePath": "#/components/schemas/Error"
               }
             }
           ]
@@ -294,7 +298,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::pets/post/requestBody/content/application::json/schema"
+              "referencePath": "#/paths/::pets/post/requestBody/content/application::json/schema"
             }
           }
         ],
@@ -315,7 +319,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Error"
+                "referencePath": "#/components/schemas/Error"
               }
             }
           ]
@@ -332,7 +336,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets-nested-array/get/GetPetsNestedArrayParams"
+        "referencePath": "#/paths/::pets-nested-array/get/GetPetsNestedArrayParams"
       },
       "responses": [
         {
@@ -344,7 +348,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/PetsNestedArray"
+                "referencePath": "#/components/schemas/PetsNestedArray"
               }
             }
           ],
@@ -365,7 +369,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Error"
+                "referencePath": "#/components/schemas/Error"
               }
             }
           ]
@@ -382,7 +386,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets::{petId}/get/GetPetsPetIdParams"
+        "referencePath": "#/paths/::pets::{petId}/get/GetPetsPetIdParams"
       },
       "responses": [
         {
@@ -394,7 +398,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             }
           ]
@@ -408,7 +412,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Error"
+                "referencePath": "#/components/schemas/Error"
               }
             }
           ]

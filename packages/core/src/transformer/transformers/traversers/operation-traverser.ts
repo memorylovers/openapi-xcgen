@@ -29,7 +29,7 @@ import { traverseResponses } from "./responses-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRComponent[] };
+) => { type: IRType | null; components: IRComponent[] };
 
 /**
  * OperationObjectを訪問し、parameters、requestBody、responsesを処理
@@ -335,8 +335,8 @@ if (import.meta.vitest) {
       };
 
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/test" },
-        models: [],
+        type: { kind: "ref", referencePath: "#/test" },
+        components: [],
       });
 
       const context: VisitorContext = {
@@ -393,7 +393,7 @@ if (import.meta.vitest) {
 
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const context: VisitorContext = {

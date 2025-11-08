@@ -11,7 +11,7 @@ import { getEndpointDataTypes } from "./services-data-types";
 /**
  * IREndpointからAPI関数を生成
  * @param endpoint - IRエンドポイント
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @param hooks - Hook instance（オプション）
  * @returns TypeScript関数コード（null: 生成スキップ）
  */
@@ -178,7 +178,10 @@ if (import.meta.vitest) {
             name: "GetUsers200Response",
             referencePath:
               "#/paths/::users/get/responses/200/content/application::json/schema",
-            itemType: { kind: "ref", name: "#/components/schemas/User" },
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
           },
         ];
 
@@ -199,7 +202,8 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::users/get/responses/200/content/application::json/schema",
+                    referencePath:
+                      "#/paths/::users/get/responses/200/content/application::json/schema",
                   },
                 },
               ],

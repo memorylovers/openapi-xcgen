@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test PathItem-level parameters being overridden by Operation-level parameters"
   },
-  "models": [
+  "components": [
     {
       "kind": "parameter",
       "name": "GetPetsIdParams",
@@ -52,7 +52,7 @@
           "name": "format",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::users::{userId}/get/parameters/1/schema/GetUsersUserIdParamsFormat"
+            "referencePath": "#/paths/::users::{userId}/get/parameters/1/schema/GetUsersUserIdParamsFormat"
           },
           "in": "query",
           "description": "Response format (Operation level - extended)"
@@ -108,7 +108,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pets::{id}/get/GetPetsIdParams"
+        "referencePath": "#/paths/::pets::{id}/get/GetPetsIdParams"
       },
       "responses": [
         {
@@ -120,7 +120,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::pets::{id}/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::pets::{id}/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -140,7 +140,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
+        "referencePath": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
       },
       "responses": [
         {
@@ -152,7 +152,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::users::{userId}/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::users::{userId}/get/responses/200/content/application::json/schema"
               }
             }
           ]

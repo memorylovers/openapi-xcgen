@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test nullable property handling"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Profile",
@@ -38,7 +38,7 @@
           "name": "settings",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/ProfileSettings"
+            "referencePath": "#/components/schemas/ProfileSettings"
           },
           "nullable": true
         },
@@ -46,7 +46,7 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/ProfileTags"
+            "referencePath": "#/components/schemas/ProfileTags"
           },
           "nullable": true
         }
@@ -88,7 +88,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Profile"
+                "referencePath": "#/components/schemas/Profile"
               }
             }
           ]

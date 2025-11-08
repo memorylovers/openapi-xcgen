@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "API for testing Path Item + Operation x-extensions merge with conflict resolution"
   },
-  "models": [
+  "components": [
     {
       "kind": "response",
       "name": "GetItemsId200Response",
@@ -41,7 +41,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::items::{id}/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::items::{id}/get/responses/200/content/application::json/schema"
               }
             }
           ]

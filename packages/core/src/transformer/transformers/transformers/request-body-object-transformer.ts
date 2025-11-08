@@ -10,7 +10,7 @@ import type {
   IRRequestBodyComponent,
   SchemaObject,
 } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import type {
   AdditionalPropertiesTraversalResult,
@@ -51,7 +51,7 @@ export function transformRequestBodyObject(
   propertyTraversalResult: PropertyTraversalResult,
   additionalPropertiesResult?: AdditionalPropertiesTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // プロパティをIRProperty形式に変換
@@ -76,7 +76,7 @@ export function transformRequestBodyObject(
   // 子モデルの収集
   const childModels = [
     ...propertyTraversalResult.childModels,
-    ...(additionalPropertiesResult?.models || []),
+    ...(additionalPropertiesResult?.components || []),
   ];
 
   // IRRequestBodyComponentを作成
@@ -101,8 +101,8 @@ export function transformRequestBodyObject(
 
   // requestBodyモデルと子要素から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [requestBodyModel, ...childModels],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [requestBodyModel, ...childModels],
   };
 }
 
@@ -154,10 +154,11 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/paths/::users/post/requestBody/content/application::json/schema",
+        referencePath:
+          "#/paths/::users/post/requestBody/content/application::json/schema",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0]).toEqual({
         kind: "requestBody",
         name: "PostUsersRequestBody",
         referencePath:
@@ -200,7 +201,7 @@ if (import.meta.vitest) {
 
       const additionalResult: AdditionalPropertiesTraversalResult = {
         type: "string",
-        models: [],
+        components: [],
       };
 
       const result = transformRequestBodyObject(
@@ -210,7 +211,7 @@ if (import.meta.vitest) {
         additionalResult,
       );
 
-      expect(result.models[0]).toMatchObject({
+      expect(result.components[0]).toMatchObject({
         kind: "requestBody",
         additionalProperties: "string",
       });
@@ -249,7 +250,7 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "nested",
-            type: { kind: "ref", name: "#/nested" },
+            type: { kind: "ref", referencePath: "#/nested" },
           },
         ],
         childModels: [mockChildModel],
@@ -261,8 +262,8 @@ if (import.meta.vitest) {
         propertyResult,
       );
 
-      expect(result.models).toHaveLength(2); // requestBody + nested
-      expect(result.models[1]).toBe(mockChildModel);
+      expect(result.components).toHaveLength(2); // requestBody + nested
+      expect(result.components[1]).toBe(mockChildModel);
     });
 
     it("should preserve all property metadata (validation, extensions, readOnly, etc.)", () => {
@@ -340,8 +341,8 @@ if (import.meta.vitest) {
         propertyResult,
       );
 
-      expect(result.models).toHaveLength(1);
-      const model = result.models[0];
+      expect(result.components).toHaveLength(1);
+      const model = result.components[0];
 
       if (model.kind === "requestBody") {
         // username: validation + extensions が保持される
@@ -443,8 +444,8 @@ if (import.meta.vitest) {
         propertyResult,
       );
 
-      expect(result.models).toHaveLength(1);
-      const model = result.models[0];
+      expect(result.components).toHaveLength(1);
+      const model = result.components[0];
 
       if (model.kind === "requestBody") {
         // age: defaultValue + validation + extensions が保持される
@@ -517,7 +518,7 @@ if (import.meta.vitest) {
         propertyResult,
       );
 
-      expect(result.models[0]).toMatchObject({
+      expect(result.components[0]).toMatchObject({
         kind: "requestBody",
         name: "PostUsersRequestBody",
         required: true,

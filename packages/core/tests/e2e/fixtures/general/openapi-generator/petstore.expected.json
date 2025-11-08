@@ -4,14 +4,14 @@
     "version": "1.0.0",
     "description": "This is a sample server Petstore server. For this sample, you can use the api key `special-key` to test the authorization filters."
   },
-  "models": [
+  "components": [
     {
       "kind": "array",
       "name": "UserArray",
       "referencePath": "#/components/requestBodies/UserArray/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/User"
+        "referencePath": "#/components/schemas/User"
       }
     },
     {
@@ -48,7 +48,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderStatus"
+            "referencePath": "#/components/schemas/OrderStatus"
           },
           "description": "Order Status"
         },
@@ -185,7 +185,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Category"
+            "referencePath": "#/components/schemas/Category"
           }
         },
         {
@@ -197,7 +197,7 @@
           "name": "photoUrls",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PetPhotoUrls"
+            "referencePath": "#/components/schemas/PetPhotoUrls"
           },
           "required": true
         },
@@ -205,14 +205,14 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PetTags"
+            "referencePath": "#/components/schemas/PetTags"
           }
         },
         {
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PetStatus"
+            "referencePath": "#/components/schemas/PetStatus"
           },
           "description": "pet status in the store",
           "deprecated": true
@@ -232,7 +232,7 @@
       "referencePath": "#/components/schemas/PetTags",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Tag"
+        "referencePath": "#/components/schemas/Tag"
       }
     },
     {
@@ -288,7 +288,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatus"
+            "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatus"
           },
           "in": "query",
           "required": true,
@@ -304,7 +304,7 @@
       "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatus",
       "itemType": {
         "kind": "ref",
-        "name": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatusItem"
+        "referencePath": "#/paths/::pet::findByStatus/get/parameters/0/schema/GetPetFindByStatusParamsStatusItem"
       }
     },
     {
@@ -333,7 +333,7 @@
       "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Pet"
+        "referencePath": "#/components/schemas/Pet"
       }
     },
     {
@@ -342,7 +342,7 @@
       "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Pet"
+        "referencePath": "#/components/schemas/Pet"
       }
     },
     {
@@ -354,7 +354,7 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::pet::findByTags/get/parameters/0/schema/GetPetFindByTagsParamsTags"
+            "referencePath": "#/paths/::pet::findByTags/get/parameters/0/schema/GetPetFindByTagsParamsTags"
           },
           "in": "query",
           "required": true,
@@ -375,7 +375,7 @@
       "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Pet"
+        "referencePath": "#/components/schemas/Pet"
       }
     },
     {
@@ -384,7 +384,7 @@
       "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Pet"
+        "referencePath": "#/components/schemas/Pet"
       }
     },
     {
@@ -638,7 +638,7 @@
         "kind": "ref",
         "ref": {
           "kind": "ref",
-          "name": "#/components/requestBodies/Pet"
+          "referencePath": "#/components/requestBodies/Pet"
         }
       },
       "responses": [
@@ -651,14 +651,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             }
           ]
@@ -692,7 +692,7 @@
         "kind": "ref",
         "ref": {
           "kind": "ref",
-          "name": "#/components/requestBodies/Pet"
+          "referencePath": "#/components/requestBodies/Pet"
         }
       },
       "responses": [
@@ -705,14 +705,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             }
           ]
@@ -754,7 +754,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::findByStatus/get/GetPetFindByStatusParams"
+        "referencePath": "#/paths/::pet::findByStatus/get/GetPetFindByStatusParams"
       },
       "responses": [
         {
@@ -766,14 +766,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema"
+                "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::xml/schema"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::pet::findByStatus/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -805,7 +805,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::findByTags/get/GetPetFindByTagsParams"
+        "referencePath": "#/paths/::pet::findByTags/get/GetPetFindByTagsParams"
       },
       "responses": [
         {
@@ -817,14 +817,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema"
+                "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::xml/schema"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::pet::findByTags/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -855,7 +855,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}/get/GetPetPetIdParams"
+        "referencePath": "#/paths/::pet::{petId}/get/GetPetPetIdParams"
       },
       "responses": [
         {
@@ -867,14 +867,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Pet"
+                "referencePath": "#/components/schemas/Pet"
               }
             }
           ]
@@ -906,7 +906,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}/post/PostPetPetIdParams"
+        "referencePath": "#/paths/::pet::{petId}/post/PostPetPetIdParams"
       },
       "requestBody": {
         "kind": "content",
@@ -915,7 +915,7 @@
             "mimeType": "application/x-www-form-urlencoded",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::pet::{petId}/post/requestBody/content/application::x-www-form-urlencoded/schema"
+              "referencePath": "#/paths/::pet::{petId}/post/requestBody/content/application::x-www-form-urlencoded/schema"
             }
           }
         ]
@@ -947,7 +947,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}/delete/DeletePetPetIdParams"
+        "referencePath": "#/paths/::pet::{petId}/delete/DeletePetPetIdParams"
       },
       "responses": [
         {
@@ -976,7 +976,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::pet::{petId}::uploadImage/post/PostPetPetIdUploadImageParams"
+        "referencePath": "#/paths/::pet::{petId}::uploadImage/post/PostPetPetIdUploadImageParams"
       },
       "requestBody": {
         "kind": "content",
@@ -985,7 +985,7 @@
             "mimeType": "multipart/form-data",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema"
+              "referencePath": "#/paths/::pet::{petId}::uploadImage/post/requestBody/content/multipart::form-data/schema"
             }
           }
         ]
@@ -1000,7 +1000,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/ApiResponse"
+                "referencePath": "#/components/schemas/ApiResponse"
               }
             }
           ]
@@ -1036,7 +1036,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::store::inventory/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::store::inventory/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -1064,7 +1064,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/Order"
+              "referencePath": "#/components/schemas/Order"
             }
           }
         ],
@@ -1081,14 +1081,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Order"
+                "referencePath": "#/components/schemas/Order"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Order"
+                "referencePath": "#/components/schemas/Order"
               }
             }
           ]
@@ -1111,7 +1111,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::store::order::{orderId}/get/GetStoreOrderOrderIdParams"
+        "referencePath": "#/paths/::store::order::{orderId}/get/GetStoreOrderOrderIdParams"
       },
       "responses": [
         {
@@ -1123,14 +1123,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Order"
+                "referencePath": "#/components/schemas/Order"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Order"
+                "referencePath": "#/components/schemas/Order"
               }
             }
           ]
@@ -1158,7 +1158,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::store::order::{orderId}/delete/DeleteStoreOrderOrderIdParams"
+        "referencePath": "#/paths/::store::order::{orderId}/delete/DeleteStoreOrderOrderIdParams"
       },
       "responses": [
         {
@@ -1190,7 +1190,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/User"
+              "referencePath": "#/components/schemas/User"
             }
           }
         ],
@@ -1223,7 +1223,7 @@
         "kind": "ref",
         "ref": {
           "kind": "ref",
-          "name": "#/components/requestBodies/UserArray"
+          "referencePath": "#/components/requestBodies/UserArray"
         }
       },
       "responses": [
@@ -1252,7 +1252,7 @@
         "kind": "ref",
         "ref": {
           "kind": "ref",
-          "name": "#/components/requestBodies/UserArray"
+          "referencePath": "#/components/requestBodies/UserArray"
         }
       },
       "responses": [
@@ -1278,7 +1278,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::login/get/GetUserLoginParams"
+        "referencePath": "#/paths/::user::login/get/GetUserLoginParams"
       },
       "responses": [
         {
@@ -1352,7 +1352,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::{username}/get/GetUserUsernameParams"
+        "referencePath": "#/paths/::user::{username}/get/GetUserUsernameParams"
       },
       "responses": [
         {
@@ -1364,14 +1364,14 @@
               "mimeType": "application/xml",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             },
             {
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]
@@ -1399,7 +1399,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::{username}/put/PutUserUsernameParams"
+        "referencePath": "#/paths/::user::{username}/put/PutUserUsernameParams"
       },
       "requestBody": {
         "kind": "content",
@@ -1408,7 +1408,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/User"
+              "referencePath": "#/components/schemas/User"
             }
           }
         ],
@@ -1444,7 +1444,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::user::{username}/delete/DeleteUserUsernameParams"
+        "referencePath": "#/paths/::user::{username}/delete/DeleteUserUsernameParams"
       },
       "responses": [
         {
@@ -1497,7 +1497,7 @@
           "mimeType": "application/json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/requestBodies/UserArray/content/application::json/schema"
+            "referencePath": "#/components/requestBodies/UserArray/content/application::json/schema"
           }
         }
       ],
@@ -1511,14 +1511,14 @@
           "mimeType": "application/json",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Pet"
+            "referencePath": "#/components/schemas/Pet"
           }
         },
         {
           "mimeType": "application/xml",
           "schema": {
             "kind": "ref",
-            "name": "#/components/schemas/Pet"
+            "referencePath": "#/components/schemas/Pet"
           }
         }
       ],

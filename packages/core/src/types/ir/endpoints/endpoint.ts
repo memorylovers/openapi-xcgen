@@ -62,7 +62,7 @@ export interface IREndpoint {
   summary?: string;
   /** タグ（OpenAPIのtags配列） */
   tags: string[];
-  /** パラメータ（統合モデルがある場合は参照、ない場合は個別配列） */
+  /** パラメータ（統合コンポーネントがある場合は参照、ない場合は個別配列） */
   parameters: IRType | IRParameter[];
   /** リクエストボディ */
   requestBody?: IRRequestBody;

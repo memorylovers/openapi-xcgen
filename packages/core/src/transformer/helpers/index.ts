@@ -3,14 +3,14 @@
  */
 
 // Re-export from naming subdirectory (直接ファイルから)
-export { buildAdditionalPropertiesModelName } from "./naming/build-additional-properties-model-name";
-export { buildInlineModelName } from "./naming/build-inline-model-name";
-export { buildParameterModelName } from "./naming/build-parameter-model-name";
-export { buildParameterSchemaModelName } from "./naming/build-parameter-schema-model-name";
-export { buildRequestBodyModelName } from "./naming/build-request-body-model-name";
-export { buildResponseModelName } from "./naming/build-response-model-name";
+export { buildAdditionalPropertiesComponentName } from "./naming/build-additional-properties-component-name";
+export { buildInlineComponentName } from "./naming/build-inline-component-name";
+export { buildParameterComponentName } from "./naming/build-parameter-component-name";
+export { buildParameterSchemaComponentName } from "./naming/build-parameter-schema-component-name";
+export { buildRequestBodyComponentName } from "./naming/build-request-body-component-name";
+export { buildResponseComponentName } from "./naming/build-response-component-name";
 export { generateEnumName } from "./naming/generate-enum-name";
-export { getModelName } from "./naming/get-model-name";
+export { getComponentName } from "./naming/get-component-name";
 export { getMediaTypeSuffix } from "./naming/media-type-suffix";
 export { pathToComponentBase } from "./naming/path-to-component-base";
 
@@ -26,7 +26,7 @@ export { parseAdditionalPropertiesPath } from "./path/parse-document-path";
 export { parseSchemaPath } from "./path/parse-document-path";
 
 // Utility functions (remain in helpers/)
-export { createParameterModel } from "./create-parameter-model";
+export { createParameterComponent } from "./create-parameter-model";
 export { enrichDiscriminatorMappings } from "./enrich-discriminator-mappings";
 export { extractExtensions } from "./extract-extensions";
 export { extractValidation } from "./extract-validation";

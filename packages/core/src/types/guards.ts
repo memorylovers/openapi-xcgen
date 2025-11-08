@@ -34,8 +34,10 @@ export function isReferenceObject(obj: unknown): obj is ReferenceObject {
 /**
  * IRComponentがIRAllOfSchemaかどうかを判定
  */
-export function isIRAllOfModel(model: IRComponent): model is IRAllOfSchema {
-  return model.kind === "allOf";
+export function isIRAllOfComponent(
+  component: IRComponent,
+): component is IRAllOfSchema {
+  return component.kind === "allOf";
 }
 
 /**
@@ -279,7 +281,7 @@ if (import.meta.vitest) {
       });
     });
 
-    describe("isIRAllOfModel", () => {
+    describe("isIRAllOfComponent", () => {
       it("should identify allOf model", () => {
         const allOfModel: IRComponent = {
           kind: "allOf",
@@ -287,7 +289,7 @@ if (import.meta.vitest) {
           referencePath: "#/components/schemas/Extended",
           schemas: [],
         };
-        expect(isIRAllOfModel(allOfModel)).toBe(true);
+        expect(isIRAllOfComponent(allOfModel)).toBe(true);
       });
 
       it("should return false for other model types", () => {
@@ -297,7 +299,7 @@ if (import.meta.vitest) {
           referencePath: "#/components/schemas/User",
           properties: [],
         };
-        expect(isIRAllOfModel(objectModel)).toBe(false);
+        expect(isIRAllOfComponent(objectModel)).toBe(false);
 
         const enumModel: IRComponent = {
           kind: "enum",
@@ -306,7 +308,7 @@ if (import.meta.vitest) {
           type: "string",
           values: [],
         };
-        expect(isIRAllOfModel(enumModel)).toBe(false);
+        expect(isIRAllOfComponent(enumModel)).toBe(false);
       });
     });
 

@@ -18,10 +18,10 @@ import { resolveModelName } from "../../../helpers/model-resolver";
  * ```typescript
  * const ir: XcgenIR = {
  *   endpoints: [{
- *     parameters: { kind: "ref", name: "#/paths/.../parameters" },
+ *     parameters: { kind: "ref", referencePath: "#/paths/.../parameters" },
  *     requestBody: {
  *       kind: "content",
- *       content: [{ schema: { kind: "ref", name: "#/components/schemas/UserUpdate" } }]
+ *       content: [{ schema: { kind: "ref", referencePath: "#/components/schemas/UserUpdate" } }]
  *     }
  *   }]
  * };
@@ -42,7 +42,7 @@ export function buildUnifiedParameterTypesMap(
       endpoint.parameters?.kind === "ref" &&
       endpoint.requestBody?.kind === "content"
     ) {
-      const parameterPath = endpoint.parameters.name;
+      const parameterPath = endpoint.parameters.referencePath;
 
       // requestBodyの型名を抽出
       for (const content of endpoint.requestBody.content) {
@@ -50,10 +50,10 @@ export function buildUnifiedParameterTypesMap(
           typeof content.schema !== "string" &&
           content.schema.kind === "ref"
         ) {
-          // ir.modelsから正しいモデル名を逆引き
+          // ir.componentsから正しいモデル名を逆引き
           const requestBodyTypeName = resolveModelName(
-            content.schema.name,
-            ir.models,
+            content.schema.referencePath,
+            ir.components,
           );
           unifiedParameterTypes.set(parameterPath, requestBodyTypeName);
           break; // 最初のスキーマのみ使用
@@ -73,7 +73,7 @@ if (import.meta.vitest) {
     it("should build map for endpoints with parameters and requestBody", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test API", version: "1.0.0" },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [
           {
@@ -83,7 +83,7 @@ if (import.meta.vitest) {
             tags: [],
             parameters: {
               kind: "ref",
-              name: "#/paths/~1users~1{userId}/patch/parameters",
+              referencePath: "#/paths/~1users~1{userId}/patch/parameters",
             },
             requestBody: {
               kind: "content",
@@ -93,7 +93,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/components/schemas/UserUpdate",
+                    referencePath: "#/components/schemas/UserUpdate",
                   },
                 },
               ],
@@ -114,7 +114,7 @@ if (import.meta.vitest) {
     it("should return empty map when no endpoints have both parameters and requestBody", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test API", version: "1.0.0" },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [
           {
@@ -136,7 +136,7 @@ if (import.meta.vitest) {
     it("should handle multiple endpoints with unified parameters", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test API", version: "1.0.0" },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [
           {
@@ -146,7 +146,7 @@ if (import.meta.vitest) {
             tags: [],
             parameters: {
               kind: "ref",
-              name: "#/paths/~1users~1{userId}/patch/parameters",
+              referencePath: "#/paths/~1users~1{userId}/patch/parameters",
             },
             requestBody: {
               kind: "content",
@@ -155,7 +155,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/components/schemas/UserUpdate",
+                    referencePath: "#/components/schemas/UserUpdate",
                   },
                 },
               ],
@@ -169,7 +169,7 @@ if (import.meta.vitest) {
             tags: [],
             parameters: {
               kind: "ref",
-              name: "#/paths/~1products~1{productId}/put/parameters",
+              referencePath: "#/paths/~1products~1{productId}/put/parameters",
             },
             requestBody: {
               kind: "content",
@@ -178,7 +178,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/components/schemas/ProductUpdate",
+                    referencePath: "#/components/schemas/ProductUpdate",
                   },
                 },
               ],
@@ -202,7 +202,7 @@ if (import.meta.vitest) {
     it("should skip endpoints with array parameters", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test API", version: "1.0.0" },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [
           {
@@ -225,7 +225,7 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/components/schemas/UserCreate",
+                    referencePath: "#/components/schemas/UserCreate",
                   },
                 },
               ],
@@ -240,18 +240,24 @@ if (import.meta.vitest) {
       expect(result.size).toBe(0);
     });
 
-    it("should resolve requestBody type from ir.models for inline schemas (paths)", () => {
+    it("should resolve requestBody type from ir.components for inline schemas (paths)", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test API", version: "1.0.0" },
-        models: [
+        components: [
           {
             kind: "union",
             name: "PostBookingsBookingIdPaymentRequestBody",
             referencePath:
               "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
             types: [
-              { kind: "ref", name: "#/components/schemas/CardPayment" },
-              { kind: "ref", name: "#/components/schemas/BankTransferPayment" },
+              {
+                kind: "ref",
+                referencePath: "#/components/schemas/CardPayment",
+              },
+              {
+                kind: "ref",
+                referencePath: "#/components/schemas/BankTransferPayment",
+              },
             ],
           },
         ],
@@ -264,7 +270,8 @@ if (import.meta.vitest) {
             tags: [],
             parameters: {
               kind: "ref",
-              name: "#/paths/~1bookings~1{bookingId}~1payment/post/parameters",
+              referencePath:
+                "#/paths/~1bookings~1{bookingId}~1payment/post/parameters",
             },
             requestBody: {
               kind: "content",
@@ -274,7 +281,8 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
+                    referencePath:
+                      "#/paths/::bookings::{bookingId}::payment/post/requestBody/content/application::json/schema",
                   },
                 },
               ],

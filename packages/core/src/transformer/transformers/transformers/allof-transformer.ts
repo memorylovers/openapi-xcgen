@@ -6,7 +6,7 @@
  */
 
 import type { IRAllOfSchema, SchemaObject } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
 import type { CompositionTraversalResult, TransformResult } from "../types";
@@ -36,7 +36,7 @@ export function transformAllOf(
   context: VisitorContext,
   traversalResult: CompositionTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // トラバーサルが失敗した場合（空配列）
@@ -59,8 +59,8 @@ export function transformAllOf(
 
   // allOfモデルと子要素から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [allOfModel, ...traversalResult.childModels],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [allOfModel, ...traversalResult.childModels],
   };
 }
 
@@ -90,8 +90,8 @@ if (import.meta.vitest) {
 
       const traversalResult: CompositionTraversalResult = {
         schemas: [
-          { kind: "ref", name: "#/components/schemas/Base" },
-          { kind: "ref", name: "#/components/schemas/ExtendedallOf1" },
+          { kind: "ref", referencePath: "#/components/schemas/Base" },
+          { kind: "ref", referencePath: "#/components/schemas/ExtendedallOf1" },
         ],
         childModels: [
           {
@@ -113,16 +113,16 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Extended",
+        referencePath: "#/components/schemas/Extended",
       });
-      expect(result.models).toHaveLength(3); // allOf + 2 child models
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(3); // allOf + 2 child models
+      expect(result.components[0]).toEqual({
         kind: "allOf",
         name: "Extended",
         referencePath: "#/components/schemas/Extended",
         schemas: [
-          { kind: "ref", name: "#/components/schemas/Base" },
-          { kind: "ref", name: "#/components/schemas/ExtendedallOf1" },
+          { kind: "ref", referencePath: "#/components/schemas/Base" },
+          { kind: "ref", referencePath: "#/components/schemas/ExtendedallOf1" },
         ],
         description: "Extended model",
       });
@@ -143,8 +143,8 @@ if (import.meta.vitest) {
 
       const traversalResult: CompositionTraversalResult = {
         schemas: [
-          { kind: "ref", name: "#/components/schemas/MergedallOf0" },
-          { kind: "ref", name: "#/components/schemas/MergedallOf1" },
+          { kind: "ref", referencePath: "#/components/schemas/MergedallOf0" },
+          { kind: "ref", referencePath: "#/components/schemas/MergedallOf1" },
         ],
         childModels: [],
       };
@@ -153,10 +153,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Merged",
+        referencePath: "#/components/schemas/Merged",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).not.toHaveProperty("description");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0]).not.toHaveProperty("description");
     });
 
     it("should return error result when traversal fails", () => {
@@ -178,7 +178,7 @@ if (import.meta.vitest) {
       const result = transformAllOf(schema, context, traversalResult);
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("FAILED_ALLOF_RESOLUTION");
     });
   });

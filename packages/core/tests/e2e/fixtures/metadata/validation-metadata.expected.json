@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test API for validation constraints, x-extensions, and metadata on properties and parameters"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "UserProfile",
@@ -93,7 +93,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/UserProfileStatus"
+            "referencePath": "#/components/schemas/UserProfileStatus"
           },
           "description": "Account status",
           "defaultValue": "active",
@@ -106,7 +106,7 @@
           "name": "accountState",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/UserProfileAccountState"
+            "referencePath": "#/components/schemas/UserProfileAccountState"
           },
           "description": "Current account state",
           "defaultValue": "active"
@@ -245,7 +245,7 @@
           "name": "sortBy",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::users/get/parameters/2/schema/GetUsersParamsSortBy"
+            "referencePath": "#/paths/::users/get/parameters/2/schema/GetUsersParamsSortBy"
           },
           "in": "query",
           "description": "Field to sort by",
@@ -258,7 +258,7 @@
           "name": "order",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::users/get/parameters/3/schema/GetUsersParamsOrder"
+            "referencePath": "#/paths/::users/get/parameters/3/schema/GetUsersParamsOrder"
           },
           "in": "query",
           "description": "Sort order",
@@ -316,7 +316,7 @@
       "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/UserProfile"
+        "referencePath": "#/components/schemas/UserProfile"
       }
     },
     {
@@ -381,7 +381,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
+        "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -393,7 +393,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/UserProfile"
+                "referencePath": "#/components/schemas/UserProfile"
               }
             }
           ]
@@ -414,7 +414,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users/get/GetUsersParams"
+        "referencePath": "#/paths/::users/get/GetUsersParams"
       },
       "responses": [
         {
@@ -426,7 +426,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::users/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -448,7 +448,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::users/post/requestBody/content/application::json/schema"
+              "referencePath": "#/paths/::users/post/requestBody/content/application::json/schema"
             }
           }
         ],
@@ -464,7 +464,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/UserProfile"
+                "referencePath": "#/components/schemas/UserProfile"
               }
             }
           ]

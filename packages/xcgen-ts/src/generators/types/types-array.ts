@@ -19,7 +19,7 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  *   kind: "array",
  *   name: "UserList",
  *   referencePath: "#/components/schemas/UserList",
- *   itemType: { kind: "ref", name: "User", referencePath: "#/components/schemas/User" },
+ *   itemType: { kind: "ref", referencePath: "User", referencePath: "#/components/schemas/User" },
  * };
  * generateArrayType(model);
  * // => "export type UserList = Array<User>;"
@@ -91,7 +91,7 @@ export type StringList = Array<string>;
           referencePath: "#/components/schemas/UserList",
           itemType: {
             kind: "ref",
-            name: "User",
+            referencePath: "User",
           },
         };
 

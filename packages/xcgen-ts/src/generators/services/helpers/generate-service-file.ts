@@ -15,7 +15,7 @@ import { generateEndpoint } from "../services-endpoint";
  *
  * @param tag - タグ名
  * @param endpoints - そのタグに属するエンドポイント配列
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @param hooks - Hook instance（オプション）
  * @returns サービスファイルのコード
  *
@@ -113,7 +113,10 @@ if (import.meta.vitest) {
               content: [
                 {
                   mimeType: "application/json",
-                  schema: { kind: "ref", name: "#/components/schemas/Pet" },
+                  schema: {
+                    kind: "ref",
+                    referencePath: "#/components/schemas/Pet",
+                  },
                 },
               ],
             },

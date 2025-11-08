@@ -6,6 +6,7 @@
 
 import type { IRExtensions, IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
+import type { TypeGenerationContext } from "../types/generation-context";
 import { generateAllOfSchema } from "./schemas-allof";
 import { generateAnyOfSchema } from "./schemas-anyof";
 import { generateArraySchema } from "./schemas-array";
@@ -14,12 +15,11 @@ import { generateObjectSchema, type PropertySchema } from "./schemas-object";
 import { irTypeToValibotSchema } from "./schemas-type-mapper";
 import { irTypeToValibotSchemaRef } from "./schemas-type-ref";
 import { generateUnionSchema } from "./schemas-union";
-import type { HookableInstance } from "../../hooks";
 
 /**
  * IRComponentをValibotスキーマ定義に変換
- * @param model - IRモデル
- * @param hooks - Hook instance（オプション）
+ * @param model - IRコンポーネント
+ * @param ctx - Type generation context
  * @returns Valibotスキーマ定義コード
  *
  * @example
@@ -34,7 +34,7 @@ import type { HookableInstance } from "../../hooks";
  *   ],
  * };
  *
- * const result = generateSchemaModel(model);
+ * const result = generateSchemaModel(model, ctx);
  * // =>
  * // /**
  * //  * Schema for Pet
@@ -47,7 +47,7 @@ import type { HookableInstance } from "../../hooks";
  */
 export function generateSchemaModel(
   model: IRComponent,
-  hooks?: HookableInstance,
+  ctx: TypeGenerationContext,
 ): string | null {
   // スキーマ名: {ModelName}Schema
   const schemaName = `${toTypeName(model.name)}Schema`;
@@ -74,7 +74,7 @@ export function generateSchemaModel(
           schema: irTypeToValibotSchema(
             prop.type,
             prop.validation,
-            hooks,
+            ctx,
             prop.extensions,
           ),
           optional: !prop.required,
@@ -98,14 +98,14 @@ export function generateSchemaModel(
       const itemSchema = irTypeToValibotSchema(
         model.itemType,
         undefined,
-        hooks,
+        ctx,
         modelExtensions,
       );
       // IRArraySchemaにはvalidationプロパティがないため、undefinedを渡す
       schemaExpression = generateArraySchema(
         itemSchema,
         undefined,
-        hooks,
+        ctx,
         modelExtensions,
       );
       break;
@@ -119,7 +119,7 @@ export function generateSchemaModel(
       const valueSchema = irTypeToValibotSchema(
         model.valueType,
         undefined,
-        hooks,
+        ctx,
         modelExtensions,
       );
       schemaExpression = `v.record(v.string(), ${valueSchema})`;
@@ -152,16 +152,17 @@ export function generateSchemaModel(
             if (typeof type !== "string" && type.kind === "ref") {
               // Core packageはreference path全体を保存: "#/components/schemas/Cat"
               // 最後のセグメントを抽出: "Cat"
-              const modelName = type.name.split("/").at(-1) ?? type.name;
+              const modelName =
+                type.referencePath.split("/").at(-1) ?? type.referencePath;
 
               // Phase 2で自動生成されたmappingから正しいdiscriminator値を取得
               let discriminatorValue = modelName;
               if (discriminator.mapping) {
-                // mappingの中からtype.nameに一致するエントリを探す
+                // mappingの中からtype.referencePathに一致するエントリを探す
                 for (const [key, refPath] of Object.entries(
                   discriminator.mapping,
                 )) {
-                  if (refPath === type.name) {
+                  if (refPath === type.referencePath) {
                     discriminatorValue = key;
                     break;
                   }
@@ -216,6 +217,14 @@ export function generateSchemaModel(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("schemas-model", () => {
@@ -234,7 +243,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateSchemaModel(model);
+        const result = generateSchemaModel(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -260,7 +269,7 @@ export const UserSchema = v.object({
           ],
         };
 
-        const result = generateSchemaModel(model);
+        const result = generateSchemaModel(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -287,7 +296,7 @@ export const StatusSchema = v.picklist(["active", "inactive"]);
           ],
         };
 
-        const result = generateSchemaModel(model);
+        const result = generateSchemaModel(model, mockCtx);
 
         expect(result).toBeNull();
       });

@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test $ref references to components"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Order",
@@ -14,14 +14,14 @@
           "name": "customer",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Customer"
+            "referencePath": "#/components/schemas/Customer"
           }
         },
         {
           "name": "items",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderItems"
+            "referencePath": "#/components/schemas/OrderItems"
           }
         }
       ]
@@ -32,7 +32,7 @@
       "referencePath": "#/components/schemas/OrderItems",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/OrderItem"
+        "referencePath": "#/components/schemas/OrderItem"
       }
     },
     {
@@ -63,7 +63,7 @@
       "referencePath": "#/paths/::customers/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Customer"
+        "referencePath": "#/components/schemas/Customer"
       }
     }
   ],
@@ -85,7 +85,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Order"
+                "referencePath": "#/components/schemas/Order"
               }
             }
           ]
@@ -108,7 +108,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::customers/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::customers/get/responses/200/content/application::json/schema"
               }
             }
           ]

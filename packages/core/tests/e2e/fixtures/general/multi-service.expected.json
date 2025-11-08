@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "description": "API with multiple services/tags"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "User",
@@ -29,7 +29,7 @@
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/UserRole"
+            "referencePath": "#/components/schemas/UserRole"
           }
         }
       ]
@@ -81,7 +81,7 @@
       "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/User"
+        "referencePath": "#/components/schemas/User"
       }
     },
     {
@@ -120,7 +120,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::users/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -137,7 +137,7 @@
       ],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
+        "referencePath": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
       },
       "responses": [
         {
@@ -149,7 +149,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]
@@ -189,7 +189,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/NewPost"
+              "referencePath": "#/components/schemas/NewPost"
             }
           }
         ],

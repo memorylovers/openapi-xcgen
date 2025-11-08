@@ -19,7 +19,7 @@ import { toTypeName } from "../../../helpers/naming";
  *   kind: "object",
  *   name: "Order",
  *   properties: [
- *     { name: "user", type: { kind: "ref", name: "#/components/schemas/User" } }
+ *     { name: "user", type: { kind: "ref", referencePath: "#/components/schemas/User" } }
  *   ]
  * };
  * extractTypeDependencies(model);
@@ -36,7 +36,8 @@ export function extractTypeDependencies(model: IRComponent): Set<string> {
 
     switch (irType.kind) {
       case "ref": {
-        const modelName = irType.name.split("/").at(-1) ?? irType.name;
+        const modelName =
+          irType.referencePath.split("/").at(-1) ?? irType.referencePath;
         dependencies.add(toTypeName(modelName));
         break;
       }
@@ -101,12 +102,15 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
@@ -122,7 +126,7 @@ if (import.meta.vitest) {
         kind: "array",
         name: "Items",
         referencePath: "#/components/schemas/Items",
-        itemType: { kind: "ref", name: "#/components/schemas/Item" },
+        itemType: { kind: "ref", referencePath: "#/components/schemas/Item" },
       };
 
       const result = extractTypeDependencies(model);
@@ -135,7 +139,7 @@ if (import.meta.vitest) {
         kind: "map",
         name: "UserMap",
         referencePath: "#/components/schemas/UserMap",
-        valueType: { kind: "ref", name: "#/components/schemas/User" },
+        valueType: { kind: "ref", referencePath: "#/components/schemas/User" },
       };
 
       const result = extractTypeDependencies(model);
@@ -151,7 +155,10 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "items",
-            type: { kind: "ref", name: "#/components/schemas/CartItems" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/CartItems",
+            },
             required: true,
           },
         ],
@@ -168,8 +175,8 @@ if (import.meta.vitest) {
         name: "ExtendedUser",
         referencePath: "#/components/schemas/ExtendedUser",
         schemas: [
-          { kind: "ref", name: "#/components/schemas/BaseUser" },
-          { kind: "ref", name: "#/components/schemas/Profile" },
+          { kind: "ref", referencePath: "#/components/schemas/BaseUser" },
+          { kind: "ref", referencePath: "#/components/schemas/Profile" },
         ],
       };
 
@@ -184,8 +191,8 @@ if (import.meta.vitest) {
         name: "Pet",
         referencePath: "#/components/schemas/Pet",
         types: [
-          { kind: "ref", name: "#/components/schemas/Cat" },
-          { kind: "ref", name: "#/components/schemas/Dog" },
+          { kind: "ref", referencePath: "#/components/schemas/Cat" },
+          { kind: "ref", referencePath: "#/components/schemas/Dog" },
         ],
       };
 

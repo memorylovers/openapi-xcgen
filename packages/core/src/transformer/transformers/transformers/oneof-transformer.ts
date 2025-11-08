@@ -6,7 +6,7 @@
  */
 
 import type { IRUnionSchema, SchemaObject } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
 import type { CompositionTraversalResult, TransformResult } from "../types";
@@ -52,7 +52,7 @@ export function transformOneOf(
   context: VisitorContext,
   traversalResult: CompositionTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // トラバーサルが失敗した場合（空配列）
@@ -95,8 +95,8 @@ export function transformOneOf(
 
   // unionモデルと子要素から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [unionModel, ...traversalResult.childModels],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [unionModel, ...traversalResult.childModels],
   };
 }
 
@@ -121,8 +121,8 @@ if (import.meta.vitest) {
 
       const traversalResult: CompositionTraversalResult = {
         schemas: [
-          { kind: "ref", name: "#/components/schemas/Success" },
-          { kind: "ref", name: "#/components/schemas/Error" },
+          { kind: "ref", referencePath: "#/components/schemas/Success" },
+          { kind: "ref", referencePath: "#/components/schemas/Error" },
         ],
         childModels: [],
       };
@@ -131,16 +131,16 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Result",
+        referencePath: "#/components/schemas/Result",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0]).toEqual({
         kind: "union",
         name: "Result",
         referencePath: "#/components/schemas/Result",
         types: [
-          { kind: "ref", name: "#/components/schemas/Success" },
-          { kind: "ref", name: "#/components/schemas/Error" },
+          { kind: "ref", referencePath: "#/components/schemas/Success" },
+          { kind: "ref", referencePath: "#/components/schemas/Error" },
         ],
         description: "Result union",
       });
@@ -169,21 +169,21 @@ if (import.meta.vitest) {
 
       const traversalResult: CompositionTraversalResult = {
         schemas: [
-          { kind: "ref", name: "#/components/schemas/Cat" },
-          { kind: "ref", name: "#/components/schemas/Dog" },
+          { kind: "ref", referencePath: "#/components/schemas/Cat" },
+          { kind: "ref", referencePath: "#/components/schemas/Dog" },
         ],
         childModels: [],
       };
 
       const result = transformOneOf(schema, context, traversalResult);
 
-      expect(result.models[0]).toEqual({
+      expect(result.components[0]).toEqual({
         kind: "union",
         name: "Pet",
         referencePath: "#/components/schemas/Pet",
         types: [
-          { kind: "ref", name: "#/components/schemas/Cat" },
-          { kind: "ref", name: "#/components/schemas/Dog" },
+          { kind: "ref", referencePath: "#/components/schemas/Cat" },
+          { kind: "ref", referencePath: "#/components/schemas/Dog" },
         ],
         discriminator: {
           propertyName: "petType",
@@ -206,17 +206,20 @@ if (import.meta.vitest) {
       };
 
       const traversalResult: CompositionTraversalResult = {
-        schemas: [{ kind: "ref", name: "#/components/schemas/User" }, "null"],
+        schemas: [
+          { kind: "ref", referencePath: "#/components/schemas/User" },
+          "null",
+        ],
         childModels: [],
       };
 
       const result = transformOneOf(schema, context, traversalResult);
 
-      expect(result.models[0]).toEqual({
+      expect(result.components[0]).toEqual({
         kind: "union",
         name: "NullableUser",
         referencePath: "#/components/schemas/NullableUser",
-        types: [{ kind: "ref", name: "#/components/schemas/User" }],
+        types: [{ kind: "ref", referencePath: "#/components/schemas/User" }],
         nullable: true,
       });
     });
@@ -240,7 +243,7 @@ if (import.meta.vitest) {
       const result = transformOneOf(schema, context, traversalResult);
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("FAILED_ONEOF_RESOLUTION");
     });
   });

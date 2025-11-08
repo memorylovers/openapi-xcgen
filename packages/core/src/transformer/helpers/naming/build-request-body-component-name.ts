@@ -6,18 +6,18 @@ import { parseRequestBodyPath } from "../path/parse-document-path";
 import { pathToComponentBase } from "./path-to-component-base";
 
 /**
- * RequestBodyのモデル名を生成（paths配下）
+ * RequestBodyのコンポーネント名を生成（paths配下）
  *
  * @param context - PathsRequestBodyContext
- * @returns モデル名（例: "PostUsersRequestBody"）
+ * @returns コンポーネント名（例: "PostUsersRequestBody"）
  *
  * @example
  * ```typescript
  * // context = { documentPath: ["paths", "/users", "post", "requestBody"], ... }
- * buildRequestBodyModelName(context)  // => "PostUsersRequestBody"
+ * buildRequestBodyComponentName(context)  // => "PostUsersRequestBody"
  * ```
  */
-export function buildRequestBodyModelName(
+export function buildRequestBodyComponentName(
   context: PathsRequestBodyContext,
 ): string {
   const parsed = parseRequestBodyPath(context.documentPath);
@@ -39,7 +39,7 @@ export function buildRequestBodyModelName(
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("buildRequestBodyModelName", () => {
+  describe("buildRequestBodyComponentName", () => {
     it("should build model name for request body", () => {
       const context: PathsRequestBodyContext = {
         kind: "requestBody",
@@ -48,7 +48,9 @@ if (import.meta.vitest) {
         contentType: "application/json",
         schemaPath: ["content", "application/json", "schema"],
       };
-      expect(buildRequestBodyModelName(context)).toBe("PostUsersRequestBody");
+      expect(buildRequestBodyComponentName(context)).toBe(
+        "PostUsersRequestBody",
+      );
     });
 
     it("should build model name with media type suffix", () => {
@@ -59,7 +61,7 @@ if (import.meta.vitest) {
         contentType: "multipart/form-data",
         schemaPath: ["content", "multipart/form-data", "schema"],
       };
-      expect(buildRequestBodyModelName(context)).toBe(
+      expect(buildRequestBodyComponentName(context)).toBe(
         "PostFilesMultipartFormDataRequestBody",
       );
     });

@@ -199,9 +199,9 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/User",
+        referencePath: "#/components/schemas/User",
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should dispatch enum to transformEnum", () => {
@@ -219,10 +219,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Status",
+        referencePath: "#/components/schemas/Status",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("enum");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("enum");
     });
 
     it("should dispatch primitive to transformPrimitive", () => {
@@ -237,7 +237,7 @@ if (import.meta.vitest) {
       const result = dispatchSchema(schema, context);
 
       expect(result.type).toBe("string");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should dispatch array with recursive traversal", () => {
@@ -254,10 +254,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Items",
+        referencePath: "#/components/schemas/Items",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("array");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("array");
     });
 
     it("should dispatch map (additionalProperties only)", () => {
@@ -274,10 +274,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/StringMap",
+        referencePath: "#/components/schemas/StringMap",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("map");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("map");
     });
 
     it("should dispatch allOf with recursive traversal", () => {
@@ -298,11 +298,11 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Extended",
+        referencePath: "#/components/schemas/Extended",
       });
       // allOf + nested object model
-      expect(result.models.length).toBeGreaterThanOrEqual(1);
-      expect(result.models[0].kind).toBe("allOf");
+      expect(result.components.length).toBeGreaterThanOrEqual(1);
+      expect(result.components[0].kind).toBe("allOf");
     });
 
     it("should dispatch oneOf with recursive traversal", () => {
@@ -322,10 +322,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Result",
+        referencePath: "#/components/schemas/Result",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("union");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("union");
     });
 
     it("should dispatch anyOf with recursive traversal", () => {
@@ -342,10 +342,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Value",
+        referencePath: "#/components/schemas/Value",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("anyOf");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("anyOf");
     });
 
     it("should dispatch object with properties", () => {
@@ -367,12 +367,12 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/User",
+        referencePath: "#/components/schemas/User",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("object");
-      if (result.models[0].kind === "object") {
-        expect(result.models[0].properties).toHaveLength(2);
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("object");
+      if (result.components[0].kind === "object") {
+        expect(result.components[0].properties).toHaveLength(2);
       }
     });
 
@@ -393,11 +393,11 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/FlexibleObject",
+        referencePath: "#/components/schemas/FlexibleObject",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("object");
-      expect(result.models[0]).toHaveProperty("additionalProperties");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("object");
+      expect(result.components[0]).toHaveProperty("additionalProperties");
     });
 
     it("should dispatch object without type but with properties", () => {
@@ -416,10 +416,10 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/ImplicitObject",
+        referencePath: "#/components/schemas/ImplicitObject",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("object");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("object");
     });
 
     it("should dispatch object in requestBody context to IRRequestBodyComponent", () => {
@@ -449,13 +449,14 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/paths/::users/post/requestBody/content/application::json/schema",
+        referencePath:
+          "#/paths/::users/post/requestBody/content/application::json/schema",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("requestBody");
-      if (result.models[0].kind === "requestBody") {
-        expect(result.models[0].properties).toHaveLength(2);
-        expect(result.models[0].description).toBe("User data");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("requestBody");
+      if (result.components[0].kind === "requestBody") {
+        expect(result.components[0].properties).toHaveLength(2);
+        expect(result.components[0].description).toBe("User data");
       }
     });
 
@@ -481,8 +482,8 @@ if (import.meta.vitest) {
 
       const result = dispatchSchema(schema, context);
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("requestBody");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("requestBody");
     });
 
     it("should dispatch object in response context to IRResponseComponent", () => {
@@ -513,14 +514,15 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/paths/::users/get/responses/200/content/application::json/schema",
+        referencePath:
+          "#/paths/::users/get/responses/200/content/application::json/schema",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("response");
-      if (result.models[0].kind === "response") {
-        expect(result.models[0].properties).toHaveLength(2);
-        expect(result.models[0].statusCode).toBe("200");
-        expect(result.models[0].description).toBe("Success response");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("response");
+      if (result.components[0].kind === "response") {
+        expect(result.components[0].properties).toHaveLength(2);
+        expect(result.components[0].statusCode).toBe("200");
+        expect(result.components[0].description).toBe("Success response");
       }
     });
 
@@ -546,8 +548,8 @@ if (import.meta.vitest) {
 
       const result = dispatchSchema(schema, context);
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("response");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("response");
       // components配下のresponseの場合、statusCodeはdocumentPathから取得できないため
       // responsesIndexが見つからず、documentPath[responsesIndex + 1]はundefinedになるが
       // これは想定された動作（実際にはcomponentsの場合は使われない）
@@ -577,9 +579,9 @@ if (import.meta.vitest) {
 
       const result = dispatchSchema(schema, context);
 
-      expect(result.models[0].kind).toBe("requestBody");
-      if (result.models[0].kind === "requestBody") {
-        expect(result.models[0].additionalProperties).toBe("string");
+      expect(result.components[0].kind).toBe("requestBody");
+      if (result.components[0].kind === "requestBody") {
+        expect(result.components[0].additionalProperties).toBe("string");
       }
     });
 
@@ -608,10 +610,10 @@ if (import.meta.vitest) {
 
       const result = dispatchSchema(schema, context);
 
-      expect(result.models[0].kind).toBe("response");
-      if (result.models[0].kind === "response") {
+      expect(result.components[0].kind).toBe("response");
+      if (result.components[0].kind === "response") {
         // number型はIR変換で"double"になる
-        expect(result.models[0].additionalProperties).toBe("double");
+        expect(result.components[0].additionalProperties).toBe("double");
       }
     });
   });

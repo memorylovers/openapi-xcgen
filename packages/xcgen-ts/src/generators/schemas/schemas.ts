@@ -11,6 +11,7 @@ import { toTypeName } from "../../helpers/naming";
 import type { HookableInstance } from "../../hooks";
 import type { GeneratorResult } from "../../types";
 import { runInParallel } from "../../helpers/parallel";
+import type { TypeGenerationContext } from "../types/generation-context";
 import { generateSchemaFile } from "./helpers/generate-schema-file";
 import { generateSchemasIndex } from "./helpers/generate-index";
 
@@ -41,22 +42,25 @@ export async function generateSchemas(
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 
+  // Create TypeGenerationContext
+  const ctx: TypeGenerationContext = { ir, hooks };
+
   // 依存関係順にソート
-  const sortedModels = sortModelsByDependencies(ir.models);
+  const sortedModels = sortModelsByDependencies(ir.components);
 
   // Step 1: IR → Code (純粋関数による変換)
   const schemaFiles = sortedModels
     .map((model) => {
       // modelFile:generate Hook を呼び出して schemaImports を取得
       let schemaImports: string[] | undefined;
-      if (hooks) {
+      if (ctx.hooks) {
         const tsCode = {
           name: model.name,
           code: "",
           imports: [],
           schemaImports: [],
         };
-        hooks.callHook("modelFile:generate", {
+        ctx.hooks.callHook("modelFile:generate", {
           model,
           tsCode,
           extensions: "extensions" in model ? model.extensions : undefined,
@@ -66,7 +70,7 @@ export async function generateSchemas(
 
       return {
         path: `schemas/${toTypeName(model.name)}Schema.ts`,
-        content: generateSchemaFile(model, hooks, schemaImports),
+        content: generateSchemaFile(model, ctx, schemaImports),
       };
     })
     .filter((f) => f.content !== null) as Array<{

@@ -6,7 +6,7 @@
  */
 
 import type { IRObjectSchema, IRProperty, SchemaObject } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import type {
   AdditionalPropertiesTraversalResult,
@@ -57,7 +57,7 @@ export function transformObject(
   propertyTraversalResult: PropertyTraversalResult,
   additionalPropertiesResult?: AdditionalPropertiesTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // プロパティをIRProperty形式に変換
@@ -82,7 +82,7 @@ export function transformObject(
   // 子モデルの収集
   const childModels = [
     ...propertyTraversalResult.childModels,
-    ...(additionalPropertiesResult?.models || []),
+    ...(additionalPropertiesResult?.components || []),
   ];
 
   // IRObjectSchemaを作成
@@ -99,8 +99,8 @@ export function transformObject(
 
   // objectモデルと子要素から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [objectModel, ...childModels],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [objectModel, ...childModels],
   };
 }
 
@@ -139,11 +139,11 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/User",
+        referencePath: "#/components/schemas/User",
       });
-      expect(result.models).toHaveLength(1);
-      if (result.models[0].kind === "object") {
-        expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(1);
+      if (result.components[0].kind === "object") {
+        expect(result.components[0]).toEqual({
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -177,8 +177,8 @@ if (import.meta.vitest) {
 
       const result = transformObject(schema, context, propertyResult);
 
-      if (result.models[0].kind === "object") {
-        expect(result.models[0].properties).toEqual([
+      if (result.components[0].kind === "object") {
+        expect(result.components[0].properties).toEqual([
           { name: "nickname", type: "string", nullable: true },
         ]);
       }
@@ -210,8 +210,8 @@ if (import.meta.vitest) {
 
       const result = transformObject(schema, context, propertyResult);
 
-      if (result.models[0].kind === "object") {
-        expect(result.models[0].properties[0]).toEqual({
+      if (result.components[0].kind === "object") {
+        expect(result.components[0].properties[0]).toEqual({
           name: "username",
           type: "string",
           description: "User's login name",
@@ -240,7 +240,7 @@ if (import.meta.vitest) {
 
       const additionalResult: AdditionalPropertiesTraversalResult = {
         type: "string",
-        models: [],
+        components: [],
       };
 
       const result = transformObject(
@@ -250,7 +250,7 @@ if (import.meta.vitest) {
         additionalResult,
       );
 
-      expect(result.models[0]).toEqual({
+      expect(result.components[0]).toEqual({
         kind: "object",
         name: "FlexibleUser",
         referencePath: "#/components/schemas/FlexibleUser",
@@ -279,7 +279,7 @@ if (import.meta.vitest) {
 
       const result = transformObject(schema, context, propertyResult);
 
-      expect(result.models[0]).not.toHaveProperty("additionalProperties");
+      expect(result.components[0]).not.toHaveProperty("additionalProperties");
     });
 
     it("should collect child models from nested properties", () => {
@@ -303,7 +303,10 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "address",
-            type: { kind: "ref", name: "#/components/schemas/AddressModel" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/AddressModel",
+            },
           },
           { name: "name", type: "string" },
         ],
@@ -319,9 +322,9 @@ if (import.meta.vitest) {
 
       const result = transformObject(schema, context, propertyResult);
 
-      expect(result.models).toHaveLength(2); // Person + AddressModel
-      expect(result.models[0].name).toBe("Person");
-      expect(result.models[1].name).toBe("AddressModel");
+      expect(result.components).toHaveLength(2); // Person + AddressModel
+      expect(result.components[0].name).toBe("Person");
+      expect(result.components[1].name).toBe("AddressModel");
     });
 
     it("should create object model with empty properties", () => {
@@ -341,7 +344,7 @@ if (import.meta.vitest) {
 
       const result = transformObject(schema, context, propertyResult);
 
-      expect(result.models[0]).toEqual({
+      expect(result.components[0]).toEqual({
         kind: "object",
         name: "EmptyObject",
         referencePath: "#/components/schemas/EmptyObject",
@@ -370,7 +373,10 @@ if (import.meta.vitest) {
         properties: [
           {
             name: "tags",
-            type: { kind: "ref", name: "#/components/schemas/TagsArray" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/TagsArray",
+            },
           },
         ],
         childModels: [
@@ -384,13 +390,16 @@ if (import.meta.vitest) {
       };
 
       const additionalResult: AdditionalPropertiesTraversalResult = {
-        type: { kind: "ref", name: "#/components/schemas/NumberArray" },
-        models: [
+        type: {
+          kind: "ref",
+          referencePath: "#/components/schemas/NumberArray",
+        },
+        components: [
           {
             kind: "array",
             name: "NumberArray",
             referencePath: "#/components/schemas/NumberArray",
-            itemType: { kind: "ref", name: "number" },
+            itemType: { kind: "ref", referencePath: "number" },
           },
         ],
       };
@@ -402,10 +411,10 @@ if (import.meta.vitest) {
         additionalResult,
       );
 
-      expect(result.models).toHaveLength(3); // ComplexObject + TagsArray + NumberArray
-      expect(result.models[0].kind).toBe("object");
-      expect(result.models[1].kind).toBe("array");
-      expect(result.models[2].kind).toBe("array");
+      expect(result.components).toHaveLength(3); // ComplexObject + TagsArray + NumberArray
+      expect(result.components[0].kind).toBe("object");
+      expect(result.components[1].kind).toBe("array");
+      expect(result.components[2].kind).toBe("array");
     });
   });
 }

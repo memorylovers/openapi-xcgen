@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test complex object structures and arrays"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Level1",
@@ -14,7 +14,7 @@
           "name": "data",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Level1Data"
+            "referencePath": "#/components/schemas/Level1Data"
           }
         }
       ]
@@ -39,7 +39,7 @@
           "name": "outer",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Level2Outer"
+            "referencePath": "#/components/schemas/Level2Outer"
           }
         }
       ]
@@ -53,7 +53,7 @@
           "name": "inner",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Level2OuterInner"
+            "referencePath": "#/components/schemas/Level2OuterInner"
           }
         }
       ]
@@ -78,7 +78,7 @@
           "name": "level1",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Level3Level1"
+            "referencePath": "#/components/schemas/Level3Level1"
           }
         }
       ]
@@ -92,7 +92,7 @@
           "name": "level2",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Level3Level1Level2"
+            "referencePath": "#/components/schemas/Level3Level1Level2"
           }
         }
       ]
@@ -106,7 +106,7 @@
           "name": "level3",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Level3Level1Level2Level3"
+            "referencePath": "#/components/schemas/Level3Level1Level2Level3"
           }
         }
       ]
@@ -131,7 +131,7 @@
           "name": "members",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/TeamMembers"
+            "referencePath": "#/components/schemas/TeamMembers"
           }
         }
       ]
@@ -142,7 +142,7 @@
       "referencePath": "#/components/schemas/TeamMembers",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/TeamMembersItem"
+        "referencePath": "#/components/schemas/TeamMembersItem"
       }
     },
     {
@@ -173,7 +173,7 @@
       "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/User"
+        "referencePath": "#/components/schemas/User"
       }
     }
   ],
@@ -195,7 +195,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Level1"
+                "referencePath": "#/components/schemas/Level1"
               }
             }
           ]
@@ -218,7 +218,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Level2"
+                "referencePath": "#/components/schemas/Level2"
               }
             }
           ]
@@ -241,7 +241,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Level3"
+                "referencePath": "#/components/schemas/Level3"
               }
             }
           ]
@@ -264,7 +264,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Team"
+                "referencePath": "#/components/schemas/Team"
               }
             }
           ]
@@ -287,7 +287,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::users/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::users/get/responses/200/content/application::json/schema"
               }
             }
           ]

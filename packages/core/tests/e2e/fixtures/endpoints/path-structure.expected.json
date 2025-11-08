@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test path parsing and normalization"
   },
-  "models": [
+  "components": [
     {
       "kind": "parameter",
       "name": "GetUsersIdParams",
@@ -89,7 +89,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
+        "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {
@@ -112,7 +112,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::org::{orgId}::projects::{projectId}/get/GetOrgOrgIdProjectsProjectIdParams"
+        "referencePath": "#/paths/::org::{orgId}::projects::{projectId}/get/GetOrgOrgIdProjectsProjectIdParams"
       },
       "responses": [
         {

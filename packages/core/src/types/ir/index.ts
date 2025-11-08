@@ -22,8 +22,8 @@ import type { IRTag } from "./tags";
 export interface XcgenIR {
   /** API基本情報 */
   metadata: IRMetadata;
-  /** データモデルの配列（オブジェクト、列挙型、配列、マップを統一的に管理） */
-  models: IRComponent[];
+  /** IRコンポーネントの配列（スキーマと操作コンポーネントを統一的に管理） */
+  components: IRComponent[];
   /** タグ定義の配列 */
   tags: IRTag[];
   /** APIエンドポイントの配列 */
@@ -44,7 +44,12 @@ export interface XcgenIR {
 // common (直接ファイルから)
 export type { IRExtensions, IRExtensionValue } from "./common/extensions";
 export type { MimeType } from "./common/mime-type";
-export type { IRRef, IRScalarType, IRType } from "./common/type";
+export type {
+  IRComponentRef,
+  IRRef,
+  IRScalarType,
+  IRType,
+} from "./common/type";
 // metadata (inline定義なのでそのまま)
 export type { IRMetadata } from "./metadata";
 // models (直接ファイルから)

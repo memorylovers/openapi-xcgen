@@ -10,7 +10,8 @@ import {
   generateTypeImports,
 } from "../../../helpers/import-handler";
 import { toTypeName } from "../../../helpers/naming";
-import type { HookableInstance, TsCodeModel } from "../../../hooks";
+import type { TsCodeModel } from "../../../hooks";
+import type { TypeGenerationContext } from "../generation-context";
 import { generateModel } from "../types-model";
 import { generateUnifiedParameterType } from "../types-parameter-unified";
 import { extractTypeDependencies } from "./extract-dependencies";
@@ -22,7 +23,7 @@ import { extractTypeDependencies } from "./extract-dependencies";
  *
  * @param model - IRComponent
  * @param requestBodyTypeName - 統合パラメータ型の場合のrequestBody型名（オプション）
- * @param hooks - Hook instance（オプション）
+ * @param ctx - Type generation context
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
@@ -32,23 +33,23 @@ import { extractTypeDependencies } from "./extract-dependencies";
  *   name: "User",
  *   properties: [...]
  * };
- * generateModelFile(model);
+ * generateModelFile(model, undefined, ctx);
  * // => "/**\n * User model\n * ...\n *\/\n\nexport interface User { ... }"
  * ```
  */
 export function generateModelFile(
   model: IRComponent,
-  requestBodyTypeName?: string,
-  hooks?: HookableInstance,
+  requestBodyTypeName: string | undefined,
+  ctx: TypeGenerationContext,
 ): string | null {
   // 1. 型定義コードを生成
   let typeCode: string | null = null;
 
   // parameterモデルで統合型が必要な場合
   if (model.kind === "parameter" && requestBodyTypeName) {
-    typeCode = generateUnifiedParameterType(model, requestBodyTypeName, hooks);
+    typeCode = generateUnifiedParameterType(model, requestBodyTypeName, ctx);
   } else {
-    typeCode = generateModel(model, hooks);
+    typeCode = generateModel(model, ctx);
   }
 
   if (!typeCode) {
@@ -65,8 +66,8 @@ export function generateModelFile(
   };
 
   // 3. modelFile:generate Hook を呼び出し
-  if (hooks) {
-    hooks.callHook("modelFile:generate", {
+  if (ctx.hooks) {
+    ctx.hooks.callHook("modelFile:generate", {
       model,
       tsCode,
       extensions: "extensions" in model ? model.extensions : undefined,
@@ -138,6 +139,14 @@ export function generateModelFile(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("generateModelFile", () => {
@@ -155,7 +164,7 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -177,18 +186,21 @@ export interface User {
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -221,13 +233,13 @@ export interface Order {
             name: "children",
             type: {
               kind: "ref",
-              name: "#/components/schemas/TreeNodeChildren",
+              referencePath: "#/components/schemas/TreeNodeChildren",
             },
           },
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -259,7 +271,7 @@ export interface TreeNode {
         ],
       };
 
-      const result = generateModelFile(model, "UserUpdate");
+      const result = generateModelFile(model, "UserUpdate", mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -288,7 +300,7 @@ export interface UpdateUserParams {
 
       // generateModel() が空のobjectに対してnullを返すかは実装依存
       // ここでは、generateModelがnullを返す場合のテスト
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       // 現在の実装では空オブジェクトも生成されるため、nullにならない
       expect(result).not.toBeNull();
@@ -302,23 +314,23 @@ export interface UpdateUserParams {
         properties: [
           {
             name: "zzzItem",
-            type: { kind: "ref", name: "#/components/schemas/ZItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/ZItem" },
             required: true,
           },
           {
             name: "aaaItem",
-            type: { kind: "ref", name: "#/components/schemas/AItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/AItem" },
             required: true,
           },
           {
             name: "mmmItem",
-            type: { kind: "ref", name: "#/components/schemas/MItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/MItem" },
             required: true,
           },
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       const lines = result!.split("\n");
       const importLines = lines.filter((line) => line.startsWith("import"));

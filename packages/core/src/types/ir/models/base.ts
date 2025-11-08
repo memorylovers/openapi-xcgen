@@ -5,6 +5,7 @@
 import type { IRExtensions } from "../common/extensions";
 import type { IRScalarType, IRType } from "../common/type";
 import type { IRProperty } from "./property";
+import type { IRValidation } from "./validation";
 
 /**
  * IRObjectSchema - オブジェクト型スキーマ定義
@@ -139,6 +140,8 @@ export interface IRArraySchema {
   description?: string;
   /** 配列アイテムの型 */
   itemType: IRType;
+  /** バリデーション制約（minItems, maxItemsなど） */
+  validation?: IRValidation;
 }
 
 /**
@@ -156,6 +159,8 @@ export interface IRMapSchema {
   description?: string;
   /** 値の型 */
   valueType: IRType;
+  /** バリデーション制約（minProperties, maxPropertiesなど） */
+  validation?: IRValidation;
 }
 
 /**

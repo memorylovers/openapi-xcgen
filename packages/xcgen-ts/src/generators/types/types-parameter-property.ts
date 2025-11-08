@@ -8,13 +8,14 @@
 import type { IREndpoint, IRParameterProperty } from "@openapi-xcgen/core";
 import { toPropertyName } from "../../helpers/naming";
 import { applyTypeModifiers, irTypeToTsType } from "../../helpers/type-mapper";
-import type { HookableInstance, TsCodeParameter } from "../../hooks";
+import type { TsCodeParameter } from "../../hooks";
+import type { TypeGenerationContext } from "./generation-context";
 
 /**
  * IRParameterPropertyからTypeScriptプロパティ定義を生成（parameter:generate Hook対応）
  * @param param - IRParameterProperty
  * @param endpoint - 所属エンドポイント（Hook用のコンテキスト、オプショナル）
- * @param hooks - Hook instance（オプション）
+ * @param ctx - Type generation context
  * @returns TypeScriptプロパティ定義文字列
  *
  * @example エンドポイントありの場合
@@ -31,7 +32,7 @@ import type { HookableInstance, TsCodeParameter } from "../../hooks";
  *   operationId: "getUser",
  *   // ...
  * };
- * generateParameterProperty(param, endpoint);
+ * generateParameterProperty(param, endpoint, ctx);
  * // => "userId: string;"
  * ```
  *
@@ -42,14 +43,14 @@ import type { HookableInstance, TsCodeParameter } from "../../hooks";
  *   type: "int",
  *   in: "query",
  * };
- * generateParameterProperty(param);
+ * generateParameterProperty(param, undefined, ctx);
  * // => "limit?: number | undefined;"
  * ```
  */
 export function generateParameterProperty(
   param: IRParameterProperty,
-  endpoint?: IREndpoint,
-  hooks?: HookableInstance,
+  endpoint: IREndpoint | undefined,
+  ctx: TypeGenerationContext,
 ): string {
   const propName = toPropertyName(param.name);
   const baseType = irTypeToTsType(param.type);
@@ -67,8 +68,8 @@ export function generateParameterProperty(
   };
 
   // 2. parameter:generate Hook を呼び出し（同期、純粋関数）
-  if (hooks) {
-    hooks.callHook("parameter:generate", {
+  if (ctx.hooks) {
+    ctx.hooks.callHook("parameter:generate", {
       parameter: param,
       endpoint,
       tsCode,
@@ -96,6 +97,14 @@ export function generateParameterProperty(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("types-parameter-property", () => {
@@ -108,7 +117,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("id: string;");
       });
@@ -120,7 +129,7 @@ if (import.meta.vitest) {
           in: "query",
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("limit?: number | undefined;");
       });
@@ -134,7 +143,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("filter: string | null;");
       });
@@ -148,7 +157,7 @@ if (import.meta.vitest) {
           description: "User ID",
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("/** User ID */ userId: string;");
       });
@@ -161,7 +170,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("xApiKey: string;");
       });
@@ -174,7 +183,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("session: string;");
       });
@@ -187,7 +196,7 @@ if (import.meta.vitest) {
           nullable: true,
         };
 
-        const result = generateParameterProperty(param);
+        const result = generateParameterProperty(param, undefined, mockCtx);
 
         expect(result).toBe("sortBy?: string | null | undefined;");
       });

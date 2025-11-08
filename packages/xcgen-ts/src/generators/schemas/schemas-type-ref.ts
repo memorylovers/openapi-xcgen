@@ -20,7 +20,7 @@ import { toTypeName } from "../../helpers/naming";
  * // => "v.string()"
  *
  * // Ref type
- * irTypeToValibotSchemaRef({ kind: "ref", name: "Pet" })
+ * irTypeToValibotSchemaRef({ kind: "ref", referencePath: "Pet" })
  * // => "PetSchema"
  *
  * // Array type
@@ -37,7 +37,7 @@ export function irTypeToValibotSchemaRef(type: IRType): string {
   // この時点でIRRefのみが残る（IRScalarTypeは上でチェック済み）
   // Core packageはreference path全体を保存: "#/components/schemas/Pet"
   // 最後のセグメントを抽出: "Pet"
-  const modelName = type.name.split("/").at(-1) ?? type.name;
+  const modelName = type.referencePath.split("/").at(-1) ?? type.referencePath;
   return `${toTypeName(modelName)}Schema`;
 }
 
@@ -54,7 +54,10 @@ if (import.meta.vitest) {
       });
 
       it("should convert ref type to schema reference", () => {
-        const result = irTypeToValibotSchemaRef({ kind: "ref", name: "Pet" });
+        const result = irTypeToValibotSchemaRef({
+          kind: "ref",
+          referencePath: "Pet",
+        });
         expect(result).toBe("PetSchema");
       });
     });

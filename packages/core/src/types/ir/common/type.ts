@@ -25,24 +25,30 @@ export type IRScalarType =
   | "byte"; // string/byte → Base64エンコード
 
 /**
- * IRRef - 型への参照（$ref）
- * 実際の型（model/enum/union）はXcgenIRから探索して判明
+ * IRComponentRef - コンポーネントへの参照（$ref）
+ * 実際の型（IRSchema/IROperationComponent）はXcgenIRから探索して判明
  * @example
  * ```yaml
  * # OpenAPI
- * $ref: "#/components/schemas/User"    # モデル参照
+ * $ref: "#/components/schemas/User"    # スキーマ参照
  * $ref: "#/components/schemas/Status"  # Enum参照
  * $ref: "#/components/schemas/Pet"     # Union参照
  * ```
  */
-export interface IRRef {
+export interface IRComponentRef {
   kind: "ref";
-  name: string; // "User", "Status", "Pet" など
+  referencePath: string; // "#/components/schemas/User" など
 }
+
+/**
+ * 後方互換性のためのエイリアス
+ * @deprecated Use IRComponentRef instead
+ */
+export type IRRef = IRComponentRef;
 
 /**
  * IRType - 型情報の判別共用体
  * プロパティやパラメータの型として使用される
- * 配列型やマップ型は常にモデルとして抽出され、IRRefで参照される
+ * 配列型やマップ型は常にコンポーネントとして抽出され、IRComponentRefで参照される
  */
-export type IRType = IRScalarType | IRRef;
+export type IRType = IRScalarType | IRComponentRef;

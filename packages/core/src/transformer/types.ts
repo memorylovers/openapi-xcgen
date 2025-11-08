@@ -331,5 +331,5 @@ export type SchemaVisitor = (
 
 export interface SchemaTransformationResult {
   type: IRType | null;
-  models: IRComponent[];
+  components: IRComponent[];
 }

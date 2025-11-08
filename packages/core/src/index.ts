@@ -10,6 +10,8 @@ export type {
   IREndpoint,
   IREnumSchema,
   IREnumValue,
+  IRArraySchema,
+  IRMapSchema,
   IRHttpMethod,
   IRMetadata,
   IRComponent,

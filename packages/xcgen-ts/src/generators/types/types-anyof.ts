@@ -20,8 +20,8 @@ import { irTypeToTsType } from "../../helpers/type-mapper";
  *   name: "Pet",
  *   referencePath: "#/components/schemas/Pet",
  *   schemas: [
- *     { kind: "ref", name: "Cat", referencePath: "#/components/schemas/Cat" },
- *     { kind: "ref", name: "Dog", referencePath: "#/components/schemas/Dog" }
+ *     { kind: "ref", referencePath: "Cat", referencePath: "#/components/schemas/Cat" },
+ *     { kind: "ref", referencePath: "Dog", referencePath: "#/components/schemas/Dog" }
  *   ],
  * };
  * generateAnyOfType(model);
@@ -61,11 +61,11 @@ if (import.meta.vitest) {
           schemas: [
             {
               kind: "ref",
-              name: "Cat",
+              referencePath: "Cat",
             },
             {
               kind: "ref",
-              name: "Dog",
+              referencePath: "Dog",
             },
           ],
         };
@@ -84,11 +84,11 @@ if (import.meta.vitest) {
           schemas: [
             {
               kind: "ref",
-              name: "Cat",
+              referencePath: "Cat",
             },
             {
               kind: "ref",
-              name: "Dog",
+              referencePath: "Dog",
             },
           ],
         };
@@ -113,15 +113,15 @@ export type Animal = Cat | Dog;
           schemas: [
             {
               kind: "ref",
-              name: "Circle",
+              referencePath: "Circle",
             },
             {
               kind: "ref",
-              name: "Square",
+              referencePath: "Square",
             },
             {
               kind: "ref",
-              name: "Triangle",
+              referencePath: "Triangle",
             },
           ],
         };

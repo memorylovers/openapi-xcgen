@@ -3,7 +3,7 @@
     "title": "OpenAPI 3.1.0 discriminator all of example",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Foo",
@@ -23,11 +23,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Foo"
+          "referencePath": "#/components/schemas/Foo"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BarAllOf1"
+          "referencePath": "#/components/schemas/BarAllOf1"
         }
       ]
     },
@@ -49,11 +49,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Foo"
+          "referencePath": "#/components/schemas/Foo"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazAllOf1"
+          "referencePath": "#/components/schemas/BazAllOf1"
         }
       ]
     },
@@ -75,11 +75,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Foo"
+          "referencePath": "#/components/schemas/Foo"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/QuxAllOf1"
+          "referencePath": "#/components/schemas/QuxAllOf1"
         }
       ]
     },
@@ -113,11 +113,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FooMapped"
+          "referencePath": "#/components/schemas/FooMapped"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BarMappedAllOf1"
+          "referencePath": "#/components/schemas/BarMappedAllOf1"
         }
       ]
     },
@@ -139,11 +139,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FooMapped"
+          "referencePath": "#/components/schemas/FooMapped"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazMappedAllOf1"
+          "referencePath": "#/components/schemas/BazMappedAllOf1"
         }
       ]
     },
@@ -165,11 +165,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FooMapped"
+          "referencePath": "#/components/schemas/FooMapped"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/QuxMappedAllOf1"
+          "referencePath": "#/components/schemas/QuxMappedAllOf1"
         }
       ]
     },
@@ -191,11 +191,11 @@
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/BarUnion"
+          "referencePath": "#/components/schemas/BarUnion"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/BazUnion"
+          "referencePath": "#/components/schemas/BazUnion"
         }
       ],
       "discriminator": {
@@ -243,7 +243,7 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/FooUnion"
+          "referencePath": "#/components/schemas/FooUnion"
         }
       ]
     }
@@ -265,7 +265,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Foo"
+                "referencePath": "#/components/schemas/Foo"
               }
             }
           ]

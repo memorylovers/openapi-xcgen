@@ -68,7 +68,7 @@ if (import.meta.vitest) {
           title: "Pet Store API",
           version: "1.0.0",
         },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [],
       };
@@ -84,7 +84,7 @@ if (import.meta.vitest) {
     it("should include XcgenApiError properties", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test", version: "1.0.0" },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [],
       };

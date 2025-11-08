@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "API with complex nested schemas"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Order",
@@ -22,7 +22,7 @@
           "name": "items",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderItems"
+            "referencePath": "#/components/schemas/OrderItems"
           },
           "required": true,
           "validation": {
@@ -33,7 +33,7 @@
           "name": "customer",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderCustomer"
+            "referencePath": "#/components/schemas/OrderCustomer"
           },
           "required": true
         },
@@ -41,28 +41,28 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderStatus"
+            "referencePath": "#/components/schemas/OrderStatus"
           }
         },
         {
           "name": "priority",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderPriority"
+            "referencePath": "#/components/schemas/OrderPriority"
           }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderTags"
+            "referencePath": "#/components/schemas/OrderTags"
           }
         },
         {
           "name": "metadata",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderMetadata"
+            "referencePath": "#/components/schemas/OrderMetadata"
           }
         },
         {
@@ -81,7 +81,10 @@
       "referencePath": "#/components/schemas/OrderItems",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/OrderItemsItem"
+        "referencePath": "#/components/schemas/OrderItemsItem"
+      },
+      "validation": {
+        "minItems": 1
       }
     },
     {
@@ -146,7 +149,7 @@
           "name": "address",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/OrderCustomerAddress"
+            "referencePath": "#/components/schemas/OrderCustomerAddress"
           }
         }
       ]
@@ -260,7 +263,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/Order"
+              "referencePath": "#/components/schemas/Order"
             }
           }
         ],
@@ -276,7 +279,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Order"
+                "referencePath": "#/components/schemas/Order"
               }
             }
           ]

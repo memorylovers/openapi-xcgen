@@ -12,7 +12,7 @@ import type {
 } from "../../../types";
 import { isReferenceObject } from "../../../types";
 import {
-  buildParameterSchemaModelName,
+  buildParameterSchemaComponentName,
   extractExtensions,
   extractValidation,
   isNullable,
@@ -89,9 +89,9 @@ export function transformParameter(
     in: parameterIn,
   };
 
-  // 既存のヘルパーを使用して適切なモデル名を生成
+  // 既存のヘルパーを使用して適切なコンポーネント名を生成
   // 例: "GetUsersParamsFilter", "GetPostsParamsXApiKey"
-  const inlineModelName = buildParameterSchemaModelName(parameterContext);
+  const inlineModelName = buildParameterSchemaComponentName(parameterContext);
 
   const schemaDocumentPath = [
     ...context.documentPath,
@@ -143,7 +143,7 @@ export function transformParameter(
   // ParameterTransformResultとして返す
   return {
     parameter: irParameter,
-    models: schemaResult.models,
+    components: schemaResult.components,
   };
 }
 
@@ -175,7 +175,7 @@ if (import.meta.vitest) {
         required: true,
         type: "string",
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle query parameter with default value", () => {
@@ -207,7 +207,7 @@ if (import.meta.vitest) {
           maximum: 100,
         },
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle header parameter with deprecated flag", () => {
@@ -231,7 +231,7 @@ if (import.meta.vitest) {
         type: "string",
         deprecated: true,
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle cookie parameter", () => {
@@ -254,7 +254,7 @@ if (import.meta.vitest) {
         in: "cookie",
         type: "string",
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should return error for parameter without schema", () => {
@@ -271,7 +271,7 @@ if (import.meta.vitest) {
       const result = transformParameter(param, context);
 
       expect(result.parameter).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("PARAMETER_MISSING_SCHEMA");
       expect(result.error?.message).toContain("Parameter without schema");
     });
@@ -293,7 +293,7 @@ if (import.meta.vitest) {
       const result = transformParameter(param, context);
 
       expect(result.parameter).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("PARAMETER_REF_NOT_SUPPORTED");
     });
 
@@ -322,12 +322,12 @@ if (import.meta.vitest) {
       expect(paramType.in).toBe("query");
       expect(paramType.type).toEqual({
         kind: "ref",
-        name: expect.stringMatching(/Tags$/),
+        referencePath: expect.stringMatching(/Tags$/),
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("array");
-      if (result.models[0].kind === "array") {
-        expect(result.models[0].itemType).toBe("string");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("array");
+      if (result.components[0].kind === "array") {
+        expect(result.components[0].itemType).toBe("string");
       }
     });
 
@@ -354,7 +354,7 @@ if (import.meta.vitest) {
         type: "string",
         nullable: true,
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle nullable parameter with OpenAPI 3.1 format", () => {
@@ -379,7 +379,7 @@ if (import.meta.vitest) {
         type: "string",
         nullable: true,
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should extract string validation constraints", () => {
@@ -411,7 +411,7 @@ if (import.meta.vitest) {
           pattern: "^[a-zA-Z0-9_]+$",
         },
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should extract array validation constraints", () => {
@@ -440,15 +440,15 @@ if (import.meta.vitest) {
       expect(paramType.in).toBe("query");
       expect(paramType.type).toEqual({
         kind: "ref",
-        name: expect.stringMatching(/Tags$/),
+        referencePath: expect.stringMatching(/Tags$/),
       });
       expect(paramType.validation).toEqual({
         minItems: 1,
         maxItems: 10,
         uniqueItems: true,
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("array");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("array");
     });
   });
 }
