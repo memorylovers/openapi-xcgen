@@ -8,4 +8,4 @@ import * as v from "valibot";
 /**
  * Schema for ProductTags
  */
-export const ProductTagsSchema = v.array(v.string());
+export const ProductTagsSchema = v.pipe(v.array(v.string()), v.minLength(1), v.maxLength(5));

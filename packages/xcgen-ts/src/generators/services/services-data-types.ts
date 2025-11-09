@@ -66,16 +66,27 @@ export function getEndpointDataTypes(
   }
 
   // リクエストボディの型名を抽出
-  if (endpoint.requestBody && endpoint.requestBody.kind === "content") {
-    for (const content of endpoint.requestBody.content) {
-      if (typeof content.schema !== "string" && content.schema.kind === "ref") {
-        // IRコンポーネントリストから正しいモデル名を逆引き
-        requestBodyType = resolveModelName(
-          content.schema.referencePath,
-          models,
-        );
-        break; // 最初のスキーマのみ使用
+  if (endpoint.requestBody) {
+    if (endpoint.requestBody.kind === "content") {
+      for (const content of endpoint.requestBody.content) {
+        if (
+          typeof content.schema !== "string" &&
+          content.schema.kind === "ref"
+        ) {
+          // IRコンポーネントリストから正しいモデル名を逆引き
+          requestBodyType = resolveModelName(
+            content.schema.referencePath,
+            models,
+          );
+          break; // 最初のスキーマのみ使用
+        }
       }
+    } else if (endpoint.requestBody.kind === "ref") {
+      // コンポーネント参照の場合（#/components/requestBodies/*）
+      requestBodyType = resolveModelName(
+        endpoint.requestBody.ref.referencePath,
+        models,
+      );
     }
   }
 
@@ -234,6 +245,43 @@ if (import.meta.vitest) {
 
         expect(result).toEqual({
           needsDataType: false,
+        });
+      });
+
+      it("should extract requestBody type from ref (kind: ref)", () => {
+        const endpoint: IREndpoint = {
+          path: "/users/array",
+          method: "post",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "ref",
+            ref: {
+              kind: "ref",
+              referencePath: "#/components/requestBodies/UserArray",
+            },
+          },
+          responses: [],
+        };
+
+        const models: IRComponent[] = [
+          {
+            kind: "array",
+            name: "UserArray",
+            referencePath:
+              "#/components/requestBodies/UserArray/content/application::json/schema",
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
+          },
+        ];
+
+        const result = getEndpointDataTypes(endpoint, models);
+
+        expect(result).toEqual({
+          requestBodyType: "UserArray",
+          needsDataType: true,
         });
       });
     });

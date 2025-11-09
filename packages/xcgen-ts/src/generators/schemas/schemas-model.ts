@@ -11,6 +11,7 @@ import { generateAllOfSchema } from "./schemas-allof";
 import { generateAnyOfSchema } from "./schemas-anyof";
 import { generateArraySchema } from "./schemas-array";
 import { generateEnumSchema } from "./schemas-enum";
+import { generateMapSchema } from "./schemas-map";
 import { generateObjectSchema, type PropertySchema } from "./schemas-object";
 import { irTypeToValibotSchema } from "./schemas-type-mapper";
 import { irTypeToValibotSchemaRef } from "./schemas-type-ref";
@@ -101,10 +102,10 @@ export function generateSchemaModel(
         ctx,
         modelExtensions,
       );
-      // IRArraySchemaにはvalidationプロパティがないため、undefinedを渡す
+      // IRArraySchema.validation を渡す（minItems/maxItems → minLength/maxLength）
       schemaExpression = generateArraySchema(
         itemSchema,
-        undefined,
+        model.validation,
         ctx,
         modelExtensions,
       );
@@ -122,7 +123,8 @@ export function generateSchemaModel(
         ctx,
         modelExtensions,
       );
-      schemaExpression = `v.record(v.string(), ${valueSchema})`;
+      // IRMapSchema.validation を渡す（minProperties/maxProperties → minLength/maxLength）
+      schemaExpression = generateMapSchema(valueSchema, model.validation, ctx);
       break;
     }
 

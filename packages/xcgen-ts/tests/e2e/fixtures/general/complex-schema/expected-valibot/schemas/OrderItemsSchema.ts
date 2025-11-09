@@ -9,4 +9,4 @@ import { OrderItemsItemSchema } from './OrderItemsItemSchema';
 /**
  * Schema for OrderItems
  */
-export const OrderItemsSchema = v.array(OrderItemsItemSchema);
+export const OrderItemsSchema = v.pipe(v.array(OrderItemsItemSchema), v.minLength(1));
