@@ -22,7 +22,7 @@ export async function createProduct(
   return request({
     method: "POST",
     path: "/products",
-    options,
+    options: { body: options },
     init,
   });
 }

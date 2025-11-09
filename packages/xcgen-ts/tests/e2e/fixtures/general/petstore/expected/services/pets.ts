@@ -41,7 +41,7 @@ export async function createPet(
   return request({
     method: "POST",
     path: "/pets",
-    options,
+    options: { body: options },
     init,
   });
 }

@@ -40,24 +40,39 @@ export function buildUnifiedParameterTypesMap(
       !Array.isArray(endpoint.parameters) &&
       typeof endpoint.parameters !== "string" &&
       endpoint.parameters?.kind === "ref" &&
-      endpoint.requestBody?.kind === "content"
+      endpoint.requestBody &&
+      (endpoint.requestBody.kind === "content" ||
+        endpoint.requestBody.kind === "ref")
     ) {
       const parameterPath = endpoint.parameters.referencePath;
 
-      // requestBodyの型名を抽出
-      for (const content of endpoint.requestBody.content) {
-        if (
-          typeof content.schema !== "string" &&
-          content.schema.kind === "ref"
-        ) {
-          // ir.componentsから正しいモデル名を逆引き
-          const requestBodyTypeName = resolveModelName(
-            content.schema.referencePath,
-            ir.components,
-          );
-          unifiedParameterTypes.set(parameterPath, requestBodyTypeName);
-          break; // 最初のスキーマのみ使用
+      let requestBodyTypeName: string | undefined;
+
+      if (endpoint.requestBody.kind === "content") {
+        // requestBodyの型名を抽出（contentの場合）
+        for (const content of endpoint.requestBody.content) {
+          if (
+            typeof content.schema !== "string" &&
+            content.schema.kind === "ref"
+          ) {
+            // ir.componentsから正しいモデル名を逆引き
+            requestBodyTypeName = resolveModelName(
+              content.schema.referencePath,
+              ir.components,
+            );
+            break; // 最初のスキーマのみ使用
+          }
         }
+      } else if (endpoint.requestBody.kind === "ref") {
+        // requestBodyの型名を抽出（refの場合）
+        requestBodyTypeName = resolveModelName(
+          endpoint.requestBody.ref.referencePath,
+          ir.components,
+        );
+      }
+
+      if (requestBodyTypeName) {
+        unifiedParameterTypes.set(parameterPath, requestBodyTypeName);
       }
     }
   }
@@ -298,6 +313,48 @@ if (import.meta.vitest) {
       expect(
         result.get("#/paths/~1bookings~1{bookingId}~1payment/post/parameters"),
       ).toBe("PostBookingsBookingIdPaymentRequestBody");
+    });
+
+    it("should handle requestBody with kind: ref (component reference)", () => {
+      const ir: XcgenIR = {
+        metadata: { title: "Test API", version: "1.0.0" },
+        components: [
+          {
+            kind: "object",
+            name: "UserArray",
+            referencePath: "#/components/requestBodies/UserArray",
+            properties: [],
+          },
+        ],
+        tags: [],
+        endpoints: [
+          {
+            path: "/users/{userId}",
+            method: "patch",
+            operationId: "updateUser",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              referencePath: "#/paths/~1users~1{userId}/patch/parameters",
+            },
+            requestBody: {
+              kind: "ref",
+              ref: {
+                kind: "ref",
+                referencePath: "#/components/requestBodies/UserArray",
+              },
+            },
+            responses: [],
+          },
+        ],
+      };
+
+      const result = buildUnifiedParameterTypesMap(ir);
+
+      expect(result.size).toBe(1);
+      expect(result.get("#/paths/~1users~1{userId}/patch/parameters")).toBe(
+        "UserArray",
+      );
     });
   });
 }

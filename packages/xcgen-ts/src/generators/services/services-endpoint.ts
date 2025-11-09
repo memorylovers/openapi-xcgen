@@ -131,6 +131,9 @@ function generateFunctionCode(
   // 関数シグネチャ
   lines.push(`export async function ${functionName}(`);
 
+  // requestBodyのみの場合を検出するフラグ
+  let isBodyOnly = false;
+
   if (dataTypes.needsDataType) {
     let dataTypeName: string;
     if (dataTypes.parameterType && dataTypes.requestBodyType) {
@@ -138,7 +141,9 @@ function generateFunctionCode(
     } else if (dataTypes.parameterType) {
       dataTypeName = dataTypes.parameterType;
     } else {
+      // requestBodyのみの場合
       dataTypeName = dataTypes.requestBodyType!;
+      isBodyOnly = true;
     }
 
     lines.push(`  options: ${dataTypeName},`);
@@ -153,7 +158,13 @@ function generateFunctionCode(
   lines.push(`    path: "${endpoint.path}",`);
 
   if (dataTypes.needsDataType) {
-    lines.push(`    options,`);
+    if (isBodyOnly) {
+      // requestBodyのみの場合は { body: options } に変換
+      lines.push(`    options: { body: options },`);
+    } else {
+      // parametersがある場合（統合型または parametersのみ）
+      lines.push(`    options,`);
+    }
   } else {
     lines.push(`    options: {},`);
   }
@@ -281,6 +292,68 @@ export async function logout(
     method: "POST",
     path: "/logout",
     options: {},
+    init,
+  });
+}
+`.trim(),
+        );
+      });
+
+      it("should wrap body-only requestBody in { body: options }", () => {
+        const models: IRComponent[] = [
+          {
+            kind: "array",
+            name: "UserArray",
+            referencePath: "#/components/requestBodies/UserArray",
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
+          },
+        ];
+
+        const endpoint: IREndpoint = {
+          path: "/users",
+          method: "post",
+          operationId: "createUsers",
+          summary: "Create multiple users",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "ref",
+            ref: {
+              kind: "ref",
+              referencePath: "#/components/requestBodies/UserArray",
+            },
+          },
+          responses: [
+            {
+              kind: "content",
+              statusCode: "201",
+              description: "Created",
+            },
+          ],
+        };
+
+        const result = generateEndpoint(endpoint, models);
+
+        expect(result).toEqual(
+          `
+/**
+ * Create multiple users
+ * @param options - Request parameters
+ * @param init - Additional fetch options
+ * @returns void
+ * @throws {_XcgenApiError} API error with status and response details
+ */
+export async function createUsers(
+  options: UserArray,
+  init?: RequestInit,
+): Promise<void> {
+  return request({
+    method: "POST",
+    path: "/users",
+    options: { body: options },
     init,
   });
 }

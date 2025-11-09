@@ -39,7 +39,7 @@ export async function addNewUser(
   return request({
     method: "POST",
     path: "/users",
-    options,
+    options: { body: options },
     init,
   });
 }

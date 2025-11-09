@@ -22,7 +22,7 @@ export async function createOrder(
   return request({
     method: "POST",
     path: "/orders",
-    options,
+    options: { body: options },
     init,
   });
 }

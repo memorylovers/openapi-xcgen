@@ -43,7 +43,7 @@ export async function testRequestInlineExtraction(
   return request({
     method: "POST",
     path: "/test-2-request",
-    options,
+    options: { body: options },
     init,
   });
 }

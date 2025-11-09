@@ -22,7 +22,7 @@ export async function createUser(
   return request({
     method: "POST",
     path: "/users",
-    options,
+    options: { body: options },
     init,
   });
 }
