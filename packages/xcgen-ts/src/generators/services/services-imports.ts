@@ -7,6 +7,23 @@ import { getEndpointDataTypes } from "./services-data-types";
 import { resolveModelName } from "../../helpers/model-resolver";
 
 /**
+ * TypeScript組み込み型（インポート不要な型）
+ *
+ * スカラー requestBody で使用される可能性のある TypeScript 組み込み型のリスト。
+ * これらの型は import 文に含めない。
+ */
+const BUILTIN_TYPES = new Set([
+  "string",
+  "number",
+  "boolean",
+  "null",
+  "undefined",
+  "unknown",
+  "Date",
+  "Blob",
+]);
+
+/**
  * サービスファイルのインポート文を生成
  * @param endpoints - エンドポイント配列
  * @param models - IRコンポーネントリスト（型名解決用）
@@ -31,16 +48,23 @@ export function generateServicesImports(
       // エンドポイントのデータ型情報を取得
       const dataTypes = getEndpointDataTypes(endpoint, models);
 
-      // パラメータ型をインポート
-      if (dataTypes.parameterType) {
+      // パラメータ型をインポート（組み込み型は除外）
+      if (
+        dataTypes.parameterType &&
+        !BUILTIN_TYPES.has(dataTypes.parameterType)
+      ) {
         importedTypes.add(dataTypes.parameterType);
       }
 
-      // リクエストボディ型をインポート
+      // リクエストボディ型をインポート（組み込み型は除外）
       // ただし、parameterTypeとrequestBodyTypeの両方がある場合、
       // services-function.tsではparameterTypeのみが使用されるため、
       // requestBodyTypeはインポートしない
-      if (dataTypes.requestBodyType && !dataTypes.parameterType) {
+      if (
+        dataTypes.requestBodyType &&
+        !dataTypes.parameterType &&
+        !BUILTIN_TYPES.has(dataTypes.requestBodyType)
+      ) {
         importedTypes.add(dataTypes.requestBodyType);
       }
 
@@ -200,6 +224,134 @@ import { request } from "../client";
 import type { XcgenApiError as _XcgenApiError } from "../client";
 import type { GetBookings200Response } from "../models/index";
 export type { GetBookings200Response } from "../models/index";
+`.trim(),
+        );
+      });
+
+      it("should not import built-in types for scalar requestBody (string)", () => {
+        const endpoints: IREndpoint[] = [
+          {
+            path: "/log",
+            method: "post",
+            operationId: "postLog",
+            tags: [],
+            parameters: [],
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "text/plain",
+                  schema: "string", // スカラー型
+                },
+              ],
+            },
+            responses: [
+              {
+                kind: "content",
+                statusCode: "204",
+                description: "Success",
+              },
+            ],
+          },
+        ];
+
+        const result = generateServicesImports(endpoints, []);
+
+        // Should not import "string" (built-in type)
+        expect(result).toEqual(
+          `
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
+`.trim(),
+        );
+      });
+
+      it("should not import built-in types for scalar requestBody (Blob)", () => {
+        const endpoints: IREndpoint[] = [
+          {
+            path: "/upload",
+            method: "post",
+            operationId: "uploadFile",
+            tags: [],
+            parameters: [],
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "application/octet-stream",
+                  schema: "binary", // スカラー型 (maps to Blob)
+                },
+              ],
+            },
+            responses: [
+              {
+                kind: "content",
+                statusCode: "201",
+                description: "Success",
+              },
+            ],
+          },
+        ];
+
+        const result = generateServicesImports(endpoints, []);
+
+        // Should not import "Blob" (built-in type)
+        expect(result).toEqual(
+          `
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
+`.trim(),
+        );
+      });
+
+      it("should not import built-in types for scalar requestBody (number)", () => {
+        const endpoints: IREndpoint[] = [
+          {
+            path: "/data",
+            method: "post",
+            operationId: "postData",
+            tags: [],
+            parameters: [],
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "application/json",
+                  schema: "int", // スカラー型 (maps to number)
+                },
+              ],
+            },
+            responses: [
+              {
+                kind: "content",
+                statusCode: "200",
+                description: "Success",
+                content: [
+                  {
+                    mimeType: "application/json",
+                    schema: {
+                      kind: "ref",
+                      referencePath: "PostData200Response",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ];
+
+        const result = generateServicesImports(endpoints, []);
+
+        // Should not import "number" (built-in type), but should import PostData200Response
+        expect(result).toEqual(
+          `
+import { request } from "../client";
+import type { XcgenApiError as _XcgenApiError } from "../client";
+import type { PostData200Response } from "../models/index";
+export type { PostData200Response } from "../models/index";
 `.trim(),
         );
       });

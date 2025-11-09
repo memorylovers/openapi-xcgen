@@ -7,6 +7,7 @@
 
 import type { XcgenIR } from "@openapi-xcgen/core";
 import { resolveModelName } from "../../../helpers/model-resolver";
+import { irTypeToTsType } from "../../../helpers/type-mapper";
 
 /**
  * 統合パラメータ型のマップを構築
@@ -50,6 +51,7 @@ export function buildUnifiedParameterTypesMap(
 
       if (endpoint.requestBody.kind === "content") {
         // requestBodyの型名を抽出（contentの場合）
+        // Phase 1: Prioritize $ref (structured models)
         for (const content of endpoint.requestBody.content) {
           if (
             typeof content.schema !== "string" &&
@@ -60,7 +62,18 @@ export function buildUnifiedParameterTypesMap(
               content.schema.referencePath,
               ir.components,
             );
-            break; // 最初のスキーマのみ使用
+            break;
+          }
+        }
+
+        // Phase 2: Fallback to scalar types if no $ref found
+        if (!requestBodyTypeName) {
+          for (const content of endpoint.requestBody.content) {
+            if (typeof content.schema === "string") {
+              // スカラー型の場合、TypeScript型名を使用
+              requestBodyTypeName = irTypeToTsType(content.schema);
+              break;
+            }
           }
         }
       } else if (endpoint.requestBody.kind === "ref") {
@@ -354,6 +367,126 @@ if (import.meta.vitest) {
       expect(result.size).toBe(1);
       expect(result.get("#/paths/~1users~1{userId}/patch/parameters")).toBe(
         "UserArray",
+      );
+    });
+
+    it("should handle requestBody with scalar type (string)", () => {
+      const ir: XcgenIR = {
+        metadata: { title: "Test API", version: "1.0.0" },
+        components: [],
+        tags: [],
+        endpoints: [
+          {
+            path: "/files/{fileId}",
+            method: "put",
+            operationId: "updateFileContent",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              referencePath: "#/paths/~1files~1{fileId}/put/parameters",
+            },
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "text/plain",
+                  schema: "string", // スカラー型
+                },
+              ],
+            },
+            responses: [],
+          },
+        ],
+      };
+
+      const result = buildUnifiedParameterTypesMap(ir);
+
+      expect(result.size).toBe(1);
+      expect(result.get("#/paths/~1files~1{fileId}/put/parameters")).toBe(
+        "string",
+      );
+    });
+
+    it("should handle requestBody with scalar type (binary)", () => {
+      const ir: XcgenIR = {
+        metadata: { title: "Test API", version: "1.0.0" },
+        components: [],
+        tags: [],
+        endpoints: [
+          {
+            path: "/upload/{id}",
+            method: "post",
+            operationId: "uploadWithMetadata",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              referencePath: "#/paths/~1upload~1{id}/post/parameters",
+            },
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "application/octet-stream",
+                  schema: "binary", // スカラー型
+                },
+              ],
+            },
+            responses: [],
+          },
+        ],
+      };
+
+      const result = buildUnifiedParameterTypesMap(ir);
+
+      expect(result.size).toBe(1);
+      expect(result.get("#/paths/~1upload~1{id}/post/parameters")).toBe("Blob");
+    });
+
+    it("should prioritize $ref over scalar when both exist in content", () => {
+      const ir: XcgenIR = {
+        metadata: { title: "Test API", version: "1.0.0" },
+        components: [],
+        tags: [],
+        endpoints: [
+          {
+            path: "/users/{userId}",
+            method: "patch",
+            operationId: "updateUser",
+            tags: [],
+            parameters: {
+              kind: "ref",
+              referencePath: "#/paths/~1users~1{userId}/patch/parameters",
+            },
+            requestBody: {
+              kind: "content",
+              required: true,
+              content: [
+                {
+                  mimeType: "text/plain",
+                  schema: "string", // スカラー型（先に配置）
+                },
+                {
+                  mimeType: "application/json",
+                  schema: {
+                    kind: "ref",
+                    referencePath: "#/components/schemas/UserUpdate",
+                  }, // $ref（後に配置）
+                },
+              ],
+            },
+            responses: [],
+          },
+        ],
+      };
+
+      const result = buildUnifiedParameterTypesMap(ir);
+
+      expect(result.size).toBe(1);
+      // $refが優先されるべき
+      expect(result.get("#/paths/~1users~1{userId}/patch/parameters")).toBe(
+        "UserUpdate",
       );
     });
   });

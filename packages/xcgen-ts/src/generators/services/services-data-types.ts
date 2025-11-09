@@ -4,6 +4,7 @@
 
 import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { resolveModelName } from "../../helpers/model-resolver";
+import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
  * エンドポイントのデータ型情報
@@ -68,6 +69,7 @@ export function getEndpointDataTypes(
   // リクエストボディの型名を抽出
   if (endpoint.requestBody) {
     if (endpoint.requestBody.kind === "content") {
+      // Phase 1: Prioritize $ref (structured models)
       for (const content of endpoint.requestBody.content) {
         if (
           typeof content.schema !== "string" &&
@@ -78,7 +80,18 @@ export function getEndpointDataTypes(
             content.schema.referencePath,
             models,
           );
-          break; // 最初のスキーマのみ使用
+          break;
+        }
+      }
+
+      // Phase 2: Fallback to scalar types if no $ref found
+      if (!requestBodyType) {
+        for (const content of endpoint.requestBody.content) {
+          if (typeof content.schema === "string") {
+            // スカラー型の場合、TypeScript型名を使用
+            requestBodyType = irTypeToTsType(content.schema);
+            break;
+          }
         }
       }
     } else if (endpoint.requestBody.kind === "ref") {
@@ -222,9 +235,9 @@ if (import.meta.vitest) {
         });
       });
 
-      it("should handle requestBody without schema ref", () => {
+      it("should handle requestBody with scalar type (string)", () => {
         const endpoint: IREndpoint = {
-          path: "/test",
+          path: "/log",
           method: "post",
           tags: [],
           parameters: [],
@@ -233,8 +246,8 @@ if (import.meta.vitest) {
             required: true,
             content: [
               {
-                mimeType: "application/json",
-                schema: "string", // プリミティブ型は文字列リテラル
+                mimeType: "text/plain",
+                schema: "string", // スカラー型
               },
             ],
           },
@@ -244,7 +257,62 @@ if (import.meta.vitest) {
         const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
-          needsDataType: false,
+          requestBodyType: "string",
+          needsDataType: true,
+        });
+      });
+
+      it("should handle requestBody with scalar type (binary)", () => {
+        const endpoint: IREndpoint = {
+          path: "/upload",
+          method: "post",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "content",
+            required: true,
+            content: [
+              {
+                mimeType: "application/octet-stream",
+                schema: "binary", // スカラー型
+              },
+            ],
+          },
+          responses: [],
+        };
+
+        const result = getEndpointDataTypes(endpoint, []);
+
+        expect(result).toEqual({
+          requestBodyType: "Blob",
+          needsDataType: true,
+        });
+      });
+
+      it("should handle requestBody with scalar type (number)", () => {
+        const endpoint: IREndpoint = {
+          path: "/data",
+          method: "post",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "content",
+            required: true,
+            content: [
+              {
+                mimeType: "application/json",
+                schema: "int", // スカラー型
+              },
+            ],
+          },
+          responses: [],
+        };
+
+        const result = getEndpointDataTypes(endpoint, []);
+
+        expect(result).toEqual({
+          requestBodyType: "number",
+          needsDataType: true,
         });
       });
 
@@ -281,6 +349,41 @@ if (import.meta.vitest) {
 
         expect(result).toEqual({
           requestBodyType: "UserArray",
+          needsDataType: true,
+        });
+      });
+
+      it("should prioritize $ref over scalar when both exist in content", () => {
+        const endpoint: IREndpoint = {
+          path: "/users",
+          method: "patch",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "content",
+            required: true,
+            content: [
+              {
+                mimeType: "text/plain",
+                schema: "string", // スカラー型（先に配置）
+              },
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  referencePath: "#/components/schemas/UserUpdate",
+                }, // $ref（後に配置）
+              },
+            ],
+          },
+          responses: [],
+        };
+
+        const result = getEndpointDataTypes(endpoint, []);
+
+        // $refが優先されるべき
+        expect(result).toEqual({
+          requestBodyType: "UserUpdate",
           needsDataType: true,
         });
       });

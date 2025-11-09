@@ -17,6 +17,23 @@ import { generateUnifiedParameterType } from "../types-parameter-unified";
 import { extractTypeDependencies } from "./extract-dependencies";
 
 /**
+ * TypeScript組み込み型（インポート不要な型）
+ *
+ * スカラー requestBody で使用される可能性のある TypeScript 組み込み型のリスト。
+ * これらの型は dependencies に追加せず、import 文を生成しない。
+ */
+const BUILTIN_TYPES = new Set([
+  "string",
+  "number",
+  "boolean",
+  "null",
+  "undefined",
+  "unknown",
+  "Date",
+  "Blob",
+]);
+
+/**
  * 純粋関数: IRComponent → TypeScript型定義コード
  *
  * 個別のモデルファイルを生成する。依存する他の型のimport文も自動生成される。
@@ -99,8 +116,8 @@ export function generateModelFile(
   // 依存型のインポート
   const dependencies = extractTypeDependencies(model);
 
-  // 統合パラメータ型の場合、requestBodyの型も追加
-  if (requestBodyTypeName) {
+  // 統合パラメータ型の場合、requestBodyの型も追加（組み込み型は除外）
+  if (requestBodyTypeName && !BUILTIN_TYPES.has(requestBodyTypeName)) {
     dependencies.add(requestBodyTypeName);
   }
 
@@ -340,6 +357,98 @@ export interface UpdateUserParams {
         "import type { MItem } from './MItem';",
         "import type { ZItem } from './ZItem';",
       ]);
+    });
+
+    it("should not import built-in types for scalar requestBody (string)", () => {
+      const model: IRComponent = {
+        kind: "parameter",
+        name: "UpdateFileParams",
+        referencePath: "#/paths/~1files~1{fileId}/put/parameters",
+        properties: [
+          {
+            name: "fileId",
+            type: "string",
+            required: true,
+            in: "path",
+          },
+        ],
+      };
+
+      // requestBodyTypeName が "string" (組み込み型)
+      const result = generateModelFile(model, "string", mockCtx);
+
+      // import文が生成されないことを確認
+      expect(result).toEqual(
+        `/**
+ * UpdateFileParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface UpdateFileParams {
+  path: {
+    fileId: string;
+  };
+  body: string;
+}`,
+      );
+    });
+
+    it("should not import built-in types for scalar requestBody (Blob)", () => {
+      const model: IRComponent = {
+        kind: "parameter",
+        name: "UploadParams",
+        referencePath: "#/paths/~1upload~1{id}/post/parameters",
+        properties: [
+          {
+            name: "id",
+            type: "string",
+            required: true,
+            in: "path",
+          },
+        ],
+      };
+
+      // requestBodyTypeName が "Blob" (組み込み型)
+      const result = generateModelFile(model, "Blob", mockCtx);
+
+      // import文が生成されないことを確認
+      expect(result).toEqual(
+        `/**
+ * UploadParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface UploadParams {
+  path: {
+    id: string;
+  };
+  body: Blob;
+}`,
+      );
+    });
+
+    it("should not import built-in types for scalar requestBody (number)", () => {
+      const model: IRComponent = {
+        kind: "parameter",
+        name: "PostDataParams",
+        referencePath: "#/paths/~1data/post/parameters",
+        properties: [],
+      };
+
+      // requestBodyTypeName が "number" (組み込み型)
+      const result = generateModelFile(model, "number", mockCtx);
+
+      // import文が生成されないことを確認
+      expect(result).toEqual(
+        `/**
+ * PostDataParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface PostDataParams {
+  body: number;
+}`,
+      );
     });
   });
 }
