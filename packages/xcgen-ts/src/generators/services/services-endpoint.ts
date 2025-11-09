@@ -3,6 +3,7 @@
  */
 
 import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
+import { escapeJSDocComment } from "../../helpers/jsdoc-comment";
 import { toFunctionName } from "../../helpers/naming";
 import type { HookableInstance, TsCodeEndpoint } from "../../hooks";
 import { getResponseType } from "./services-response-type";
@@ -107,10 +108,10 @@ function generateFunctionCode(
   // JSDocコメント
   lines.push("/**");
   if (endpoint.summary) {
-    lines.push(` * ${endpoint.summary}`);
+    lines.push(` * ${escapeJSDocComment(endpoint.summary)}`);
   }
   if (endpoint.description) {
-    lines.push(` * ${endpoint.description}`);
+    lines.push(` * ${escapeJSDocComment(endpoint.description)}`);
   }
 
   if (dataTypes.needsDataType) {

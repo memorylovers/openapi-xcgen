@@ -9,6 +9,7 @@ import {
   generateTypeImports,
   processImports,
 } from "../../../helpers/import-handler";
+import { escapeJSDocComment } from "../../../helpers/jsdoc-comment";
 import { toTypeName } from "../../../helpers/naming";
 import type { TypeGenerationContext } from "../../types/generation-context";
 import { generateSchemaModel } from "../schemas-model";
@@ -70,7 +71,7 @@ export function generateSchemaFile(
   lines.push("/**");
   const commentLines = finalComment.split("\n");
   for (const line of commentLines) {
-    lines.push(` * ${line}`);
+    lines.push(` * ${escapeJSDocComment(line)}`);
   }
   lines.push(" */");
   lines.push("");

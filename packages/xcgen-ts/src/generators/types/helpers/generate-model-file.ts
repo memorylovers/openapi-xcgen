@@ -9,6 +9,7 @@ import {
   processImports,
   generateTypeImports,
 } from "../../../helpers/import-handler";
+import { escapeJSDocComment } from "../../../helpers/jsdoc-comment";
 import { toTypeName } from "../../../helpers/naming";
 import type { TsCodeModel } from "../../../hooks";
 import type { TypeGenerationContext } from "../generation-context";
@@ -107,7 +108,7 @@ export function generateModelFile(
   if (tsCode.comment) {
     lines.push("/**");
     tsCode.comment.split("\n").forEach((line) => {
-      lines.push(` * ${line}`);
+      lines.push(` * ${escapeJSDocComment(line)}`);
     });
     lines.push(" */");
     lines.push("");

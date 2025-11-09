@@ -366,4 +366,112 @@ describe("schemaFile:generate hook", () => {
       expect(result).toContain(" * Line 3");
     });
   });
+
+  describe("JSDoc comment escaping", () => {
+    it("should escape comment terminator in default comment", () => {
+      const model: IRComponent = {
+        kind: "object",
+        name: "Pattern*/Model",
+        referencePath: "#/components/schemas/Pattern*/Model",
+        properties: [
+          {
+            name: "value",
+            type: "string",
+            required: true,
+          },
+        ],
+      };
+
+      const ctx: TypeGenerationContext = { ir: mockIR };
+      const result = generateSchemaFile(model, ctx);
+
+      // */ should be escaped to *\/
+      expect(result).toContain(
+        " * Valibot validation schema for Pattern*\\/Model",
+      );
+      expect(result).not.toMatch(/ \* .*Pattern\*\/Model/); // Unescaped */ should not exist
+    });
+
+    it("should escape comment terminator in custom comment", () => {
+      const model: IRComponent = {
+        kind: "object",
+        name: "User",
+        referencePath: "#/components/schemas/User",
+        properties: [
+          {
+            name: "email",
+            type: "string",
+            required: true,
+          },
+        ],
+      };
+
+      const hooks = createHooks({
+        "schemaFile:generate": (ctx) => {
+          ctx.tsCode.comment = "Use pattern: */";
+        },
+      });
+
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateSchemaFile(model, ctx);
+
+      // */ should be escaped to *\/
+      expect(result).toContain(" * Use pattern: *\\/");
+      expect(result).not.toContain(" * Use pattern: */"); // Unescaped
+    });
+
+    it("should escape multiple comment terminators", () => {
+      const model: IRComponent = {
+        kind: "object",
+        name: "User",
+        referencePath: "#/components/schemas/User",
+        properties: [
+          {
+            name: "email",
+            type: "string",
+            required: true,
+          },
+        ],
+      };
+
+      const hooks = createHooks({
+        "schemaFile:generate": (ctx) => {
+          ctx.tsCode.comment = "Start */ middle */ end";
+        },
+      });
+
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateSchemaFile(model, ctx);
+
+      // All */ should be escaped
+      expect(result).toContain(" * Start *\\/ middle *\\/ end");
+    });
+
+    it("should not modify text without comment terminators", () => {
+      const model: IRComponent = {
+        kind: "object",
+        name: "User",
+        referencePath: "#/components/schemas/User",
+        properties: [
+          {
+            name: "email",
+            type: "string",
+            required: true,
+          },
+        ],
+      };
+
+      const hooks = createHooks({
+        "schemaFile:generate": (ctx) => {
+          ctx.tsCode.comment = "Normal text with * and / separately";
+        },
+      });
+
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateSchemaFile(model, ctx);
+
+      // Should not modify
+      expect(result).toContain(" * Normal text with * and / separately");
+    });
+  });
 });
