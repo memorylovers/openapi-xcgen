@@ -64,11 +64,11 @@ tags:
   - name: pets
     description: Everything about your Pets
 
-# paths-transformer.ts: VisitorContext -> IREndpoint[] + IRModel[]
+# paths-transformer.ts: VisitorContext -> IREndpoint[] + IRComponent[]
 paths:
-  # path-item-transformer.ts: PathItemContext -> IREndpoint[] + IRModel[]
+  # path-item-transformer.ts: PathItemContext -> IREndpoint[] + IRComponent[]
   /pets:
-    # operation-transformer.ts: OperationContext -> IREndpoint + IRModel[]
+    # operation-transformer.ts: OperationContext -> IREndpoint + IRComponent[]
     get:
       operationId: listPets
       summary: List all pets
@@ -96,7 +96,7 @@ paths:
           content:
             application/json:
               schema:
-                # array-transformer.ts: VisitorContext -> IRArrayModel
+                # array-transformer.ts: VisitorContext -> IRArraySchema
                 # array-traverser.ts: モデル名に Item サフィックスを付与
                 type: array
                 items:
@@ -159,7 +159,7 @@ paths:
                   type: string
                   description: Pet name
                 type:
-                  # enum-transformer.ts: VisitorContext -> IREnumModel
+                  # enum-transformer.ts: VisitorContext -> IREnumSchema
                   type: string
                   enum: [dog, cat, bird]
 
@@ -177,10 +177,10 @@ paths:
                   status:
                     type: string
 
-# components-transformer.ts: VisitorContext -> IRModel[]
+# components-transformer.ts: VisitorContext -> IRComponent[]
 components:
   schemas:
-    # object-transformer.ts: SchemaContext -> IRObjectModel
+    # object-transformer.ts: SchemaContext -> IRObjectSchema
     Pet:
       type: object
       required: [id, name]
@@ -222,7 +222,7 @@ components:
           type: string
           format: email
 
-    # array-transformer.ts: SchemaContext -> IRArrayModel
+    # array-transformer.ts: SchemaContext -> IRArraySchema
     CatalogList:
       type: array
       items:
@@ -236,13 +236,13 @@ components:
         name:
           type: string
 
-    # map-transformer.ts: SchemaContext -> IRMapModel
+    # map-transformer.ts: SchemaContext -> IRMapSchema
     LocalizedSettings:
       type: object
       additionalProperties:
         type: string
 
-    # enum-transformer.ts: SchemaContext -> IREnumModel
+    # enum-transformer.ts: SchemaContext -> IREnumSchema
     Status:
       type: string
       enum: [active, inactive]
@@ -265,7 +265,7 @@ dispatchSchema(schema, context)
   ├─ allOf/oneOf/anyOf → traverseComposition() + transform*Of()
   └─ primitive/$ref → transformPrimitive()
   ↓
-TransformResult { type, models }
+TransformResult { type, components }
 ```
 
 ### Operation系の処理フロー
@@ -280,7 +280,7 @@ transformOperation(operation, pathContext)
   ↓
 各traverserが内部でdispatchSchema()を呼び出し
   ↓
-IREndpoint + 抽出されたIRModel[]
+IREndpoint + 抽出されたIRComponent[]
 ```
 
 ---

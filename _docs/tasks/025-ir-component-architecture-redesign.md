@@ -1028,32 +1028,46 @@ IRModelは以下の種類がある
 
 ---
 
-### ⏳ Phase 3: ドキュメント更新 - TODO
+### ✅ Phase 3: ドキュメント更新 - 完了
 
-**ステータス**: 未着手
+**完了日**: 2025-11-09
 
-**主な作業**:
+**ステータス**: 完了
 
-- [ ] IR設計ドキュメントの更新（`_docs/003_core_ir_design.md`）
-- [ ] アーキテクチャドキュメントの更新（`_docs/002_core_architecture.md`）
-- [ ] Transformer設計の更新（`_docs/004_core_parser_transformer.md`）
-- [ ] プロジェクトガイドラインの更新（`CLAUDE.md`）
+**実施内容**:
 
-**推定時間**: 半日
+- ✅ IR設計ドキュメントの更新（`_docs/003_core_ir_design.md`）
+  - IRObjectModel → IRObjectSchema など4箇所の旧型名を修正
+- ✅ アーキテクチャドキュメントの更新（`_docs/002_core_architecture.md`）
+  - 確認済み、既に更新済み
+- ✅ Transformer設計の更新（`_docs/004_core_transformer_architecture.md`）
+  - IRModel → IRComponent など3箇所の旧型名・フィールド名を修正
+- ✅ プロジェクトガイドラインの更新（`CLAUDE.md`）
+  - 確認済み、旧用語の記載なし
+- ✅ 追加ドキュメント更新:
+  - `_docs/901_transformer_examples.md` - 複数箇所の旧型名を修正
+  - `_docs/tasks/013-1-x-extensions-core.md` - 複数箇所の旧型名を修正
+  - `_docs/tasks/013-2-x-extensions-xcgen-ts-hooks.md` - 1箇所の旧型名を修正
 
 ---
 
-### ⏳ Phase 4: Breaking Changes対応 - TODO
+### ✅ Phase 4: Breaking Changes対応 - 完了
 
-**ステータス**: 未着手
+**完了日**: 2025-11-09
 
-**主な作業**:
+**ステータス**: 完了
 
-- [ ] CHANGELOG.md 作成
-- [ ] バージョンバンプ（0.x.x → 0.y.0）
-- [ ] GitHub Release 作成
+**実施内容**:
 
-**推定時間**: 半日
+- ✅ CHANGELOG.md 作成
+  - Breaking Changes セクションに Task 025 の変更を記載
+  - 移行ガイドを提供（型リネーム、フィールド変更の例）
+  - 後方互換性エイリアスの説明を追加
+- ✅ バージョン管理
+  - 初回リリース 0.1.0 として既にリリース済み
+  - Task 025 の変更は 0.1.0 に含まれる
+- ✅ GitHub Release
+  - 既に作成済み（@openapi-xcgen/core@0.1.0 等）
 
 ---
 

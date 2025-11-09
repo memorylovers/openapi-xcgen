@@ -86,7 +86,7 @@ IRComponentは以下の種類がある
 OpenAPIの`type: object`から生成されます。
 
 ```
-IRObjectModel
+IRObjectSchema
 ├── properties: IRProperty[]
 │   ├── name
 │   ├── type: IRType
@@ -103,7 +103,7 @@ IRObjectModel
 OpenAPIの`enum`から生成されます。
 
 ```
-IREnumModel
+IREnumSchema
 ├── values: IREnumValue[]
 │   ├── value
 │   └── description
@@ -118,7 +118,7 @@ IREnumModel
 OpenAPIの`type: array`から生成されます。
 
 ```
-IRArrayModel
+IRArraySchema
 └── items: IRType
 ```
 
@@ -129,7 +129,7 @@ IRArrayModel
 OpenAPIの`type: object` + `additionalProperties`から生成されます。
 
 ```
-IRMapModel
+IRMapSchema
 └── valueType: IRType
 ```
 

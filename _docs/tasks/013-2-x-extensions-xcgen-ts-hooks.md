@@ -132,7 +132,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 // プロパティ生成Hook
 interface PropertyGenerateContext {
   property: IRProperty;      // IR プロパティ定義（読み取り専用）
-  model: IRModel;            // 所属モデル（読み取り専用）
+  component: IRComponent;    // 所属コンポーネント（読み取り専用）
   tsCode: TsCodeProperty;    // 生成される型定義（Hook で変更可能）
   extensions?: Extensions;   // x-extensions
 }
