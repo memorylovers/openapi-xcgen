@@ -11,7 +11,7 @@ export default defineConfig({
         ctx.tsCode.pipes.push(`v.custom(${ctx.extensions["x-validation"]})`);
       }
     },
-    "modelFile:generate": (ctx: HookContext<"modelFile:generate">) => {
+    "schemaFile:generate": (ctx: HookContext<"schemaFile:generate">) => {
       // バリデーション関数を収集して1つのimport文にまとめる
       const validationFunctions: string[] = [];
       const modelProperties =
@@ -27,8 +27,7 @@ export default defineConfig({
       // 関数をソートして1つのimport文にまとめる（スキーマファイル用）
       if (validationFunctions.length > 0) {
         const sorted = [...new Set(validationFunctions)].sort(); // 重複削除 + ソート
-        if (!ctx.tsCode.schemaImports) ctx.tsCode.schemaImports = [];
-        ctx.tsCode.schemaImports.push(
+        ctx.tsCode.imports.push(
           `import { ${sorted.join(", ")} } from "../_userdefs"`,
         );
       }

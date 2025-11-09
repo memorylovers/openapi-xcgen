@@ -51,26 +51,9 @@ export async function generateSchemas(
   // Step 1: IR → Code (純粋関数による変換)
   const schemaFiles = sortedModels
     .map((model) => {
-      // modelFile:generate Hook を呼び出して schemaImports を取得
-      let schemaImports: string[] | undefined;
-      if (ctx.hooks) {
-        const tsCode = {
-          name: model.name,
-          code: "",
-          imports: [],
-          schemaImports: [],
-        };
-        ctx.hooks.callHook("modelFile:generate", {
-          model,
-          tsCode,
-          extensions: "extensions" in model ? model.extensions : undefined,
-        });
-        schemaImports = tsCode.schemaImports;
-      }
-
       return {
         path: `schemas/${toTypeName(model.name)}Schema.ts`,
-        content: generateSchemaFile(model, ctx, schemaImports),
+        content: generateSchemaFile(model, ctx),
       };
     })
     .filter((f) => f.content !== null) as Array<{

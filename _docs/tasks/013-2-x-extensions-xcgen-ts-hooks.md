@@ -18,7 +18,8 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 #### Hook基盤システム
 
 - `src/hooks/types.ts` - 全Hook Context型とTsCode型定義
-  - `TsCodeModel` に `schemaImports?: string[]` 追加
+  - `SchemaFileGenerateContext` と `TsCodeSchema` を追加
+  - `schemaFile:generate` フックをサポート
 - `src/hooks/create-hooks.ts` - 同期Hookシステム（純粋関数のみ）
   - ジェネリック型推論による型安全性
   - 例外処理（Fail-fast原則）
@@ -54,9 +55,10 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - `src/generators/schemas/schemas-type-mapper.ts` - hooks パラメータ伝播
 - `src/generators/schemas/schemas-array.ts` - hooks パラメータ伝播
 - `src/generators/schemas/schemas-model.ts` - hooks パラメータ伝播
-- `src/generators/schemas/helpers/generate-schema-file.ts` - schemaImports パラメータ対応
+- `src/generators/schemas/helpers/generate-schema-file.ts` - `schemaFile:generate` Hook呼び出し実装
   - カスタムインポート処理（`useTypeKeyword: false` でバリュー import）
-- `src/generators/schemas/schemas.ts` - `modelFile:generate` Hook呼び出して schemaImports 取得
+  - 実際のスキーマコードを生成してから Hook を呼び出す
+- `src/generators/schemas/schemas.ts` - スキーマファイル生成のオーケストレーション
 - その他の生成器も hooks パラメータ対応済み
 
 #### テスト
@@ -66,6 +68,7 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 - `tests/unit/hooks/property-generate.test.ts` - 13個のテスト
 - `tests/unit/hooks/parameter-generate.test.ts` - 18個のテスト
 - `tests/unit/hooks/model-generate.test.ts` - 16個のテスト
+- `tests/unit/hooks/schema-generate.test.ts` - 8個のテスト（schemaFile:generate フック）
 - `tests/unit/hooks/endpoint-generate.test.ts` - 12個のテスト
 - `tests/unit/hooks/validation-transform.test.ts` - 12個のテスト
 
@@ -122,7 +125,8 @@ xcgen-ts（TypeScript生成器）に同期型のHook機構を導入し、x-exten
 |--------|-----------|------|
 | `property:generate` | プロパティ生成時 | 型名のカスタマイズ、プロパティレベルの拡張 |
 | `parameter:generate` | パラメータ生成時 | パラメータ型のカスタマイズ |
-| `modelFile:generate` | モデルファイル生成時 | ファイルレベルの拡張、インポート追加 |
+| `modelFile:generate` | モデル型ファイル生成時 | 型定義ファイルのインポート追加 |
+| `schemaFile:generate` | スキーマファイル生成時 | Valibotスキーマファイルのインポート追加 |
 | `endpoint:generate` | エンドポイント生成時 | API関数のカスタマイズ |
 | `validation:transform` | バリデーション変換時 | IRValidation → Valibot schemaへの変換カスタマイズ |
 
@@ -210,7 +214,7 @@ export default defineConfig({
 })
 ```
 
-#### 出力例
+#### 出力例（型ファイル）
 
 ```typescript
 // generated/models/User.ts
@@ -228,6 +232,64 @@ export interface User {
   /** Optional phone number */ phoneNumber?: PhoneNumber | undefined;
 }
 ```
+
+#### カスタムバリデータ例: schemaFile:generate Hook
+
+```typescript
+// xcgen.config.ts
+import { defineConfig } from '@openapi-xcgen/xcgen-ts'
+import type { HookContext } from '@openapi-xcgen/xcgen-ts'
+
+export default defineConfig({
+  input: './openapi.yaml',
+  output: './generated',
+  hooks: {
+    'schemaFile:generate': (ctx: HookContext<'schemaFile:generate'>) => {
+      // スキーマファイル生成時に実際のスキーマコードを確認できる
+      if (ctx.tsCode.code.includes('email: v.string()')) {
+        // カスタムバリデータ関数のインポートを追加
+        ctx.tsCode.imports.push(
+          "import { validateEmail } from '../validators/email'"
+        );
+      }
+
+      // x-extensions を使った条件分岐
+      if (ctx.extensions?.['x-validator'] === 'custom') {
+        const validatorName = ctx.model.name.toLowerCase();
+        ctx.tsCode.imports.push(
+          `import { validate${ctx.model.name} } from '../validators/${validatorName}'`
+        );
+      }
+    }
+  }
+})
+```
+
+#### 出力例（スキーマファイル）
+
+```typescript
+// generated/schemas/UserSchema.ts
+/**
+ * Valibot validation schema for User
+ * Auto-generated from OpenAPI specification
+ */
+
+import * as v from "valibot";
+import { validateEmail } from '../validators/email';
+
+export const UserSchema = v.object({
+  userId: v.string(),
+  email: v.string(),
+  username: v.string(),
+  phoneNumber: v.optional(v.string()),
+});
+```
+
+**注意**:
+
+- `modelFile:generate` は型ファイル（models/*.ts）生成時に呼ばれます
+- `schemaFile:generate` はスキーマファイル（schemas/*Schema.ts）生成時に呼ばれます
+- 両者は別のタイミングで呼ばれるため、用途に応じて使い分けてください
 
 ## 制限事項
 

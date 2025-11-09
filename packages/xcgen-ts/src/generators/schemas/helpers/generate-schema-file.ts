@@ -21,7 +21,6 @@ import { extractSchemaDependencies } from "./extract-dependencies";
  *
  * @param model - IRComponent
  * @param ctx - Type generation context
- * @param schemaImports - Hook経由で追加されたimport（オプション）
  * @returns Valibotスキーマコード（null: 生成スキップ）
  *
  * @example
@@ -38,7 +37,6 @@ import { extractSchemaDependencies } from "./extract-dependencies";
 export function generateSchemaFile(
   model: IRComponent,
   ctx: TypeGenerationContext,
-  schemaImports?: string[],
 ): string | null {
   const schemaCode = generateSchemaModel(model, ctx);
 
@@ -46,10 +44,34 @@ export function generateSchemaFile(
     return null;
   }
 
+  // schemaFile:generate Hook を呼び出して追加インポートを取得
+  let customImports: string[] = [];
+  let finalSchemaCode = schemaCode;
+  let finalComment = `Valibot validation schema for ${model.name}\nAuto-generated from OpenAPI specification`;
+
+  if (ctx.hooks) {
+    const tsCode = {
+      name: toTypeName(model.name),
+      code: schemaCode,
+      imports: [],
+      comment: `Valibot validation schema for ${model.name}\nAuto-generated from OpenAPI specification`,
+    };
+    ctx.hooks.callHook("schemaFile:generate", {
+      model,
+      tsCode,
+      extensions: "extensions" in model ? model.extensions : undefined,
+    });
+    customImports = tsCode.imports;
+    finalSchemaCode = tsCode.code;
+    finalComment = tsCode.comment ?? finalComment;
+  }
+
   const lines: string[] = [];
   lines.push("/**");
-  lines.push(` * Valibot validation schema for ${model.name}`);
-  lines.push(" * Auto-generated from OpenAPI specification");
+  const commentLines = finalComment.split("\n");
+  for (const line of commentLines) {
+    lines.push(` * ${line}`);
+  }
   lines.push(" */");
   lines.push("");
   lines.push('import * as v from "valibot";');
@@ -57,8 +79,8 @@ export function generateSchemaFile(
   // Hookで追加されたインポートを処理
   let rawImports: string[] = [];
   let typeNames: string[] = [];
-  if (schemaImports && schemaImports.length > 0) {
-    const processed = processImports(schemaImports);
+  if (customImports.length > 0) {
+    const processed = processImports(customImports);
     rawImports = processed.rawImports;
     typeNames = processed.typeNames;
   }
@@ -94,7 +116,7 @@ export function generateSchemaFile(
   // if (rawImports.length > 0 || allTypeImports.size > 0) {
   lines.push("");
   // }
-  lines.push(schemaCode);
+  lines.push(finalSchemaCode);
 
   return lines.join("\n");
 }
