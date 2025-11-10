@@ -98,7 +98,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/SpecialEventCategory"
+            "referencePath": "#/components/schemas/SpecialEvent/SpecialEventCategory"
           },
           "required": true
         },
@@ -106,7 +106,7 @@
           "name": "location",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/SpecialEventLocation"
+            "referencePath": "#/components/schemas/SpecialEvent/SpecialEventLocation"
           },
           "required": true
         },
@@ -159,7 +159,7 @@
     {
       "kind": "enum",
       "name": "SpecialEventCategory",
-      "referencePath": "#/components/schemas/SpecialEventCategory",
+      "referencePath": "#/components/schemas/SpecialEvent/SpecialEventCategory",
       "type": "string",
       "values": [
         {
@@ -191,7 +191,7 @@
     {
       "kind": "enum",
       "name": "SpecialEventLocation",
-      "referencePath": "#/components/schemas/SpecialEventLocation",
+      "referencePath": "#/components/schemas/SpecialEvent/SpecialEventLocation",
       "type": "string",
       "values": [
         {
@@ -265,7 +265,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/SpecialEventRequestCategory"
+            "referencePath": "#/components/schemas/SpecialEventRequest/SpecialEventRequestCategory"
           },
           "required": true
         },
@@ -273,7 +273,7 @@
           "name": "location",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/SpecialEventRequestLocation"
+            "referencePath": "#/components/schemas/SpecialEventRequest/SpecialEventRequestLocation"
           },
           "required": true
         },
@@ -316,7 +316,7 @@
     {
       "kind": "enum",
       "name": "SpecialEventRequestCategory",
-      "referencePath": "#/components/schemas/SpecialEventRequestCategory",
+      "referencePath": "#/components/schemas/SpecialEventRequest/SpecialEventRequestCategory",
       "type": "string",
       "values": [
         {
@@ -348,7 +348,7 @@
     {
       "kind": "enum",
       "name": "SpecialEventRequestLocation",
-      "referencePath": "#/components/schemas/SpecialEventRequestLocation",
+      "referencePath": "#/components/schemas/SpecialEventRequest/SpecialEventRequestLocation",
       "type": "string",
       "values": [
         {
@@ -418,14 +418,14 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/SpecialEventUpdateCategory"
+            "referencePath": "#/components/schemas/SpecialEventUpdate/SpecialEventUpdateCategory"
           }
         },
         {
           "name": "location",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/SpecialEventUpdateLocation"
+            "referencePath": "#/components/schemas/SpecialEventUpdate/SpecialEventUpdateLocation"
           }
         },
         {
@@ -466,7 +466,7 @@
     {
       "kind": "enum",
       "name": "SpecialEventUpdateCategory",
-      "referencePath": "#/components/schemas/SpecialEventUpdateCategory",
+      "referencePath": "#/components/schemas/SpecialEventUpdate/SpecialEventUpdateCategory",
       "type": "string",
       "values": [
         {
@@ -498,7 +498,7 @@
     {
       "kind": "enum",
       "name": "SpecialEventUpdateLocation",
-      "referencePath": "#/components/schemas/SpecialEventUpdateLocation",
+      "referencePath": "#/components/schemas/SpecialEventUpdate/SpecialEventUpdateLocation",
       "type": "string",
       "values": [
         {
@@ -575,7 +575,7 @@
           "name": "ticket_type",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/TicketPurchaseRequestTicketType"
+            "referencePath": "#/components/schemas/TicketPurchaseRequest/TicketPurchaseRequestTicketType"
           },
           "required": true
         },
@@ -599,7 +599,7 @@
           "name": "payment_method",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod"
+            "referencePath": "#/components/schemas/TicketPurchaseRequest/TicketPurchaseRequestPaymentMethod"
           },
           "required": true
         }
@@ -608,7 +608,7 @@
     {
       "kind": "enum",
       "name": "TicketPurchaseRequestTicketType",
-      "referencePath": "#/components/schemas/TicketPurchaseRequestTicketType",
+      "referencePath": "#/components/schemas/TicketPurchaseRequest/TicketPurchaseRequestTicketType",
       "type": "string",
       "values": [
         {
@@ -640,7 +640,7 @@
     {
       "kind": "union",
       "name": "TicketPurchaseRequestPaymentMethod",
-      "referencePath": "#/components/schemas/TicketPurchaseRequestPaymentMethod",
+      "referencePath": "#/components/schemas/TicketPurchaseRequest/TicketPurchaseRequestPaymentMethod",
       "types": [
         {
           "kind": "ref",
@@ -706,7 +706,7 @@
           "name": "ticket_type",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/TicketPurchaseConfirmationTicketType"
+            "referencePath": "#/components/schemas/TicketPurchaseConfirmation/TicketPurchaseConfirmationTicketType"
           },
           "required": true
         },
@@ -727,7 +727,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/TicketPurchaseConfirmationStatus"
+            "referencePath": "#/components/schemas/TicketPurchaseConfirmation/TicketPurchaseConfirmationStatus"
           },
           "required": true,
           "readOnly": true
@@ -749,7 +749,7 @@
     {
       "kind": "enum",
       "name": "TicketPurchaseConfirmationTicketType",
-      "referencePath": "#/components/schemas/TicketPurchaseConfirmationTicketType",
+      "referencePath": "#/components/schemas/TicketPurchaseConfirmation/TicketPurchaseConfirmationTicketType",
       "type": "string",
       "values": [
         {
@@ -781,7 +781,7 @@
     {
       "kind": "enum",
       "name": "TicketPurchaseConfirmationStatus",
-      "referencePath": "#/components/schemas/TicketPurchaseConfirmationStatus",
+      "referencePath": "#/components/schemas/TicketPurchaseConfirmation/TicketPurchaseConfirmationStatus",
       "type": "string",
       "values": [
         {
@@ -1034,7 +1034,7 @@
           "name": "daily_hours",
           "type": {
             "kind": "ref",
-            "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours"
+            "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours"
           }
         }
       ],
@@ -1043,7 +1043,7 @@
     {
       "kind": "array",
       "name": "GetMuseumHours200ResponseDailyHours",
-      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/GetMuseumHours200ResponseDailyHours",
+      "referencePath": "#/paths/::museum-hours/get/responses/200/content/application::json/schema/GetMuseumHours200ResponseDailyHours",
       "itemType": {
         "kind": "ref",
         "referencePath": "#/components/schemas/DailyHours"
@@ -1140,7 +1140,7 @@
           "name": "events",
           "type": {
             "kind": "ref",
-            "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents"
+            "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents"
           }
         },
         {
@@ -1156,7 +1156,7 @@
     {
       "kind": "array",
       "name": "GetSpecialEvents200ResponseEvents",
-      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/GetSpecialEvents200ResponseEvents",
+      "referencePath": "#/paths/::special-events/get/responses/200/content/application::json/schema/GetSpecialEvents200ResponseEvents",
       "itemType": {
         "kind": "ref",
         "referencePath": "#/components/schemas/SpecialEvent"

@@ -212,7 +212,7 @@
           "name": "nested",
           "type": {
             "kind": "ref",
-            "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/PostTest2RequestRequestBodyNested"
+            "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested"
           }
         }
       ],
@@ -221,7 +221,7 @@
     {
       "kind": "object",
       "name": "PostTest2RequestRequestBodyNested",
-      "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/PostTest2RequestRequestBodyNested",
+      "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested",
       "properties": [
         {
           "name": "value",
@@ -316,7 +316,7 @@
           "name": "result",
           "type": {
             "kind": "ref",
-            "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResult"
+            "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult"
           }
         }
       ],
@@ -325,13 +325,13 @@
     {
       "kind": "object",
       "name": "GetTest3Response202ResponseResult",
-      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResult",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
       "properties": [
         {
           "name": "status",
           "type": {
             "kind": "ref",
-            "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResultStatus"
+            "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult/GetTest3Response202ResponseResultStatus"
           }
         }
       ]
@@ -339,7 +339,7 @@
     {
       "kind": "enum",
       "name": "GetTest3Response202ResponseResultStatus",
-      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResultStatus",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult/GetTest3Response202ResponseResultStatus",
       "type": "string",
       "values": [
         {

@@ -38,35 +38,35 @@
           "name": "profile",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/DataTypesProfile"
+            "referencePath": "#/components/schemas/DataTypes/DataTypesProfile"
           }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/DataTypesTags"
+            "referencePath": "#/components/schemas/DataTypes/DataTypesTags"
           }
         },
         {
           "name": "numbers",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/DataTypesNumbers"
+            "referencePath": "#/components/schemas/DataTypes/DataTypesNumbers"
           }
         },
         {
           "name": "scores",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/DataTypesScores"
+            "referencePath": "#/components/schemas/DataTypes/DataTypesScores"
           }
         },
         {
           "name": "flags",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/DataTypesFlags"
+            "referencePath": "#/components/schemas/DataTypes/DataTypesFlags"
           }
         }
       ]
@@ -74,7 +74,7 @@
     {
       "kind": "object",
       "name": "DataTypesProfile",
-      "referencePath": "#/components/schemas/DataTypesProfile",
+      "referencePath": "#/components/schemas/DataTypes/DataTypesProfile",
       "properties": [
         {
           "name": "bio",
@@ -85,25 +85,25 @@
     {
       "kind": "array",
       "name": "DataTypesTags",
-      "referencePath": "#/components/schemas/DataTypesTags",
+      "referencePath": "#/components/schemas/DataTypes/DataTypesTags",
       "itemType": "string"
     },
     {
       "kind": "array",
       "name": "DataTypesNumbers",
-      "referencePath": "#/components/schemas/DataTypesNumbers",
+      "referencePath": "#/components/schemas/DataTypes/DataTypesNumbers",
       "itemType": "int"
     },
     {
       "kind": "array",
       "name": "DataTypesScores",
-      "referencePath": "#/components/schemas/DataTypesScores",
+      "referencePath": "#/components/schemas/DataTypes/DataTypesScores",
       "itemType": "double"
     },
     {
       "kind": "array",
       "name": "DataTypesFlags",
-      "referencePath": "#/components/schemas/DataTypesFlags",
+      "referencePath": "#/components/schemas/DataTypes/DataTypesFlags",
       "itemType": "boolean"
     }
   ],

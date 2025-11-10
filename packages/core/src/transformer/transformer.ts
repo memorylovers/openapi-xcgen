@@ -476,7 +476,7 @@ if (import.meta.vitest) {
                 name: "status",
                 type: {
                   kind: "ref",
-                  referencePath: "#/components/schemas/PetStatus",
+                  referencePath: "#/components/schemas/Pet/PetStatus",
                 },
               },
             ],
@@ -484,7 +484,7 @@ if (import.meta.vitest) {
           {
             kind: "enum",
             name: "PetStatus",
-            referencePath: "#/components/schemas/PetStatus",
+            referencePath: "#/components/schemas/Pet/PetStatus",
             type: "string",
             values: [
               { value: "available", name: "AVAILABLE" },

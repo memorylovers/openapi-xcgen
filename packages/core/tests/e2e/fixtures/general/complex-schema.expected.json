@@ -22,7 +22,7 @@
           "name": "items",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderItems"
+            "referencePath": "#/components/schemas/Order/OrderItems"
           },
           "required": true,
           "validation": {
@@ -33,7 +33,7 @@
           "name": "customer",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderCustomer"
+            "referencePath": "#/components/schemas/Order/OrderCustomer"
           },
           "required": true
         },
@@ -41,28 +41,28 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderStatus"
+            "referencePath": "#/components/schemas/Order/OrderStatus"
           }
         },
         {
           "name": "priority",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderPriority"
+            "referencePath": "#/components/schemas/Order/OrderPriority"
           }
         },
         {
           "name": "tags",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderTags"
+            "referencePath": "#/components/schemas/Order/OrderTags"
           }
         },
         {
           "name": "metadata",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderMetadata"
+            "referencePath": "#/components/schemas/Order/OrderMetadata"
           }
         },
         {
@@ -78,10 +78,10 @@
     {
       "kind": "array",
       "name": "OrderItems",
-      "referencePath": "#/components/schemas/OrderItems",
+      "referencePath": "#/components/schemas/Order/OrderItems",
       "itemType": {
         "kind": "ref",
-        "referencePath": "#/components/schemas/OrderItemsItem"
+        "referencePath": "#/components/schemas/Order/OrderItemsItem"
       },
       "validation": {
         "minItems": 1
@@ -90,7 +90,7 @@
     {
       "kind": "object",
       "name": "OrderItemsItem",
-      "referencePath": "#/components/schemas/OrderItemsItem",
+      "referencePath": "#/components/schemas/Order/OrderItemsItem",
       "properties": [
         {
           "name": "productId",
@@ -126,7 +126,7 @@
     {
       "kind": "object",
       "name": "OrderCustomer",
-      "referencePath": "#/components/schemas/OrderCustomer",
+      "referencePath": "#/components/schemas/Order/OrderCustomer",
       "properties": [
         {
           "name": "id",
@@ -149,7 +149,7 @@
           "name": "address",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderCustomerAddress"
+            "referencePath": "#/components/schemas/Order/OrderCustomer/OrderCustomerAddress"
           }
         }
       ]
@@ -157,7 +157,7 @@
     {
       "kind": "object",
       "name": "OrderCustomerAddress",
-      "referencePath": "#/components/schemas/OrderCustomerAddress",
+      "referencePath": "#/components/schemas/Order/OrderCustomer/OrderCustomerAddress",
       "properties": [
         {
           "name": "street",
@@ -183,7 +183,7 @@
     {
       "kind": "enum",
       "name": "OrderStatus",
-      "referencePath": "#/components/schemas/OrderStatus",
+      "referencePath": "#/components/schemas/Order/OrderStatus",
       "type": "string",
       "values": [
         {
@@ -211,7 +211,7 @@
     {
       "kind": "enum",
       "name": "OrderPriority",
-      "referencePath": "#/components/schemas/OrderPriority",
+      "referencePath": "#/components/schemas/Order/OrderPriority",
       "type": "string",
       "values": [
         {
@@ -235,13 +235,13 @@
     {
       "kind": "array",
       "name": "OrderTags",
-      "referencePath": "#/components/schemas/OrderTags",
+      "referencePath": "#/components/schemas/Order/OrderTags",
       "itemType": "string"
     },
     {
       "kind": "map",
       "name": "OrderMetadata",
-      "referencePath": "#/components/schemas/OrderMetadata",
+      "referencePath": "#/components/schemas/Order/OrderMetadata",
       "valueType": "string"
     }
   ],

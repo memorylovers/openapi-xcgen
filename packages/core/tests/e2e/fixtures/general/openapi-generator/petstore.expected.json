@@ -48,7 +48,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderStatus"
+            "referencePath": "#/components/schemas/Order/OrderStatus"
           },
           "description": "Order Status"
         },
@@ -63,7 +63,7 @@
     {
       "kind": "enum",
       "name": "OrderStatus",
-      "referencePath": "#/components/schemas/OrderStatus",
+      "referencePath": "#/components/schemas/Order/OrderStatus",
       "type": "string",
       "values": [
         {
@@ -197,7 +197,7 @@
           "name": "photoUrls",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/PetPhotoUrls"
+            "referencePath": "#/components/schemas/Pet/PetPhotoUrls"
           },
           "required": true
         },
@@ -205,14 +205,14 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/PetTags"
+            "referencePath": "#/components/schemas/Pet/PetTags"
           }
         },
         {
           "name": "status",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/PetStatus"
+            "referencePath": "#/components/schemas/Pet/PetStatus"
           },
           "description": "pet status in the store",
           "deprecated": true
@@ -223,13 +223,13 @@
     {
       "kind": "array",
       "name": "PetPhotoUrls",
-      "referencePath": "#/components/schemas/PetPhotoUrls",
+      "referencePath": "#/components/schemas/Pet/PetPhotoUrls",
       "itemType": "string"
     },
     {
       "kind": "array",
       "name": "PetTags",
-      "referencePath": "#/components/schemas/PetTags",
+      "referencePath": "#/components/schemas/Pet/PetTags",
       "itemType": {
         "kind": "ref",
         "referencePath": "#/components/schemas/Tag"
@@ -238,7 +238,7 @@
     {
       "kind": "enum",
       "name": "PetStatus",
-      "referencePath": "#/components/schemas/PetStatus",
+      "referencePath": "#/components/schemas/Pet/PetStatus",
       "type": "string",
       "values": [
         {

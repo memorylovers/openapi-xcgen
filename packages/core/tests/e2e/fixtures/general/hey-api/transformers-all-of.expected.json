@@ -13,7 +13,7 @@
           "name": "foo",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/FooFoo"
+            "referencePath": "#/components/schemas/Foo/FooFoo"
           },
           "required": true
         }
@@ -22,7 +22,7 @@
     {
       "kind": "array",
       "name": "FooFoo",
-      "referencePath": "#/components/schemas/FooFoo",
+      "referencePath": "#/components/schemas/Foo/FooFoo",
       "itemType": {
         "kind": "ref",
         "referencePath": "#/components/schemas/Bar"
@@ -37,7 +37,7 @@
           "name": "foo",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/BarFoo"
+            "referencePath": "#/components/schemas/Bar/BarFoo"
           },
           "required": true
         },
@@ -45,7 +45,7 @@
           "name": "bar",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/BarBar"
+            "referencePath": "#/components/schemas/Bar/BarBar"
           },
           "required": true
         }
@@ -54,16 +54,16 @@
     {
       "kind": "array",
       "name": "BarFoo",
-      "referencePath": "#/components/schemas/BarFoo",
+      "referencePath": "#/components/schemas/Bar/BarFoo",
       "itemType": {
         "kind": "ref",
-        "referencePath": "#/components/schemas/BarFooItem"
+        "referencePath": "#/components/schemas/Bar/BarFooItem"
       }
     },
     {
       "kind": "union",
       "name": "BarFooItem",
-      "referencePath": "#/components/schemas/BarFooItem",
+      "referencePath": "#/components/schemas/Bar/BarFooItem",
       "types": [
         {
           "kind": "ref",
@@ -74,7 +74,7 @@
     {
       "kind": "enum",
       "name": "BarBar",
-      "referencePath": "#/components/schemas/BarBar",
+      "referencePath": "#/components/schemas/Bar/BarBar",
       "type": "string",
       "values": [
         {
@@ -126,7 +126,7 @@
           "name": "baz",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/BazAllOf1Baz"
+            "referencePath": "#/components/schemas/BazAllOf1/BazAllOf1Baz"
           }
         },
         {
@@ -141,7 +141,7 @@
     {
       "kind": "enum",
       "name": "BazAllOf1Baz",
-      "referencePath": "#/components/schemas/BazAllOf1Baz",
+      "referencePath": "#/components/schemas/BazAllOf1/BazAllOf1Baz",
       "type": "string",
       "values": [
         {

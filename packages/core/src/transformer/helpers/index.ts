@@ -26,7 +26,6 @@ export { parseAdditionalPropertiesPath } from "./path/parse-document-path";
 export { parseSchemaPath } from "./path/parse-document-path";
 
 // Utility functions (remain in helpers/)
-export { createParameterComponent } from "./create-parameter-model";
 export { enrichDiscriminatorMappings } from "./enrich-discriminator-mappings";
 export { extractExtensions } from "./extract-extensions";
 export { extractValidation } from "./extract-validation";

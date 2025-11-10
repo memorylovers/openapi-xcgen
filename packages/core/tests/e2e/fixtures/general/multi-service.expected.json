@@ -29,7 +29,7 @@
           "name": "role",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/UserRole"
+            "referencePath": "#/components/schemas/User/UserRole"
           }
         }
       ]
@@ -37,7 +37,7 @@
     {
       "kind": "enum",
       "name": "UserRole",
-      "referencePath": "#/components/schemas/UserRole",
+      "referencePath": "#/components/schemas/User/UserRole",
       "type": "string",
       "values": [
         {

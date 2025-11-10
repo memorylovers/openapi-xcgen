@@ -21,7 +21,7 @@
           "name": "items",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/OrderItems"
+            "referencePath": "#/components/schemas/Order/OrderItems"
           }
         }
       ]
@@ -29,7 +29,7 @@
     {
       "kind": "array",
       "name": "OrderItems",
-      "referencePath": "#/components/schemas/OrderItems",
+      "referencePath": "#/components/schemas/Order/OrderItems",
       "itemType": {
         "kind": "ref",
         "referencePath": "#/components/schemas/OrderItem"

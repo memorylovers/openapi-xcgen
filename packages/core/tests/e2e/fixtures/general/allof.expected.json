@@ -104,7 +104,7 @@
           "name": "role",
           "type": {
             "kind": "ref",
-            "referencePath": "#/components/schemas/AuditableUserAllOf2Role"
+            "referencePath": "#/components/schemas/AuditableUserAllOf2/AuditableUserAllOf2Role"
           },
           "required": true
         }
@@ -113,7 +113,7 @@
     {
       "kind": "enum",
       "name": "AuditableUserAllOf2Role",
-      "referencePath": "#/components/schemas/AuditableUserAllOf2Role",
+      "referencePath": "#/components/schemas/AuditableUserAllOf2/AuditableUserAllOf2Role",
       "type": "string",
       "values": [
         {

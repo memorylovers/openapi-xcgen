@@ -157,7 +157,7 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "referencePath": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags"
+            "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags"
           },
           "extensions": {
             "x-property-extension": "tags-field",
@@ -170,7 +170,7 @@
     {
       "kind": "array",
       "name": "PostPostsRequestBodyTags",
-      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/PostPostsRequestBodyTags",
+      "referencePath": "#/paths/::posts/post/requestBody/content/application::json/schema/PostPostsRequestBodyTags",
       "itemType": "string"
     }
   ],
