@@ -2,7 +2,7 @@
  * スキーマの依存関係解析とトポロジカルソート
  */
 
-import type { IRModel, IRType } from "@openapi-xcgen/core";
+import type { IRComponent, IRType } from "@openapi-xcgen/core";
 
 /**
  * IRTypeから参照されている型名を抽出
@@ -20,7 +20,8 @@ function extractTypeReferences(type: IRType): string[] {
   switch (type.kind) {
     case "ref": {
       // 参照パスから型名を抽出
-      const modelName = type.name.split("/").at(-1) ?? type.name;
+      const modelName =
+        type.referencePath.split("/").at(-1) ?? type.referencePath;
       references.push(modelName);
       break;
     }
@@ -30,11 +31,11 @@ function extractTypeReferences(type: IRType): string[] {
 }
 
 /**
- * IRModelが依存している他のモデル名を抽出
- * @param model - IRモデル
+ * IRComponentが依存している他のモデル名を抽出
+ * @param model - IRコンポーネント
  * @returns 依存しているモデル名の配列
  */
-export function extractModelDependencies(model: IRModel): string[] {
+export function extractModelDependencies(model: IRComponent): string[] {
   const dependencies = new Set<string>();
 
   switch (model.kind) {
@@ -84,7 +85,8 @@ export function extractModelDependencies(model: IRModel): string[] {
           continue;
         }
         if (type.kind === "ref") {
-          const modelName = type.name.split("/").at(-1) ?? type.name;
+          const modelName =
+            type.referencePath.split("/").at(-1) ?? type.referencePath;
           dependencies.add(modelName);
         }
       }
@@ -108,7 +110,7 @@ export function extractModelDependencies(model: IRModel): string[] {
 
 /**
  * モデルをトポロジカルソート（依存先が先に来るように並べ替え）
- * @param models - IRモデル配列
+ * @param models - IRコンポーネント配列
  * @returns ソート済みモデル配列
  *
  * @example
@@ -126,9 +128,9 @@ export function extractModelDependencies(model: IRModel): string[] {
  * // - User (depends on Base and UserAllOf1, comes last)
  * ```
  */
-export function sortModelsByDependencies(models: IRModel[]): IRModel[] {
+export function sortModelsByDependencies(models: IRComponent[]): IRComponent[] {
   // モデル名からモデルへのマップを作成
-  const modelMap = new Map<string, IRModel>();
+  const modelMap = new Map<string, IRComponent>();
   for (const model of models) {
     modelMap.set(model.name, model);
   }
@@ -143,7 +145,7 @@ export function sortModelsByDependencies(models: IRModel[]): IRModel[] {
   }
 
   // トポロジカルソート（Kahn's algorithm）
-  const sorted: IRModel[] = [];
+  const sorted: IRComponent[] = [];
   const visited = new Set<string>();
   const inProgress = new Set<string>();
 
@@ -194,13 +196,13 @@ if (import.meta.vitest) {
   describe("schemas-sort", () => {
     describe("extractModelDependencies", () => {
       it("should extract dependencies from allOf model", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "allOf",
           name: "User",
           referencePath: "#/components/schemas/User",
           schemas: [
-            { kind: "ref", name: "#/components/schemas/Base" },
-            { kind: "ref", name: "#/components/schemas/UserAllOf1" },
+            { kind: "ref", referencePath: "#/components/schemas/Base" },
+            { kind: "ref", referencePath: "#/components/schemas/UserAllOf1" },
           ],
         };
 
@@ -210,14 +212,14 @@ if (import.meta.vitest) {
       });
 
       it("should extract dependencies from object with ref properties", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "Post",
           referencePath: "#/components/schemas/Post",
           properties: [
             {
               name: "author",
-              type: { kind: "ref", name: "#/components/schemas/User" },
+              type: { kind: "ref", referencePath: "#/components/schemas/User" },
               required: true,
             },
             {
@@ -234,7 +236,7 @@ if (import.meta.vitest) {
       });
 
       it("should return empty array for enum model", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",
@@ -253,27 +255,27 @@ if (import.meta.vitest) {
 
     describe("sortModelsByDependencies", () => {
       it("should sort models by dependencies", () => {
-        const baseModel: IRModel = {
+        const baseModel: IRComponent = {
           kind: "object",
           name: "Base",
           referencePath: "#/components/schemas/Base",
           properties: [],
         };
 
-        const userAllOf1Model: IRModel = {
+        const userAllOf1Model: IRComponent = {
           kind: "object",
           name: "UserAllOf1",
           referencePath: "#/components/schemas/UserAllOf1",
           properties: [],
         };
 
-        const userModel: IRModel = {
+        const userModel: IRComponent = {
           kind: "allOf",
           name: "User",
           referencePath: "#/components/schemas/User",
           schemas: [
-            { kind: "ref", name: "#/components/schemas/Base" },
-            { kind: "ref", name: "#/components/schemas/UserAllOf1" },
+            { kind: "ref", referencePath: "#/components/schemas/Base" },
+            { kind: "ref", referencePath: "#/components/schemas/UserAllOf1" },
           ],
         };
 
@@ -295,14 +297,14 @@ if (import.meta.vitest) {
       });
 
       it("should handle models without dependencies", () => {
-        const model1: IRModel = {
+        const model1: IRComponent = {
           kind: "object",
           name: "Model1",
           referencePath: "#/components/schemas/Model1",
           properties: [],
         };
 
-        const model2: IRModel = {
+        const model2: IRComponent = {
           kind: "object",
           name: "Model2",
           referencePath: "#/components/schemas/Model2",

@@ -1,12 +1,16 @@
 /**
  * Map Transformer - v2 Transformer Architecture
  *
- * Map型スキーマ（additionalPropertiesのみ）をIRMapModelに変換します。
+ * Map型スキーマ（additionalPropertiesのみ）をIRMapSchemaに変換します。
  * トラバーサル（値訪問）は map-traverser に委譲します。
  */
 
-import type { IRMapModel, SchemaObject } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import type { IRMapSchema, SchemaObject } from "../../../types";
+import {
+  buildReferencePath,
+  extractValidation,
+  getComponentName,
+} from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
 import type {
@@ -15,7 +19,7 @@ import type {
 } from "../types";
 
 /**
- * Map型スキーマをIRMapModelに変換
+ * Map型スキーマをIRMapSchemaに変換
  *
  * @param schema - Mapスキーマ
  * @param context - Visitorコンテキスト
@@ -36,7 +40,7 @@ export function transformMap(
   context: VisitorContext,
   traversalResult: AdditionalPropertiesTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // トラバーサルが失敗した場合（値型が undefined）
@@ -48,19 +52,23 @@ export function transformMap(
     );
   }
 
-  // IRMapModelを作成
-  const mapModel: IRMapModel = {
+  // バリデーション情報を抽出
+  const validation = extractValidation(schema);
+
+  // IRMapSchemaを作成
+  const mapModel: IRMapSchema = {
     kind: "map",
     name,
     referencePath,
     valueType: traversalResult.type,
     ...(schema.description && { description: schema.description }),
+    ...(validation && { validation }),
   };
 
   // Mapモデルと値から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [mapModel, ...traversalResult.models],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [mapModel, ...traversalResult.components],
   };
 }
 
@@ -82,16 +90,16 @@ if (import.meta.vitest) {
 
       const traversalResult: AdditionalPropertiesTraversalResult = {
         type: "string",
-        models: [],
+        components: [],
       };
 
       const result = transformMap(schema, context, traversalResult);
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/StringMap",
+        referencePath: "#/components/schemas/StringMap",
       });
-      expect(result.models).toEqual([
+      expect(result.components).toEqual([
         {
           kind: "map",
           name: "StringMap",
@@ -119,9 +127,9 @@ if (import.meta.vitest) {
       const traversalResult: AdditionalPropertiesTraversalResult = {
         type: {
           kind: "ref",
-          name: "#/components/schemas/ArrayMapValue",
+          referencePath: "#/components/schemas/ArrayMapValue",
         },
-        models: [
+        components: [
           {
             kind: "array",
             name: "ArrayMapValue",
@@ -135,20 +143,20 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/ArrayMap",
+        referencePath: "#/components/schemas/ArrayMap",
       });
-      expect(result.models).toHaveLength(2);
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(2);
+      expect(result.components[0]).toEqual({
         kind: "map",
         name: "ArrayMap",
         referencePath: "#/components/schemas/ArrayMap",
         valueType: {
           kind: "ref",
-          name: "#/components/schemas/ArrayMapValue",
+          referencePath: "#/components/schemas/ArrayMapValue",
         },
         description: "Map of string arrays",
       });
-      expect(result.models[1].kind).toBe("array");
+      expect(result.components[1].kind).toBe("array");
     });
 
     it("should return error result when value type is undefined", () => {
@@ -164,13 +172,13 @@ if (import.meta.vitest) {
 
       const traversalResult: AdditionalPropertiesTraversalResult = {
         type: undefined,
-        models: [],
+        components: [],
       };
 
       const result = transformMap(schema, context, traversalResult);
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("FAILED_MAP_VALUE_RESOLUTION");
     });
   });

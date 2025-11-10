@@ -51,7 +51,7 @@ export function transformRequestBody(
   if (isReferenceObject(requestBody)) {
     const ref: IRRef = {
       kind: "ref",
-      name: requestBody.$ref,
+      referencePath: requestBody.$ref,
     };
 
     const irRequestBody: IRRequestBody = {
@@ -64,7 +64,7 @@ export function transformRequestBody(
       // TransformResultインターフェースは汎用的なため、型の妥協が必要
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       type: irRequestBody as any,
-      models: [],
+      components: [],
     };
   }
 
@@ -78,7 +78,7 @@ export function transformRequestBody(
     );
     return {
       type: null,
-      models: [],
+      components: [],
     };
   }
 
@@ -103,12 +103,12 @@ export function transformRequestBody(
     // TransformResultインターフェースは汎用的なため、型の妥協が必要
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     type: irRequestBody as any,
-    models: contentResult.childModels,
+    components: contentResult.childModels,
   };
 }
 
 /**
- * インラインobjectスキーマからIRRequestBodyModelを生成
+ * インラインobjectスキーマからIRRequestBodyComponentを生成
  *
  * 3層アーキテクチャに準拠: SchemaObject と PropertyTraversalResult を受け取り、
  * TransformResult を返します。
@@ -135,7 +135,7 @@ export function transformRequestBody(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  type IRModel = import("../../../types").IRModel;
+  type IRComponent = import("../../../types").IRComponent;
 
   describe("transformRequestBody", () => {
     it("should handle reference request body", () => {
@@ -160,10 +160,10 @@ if (import.meta.vitest) {
         kind: "ref",
         ref: {
           kind: "ref",
-          name: "#/components/requestBodies/UserInput",
+          referencePath: "#/components/requestBodies/UserInput",
         },
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle request body with content", () => {
@@ -191,7 +191,10 @@ if (import.meta.vitest) {
         content: [
           {
             mimeType: "application/json",
-            schema: { kind: "ref", name: "#/paths/::users/post/requestBody" },
+            schema: {
+              kind: "ref",
+              referencePath: "#/paths/::users/post/requestBody",
+            },
           },
         ],
         childModels: [],
@@ -207,11 +210,14 @@ if (import.meta.vitest) {
         content: [
           {
             mimeType: "application/json",
-            schema: { kind: "ref", name: "#/paths/::users/post/requestBody" },
+            schema: {
+              kind: "ref",
+              referencePath: "#/paths/::users/post/requestBody",
+            },
           },
         ],
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should return null for empty content", () => {
@@ -234,7 +240,7 @@ if (import.meta.vitest) {
       const result = transformRequestBody(requestBody, context, contentResult);
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should include child models from content", () => {
@@ -252,7 +258,7 @@ if (import.meta.vitest) {
         rootSegment: "paths",
       };
 
-      const mockModel: IRModel = {
+      const mockModel: IRComponent = {
         kind: "object",
         name: "TestModel",
         referencePath: "#/test",
@@ -263,7 +269,7 @@ if (import.meta.vitest) {
         content: [
           {
             mimeType: "application/json",
-            schema: { kind: "ref", name: "#/test" },
+            schema: { kind: "ref", referencePath: "#/test" },
           },
         ],
         childModels: [mockModel],
@@ -272,8 +278,8 @@ if (import.meta.vitest) {
 
       const result = transformRequestBody(requestBody, context, contentResult);
 
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0]).toBe(mockModel);
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0]).toBe(mockModel);
     });
   });
 }

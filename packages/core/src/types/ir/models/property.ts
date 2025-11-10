@@ -60,7 +60,7 @@ export interface IRProperty {
  * IRPropertyにパラメータ固有のin情報を追加
  * @example
  * ```yaml
- * # OpenAPI → IRParameterProperty (パラメータが統合モデルのプロパティになる)
+ * # OpenAPI → IRParameterProperty (パラメータが統合コンポーネントのプロパティになる)
  * parameters:
  *   - name: id
  *     in: path  # この情報を保持

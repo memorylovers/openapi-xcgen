@@ -1,22 +1,26 @@
 /**
  * Array Transformer - v2 Transformer Architecture
  *
- * 配列スキーマをIRArrayModelに変換します。
+ * 配列スキーマをIRArraySchemaに変換します。
  * トラバーサル（items訪問）は array-traverser に委譲します。
  */
 
 import type {
-  IRArrayModel,
+  IRArraySchema,
   ReferenceObject,
   SchemaObject,
 } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import {
+  buildReferencePath,
+  extractValidation,
+  getComponentName,
+} from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createErrorResult } from "../errors";
 import type { ArrayItemTraversalResult, TransformResult } from "../types";
 
 /**
- * 配列スキーマをIRArrayModelに変換
+ * 配列スキーマをIRArraySchemaに変換
  *
  * @param schema - 配列スキーマ
  * @param context - Visitorコンテキスト
@@ -39,7 +43,7 @@ export function transformArray(
   context: VisitorContext,
   traversalResult: ArrayItemTraversalResult,
 ): TransformResult {
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const referencePath = buildReferencePath(context.documentPath);
 
   // トラバーサルが失敗した場合
@@ -51,19 +55,23 @@ export function transformArray(
     );
   }
 
-  // IRArrayModelを作成
-  const arrayModel: IRArrayModel = {
+  // バリデーション情報を抽出
+  const validation = extractValidation(schema);
+
+  // IRArraySchemaを作成
+  const arrayModel: IRArraySchema = {
     kind: "array",
     name,
     referencePath,
     itemType: traversalResult.itemType,
     ...(schema.description && { description: schema.description }),
+    ...(validation && { validation }),
   };
 
   // 配列モデルと子要素から抽出されたモデルを返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [arrayModel, ...traversalResult.models],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [arrayModel, ...traversalResult.components],
   };
 }
 
@@ -85,16 +93,16 @@ if (import.meta.vitest) {
 
       const traversalResult: ArrayItemTraversalResult = {
         itemType: "string",
-        models: [],
+        components: [],
       };
 
       const result = transformArray(schema, context, traversalResult);
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Items",
+        referencePath: "#/components/schemas/Items",
       });
-      expect(result.models).toEqual([
+      expect(result.components).toEqual([
         {
           kind: "array",
           name: "Items",
@@ -124,9 +132,9 @@ if (import.meta.vitest) {
       const traversalResult: ArrayItemTraversalResult = {
         itemType: {
           kind: "ref",
-          name: "#/components/schemas/BlogPostsItem",
+          referencePath: "#/components/schemas/BlogPostsItem",
         },
-        models: [
+        components: [
           {
             kind: "object",
             name: "BlogPostsItem",
@@ -145,20 +153,20 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/BlogPosts",
+        referencePath: "#/components/schemas/BlogPosts",
       });
-      expect(result.models).toHaveLength(2);
-      expect(result.models[0]).toEqual({
+      expect(result.components).toHaveLength(2);
+      expect(result.components[0]).toEqual({
         kind: "array",
         name: "BlogPosts",
         referencePath: "#/components/schemas/BlogPosts",
         itemType: {
           kind: "ref",
-          name: "#/components/schemas/BlogPostsItem",
+          referencePath: "#/components/schemas/BlogPostsItem",
         },
         description: "List of blog posts",
       });
-      expect(result.models[1].kind).toBe("object");
+      expect(result.components[1].kind).toBe("object");
     });
 
     it("should return error result when item type resolution fails", () => {
@@ -175,13 +183,13 @@ if (import.meta.vitest) {
 
       const traversalResult: ArrayItemTraversalResult = {
         itemType: null,
-        models: [],
+        components: [],
       };
 
       const result = transformArray(schema, context, traversalResult);
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("FAILED_ARRAY_ITEM_RESOLUTION");
     });
   });

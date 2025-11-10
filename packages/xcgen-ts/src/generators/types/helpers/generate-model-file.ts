@@ -1,54 +1,73 @@
 /**
  * モデルファイル生成
  *
- * IRModel → TypeScript型定義コード（個別ファイル）への変換
+ * IRComponent → TypeScript型定義コード（個別ファイル）への変換
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import {
   processImports,
   generateTypeImports,
 } from "../../../helpers/import-handler";
+import { escapeJSDocComment } from "../../../helpers/jsdoc-comment";
 import { toTypeName } from "../../../helpers/naming";
-import type { HookableInstance, TsCodeModel } from "../../../hooks";
+import type { TsCodeModel } from "../../../hooks";
+import type { TypeGenerationContext } from "../generation-context";
 import { generateModel } from "../types-model";
 import { generateUnifiedParameterType } from "../types-parameter-unified";
 import { extractTypeDependencies } from "./extract-dependencies";
 
 /**
- * 純粋関数: IRModel → TypeScript型定義コード
+ * TypeScript組み込み型（インポート不要な型）
+ *
+ * スカラー requestBody で使用される可能性のある TypeScript 組み込み型のリスト。
+ * これらの型は dependencies に追加せず、import 文を生成しない。
+ */
+const BUILTIN_TYPES = new Set([
+  "string",
+  "number",
+  "boolean",
+  "null",
+  "undefined",
+  "unknown",
+  "Date",
+  "Blob",
+]);
+
+/**
+ * 純粋関数: IRComponent → TypeScript型定義コード
  *
  * 個別のモデルファイルを生成する。依存する他の型のimport文も自動生成される。
  *
- * @param model - IRModel
+ * @param model - IRComponent
  * @param requestBodyTypeName - 統合パラメータ型の場合のrequestBody型名（オプション）
- * @param hooks - Hook instance（オプション）
+ * @param ctx - Type generation context
  * @returns TypeScript型定義コード（null: 生成スキップ）
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   properties: [...]
  * };
- * generateModelFile(model);
+ * generateModelFile(model, undefined, ctx);
  * // => "/**\n * User model\n * ...\n *\/\n\nexport interface User { ... }"
  * ```
  */
 export function generateModelFile(
-  model: IRModel,
-  requestBodyTypeName?: string,
-  hooks?: HookableInstance,
+  model: IRComponent,
+  requestBodyTypeName: string | undefined,
+  ctx: TypeGenerationContext,
 ): string | null {
   // 1. 型定義コードを生成
   let typeCode: string | null = null;
 
   // parameterモデルで統合型が必要な場合
   if (model.kind === "parameter" && requestBodyTypeName) {
-    typeCode = generateUnifiedParameterType(model, requestBodyTypeName, hooks);
+    typeCode = generateUnifiedParameterType(model, requestBodyTypeName, ctx);
   } else {
-    typeCode = generateModel(model, hooks);
+    typeCode = generateModel(model, ctx);
   }
 
   if (!typeCode) {
@@ -65,8 +84,8 @@ export function generateModelFile(
   };
 
   // 3. modelFile:generate Hook を呼び出し
-  if (hooks) {
-    hooks.callHook("modelFile:generate", {
+  if (ctx.hooks) {
+    ctx.hooks.callHook("modelFile:generate", {
       model,
       tsCode,
       extensions: "extensions" in model ? model.extensions : undefined,
@@ -89,7 +108,7 @@ export function generateModelFile(
   if (tsCode.comment) {
     lines.push("/**");
     tsCode.comment.split("\n").forEach((line) => {
-      lines.push(` * ${line}`);
+      lines.push(` * ${escapeJSDocComment(line)}`);
     });
     lines.push(" */");
     lines.push("");
@@ -98,8 +117,8 @@ export function generateModelFile(
   // 依存型のインポート
   const dependencies = extractTypeDependencies(model);
 
-  // 統合パラメータ型の場合、requestBodyの型も追加
-  if (requestBodyTypeName) {
+  // 統合パラメータ型の場合、requestBodyの型も追加（組み込み型は除外）
+  if (requestBodyTypeName && !BUILTIN_TYPES.has(requestBodyTypeName)) {
     dependencies.add(requestBodyTypeName);
   }
 
@@ -138,11 +157,19 @@ export function generateModelFile(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("generateModelFile", () => {
     it("should generate model file with header", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "User",
         referencePath: "#/components/schemas/User",
@@ -155,7 +182,7 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -170,25 +197,28 @@ export interface User {
     });
 
     it("should generate imports for referenced types", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -207,7 +237,7 @@ export interface Order {
     });
 
     it("should not import self-reference", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "TreeNode",
         referencePath: "#/components/schemas/TreeNode",
@@ -221,13 +251,13 @@ export interface Order {
             name: "children",
             type: {
               kind: "ref",
-              name: "#/components/schemas/TreeNodeChildren",
+              referencePath: "#/components/schemas/TreeNodeChildren",
             },
           },
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -245,7 +275,7 @@ export interface TreeNode {
     });
 
     it("should generate unified parameter type with imports", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "parameter",
         name: "UpdateUserParams",
         referencePath: "#/paths/~1users~1{userId}/patch/parameters",
@@ -259,7 +289,7 @@ export interface TreeNode {
         ],
       };
 
-      const result = generateModelFile(model, "UserUpdate");
+      const result = generateModelFile(model, "UserUpdate", mockCtx);
 
       expect(result).toEqual(
         `/**
@@ -279,7 +309,7 @@ export interface UpdateUserParams {
     });
 
     it("should return null for models that generate no code", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Empty",
         referencePath: "#/components/schemas/Empty",
@@ -288,37 +318,37 @@ export interface UpdateUserParams {
 
       // generateModel() が空のobjectに対してnullを返すかは実装依存
       // ここでは、generateModelがnullを返す場合のテスト
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       // 現在の実装では空オブジェクトも生成されるため、nullにならない
       expect(result).not.toBeNull();
     });
 
     it("should sort imports alphabetically", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
         properties: [
           {
             name: "zzzItem",
-            type: { kind: "ref", name: "#/components/schemas/ZItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/ZItem" },
             required: true,
           },
           {
             name: "aaaItem",
-            type: { kind: "ref", name: "#/components/schemas/AItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/AItem" },
             required: true,
           },
           {
             name: "mmmItem",
-            type: { kind: "ref", name: "#/components/schemas/MItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/MItem" },
             required: true,
           },
         ],
       };
 
-      const result = generateModelFile(model);
+      const result = generateModelFile(model, undefined, mockCtx);
 
       const lines = result!.split("\n");
       const importLines = lines.filter((line) => line.startsWith("import"));
@@ -328,6 +358,98 @@ export interface UpdateUserParams {
         "import type { MItem } from './MItem';",
         "import type { ZItem } from './ZItem';",
       ]);
+    });
+
+    it("should not import built-in types for scalar requestBody (string)", () => {
+      const model: IRComponent = {
+        kind: "parameter",
+        name: "UpdateFileParams",
+        referencePath: "#/paths/~1files~1{fileId}/put/parameters",
+        properties: [
+          {
+            name: "fileId",
+            type: "string",
+            required: true,
+            in: "path",
+          },
+        ],
+      };
+
+      // requestBodyTypeName が "string" (組み込み型)
+      const result = generateModelFile(model, "string", mockCtx);
+
+      // import文が生成されないことを確認
+      expect(result).toEqual(
+        `/**
+ * UpdateFileParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface UpdateFileParams {
+  path: {
+    fileId: string;
+  };
+  body: string;
+}`,
+      );
+    });
+
+    it("should not import built-in types for scalar requestBody (Blob)", () => {
+      const model: IRComponent = {
+        kind: "parameter",
+        name: "UploadParams",
+        referencePath: "#/paths/~1upload~1{id}/post/parameters",
+        properties: [
+          {
+            name: "id",
+            type: "string",
+            required: true,
+            in: "path",
+          },
+        ],
+      };
+
+      // requestBodyTypeName が "Blob" (組み込み型)
+      const result = generateModelFile(model, "Blob", mockCtx);
+
+      // import文が生成されないことを確認
+      expect(result).toEqual(
+        `/**
+ * UploadParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface UploadParams {
+  path: {
+    id: string;
+  };
+  body: Blob;
+}`,
+      );
+    });
+
+    it("should not import built-in types for scalar requestBody (number)", () => {
+      const model: IRComponent = {
+        kind: "parameter",
+        name: "PostDataParams",
+        referencePath: "#/paths/~1data/post/parameters",
+        properties: [],
+      };
+
+      // requestBodyTypeName が "number" (組み込み型)
+      const result = generateModelFile(model, "number", mockCtx);
+
+      // import文が生成されないことを確認
+      expect(result).toEqual(
+        `/**
+ * PostDataParams model
+ * Auto-generated from OpenAPI specification
+ */
+
+export interface PostDataParams {
+  body: number;
+}`,
+      );
     });
   });
 }

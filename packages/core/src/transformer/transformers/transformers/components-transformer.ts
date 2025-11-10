@@ -11,7 +11,7 @@
 import { consola } from "consola";
 import type {
   ComponentsObject,
-  IRModel,
+  IRComponent,
   IRRequestBody,
   IRResponse,
   IRSecurityScheme,
@@ -34,7 +34,7 @@ import { transformSecuritySchemes } from "./security-schemes-transformer";
  */
 export interface ComponentsTransformResult {
   /** 抽出されたモデル（オブジェクト、列挙型、配列、マップを統一的に管理） */
-  models: IRModel[];
+  components: IRComponent[];
   /** セキュリティスキーム定義 */
   securitySchemes?: Record<string, IRSecurityScheme>;
   /** 共通レスポンス定義 */
@@ -76,7 +76,7 @@ export function transformComponents(
   context: TransformContext,
 ): ComponentsTransformResult {
   const result: ComponentsTransformResult = {
-    models: [],
+    components: [],
   };
 
   // securitySchemesを処理
@@ -127,7 +127,7 @@ export function transformComponents(
 
       if (responseResult.type) {
         responses[name] = responseResult.type as unknown as IRResponse;
-        result.models.push(...responseResult.models);
+        result.components.push(...responseResult.components);
       }
     }
 
@@ -180,7 +180,7 @@ export function transformComponents(
       if (requestBodyResult.type) {
         requestBodies[name] =
           requestBodyResult.type as unknown as IRRequestBody;
-        result.models.push(...requestBodyResult.models);
+        result.components.push(...requestBodyResult.components);
       }
     }
 
@@ -197,7 +197,7 @@ export function transformComponents(
       context,
       dispatchSchema,
     );
-    result.models.push(...schemasResult.models);
+    result.components.push(...schemasResult.components);
   }
 
   return result;
@@ -229,11 +229,11 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result.models).toHaveLength(3); // Item object + 2 enums
-      expect(result.models[0].kind).toBe("object");
-      expect(result.models[0].name).toBe("Item");
-      expect(result.models[1].kind).toBe("enum");
-      expect(result.models[2].kind).toBe("enum");
+      expect(result.components).toHaveLength(3); // Item object + 2 enums
+      expect(result.components[0].kind).toBe("object");
+      expect(result.components[0].name).toBe("Item");
+      expect(result.components[1].kind).toBe("enum");
+      expect(result.components[2].kind).toBe("enum");
     });
 
     it("should handle empty components.schemas", () => {
@@ -243,7 +243,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
 
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle null or missing schemas", () => {
@@ -254,7 +254,7 @@ if (import.meta.vitest) {
       });
 
       expect(result).toEqual({
-        models: [],
+        components: [],
       });
     });
 
@@ -276,7 +276,7 @@ if (import.meta.vitest) {
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("Invalid schema"),
       );
-      expect(result.models.length).toEqual(1); // Valid enum only
+      expect(result.components.length).toEqual(1); // Valid enum only
 
       warnSpy.mockRestore();
     });
@@ -334,7 +334,7 @@ if (import.meta.vitest) {
       });
 
       // GoodSchemaは正常に処理される
-      expect(result.models.length).toBeGreaterThan(0);
+      expect(result.components.length).toBeGreaterThan(0);
 
       warnSpy.mockRestore();
     });

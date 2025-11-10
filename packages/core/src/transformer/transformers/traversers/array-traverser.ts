@@ -7,7 +7,7 @@
 
 import { consola } from "consola";
 import type { ReferenceObject, SchemaObjectWithNullable } from "../../../types";
-import { buildReferencePath, getModelName } from "../../helpers";
+import { buildReferencePath, getComponentName } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createArrayItemTraversalError } from "../errors";
 import type { ArrayItemTraversalResult } from "../types";
@@ -21,7 +21,7 @@ import type { ArrayItemTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: unknown; models: unknown[] };
+) => { type: unknown; components: unknown[] };
 
 /**
  * 配列の items フィールドを訪問し、要素型と子モデルを返す
@@ -49,7 +49,7 @@ export function traverseArrayItem(
   }
 
   // 配列要素用のコンテキストを構築
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const itemContext: VisitorContext = {
     documentPath: [...context.documentPath.slice(0, -1), `${name}Item`],
     rootSegment: context.rootSegment,
@@ -69,7 +69,7 @@ export function traverseArrayItem(
 
   return {
     itemType: itemResult.type as ArrayItemTraversalResult["itemType"],
-    models: itemResult.models as ArrayItemTraversalResult["models"],
+    components: itemResult.components as ArrayItemTraversalResult["components"],
   };
 }
 
@@ -81,7 +81,7 @@ if (import.meta.vitest) {
     it("should traverse array items with primitive type", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema = {
@@ -98,7 +98,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         itemType: "string",
-        models: [],
+        components: [],
       });
 
       expect(mockVisitSchema).toHaveBeenCalledWith(
@@ -112,8 +112,11 @@ if (import.meta.vitest) {
 
     it("should traverse array items with nested object", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/components/schemas/BlogPostsItem" },
-        models: [
+        type: {
+          kind: "ref",
+          referencePath: "#/components/schemas/BlogPostsItem",
+        },
+        components: [
           {
             kind: "object",
             name: "BlogPostsItem",
@@ -142,10 +145,10 @@ if (import.meta.vitest) {
 
       expect(result.itemType).toEqual({
         kind: "ref",
-        name: "#/components/schemas/BlogPostsItem",
+        referencePath: "#/components/schemas/BlogPostsItem",
       });
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("object");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("object");
     });
 
     it("should warn and return null when items are missing", () => {
@@ -166,7 +169,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         itemType: null,
-        models: [],
+        components: [],
         error: {
           code: "ARRAY_ITEMS_MISSING",
           message: "Array schema without items: #/components/schemas/Missing",
@@ -188,7 +191,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: null,
-        models: [],
+        components: [],
       });
 
       const schema = {
@@ -206,7 +209,7 @@ if (import.meta.vitest) {
 
       expect(result).toEqual({
         itemType: null,
-        models: [],
+        components: [],
         error: {
           code: "ARRAY_ITEM_RESOLUTION_FAILED",
           message:

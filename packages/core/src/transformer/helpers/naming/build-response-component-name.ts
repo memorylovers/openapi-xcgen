@@ -6,18 +6,20 @@ import { parseResponsePath } from "../path/parse-document-path";
 import { pathToComponentBase } from "./path-to-component-base";
 
 /**
- * Responseのモデル名を生成（paths配下）
+ * Responseのコンポーネント名を生成（paths配下）
  *
  * @param context - PathsResponseContext
- * @returns モデル名（例: "GetUsers200Response"）
+ * @returns コンポーネント名（例: "GetUsers200Response"）
  *
  * @example
  * ```typescript
  * // context = { documentPath: ["paths", "/users", "get", "responses", "200"], ... }
- * buildResponseModelName(context)  // => "GetUsers200Response"
+ * buildResponseComponentName(context)  // => "GetUsers200Response"
  * ```
  */
-export function buildResponseModelName(context: PathsResponseContext): string {
+export function buildResponseComponentName(
+  context: PathsResponseContext,
+): string {
   const parsed = parseResponsePath(context.documentPath);
   if (!parsed) {
     consola.warn(`Invalid response path: ${context.documentPath.join("/")}`);
@@ -35,7 +37,7 @@ export function buildResponseModelName(context: PathsResponseContext): string {
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("buildResponseModelName", () => {
+  describe("buildResponseComponentName", () => {
     it("should build model name for 200 response", () => {
       const context: PathsResponseContext = {
         kind: "response",
@@ -44,7 +46,7 @@ if (import.meta.vitest) {
         contentType: "application/json",
         schemaPath: ["content", "application/json", "schema"],
       };
-      expect(buildResponseModelName(context)).toBe("GetUsers200Response");
+      expect(buildResponseComponentName(context)).toBe("GetUsers200Response");
     });
 
     it("should build model name for 404 response", () => {
@@ -55,7 +57,7 @@ if (import.meta.vitest) {
         contentType: "application/json",
         schemaPath: ["content", "application/json", "schema"],
       };
-      expect(buildResponseModelName(context)).toBe("GetUsersId404Response");
+      expect(buildResponseComponentName(context)).toBe("GetUsersId404Response");
     });
   });
 }

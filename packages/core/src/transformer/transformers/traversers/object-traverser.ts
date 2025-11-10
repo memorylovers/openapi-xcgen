@@ -18,7 +18,7 @@ import {
   buildReferencePath,
   extractExtensions,
   extractValidation,
-  getModelName,
+  getComponentName,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
 import { createAdditionalPropertiesTraversalError } from "../errors";
@@ -33,7 +33,7 @@ import type {
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: unknown; models: unknown[] };
+) => { type: unknown; components: unknown[] };
 
 /**
  * Object型スキーマのpropertiesを訪問
@@ -67,8 +67,8 @@ export function traverseObjectProperties(
 
   // 各プロパティを訪問
   Object.entries(properties).forEach(([propName, propSchema]) => {
-    // プロパティ名を含む適切なモデル名を生成
-    const parentName = getModelName(context);
+    // プロパティ名を含む適切なコンポーネント名を生成
+    const parentName = getComponentName(context);
     const propTypeName = `${parentName}${pascalCase(propName)}`;
 
     // 適切なdocumentPathを構築
@@ -124,7 +124,7 @@ export function traverseObjectProperties(
       ...(extensions && { extensions }),
     });
 
-    allChildModels.push(...result.models);
+    allChildModels.push(...result.components);
   });
 
   return {
@@ -155,7 +155,7 @@ export function traverseObjectAdditionalProperties(
   if (additional === undefined) {
     return {
       type: undefined,
-      models: [],
+      components: [],
     };
   }
 
@@ -172,12 +172,12 @@ export function traverseObjectAdditionalProperties(
   if (additional === false) {
     return {
       type: undefined,
-      models: [],
+      components: [],
     };
   }
 
   // additionalProperties にスキーマが指定されている場合
-  const name = getModelName(context);
+  const name = getComponentName(context);
   const valueContext: VisitorContext = {
     documentPath: [
       ...context.documentPath.slice(0, -1),
@@ -199,7 +199,8 @@ export function traverseObjectAdditionalProperties(
 
   return {
     type: valueResult.type as AdditionalPropertiesTraversalResult["type"],
-    models: valueResult.models as AdditionalPropertiesTraversalResult["models"],
+    components:
+      valueResult.components as AdditionalPropertiesTraversalResult["components"],
   };
 }
 
@@ -213,11 +214,11 @@ if (import.meta.vitest) {
         .fn()
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: "number",
-          models: [],
+          components: [],
         });
 
       const schema: SchemaObject = {
@@ -252,7 +253,7 @@ if (import.meta.vitest) {
     it("should handle nullable properties (OpenAPI 3.0)", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema = {
@@ -279,7 +280,7 @@ if (import.meta.vitest) {
     it("should handle type array with null (OpenAPI 3.1)", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema = {
@@ -307,7 +308,7 @@ if (import.meta.vitest) {
     it("should handle properties with descriptions", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -356,15 +357,15 @@ if (import.meta.vitest) {
         .fn()
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: null, // 失敗
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: "number",
-          models: [],
+          components: [],
         });
 
       const schema: SchemaObject = {
@@ -398,8 +399,11 @@ if (import.meta.vitest) {
       const mockVisitSchema = vi
         .fn()
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/components/schemas/AddressModel" },
-          models: [
+          type: {
+            kind: "ref",
+            referencePath: "#/components/schemas/AddressModel",
+          },
+          components: [
             {
               kind: "object",
               name: "AddressModel",
@@ -410,7 +414,7 @@ if (import.meta.vitest) {
         })
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         });
 
       const schema: SchemaObject = {
@@ -439,7 +443,7 @@ if (import.meta.vitest) {
     it("should extract defaultValue from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "integer",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -466,7 +470,7 @@ if (import.meta.vitest) {
     it("should extract deprecated flag from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -493,7 +497,7 @@ if (import.meta.vitest) {
     it("should extract readOnly flag from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -520,7 +524,7 @@ if (import.meta.vitest) {
     it("should extract writeOnly flag from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -547,7 +551,7 @@ if (import.meta.vitest) {
     it("should extract validation constraints from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -583,7 +587,7 @@ if (import.meta.vitest) {
     it("should extract x-extensions from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -618,7 +622,7 @@ if (import.meta.vitest) {
     it("should extract all metadata together from properties", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -667,7 +671,7 @@ if (import.meta.vitest) {
     it("should traverse additionalProperties with schema", () => {
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -690,7 +694,7 @@ if (import.meta.vitest) {
       );
 
       expect(result.type).toBe("string");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should return undefined when additionalProperties is missing", () => {
@@ -715,7 +719,7 @@ if (import.meta.vitest) {
       );
 
       expect(result.type).toBeUndefined();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(mockVisitSchema).not.toHaveBeenCalled();
     });
 
@@ -767,7 +771,7 @@ if (import.meta.vitest) {
       );
 
       expect(result.type).toBeUndefined();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(mockVisitSchema).not.toHaveBeenCalled();
     });
 
@@ -775,7 +779,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: null,
-        models: [],
+        components: [],
       });
 
       const schema: SchemaObject = {
@@ -796,7 +800,7 @@ if (import.meta.vitest) {
       );
 
       expect(result.type).toBeUndefined();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(warnSpy).toHaveBeenCalledWith(
         "Failed to process additionalProperties in object: #/components/schemas/FailedExtra",
       );

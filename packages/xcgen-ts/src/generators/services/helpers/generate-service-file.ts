@@ -4,7 +4,7 @@
  * タグ別のエンドポイントグループからサービスファイルを生成
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { processImports } from "../../../helpers/import-handler";
 import type { HookableInstance } from "../../../hooks";
 import { generateServicesImports } from "../services-imports";
@@ -15,7 +15,7 @@ import { generateEndpoint } from "../services-endpoint";
  *
  * @param tag - タグ名
  * @param endpoints - そのタグに属するエンドポイント配列
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @param hooks - Hook instance（オプション）
  * @returns サービスファイルのコード
  *
@@ -25,7 +25,7 @@ import { generateEndpoint } from "../services-endpoint";
  *   { operationId: "getPet", ... },
  *   { operationId: "createPet", ... }
  * ];
- * const models: IRModel[] = [...];
+ * const models: IRComponent[] = [...];
  * generateServiceFile("pets", endpoints, models);
  * // => "/**\n * pets service functions\n * ...\n *\/\n\nimport { request } from '../client';\n\nexport async function getPet(...) { ... }"
  * ```
@@ -33,7 +33,7 @@ import { generateEndpoint } from "../services-endpoint";
 export function generateServiceFile(
   tag: string,
   endpoints: IREndpoint[],
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
   hooks?: HookableInstance,
 ): string {
   const lines: string[] = [];
@@ -113,7 +113,10 @@ if (import.meta.vitest) {
               content: [
                 {
                   mimeType: "application/json",
-                  schema: { kind: "ref", name: "#/components/schemas/Pet" },
+                  schema: {
+                    kind: "ref",
+                    referencePath: "#/components/schemas/Pet",
+                  },
                 },
               ],
             },

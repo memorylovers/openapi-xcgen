@@ -2,7 +2,8 @@
  * API関数生成
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
+import { escapeJSDocComment } from "../../helpers/jsdoc-comment";
 import { toFunctionName } from "../../helpers/naming";
 import type { HookableInstance, TsCodeEndpoint } from "../../hooks";
 import { getResponseType } from "./services-response-type";
@@ -11,13 +12,13 @@ import { getEndpointDataTypes } from "./services-data-types";
 /**
  * IREndpointからAPI関数を生成
  * @param endpoint - IRエンドポイント
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @param hooks - Hook instance（オプション）
  * @returns TypeScript関数コード（null: 生成スキップ）
  */
 export function generateEndpoint(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
   hooks?: HookableInstance,
 ): string | null {
   if (!endpoint.operationId) {
@@ -62,7 +63,7 @@ export function generateEndpoint(
  */
 function generateJSDocComment(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   const lines: string[] = [];
   const dataTypes = getEndpointDataTypes(endpoint, models);
@@ -98,7 +99,7 @@ function generateJSDocComment(
 function generateFunctionCode(
   endpoint: IREndpoint,
   functionName: string,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   const lines: string[] = [];
   const dataTypes = getEndpointDataTypes(endpoint, models);
@@ -107,10 +108,10 @@ function generateFunctionCode(
   // JSDocコメント
   lines.push("/**");
   if (endpoint.summary) {
-    lines.push(` * ${endpoint.summary}`);
+    lines.push(` * ${escapeJSDocComment(endpoint.summary)}`);
   }
   if (endpoint.description) {
-    lines.push(` * ${endpoint.description}`);
+    lines.push(` * ${escapeJSDocComment(endpoint.description)}`);
   }
 
   if (dataTypes.needsDataType) {
@@ -131,6 +132,9 @@ function generateFunctionCode(
   // 関数シグネチャ
   lines.push(`export async function ${functionName}(`);
 
+  // requestBodyのみの場合を検出するフラグ
+  let isBodyOnly = false;
+
   if (dataTypes.needsDataType) {
     let dataTypeName: string;
     if (dataTypes.parameterType && dataTypes.requestBodyType) {
@@ -138,7 +142,9 @@ function generateFunctionCode(
     } else if (dataTypes.parameterType) {
       dataTypeName = dataTypes.parameterType;
     } else {
+      // requestBodyのみの場合
       dataTypeName = dataTypes.requestBodyType!;
+      isBodyOnly = true;
     }
 
     lines.push(`  options: ${dataTypeName},`);
@@ -153,7 +159,13 @@ function generateFunctionCode(
   lines.push(`    path: "${endpoint.path}",`);
 
   if (dataTypes.needsDataType) {
-    lines.push(`    options,`);
+    if (isBodyOnly) {
+      // requestBodyのみの場合は { body: options } に変換
+      lines.push(`    options: { body: options },`);
+    } else {
+      // parametersがある場合（統合型または parametersのみ）
+      lines.push(`    options,`);
+    }
   } else {
     lines.push(`    options: {},`);
   }
@@ -172,13 +184,16 @@ if (import.meta.vitest) {
   describe("services-endpoint", () => {
     describe("generateEndpoint", () => {
       it("should generate function with operationId", () => {
-        const models: IRModel[] = [
+        const models: IRComponent[] = [
           {
             kind: "array",
             name: "GetUsers200Response",
             referencePath:
               "#/paths/::users/get/responses/200/content/application::json/schema",
-            itemType: { kind: "ref", name: "#/components/schemas/User" },
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
           },
         ];
 
@@ -199,7 +214,8 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::users/get/responses/200/content/application::json/schema",
+                    referencePath:
+                      "#/paths/::users/get/responses/200/content/application::json/schema",
                   },
                 },
               ],
@@ -277,6 +293,68 @@ export async function logout(
     method: "POST",
     path: "/logout",
     options: {},
+    init,
+  });
+}
+`.trim(),
+        );
+      });
+
+      it("should wrap body-only requestBody in { body: options }", () => {
+        const models: IRComponent[] = [
+          {
+            kind: "array",
+            name: "UserArray",
+            referencePath: "#/components/requestBodies/UserArray",
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
+          },
+        ];
+
+        const endpoint: IREndpoint = {
+          path: "/users",
+          method: "post",
+          operationId: "createUsers",
+          summary: "Create multiple users",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "ref",
+            ref: {
+              kind: "ref",
+              referencePath: "#/components/requestBodies/UserArray",
+            },
+          },
+          responses: [
+            {
+              kind: "content",
+              statusCode: "201",
+              description: "Created",
+            },
+          ],
+        };
+
+        const result = generateEndpoint(endpoint, models);
+
+        expect(result).toEqual(
+          `
+/**
+ * Create multiple users
+ * @param options - Request parameters
+ * @param init - Additional fetch options
+ * @returns void
+ * @throws {_XcgenApiError} API error with status and response details
+ */
+export async function createUsers(
+  options: UserArray,
+  init?: RequestInit,
+): Promise<void> {
+  return request({
+    method: "POST",
+    path: "/users",
+    options: { body: options },
     init,
   });
 }

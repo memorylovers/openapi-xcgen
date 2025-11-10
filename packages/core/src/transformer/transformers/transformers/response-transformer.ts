@@ -60,7 +60,7 @@ export function transformResponse(
   if (isReferenceObject(response)) {
     const ref: IRRef = {
       kind: "ref",
-      name: response.$ref,
+      referencePath: response.$ref,
     };
 
     const irResponse: IRResponse = {
@@ -74,7 +74,7 @@ export function transformResponse(
       // TransformResultインターフェースは汎用的なため、型の妥協が必要
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       type: irResponse as any,
-      models: [],
+      components: [],
     };
   }
 
@@ -124,12 +124,12 @@ export function transformResponse(
     // TransformResultインターフェースは汎用的なため、型の妥協が必要
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     type: irResponse as any,
-    models: childModels,
+    components: childModels,
   };
 }
 
 /**
- * インラインobjectスキーマからIRResponseModelを生成
+ * インラインobjectスキーマからIRResponseComponentを生成
  *
  * 3層アーキテクチャに準拠: SchemaObject と PropertyTraversalResult を受け取り、
  * TransformResult を返します。
@@ -157,7 +157,7 @@ export function transformResponse(
 // === in-source testing ===
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-  type IRModel = import("../../../types").IRModel;
+  type IRComponent = import("../../../types").IRComponent;
 
   describe("transformResponse", () => {
     it("should handle reference response", () => {
@@ -177,10 +177,10 @@ if (import.meta.vitest) {
         statusCode: "200",
         ref: {
           kind: "ref",
-          name: "#/components/responses/SuccessResponse",
+          referencePath: "#/components/responses/SuccessResponse",
         },
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle response with content only", () => {
@@ -209,7 +209,7 @@ if (import.meta.vitest) {
             mimeType: "application/json",
             schema: {
               kind: "ref",
-              name: "#/paths/::users/get/responses/200",
+              referencePath: "#/paths/::users/get/responses/200",
             },
           },
         ],
@@ -228,12 +228,12 @@ if (import.meta.vitest) {
             mimeType: "application/json",
             schema: {
               kind: "ref",
-              name: "#/paths/::users/get/responses/200",
+              referencePath: "#/paths/::users/get/responses/200",
             },
           },
         ],
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle response with headers", () => {
@@ -260,7 +260,7 @@ if (import.meta.vitest) {
         content: [
           {
             mimeType: "application/json",
-            schema: { kind: "ref", name: "#/test" },
+            schema: { kind: "ref", referencePath: "#/test" },
           },
         ],
         childModels: [],
@@ -316,7 +316,7 @@ if (import.meta.vitest) {
         statusCode: "204",
         description: "No content",
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should collect child models from content and headers", () => {
@@ -334,14 +334,14 @@ if (import.meta.vitest) {
         rootSegment: "paths",
       };
 
-      const mockContentModel: IRModel = {
+      const mockContentModel: IRComponent = {
         kind: "object",
         name: "ContentModel",
         referencePath: "#/content",
         properties: [],
       };
 
-      const mockHeaderModel: IRModel = {
+      const mockHeaderModel: IRComponent = {
         kind: "object",
         name: "HeaderModel",
         referencePath: "#/header",
@@ -352,7 +352,7 @@ if (import.meta.vitest) {
         content: [
           {
             mimeType: "application/json",
-            schema: { kind: "ref", name: "#/content" },
+            schema: { kind: "ref", referencePath: "#/content" },
           },
         ],
         childModels: [mockContentModel],
@@ -372,9 +372,9 @@ if (import.meta.vitest) {
         headersResult,
       );
 
-      expect(result.models).toHaveLength(2);
-      expect(result.models).toContain(mockContentModel);
-      expect(result.models).toContain(mockHeaderModel);
+      expect(result.components).toHaveLength(2);
+      expect(result.components).toContain(mockContentModel);
+      expect(result.components).toContain(mockHeaderModel);
     });
   });
 }

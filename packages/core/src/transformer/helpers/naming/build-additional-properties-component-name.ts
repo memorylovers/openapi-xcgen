@@ -1,8 +1,8 @@
 /**
- * additionalPropertiesの値型モデル名を生成
+ * additionalPropertiesの値型コンポーネント名を生成
  *
  * 設計方針:
- * - additionalPropertiesの値は常に `{親モデル名}Item` サフィックス
+ * - additionalPropertiesの値は常に `{親コンポーネント名}Item` サフィックス
  * - 例: MetricsData → MetricsDataItem
  * - REST APIの文脈で自然な命名（各アイテムを表す）
  */
@@ -12,10 +12,10 @@ import type { AdditionalPropertiesContext, VisitorContext } from "../../types";
 import { isAdditionalPropertiesContext } from "../../../types/guards";
 
 /**
- * additionalPropertiesの値型モデル名を生成
+ * additionalPropertiesの値型コンポーネント名を生成
  *
- * @param contextOrParentName - AdditionalPropertiesContext、VisitorContext、または親モデル名
- * @returns モデル名（例: "MetricsDataItem"）
+ * @param contextOrParentName - AdditionalPropertiesContext、VisitorContext、または親コンポーネント名
+ * @returns コンポーネント名（例: "MetricsDataItem"）
  *
  * @example Context使用
  * ```typescript
@@ -24,15 +24,15 @@ import { isAdditionalPropertiesContext } from "../../../types/guards";
  *   parentSchemaName: "MetricsData",
  *   ...
  * };
- * buildAdditionalPropertiesModelName(context)  // => "MetricsDataItem"
+ * buildAdditionalPropertiesComponentName(context)  // => "MetricsDataItem"
  * ```
  *
  * @example 文字列使用（後方互換性）
  * ```typescript
- * buildAdditionalPropertiesModelName("MetricsData")  // => "MetricsDataItem"
+ * buildAdditionalPropertiesComponentName("MetricsData")  // => "MetricsDataItem"
  * ```
  */
-export function buildAdditionalPropertiesModelName(
+export function buildAdditionalPropertiesComponentName(
   contextOrParentName: AdditionalPropertiesContext | VisitorContext | string,
 ): string {
   let parentName: string;
@@ -46,7 +46,7 @@ export function buildAdditionalPropertiesModelName(
   } else {
     // その他のVisitorContext（循環依存回避のため、親名を外部から渡す想定）
     consola.warn(
-      "buildAdditionalPropertiesModelName requires AdditionalPropertiesContext or string",
+      "buildAdditionalPropertiesComponentName requires AdditionalPropertiesContext or string",
     );
     return "UnknownItem";
   }
@@ -58,7 +58,7 @@ export function buildAdditionalPropertiesModelName(
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("buildAdditionalPropertiesModelName", () => {
+  describe("buildAdditionalPropertiesComponentName", () => {
     describe("Context-based usage", () => {
       it("should generate model name from AdditionalPropertiesContext", () => {
         const context: AdditionalPropertiesContext = {
@@ -72,7 +72,7 @@ if (import.meta.vitest) {
           rootSegment: "components",
           parentSchemaName: "MetricsData",
         };
-        expect(buildAdditionalPropertiesModelName(context)).toBe(
+        expect(buildAdditionalPropertiesComponentName(context)).toBe(
           "MetricsDataItem",
         );
       });
@@ -80,31 +80,33 @@ if (import.meta.vitest) {
 
     describe("String-based usage (backward compatibility)", () => {
       it("should generate model name with Item suffix", () => {
-        expect(buildAdditionalPropertiesModelName("MetricsData")).toBe(
+        expect(buildAdditionalPropertiesComponentName("MetricsData")).toBe(
           "MetricsDataItem",
         );
-        expect(buildAdditionalPropertiesModelName("Settings")).toBe(
+        expect(buildAdditionalPropertiesComponentName("Settings")).toBe(
           "SettingsItem",
         );
-        expect(buildAdditionalPropertiesModelName("Config")).toBe("ConfigItem");
+        expect(buildAdditionalPropertiesComponentName("Config")).toBe(
+          "ConfigItem",
+        );
       });
 
       it("should work with single-word names", () => {
-        expect(buildAdditionalPropertiesModelName("User")).toBe("UserItem");
-        expect(buildAdditionalPropertiesModelName("Data")).toBe("DataItem");
+        expect(buildAdditionalPropertiesComponentName("User")).toBe("UserItem");
+        expect(buildAdditionalPropertiesComponentName("Data")).toBe("DataItem");
       });
 
       it("should work with PascalCase names", () => {
-        expect(buildAdditionalPropertiesModelName("UserProfile")).toBe(
+        expect(buildAdditionalPropertiesComponentName("UserProfile")).toBe(
           "UserProfileItem",
         );
-        expect(buildAdditionalPropertiesModelName("ApiResponse")).toBe(
+        expect(buildAdditionalPropertiesComponentName("ApiResponse")).toBe(
           "ApiResponseItem",
         );
       });
 
       it("should handle empty string gracefully", () => {
-        expect(buildAdditionalPropertiesModelName("")).toBe("Item");
+        expect(buildAdditionalPropertiesComponentName("")).toBe("Item");
       });
     });
   });

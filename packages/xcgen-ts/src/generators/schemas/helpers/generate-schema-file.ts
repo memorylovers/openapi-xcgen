@@ -1,55 +1,78 @@
 /**
  * スキーマファイル生成
  *
- * IRModel → Valibotスキーマコード（個別ファイル）への変換
+ * IRComponent → Valibotスキーマコード（個別ファイル）への変換
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import {
   generateTypeImports,
   processImports,
 } from "../../../helpers/import-handler";
+import { escapeJSDocComment } from "../../../helpers/jsdoc-comment";
 import { toTypeName } from "../../../helpers/naming";
-import type { HookableInstance } from "../../../hooks";
+import type { TypeGenerationContext } from "../../types/generation-context";
 import { generateSchemaModel } from "../schemas-model";
 import { extractSchemaDependencies } from "./extract-dependencies";
 
 /**
- * 純粋関数: IRModel → Valibotスキーマコード
+ * 純粋関数: IRComponent → Valibotスキーマコード
  *
  * 個別のスキーマファイルを生成する。依存する他のスキーマのimport文も自動生成される。
  *
- * @param model - IRModel
- * @param hooks - Hook instance（オプション）
- * @param schemaImports - Hook経由で追加されたimport（オプション）
+ * @param model - IRComponent
+ * @param ctx - Type generation context
  * @returns Valibotスキーマコード（null: 生成スキップ）
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   properties: [...]
  * };
- * generateSchemaFile(model);
+ * generateSchemaFile(model, ctx);
  * // => "/**\n * Valibot validation schema for User\n * ...\n *\/\n\nimport * as v from "valibot";\n\nexport const UserSchema = ..."
  * ```
  */
 export function generateSchemaFile(
-  model: IRModel,
-  hooks?: HookableInstance,
-  schemaImports?: string[],
+  model: IRComponent,
+  ctx: TypeGenerationContext,
 ): string | null {
-  const schemaCode = generateSchemaModel(model, hooks);
+  const schemaCode = generateSchemaModel(model, ctx);
 
   if (!schemaCode) {
     return null;
   }
 
+  // schemaFile:generate Hook を呼び出して追加インポートを取得
+  let customImports: string[] = [];
+  let finalSchemaCode = schemaCode;
+  let finalComment = `Valibot validation schema for ${model.name}\nAuto-generated from OpenAPI specification`;
+
+  if (ctx.hooks) {
+    const tsCode = {
+      name: toTypeName(model.name),
+      code: schemaCode,
+      imports: [],
+      comment: `Valibot validation schema for ${model.name}\nAuto-generated from OpenAPI specification`,
+    };
+    ctx.hooks.callHook("schemaFile:generate", {
+      model,
+      tsCode,
+      extensions: "extensions" in model ? model.extensions : undefined,
+    });
+    customImports = tsCode.imports;
+    finalSchemaCode = tsCode.code;
+    finalComment = tsCode.comment ?? finalComment;
+  }
+
   const lines: string[] = [];
   lines.push("/**");
-  lines.push(` * Valibot validation schema for ${model.name}`);
-  lines.push(" * Auto-generated from OpenAPI specification");
+  const commentLines = finalComment.split("\n");
+  for (const line of commentLines) {
+    lines.push(` * ${escapeJSDocComment(line)}`);
+  }
   lines.push(" */");
   lines.push("");
   lines.push('import * as v from "valibot";');
@@ -57,8 +80,8 @@ export function generateSchemaFile(
   // Hookで追加されたインポートを処理
   let rawImports: string[] = [];
   let typeNames: string[] = [];
-  if (schemaImports && schemaImports.length > 0) {
-    const processed = processImports(schemaImports);
+  if (customImports.length > 0) {
+    const processed = processImports(customImports);
     rawImports = processed.rawImports;
     typeNames = processed.typeNames;
   }
@@ -94,18 +117,26 @@ export function generateSchemaFile(
   // if (rawImports.length > 0 || allTypeImports.size > 0) {
   lines.push("");
   // }
-  lines.push(schemaCode);
+  lines.push(finalSchemaCode);
 
   return lines.join("\n");
 }
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("generateSchemaFile", () => {
     it("should generate schema file with header", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "User",
         referencePath: "#/components/schemas/User",
@@ -118,7 +149,7 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       expect(result).toContain("/**");
       expect(result).toContain(" * Valibot validation schema for User");
@@ -129,25 +160,28 @@ if (import.meta.vitest) {
     });
 
     it("should generate imports for referenced schemas", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       expect(result).toContain(
         "import { ProductSchema } from './ProductSchema';",
@@ -157,7 +191,7 @@ if (import.meta.vitest) {
     });
 
     it("should not import self-reference", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "TreeNode",
         referencePath: "#/components/schemas/TreeNode",
@@ -171,20 +205,20 @@ if (import.meta.vitest) {
             name: "children",
             type: {
               kind: "ref",
-              name: "#/components/schemas/TreeNodeChildren", // 配列は独立したモデルとして抽出される
+              referencePath: "#/components/schemas/TreeNodeChildren", // 配列は独立したモデルとして抽出される
             },
           },
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       expect(result).not.toContain("import { TreeNodeSchema }");
       expect(result).toContain("export const TreeNodeSchema = v.object({");
     });
 
     it("should return null for parameter models", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "parameter",
         name: "GetUserParams",
         referencePath: "#/paths/~1users~1{userId}/get/parameters",
@@ -198,37 +232,37 @@ if (import.meta.vitest) {
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       // generateSchemaModel() がparameterモデルに対してnullを返す
       expect(result).toBeNull();
     });
 
     it("should sort imports alphabetically", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
         properties: [
           {
             name: "zzzItem",
-            type: { kind: "ref", name: "#/components/schemas/ZItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/ZItem" },
             required: true,
           },
           {
             name: "aaaItem",
-            type: { kind: "ref", name: "#/components/schemas/AItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/AItem" },
             required: true,
           },
           {
             name: "mmmItem",
-            type: { kind: "ref", name: "#/components/schemas/MItem" },
+            type: { kind: "ref", referencePath: "#/components/schemas/MItem" },
             required: true,
           },
         ],
       };
 
-      const result = generateSchemaFile(model);
+      const result = generateSchemaFile(model, mockCtx);
 
       const lines = result!.split("\n");
       const importLines = lines.filter(

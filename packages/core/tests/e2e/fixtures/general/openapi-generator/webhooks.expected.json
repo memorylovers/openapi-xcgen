@@ -3,7 +3,7 @@
     "title": "Webhook Example",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Pet",

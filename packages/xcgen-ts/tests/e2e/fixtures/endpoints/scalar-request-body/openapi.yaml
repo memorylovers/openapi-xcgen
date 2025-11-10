@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: Scalar Request Body API
+  version: 1.0.0
+  description: Test API for scalar type requestBody (string, binary, number, etc.)
+
+paths:
+  /log:
+    post:
+      operationId: postLog
+      summary: Post a log message
+      description: Upload a plain text log message
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '204':
+          description: Log message received
+
+  /upload:
+    post:
+      operationId: uploadFile
+      summary: Upload a binary file
+      description: Upload file as binary data
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: File uploaded
+
+  /data:
+    post:
+      operationId: postData
+      summary: Post numeric data
+      description: Post a single number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: number
+      responses:
+        '200':
+          description: Data received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: number
+
+  /files/{fileId}:
+    put:
+      operationId: updateFileContent
+      summary: Update file content with metadata
+      description: Update file with path parameter and text content
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Author
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: File updated
+
+  /upload/{uploadId}:
+    post:
+      operationId: uploadWithMetadata
+      summary: Upload file with metadata
+      description: Upload binary file with query parameters
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: compress
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: File uploaded with metadata

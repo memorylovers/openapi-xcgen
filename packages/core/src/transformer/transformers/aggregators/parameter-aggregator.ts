@@ -1,15 +1,15 @@
 /**
  * Parameter Aggregator - v2 Transformer Architecture
  *
- * 複数のパラメータを1つの統合モデル（IRParameterModel）に集約します。
+ * 複数のパラメータを1つの統合コンポーネント（IRParameterComponent）に集約します。
  * Aggregatorレイヤーは、Transformerで生成されたIRParameterを受け取り、
- * それらをまとめてパラメータ統合モデルを生成する責務を持ちます。
+ * それらをまとめてパラメータ統合コンポーネントを生成する責務を持ちます。
  */
 
 import { pascalCase } from "es-toolkit/string";
 import type {
   IRParameter,
-  IRParameterModel,
+  IRParameterComponent,
   IRParameterProperty,
   IRRef,
 } from "../../../types";
@@ -18,7 +18,7 @@ import type { VisitorContext } from "../../types";
 import type { ParameterAggregationResult } from "../types";
 
 /**
- * パラメータを統合モデルに集約
+ * パラメータを統合コンポーネントに集約
  *
  * @param parameters - IRParameter配列（parameters-traverserの出力）
  * @param context - Visitorコンテキスト（operationコンテキスト）
@@ -59,8 +59,8 @@ export function aggregateParameters(
     };
   }
 
-  // 統合モデル名を生成
-  const modelName = generateParameterModelName(pathTemplate, method);
+  // 統合コンポーネント名を生成
+  const modelName = generateParameterComponentName(pathTemplate, method);
   const referencePath = buildReferencePath([
     ...context.documentPath,
     modelName,
@@ -74,8 +74,8 @@ export function aggregateParameters(
   // パラメータの説明を生成
   const description = generateDescription(parameters, pathTemplate, method);
 
-  // 統合モデルを生成
-  const model: IRParameterModel = {
+  // 統合コンポーネントを生成
+  const model: IRParameterComponent = {
     kind: "parameter",
     name: modelName,
     referencePath,
@@ -86,7 +86,7 @@ export function aggregateParameters(
   // 参照を生成
   const reference: IRRef = {
     kind: "ref",
-    name: referencePath,
+    referencePath: referencePath,
   };
 
   return {
@@ -96,9 +96,9 @@ export function aggregateParameters(
 }
 
 /**
- * パラメータ統合モデル名を生成
+ * パラメータ統合コンポーネント名を生成
  *
- * パステンプレートとHTTPメソッドから、一意のモデル名を生成します。
+ * パステンプレートとHTTPメソッドから、一意のコンポーネント名を生成します。
  * パスパラメータ（{id}など）も名前に含めて一意性を確保します。
  *
  * @param pathTemplate - パステンプレート（例: "/users/{id}/posts"）
@@ -107,17 +107,17 @@ export function aggregateParameters(
  *
  * @example
  * ```typescript
- * generateParameterModelName("/pets", "get")
+ * generateParameterComponentName("/pets", "get")
  * // => "GetPetsParams"
  *
- * generateParameterModelName("/pets/{petId}", "get")
+ * generateParameterComponentName("/pets/{petId}", "get")
  * // => "GetPetsPetIdParams"
  *
- * generateParameterModelName("/users/{id}/posts", "get")
+ * generateParameterComponentName("/users/{id}/posts", "get")
  * // => "GetUsersIdPostsParams"
  * ```
  */
-function generateParameterModelName(
+function generateParameterComponentName(
   pathTemplate: string,
   method: string,
 ): string {
@@ -169,7 +169,7 @@ function convertToParameterProperty(
 }
 
 /**
- * パラメータ統合モデルの説明を生成
+ * パラメータ統合コンポーネントの説明を生成
  *
  * @param parameters - パラメータ配列
  * @param pathTemplate - パステンプレート
@@ -234,7 +234,7 @@ if (import.meta.vitest) {
 
       expect(result.reference).toEqual({
         kind: "ref",
-        name: "#/paths/::users::{id}/get/GetUsersIdParams",
+        referencePath: "#/paths/::users::{id}/get/GetUsersIdParams",
       });
 
       expect(result.model).not.toBeNull();
@@ -421,24 +421,26 @@ if (import.meta.vitest) {
     });
   });
 
-  describe("generateParameterModelName", () => {
+  describe("generateParameterComponentName", () => {
     it("should generate unique parameter model names including path parameters", () => {
       // /pets と /pets/{petId} で異なる名前になることを確認
-      expect(generateParameterModelName("/pets", "get")).toBe("GetPetsParams");
-      expect(generateParameterModelName("/pets/{petId}", "get")).toBe(
+      expect(generateParameterComponentName("/pets", "get")).toBe(
+        "GetPetsParams",
+      );
+      expect(generateParameterComponentName("/pets/{petId}", "get")).toBe(
         "GetPetsPetIdParams",
       );
     });
 
     it("should generate parameter model name including path parameters", () => {
-      expect(generateParameterModelName("/users/{id}", "get")).toBe(
+      expect(generateParameterComponentName("/users/{id}", "get")).toBe(
         "GetUsersIdParams",
       );
-      expect(generateParameterModelName("/users/{id}/posts", "get")).toBe(
+      expect(generateParameterComponentName("/users/{id}/posts", "get")).toBe(
         "GetUsersIdPostsParams",
       );
       expect(
-        generateParameterModelName(
+        generateParameterComponentName(
           "/api/v1/users/{userId}/posts/{postId}",
           "patch",
         ),
@@ -446,21 +448,23 @@ if (import.meta.vitest) {
     });
 
     it("should handle paths without parameters", () => {
-      expect(generateParameterModelName("/users", "get")).toBe(
+      expect(generateParameterComponentName("/users", "get")).toBe(
         "GetUsersParams",
       );
-      expect(generateParameterModelName("/api/v1/search", "post")).toBe(
+      expect(generateParameterComponentName("/api/v1/search", "post")).toBe(
         "PostApiV1SearchParams",
       );
     });
 
     it("should handle root path", () => {
-      expect(generateParameterModelName("/", "get")).toBe("GetParams");
+      expect(generateParameterComponentName("/", "get")).toBe("GetParams");
     });
 
     it("should handle paths with only parameters", () => {
-      expect(generateParameterModelName("/{id}", "get")).toBe("GetIdParams");
-      expect(generateParameterModelName("/{category}/{id}", "delete")).toBe(
+      expect(generateParameterComponentName("/{id}", "get")).toBe(
+        "GetIdParams",
+      );
+      expect(generateParameterComponentName("/{category}/{id}", "delete")).toBe(
         "DeleteCategoryIdParams",
       );
     });

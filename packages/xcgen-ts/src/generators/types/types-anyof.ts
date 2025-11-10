@@ -1,34 +1,36 @@
 /**
  * TypeScript AnyOf型生成
  *
- * IRAnyOfModelからTypeScriptのunion typeを生成する
+ * IRAnyOfSchemaからTypeScriptのunion typeを生成する
  */
 
-import type { IRModel } from "@openapi-xcgen/core";
+import type { IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
- * IRAnyOfModelからTypeScript union typeを生成
- * @param model - IRAnyOfModel
+ * IRAnyOfSchemaからTypeScript union typeを生成
+ * @param model - IRAnyOfSchema
  * @returns TypeScript union type定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "anyOf",
  *   name: "Pet",
  *   referencePath: "#/components/schemas/Pet",
  *   schemas: [
- *     { kind: "ref", name: "Cat", referencePath: "#/components/schemas/Cat" },
- *     { kind: "ref", name: "Dog", referencePath: "#/components/schemas/Dog" }
+ *     { kind: "ref", referencePath: "Cat", referencePath: "#/components/schemas/Cat" },
+ *     { kind: "ref", referencePath: "Dog", referencePath: "#/components/schemas/Dog" }
  *   ],
  * };
  * generateAnyOfType(model);
  * // => "export type Pet = Cat | Dog;"
  * ```
  */
-export function generateAnyOfType(model: IRModel & { kind: "anyOf" }): string {
+export function generateAnyOfType(
+  model: IRComponent & { kind: "anyOf" },
+): string {
   const typeName = toTypeName(model.name);
   const types = model.schemas.map((schema) => irTypeToTsType(schema));
 
@@ -52,18 +54,18 @@ if (import.meta.vitest) {
   describe("types-anyof", () => {
     describe("generateAnyOfType", () => {
       it("should generate basic anyOf type", () => {
-        const model: IRModel & { kind: "anyOf" } = {
+        const model: IRComponent & { kind: "anyOf" } = {
           kind: "anyOf",
           name: "Pet",
           referencePath: "#/components/schemas/Pet",
           schemas: [
             {
               kind: "ref",
-              name: "Cat",
+              referencePath: "Cat",
             },
             {
               kind: "ref",
-              name: "Dog",
+              referencePath: "Dog",
             },
           ],
         };
@@ -74,7 +76,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate anyOf with description", () => {
-        const model: IRModel & { kind: "anyOf" } = {
+        const model: IRComponent & { kind: "anyOf" } = {
           kind: "anyOf",
           name: "Animal",
           referencePath: "#/components/schemas/Animal",
@@ -82,11 +84,11 @@ if (import.meta.vitest) {
           schemas: [
             {
               kind: "ref",
-              name: "Cat",
+              referencePath: "Cat",
             },
             {
               kind: "ref",
-              name: "Dog",
+              referencePath: "Dog",
             },
           ],
         };
@@ -104,22 +106,22 @@ export type Animal = Cat | Dog;
       });
 
       it("should generate anyOf with multiple schemas", () => {
-        const model: IRModel & { kind: "anyOf" } = {
+        const model: IRComponent & { kind: "anyOf" } = {
           kind: "anyOf",
           name: "Shape",
           referencePath: "#/components/schemas/Shape",
           schemas: [
             {
               kind: "ref",
-              name: "Circle",
+              referencePath: "Circle",
             },
             {
               kind: "ref",
-              name: "Square",
+              referencePath: "Square",
             },
             {
               kind: "ref",
-              name: "Triangle",
+              referencePath: "Triangle",
             },
           ],
         };

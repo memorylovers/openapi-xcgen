@@ -7,7 +7,7 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
+  IRComponent,
   IRType,
   OperationObject,
   ParameterObject,
@@ -29,7 +29,7 @@ import { traverseResponses } from "./responses-traverser";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: IRType | null; models: IRModel[] };
+) => { type: IRType | null; components: IRComponent[] };
 
 /**
  * OperationObjectを訪問し、parameters、requestBody、responsesを処理
@@ -69,7 +69,7 @@ export function traverseOperation(
     `Traversing operation at: ${buildReferencePath(context.documentPath)}`,
   );
 
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
 
   // 1. parametersを処理（PathItemとOperationレベルをマージ）
   // PathItem レベルのパラメータ（$ref は警告してスキップ）
@@ -335,8 +335,8 @@ if (import.meta.vitest) {
       };
 
       const mockVisitSchema = vi.fn().mockReturnValue({
-        type: { kind: "ref", name: "#/test" },
-        models: [],
+        type: { kind: "ref", referencePath: "#/test" },
+        components: [],
       });
 
       const context: VisitorContext = {
@@ -393,7 +393,7 @@ if (import.meta.vitest) {
 
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: "string",
-        models: [],
+        components: [],
       });
 
       const context: VisitorContext = {

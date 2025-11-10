@@ -28,7 +28,7 @@ import type { TransformResult } from "../types";
  *
  * @param schema - 変換対象のスキーマ
  * @param context - Visitorコンテキスト（現在は使用していないが、将来の拡張用）
- * @returns 変換結果（type: IRType, models: []）
+ * @returns 変換結果（type: IRType, components: []）
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -62,8 +62,8 @@ export function transformPrimitive(
   if (isReferenceObject(schema)) {
     // IRRef設計に従い完全パス形式を使用
     return {
-      type: { kind: "ref", name: schema.$ref },
-      models: [],
+      type: { kind: "ref", referencePath: schema.$ref },
+      components: [],
     };
   }
 
@@ -76,7 +76,7 @@ export function transformPrimitive(
     if (scalarType) {
       return {
         type: scalarType,
-        models: [],
+        components: [],
       };
     }
   }
@@ -93,7 +93,7 @@ export function transformPrimitive(
       if (scalarType) {
         return {
           type: scalarType,
-          models: [],
+          components: [],
         };
       }
     }
@@ -101,7 +101,7 @@ export function transformPrimitive(
     if (schema.type.length === 1 && schema.type[0] === "null") {
       return {
         type: "null",
-        models: [],
+        components: [],
       };
     }
   }
@@ -132,7 +132,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
       expect(result.type).toEqual("string");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should resolve integer with format", () => {
@@ -145,7 +145,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
       expect(result.type).toEqual("long");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should resolve string with date format", () => {
@@ -164,7 +164,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
       expect(result.type).toEqual("datetime");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should return error result for array types (should use dispatchSchema)", () => {
@@ -224,9 +224,9 @@ if (import.meta.vitest) {
       });
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/User",
+        referencePath: "#/components/schemas/User",
       });
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should return error result for empty schemas", () => {
@@ -299,7 +299,7 @@ if (import.meta.vitest) {
       });
       // nullableはプロパティレベルで管理されるため、scalar typeにはnullableプロパティがない
       expect(result.type).toEqual("string");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle format in primitive", () => {
@@ -313,7 +313,7 @@ if (import.meta.vitest) {
       });
       // email formatは通常のstringとして扱われる
       expect(result.type).toEqual("string");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle special format in primitive", () => {
@@ -327,7 +327,7 @@ if (import.meta.vitest) {
       });
       // date-time formatは特別な型として扱われる
       expect(result.type).toEqual("datetime");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle null type (OpenAPI 3.1)", () => {
@@ -340,7 +340,7 @@ if (import.meta.vitest) {
       });
       // OpenAPI 3.1のnull型は特別なスカラー型として扱う
       expect(result.type).toEqual("null");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle array type with null (OpenAPI 3.1)", () => {
@@ -353,7 +353,7 @@ if (import.meta.vitest) {
       });
       // 型配列の最初の非null型を返す（nullableはプロパティレベルで処理）
       expect(result.type).toEqual("string");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle array type with only null (OpenAPI 3.1)", () => {
@@ -366,7 +366,7 @@ if (import.meta.vitest) {
       });
       // null型のみの配列はnull型として扱う
       expect(result.type).toEqual("null");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
   });
 }

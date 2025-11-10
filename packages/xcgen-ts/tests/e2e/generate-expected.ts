@@ -182,6 +182,7 @@ async function main() {
       "models/inline-schemas",
       // Endpoints fixtures
       "endpoints/parameter-override",
+      "endpoints/scalar-request-body",
       // Validation fixture
       "validation",
       // Hooks fixtures (valibot only)

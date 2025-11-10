@@ -8,7 +8,7 @@
 
 import { consola } from "consola";
 import type {
-  IRModel,
+  IRComponent,
   IRParameter,
   ParameterObject,
   ReferenceObject,
@@ -52,7 +52,7 @@ export function traverseParameters(
   }
 
   const visitedParameters: ParametersTraversalResult["parameters"] = [];
-  const allChildModels: IRModel[] = [];
+  const allChildModels: IRComponent[] = [];
 
   // 各パラメータを訪問
   parameters.forEach((param, index) => {
@@ -95,7 +95,7 @@ export function traverseParameters(
       ...(irParam.extensions && { extensions: irParam.extensions }),
     });
 
-    allChildModels.push(...result.models);
+    allChildModels.push(...result.components);
   });
 
   return {
@@ -307,7 +307,7 @@ if (import.meta.vitest) {
       expect(result.parameters[0].name).toBe("tags");
       expect(result.parameters[0].type).toEqual({
         kind: "ref",
-        name: expect.stringMatching(/Tags$/),
+        referencePath: expect.stringMatching(/Tags$/),
       });
       // Array parameters create child models
       expect(result.childModels).toHaveLength(1);

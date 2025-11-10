@@ -4,16 +4,16 @@
  * IRPropertyからTypeScriptのプロパティ定義を生成する
  */
 
-import type { IRModel, IRProperty } from "@openapi-xcgen/core";
+import type { IRComponent, IRProperty } from "@openapi-xcgen/core";
 import { toPropertyName } from "../../helpers/naming";
 import { applyTypeModifiers, irTypeToTsType } from "../../helpers/type-mapper";
-import type { HookableInstance } from "../../hooks/create-hooks";
+import type { TypeGenerationContext } from "./generation-context";
 
 /**
  * IRPropertyからTypeScriptプロパティ定義を生成
  * @param prop - IRProperty
  * @param model - 親モデル（Hook用のコンテキスト）
- * @param hooks - Hook instance（オプション）
+ * @param ctx - Type generation context
  * @returns TypeScriptプロパティ定義文字列
  *
  * @example
@@ -23,20 +23,20 @@ import type { HookableInstance } from "../../hooks/create-hooks";
  *   type: "string",
  *   required: true,
  * };
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   referencePath: "#/components/schemas/User",
  *   properties: []
  * };
- * generateProperty(prop, model);
+ * generateProperty(prop, model, ctx);
  * // => "email: string;"
  * ```
  */
 export function generateProperty(
   prop: IRProperty,
-  model: IRModel,
-  hooks?: HookableInstance,
+  model: IRComponent,
+  ctx: TypeGenerationContext,
 ): string {
   const propName = toPropertyName(prop.name);
   const baseType = irTypeToTsType(prop.type);
@@ -50,8 +50,8 @@ export function generateProperty(
   };
 
   // 2. Hook を呼び出し（同期、純粋関数）
-  if (hooks) {
-    hooks.callHook("property:generate", {
+  if (ctx.hooks) {
+    ctx.hooks.callHook("property:generate", {
       property: prop,
       model,
       tsCode,
@@ -82,9 +82,17 @@ export function generateProperty(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
-  const mockModel: IRModel = {
+  const mockModel: IRComponent = {
     kind: "object",
     name: "TestModel",
     referencePath: "#/components/schemas/TestModel",
@@ -100,7 +108,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateProperty(prop, mockModel);
+        const result = generateProperty(prop, mockModel, mockCtx);
 
         expect(result).toBe("email: string;");
       });
@@ -111,7 +119,7 @@ if (import.meta.vitest) {
           type: "string",
         };
 
-        const result = generateProperty(prop, mockModel);
+        const result = generateProperty(prop, mockModel, mockCtx);
 
         expect(result).toBe("phone?: string | undefined;");
       });
@@ -124,7 +132,7 @@ if (import.meta.vitest) {
           readOnly: true,
         };
 
-        const result = generateProperty(prop, mockModel);
+        const result = generateProperty(prop, mockModel, mockCtx);
 
         expect(result).toBe("readonly id: number;");
       });
@@ -137,7 +145,7 @@ if (import.meta.vitest) {
           required: true,
         };
 
-        const result = generateProperty(prop, mockModel);
+        const result = generateProperty(prop, mockModel, mockCtx);
 
         expect(result).toBe("deletedAt: string | null;");
       });
@@ -150,10 +158,12 @@ if (import.meta.vitest) {
           description: "User name",
         };
 
-        const result = generateProperty(prop, mockModel);
+        const result = generateProperty(prop, mockModel, mockCtx);
 
         expect(result).toBe("/** User name */ name: string;");
       });
+
+      // Inline化テストは現段階では実施しない（TypeScript生成は常に参照名を使用）
     });
   });
 }

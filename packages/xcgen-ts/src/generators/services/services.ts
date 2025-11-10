@@ -49,7 +49,7 @@ export async function generateServices(
     const filename = kebabCase(tag);
     return {
       path: `services/${filename}.ts`,
-      content: generateServiceFile(tag, endpoints, ir.models, hooks),
+      content: generateServiceFile(tag, endpoints, ir.components, hooks),
     };
   });
 

@@ -1,7 +1,7 @@
 /**
  * TypeScript型定義生成器
  *
- * IRModelからTypeScriptの型定義（interface, type, enum）を生成する
+ * IRComponentからTypeScriptの型定義（interface, type, enum）を生成する
  */
 
 import type { XcgenIR } from "@openapi-xcgen/core";
@@ -10,6 +10,7 @@ import { toTypeName } from "../../helpers/naming";
 import { runInParallel } from "../../helpers/parallel";
 import type { HookableInstance } from "../../hooks";
 import type { GeneratorResult } from "../../types";
+import type { TypeGenerationContext } from "./generation-context";
 import { buildUnifiedParameterTypesMap } from "./helpers/build-unified-parameter-map";
 import { generateModelsIndex } from "./helpers/generate-index";
 import { generateModelFile } from "./helpers/generate-model-file";
@@ -49,11 +50,14 @@ export async function generateTypes(
 ): Promise<GeneratorResult> {
   const files: string[] = [];
 
+  // Create TypeGenerationContext
+  const ctx: TypeGenerationContext = { ir, hooks: _hooks };
+
   // endpointsを走査して、統合型が必要なparameterモデルを検出
   const unifiedParameterTypes = buildUnifiedParameterTypesMap(ir);
 
   // Step 1: IR → Code (純粋関数による変換)
-  const modelFiles = ir.models
+  const modelFiles = ir.components
     .map((model) => {
       const isUnified = unifiedParameterTypes.has(model.referencePath);
       const requestBodyTypeName = isUnified
@@ -62,7 +66,7 @@ export async function generateTypes(
 
       return {
         path: `models/${toTypeName(model.name)}.ts`,
-        content: generateModelFile(model, requestBodyTypeName, _hooks),
+        content: generateModelFile(model, requestBodyTypeName, ctx),
       };
     })
     .filter((f) => f.content !== null) as GeneratedModelFile[];
@@ -75,7 +79,7 @@ export async function generateTypes(
   files.push(...modelFiles.map((f) => f.path));
 
   // Step 3: models/index.ts 生成・書き込み
-  const indexContent = generateModelsIndex(ir.models);
+  const indexContent = generateModelsIndex(ir.components);
   await writer.write("models/index.ts", indexContent);
   files.push("models/index.ts");
 

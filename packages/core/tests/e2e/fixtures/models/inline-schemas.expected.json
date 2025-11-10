@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test cases for inline schema extraction - validates conversion from inline schemas to independent models"
   },
-  "models": [
+  "components": [
     {
       "kind": "enum",
       "name": "RoleEnum",
@@ -54,7 +54,7 @@
           "name": "profile",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/UserProfile"
+            "referencePath": "#/components/schemas/UserProfile"
           }
         }
       ]
@@ -90,7 +90,7 @@
           "name": "category",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-1-parameters::{id}/get/parameters/1/schema/GetTest1ParametersIdParamsCategory"
+            "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/1/schema/GetTest1ParametersIdParamsCategory"
           },
           "in": "query",
           "description": "Optional enum query parameter"
@@ -99,7 +99,7 @@
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-1-parameters::{id}/get/parameters/2/schema/GetTest1ParametersIdParamsStatus"
+            "referencePath": "#/paths/::test-1-parameters::{id}/get/parameters/2/schema/GetTest1ParametersIdParamsStatus"
           },
           "in": "query",
           "required": true,
@@ -212,7 +212,7 @@
           "name": "nested",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-2-request/post/requestBody/content/application::json/PostTest2RequestRequestBodyNested"
+            "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested"
           }
         }
       ],
@@ -221,7 +221,7 @@
     {
       "kind": "object",
       "name": "PostTest2RequestRequestBodyNested",
-      "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/PostTest2RequestRequestBodyNested",
+      "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema/PostTest2RequestRequestBodyNested",
       "properties": [
         {
           "name": "value",
@@ -235,7 +235,7 @@
           "name": "role",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/RoleEnum"
+            "referencePath": "#/components/schemas/RoleEnum"
           }
         }
       ]
@@ -278,7 +278,7 @@
       "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/schema",
       "itemType": {
         "kind": "ref",
-        "name": "#/paths/::test-3-response/get/responses/201/content/application::json/GetTest3Response201ResponseItem"
+        "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/GetTest3Response201ResponseItem"
       }
     },
     {
@@ -294,7 +294,7 @@
           "name": "testStatus",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/StatusEnum"
+            "referencePath": "#/components/schemas/StatusEnum"
           }
         },
         {
@@ -316,7 +316,7 @@
           "name": "result",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResult"
+            "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult"
           }
         }
       ],
@@ -325,13 +325,13 @@
     {
       "kind": "object",
       "name": "GetTest3Response202ResponseResult",
-      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResult",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult",
       "properties": [
         {
           "name": "status",
           "type": {
             "kind": "ref",
-            "name": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResultStatus"
+            "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult/GetTest3Response202ResponseResultStatus"
           }
         }
       ]
@@ -339,7 +339,7 @@
     {
       "kind": "enum",
       "name": "GetTest3Response202ResponseResultStatus",
-      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/GetTest3Response202ResponseResultStatus",
+      "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema/GetTest3Response202ResponseResult/GetTest3Response202ResponseResultStatus",
       "type": "string",
       "values": [
         {
@@ -364,7 +364,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::test-1-parameters::{id}/get/GetTest1ParametersIdParams"
+        "referencePath": "#/paths/::test-1-parameters::{id}/get/GetTest1ParametersIdParams"
       },
       "responses": [
         {
@@ -376,7 +376,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::test-1-parameters::{id}/get/responses/200/content/application::json/schema"
               }
             }
           ]
@@ -398,7 +398,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/paths/::test-2-request/post/requestBody/content/application::json/schema"
+              "referencePath": "#/paths/::test-2-request/post/requestBody/content/application::json/schema"
             }
           }
         ],
@@ -414,7 +414,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-2-request/post/responses/201/content/application::json/schema"
+                "referencePath": "#/paths/::test-2-request/post/responses/201/content/application::json/schema"
               }
             }
           ]
@@ -430,7 +430,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::test-3-response/get/GetTest3ResponseParams"
+        "referencePath": "#/paths/::test-3-response/get/GetTest3ResponseParams"
       },
       "responses": [
         {
@@ -453,7 +453,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-3-response/get/responses/201/content/application::json/schema"
+                "referencePath": "#/paths/::test-3-response/get/responses/201/content/application::json/schema"
               }
             }
           ]
@@ -467,7 +467,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::test-3-response/get/responses/202/content/application::json/schema"
+                "referencePath": "#/paths/::test-3-response/get/responses/202/content/application::json/schema"
               }
             }
           ]
@@ -481,7 +481,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/UserResponse"
+                "referencePath": "#/components/schemas/UserResponse"
               }
             }
           ]

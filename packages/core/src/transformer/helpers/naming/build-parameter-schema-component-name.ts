@@ -1,5 +1,5 @@
 /**
- * パラメータinline schema用のモデル名を生成
+ * パラメータinline schema用のコンポーネント名を生成
  *
  * パラメータのschema（enum, array, objectなど）が独立したモデルとして抽出される際の名前を生成します。
  * 命名規則: {Method}{Path}Params{ParameterName}
@@ -7,30 +7,30 @@
 
 import { pascalCase } from "es-toolkit/string";
 import type { ParameterContext } from "../../types";
-import { buildParameterModelName } from "./build-parameter-model-name";
+import { buildParameterComponentName } from "./build-parameter-component-name";
 
 /**
- * パラメータinline schema用のモデル名を生成
+ * パラメータinline schema用のコンポーネント名を生成
  *
  * パラメータのschema（enum, array, objectなど）が独立したモデルとして抽出される際の名前を生成します。
  * 命名規則: {Method}{Path}Params{ParameterName}
  *
  * @param context - ParameterContext
- * @returns モデル名（例: "GetUsersIdParamsCategory", "PostUsersParamsLimit"）
+ * @returns コンポーネント名（例: "GetUsersIdParamsCategory", "PostUsersParamsLimit"）
  *
  * @example
  * ```typescript
- * buildParameterSchemaModelName(context)
+ * buildParameterSchemaComponentName(context)
  * // => "GetUsersIdParamsCategory"
  *
- * buildParameterSchemaModelName(context)
+ * buildParameterSchemaComponentName(context)
  * // => "PostUsersParamsLimit"
  * ```
  */
-export function buildParameterSchemaModelName(
+export function buildParameterSchemaComponentName(
   context: ParameterContext,
 ): string {
-  const paramBase = buildParameterModelName(context);
+  const paramBase = buildParameterComponentName(context);
   const paramNamePascal = pascalCase(context.parameterName);
   return `${paramBase}${paramNamePascal}`;
 }
@@ -39,7 +39,7 @@ export function buildParameterSchemaModelName(
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("buildParameterSchemaModelName", () => {
+  describe("buildParameterSchemaComponentName", () => {
     it("should build model name for path parameter", () => {
       const context: ParameterContext = {
         kind: "parameter",
@@ -48,7 +48,9 @@ if (import.meta.vitest) {
         in: "path",
         rootSegment: "paths",
       };
-      expect(buildParameterSchemaModelName(context)).toBe("GetUsersIdParamsId");
+      expect(buildParameterSchemaComponentName(context)).toBe(
+        "GetUsersIdParamsId",
+      );
     });
 
     it("should build model name for query parameter", () => {
@@ -59,7 +61,7 @@ if (import.meta.vitest) {
         in: "query",
         rootSegment: "paths",
       };
-      expect(buildParameterSchemaModelName(context)).toBe(
+      expect(buildParameterSchemaComponentName(context)).toBe(
         "GetUsersParamsCategory",
       );
     });
@@ -77,7 +79,7 @@ if (import.meta.vitest) {
         in: "query",
         rootSegment: "paths",
       };
-      expect(buildParameterSchemaModelName(context)).toBe(
+      expect(buildParameterSchemaComponentName(context)).toBe(
         "PostApiV2UsersUserIdPostsParamsLimit",
       );
     });
@@ -90,7 +92,7 @@ if (import.meta.vitest) {
         in: "header",
         rootSegment: "paths",
       };
-      expect(buildParameterSchemaModelName(context)).toBe(
+      expect(buildParameterSchemaComponentName(context)).toBe(
         "GetPostsParamsXApiKey",
       );
     });
@@ -103,7 +105,7 @@ if (import.meta.vitest) {
         in: "cookie",
         rootSegment: "paths",
       };
-      expect(buildParameterSchemaModelName(context)).toBe(
+      expect(buildParameterSchemaComponentName(context)).toBe(
         "GetSessionParamsSessionId",
       );
     });

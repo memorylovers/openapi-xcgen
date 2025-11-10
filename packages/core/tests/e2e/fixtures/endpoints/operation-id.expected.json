@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test operationId as optional field per OpenAPI specification"
   },
-  "models": [
+  "components": [
     {
       "kind": "parameter",
       "name": "GetUsersIdParams",
@@ -48,7 +48,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{id}/get/GetUsersIdParams"
+        "referencePath": "#/paths/::users::{id}/get/GetUsersIdParams"
       },
       "responses": [
         {

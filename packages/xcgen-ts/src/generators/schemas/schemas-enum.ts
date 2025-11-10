@@ -2,10 +2,10 @@
  * Enumスキーマ生成
  */
 
-import type { IREnumModel } from "@openapi-xcgen/core";
+import type { IREnumSchema } from "@openapi-xcgen/core";
 
 /**
- * IREnumModelのValibotスキーマを生成
+ * IREnumSchemaのValibotスキーマを生成
  * @param model - IREnum モデル
  * @returns Valibotスキーマ文字列
  *
@@ -19,7 +19,7 @@ import type { IREnumModel } from "@openapi-xcgen/core";
  * // => 'v.picklist(["pending", "active", "inactive"])'
  * ```
  */
-export function generateEnumSchema(model: IREnumModel): string {
+export function generateEnumSchema(model: IREnumSchema): string {
   // IREnumValue.valueを取り出して文字列または数値としてシリアライズ
   const serializedValues = model.values.map((enumValue) => {
     const value = enumValue.value;
@@ -42,7 +42,7 @@ if (import.meta.vitest) {
   describe("schemas-enum", () => {
     describe("generateEnumSchema", () => {
       it("should generate picklist for string enum", () => {
-        const model: IREnumModel = {
+        const model: IREnumSchema = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",
@@ -60,7 +60,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate picklist for number enum", () => {
-        const model: IREnumModel = {
+        const model: IREnumSchema = {
           kind: "enum",
           name: "Priority",
           referencePath: "#/components/schemas/Priority",
@@ -78,7 +78,7 @@ if (import.meta.vitest) {
       });
 
       it("should handle mixed string/number enum", () => {
-        const model: IREnumModel = {
+        const model: IREnumSchema = {
           kind: "enum",
           name: "Mixed",
           referencePath: "#/components/schemas/Mixed",
@@ -97,7 +97,7 @@ if (import.meta.vitest) {
       });
 
       it("should escape double quotes in string values", () => {
-        const model: IREnumModel = {
+        const model: IREnumSchema = {
           kind: "enum",
           name: "WithQuotes",
           referencePath: "#/components/schemas/WithQuotes",

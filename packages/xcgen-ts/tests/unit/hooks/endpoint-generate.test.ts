@@ -32,7 +32,8 @@ describe("endpoint:generate hook", () => {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::users/get/responses/200/GetUsers200Response",
+                    referencePath:
+                      "#/paths/::users/get/responses/200/GetUsers200Response",
                   },
                 },
               ],
@@ -289,7 +290,8 @@ export async function listUsers(
                 mimeType: "application/json",
                 schema: {
                   kind: "ref",
-                  name: "#/paths/::users/get/responses/200/GetUsers200Response",
+                  referencePath:
+                    "#/paths/::users/get/responses/200/GetUsers200Response",
                 },
               },
             ],
@@ -424,7 +426,8 @@ export async function getUsers(
                 mimeType: "application/json",
                 schema: {
                   kind: "ref",
-                  name: "#/paths/::users/get/responses/200/GetUsers200Response",
+                  referencePath:
+                    "#/paths/::users/get/responses/200/GetUsers200Response",
                 },
               },
             ],

@@ -5,13 +5,14 @@
 import type { IRExtensions } from "../common/extensions";
 import type { IRScalarType, IRType } from "../common/type";
 import type { IRProperty } from "./property";
+import type { IRValidation } from "./validation";
 
 /**
- * IRObjectModel - オブジェクト型モデル定義
+ * IRObjectSchema - オブジェクト型スキーマ定義
  * componentsで定義されたものと、インラインスキーマから自動生成されたものの両方を含む
  * @example
  * ```yaml
- * # OpenAPI → IRObjectModel
+ * # OpenAPI → IRObjectSchema
  * # パターン1: componentsで定義
  * components:
  *   schemas:
@@ -38,10 +39,10 @@ import type { IRProperty } from "./property";
  *                   type: string
  * ```
  */
-export interface IRObjectModel {
+export interface IRObjectSchema {
   /** 型種別 */
   kind: "object";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /**
    * 参照パス（$refで参照される際のパス）
@@ -50,7 +51,7 @@ export interface IRObjectModel {
    * - インラインスキーマ: `#/paths/::users/post/requestBody/PostUsersRequestBody`
    */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
   /** プロパティの配列 */
   properties: IRProperty[];
@@ -83,11 +84,11 @@ export interface IREnumValue {
 }
 
 /**
- * IREnumModel - 列挙型モデル定義
+ * IREnumSchema - 列挙型スキーマ定義
  * componentsで定義されたものと、インラインenumから自動生成されたものの両方を含む
  * @example
  * ```yaml
- * # OpenAPI → IREnumModel
+ * # OpenAPI → IREnumSchema
  * # パターン1: componentsで定義
  * components:
  *   schemas:
@@ -102,7 +103,7 @@ export interface IREnumValue {
  *     enum: [active, inactive, pending]
  * ```
  */
-export interface IREnumModel {
+export interface IREnumSchema {
   /** 型種別 */
   kind: "enum";
   /** Enum名（PascalCase） */
@@ -125,46 +126,50 @@ export interface IREnumModel {
 }
 
 /**
- * IRArrayModel - 配列型モデル定義（将来の拡張性のため）
- * 現在は未使用だが、将来的に独立したモデルとしての抽出に備える
+ * IRArraySchema - 配列型スキーマ定義（将来の拡張性のため）
+ * 現在は未使用だが、将来的に独立したコンポーネントとしての抽出に備える
  */
-export interface IRArrayModel {
+export interface IRArraySchema {
   /** 型種別 */
   kind: "array";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
   /** 配列アイテムの型 */
   itemType: IRType;
+  /** バリデーション制約（minItems, maxItemsなど） */
+  validation?: IRValidation;
 }
 
 /**
- * IRMapModel - マップ型モデル定義（将来の拡張性のため）
- * 現在は未使用だが、将来的に独立したモデルとしての抽出に備える
+ * IRMapSchema - マップ型スキーマ定義（将来の拡張性のため）
+ * 現在は未使用だが、将来的に独立したコンポーネントとしての抽出に備える
  */
-export interface IRMapModel {
+export interface IRMapSchema {
   /** 型種別 */
   kind: "map";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
   /** 値の型 */
   valueType: IRType;
+  /** バリデーション制約（minProperties, maxPropertiesなど） */
+  validation?: IRValidation;
 }
 
 /**
- * IRAllOfModel - allOf合成モデル定義
+ * IRAllOfSchema - allOf合成スキーマ定義
  * OpenAPIのallOfキーワードを表現し、複数のスキーマの合成（継承・インターセクション）を表す
  *
  * @example
  * ```yaml
- * # OpenAPI → IRAllOfModel
+ * # OpenAPI → IRAllOfSchema
  * Extended:
  *   allOf:
  *     - $ref: '#/components/schemas/Base'
@@ -179,28 +184,28 @@ export interface IRMapModel {
  * }
  * ```
  */
-export interface IRAllOfModel {
+export interface IRAllOfSchema {
   /** 型種別 */
   kind: "allOf";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
-  /** 合成する型の配列（通常はIRRefまたはインライン型） */
+  /** 合成する型の配列（通常はIRComponentRefまたはインライン型） */
   schemas: IRType[];
   /** OpenAPI拡張フィールド（x-プレフィックス） */
   extensions?: IRExtensions;
 }
 
 /**
- * IRAnyOfModel - anyOf合成モデル定義
+ * IRAnyOfSchema - anyOf合成スキーマ定義
  * OpenAPIのanyOfキーワードを表現し、複数のスキーマのうち1つ以上に適合する（包含的Union）を表す
  *
  * @example
  * ```yaml
- * # OpenAPI → IRAnyOfModel (通常のUnion)
+ * # OpenAPI → IRAnyOfSchema (通常のUnion)
  * Fruit:
  *   anyOf:
  *     - $ref: '#/components/schemas/Apple'
@@ -215,7 +220,7 @@ export interface IRAllOfModel {
  *
  * @example
  * ```yaml
- * # OpenAPI 3.1 → IRAnyOfModel (nullable型パターン)
+ * # OpenAPI 3.1 → IRAnyOfSchema (nullable型パターン)
  * NullableString:
  *   anyOf:
  *     - type: string
@@ -235,14 +240,14 @@ export interface IRAllOfModel {
  * }
  * ```
  */
-export interface IRAnyOfModel {
+export interface IRAnyOfSchema {
   /** 型種別 */
   kind: "anyOf";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
   /** null許容フラグ（anyOf: [{type: X}, {type: 'null'}]パターンで自動検出） */
   nullable?: true;
@@ -279,7 +284,7 @@ export interface IRDiscriminator {
 }
 
 /**
- * IRUnionModel - oneOf合成モデル（排他的Union - exactly one）
+ * IRUnionSchema - oneOf合成スキーマ（排他的Union - exactly one）
  *
  * OpenAPI 3.x の oneOf に対応。
  * TypeSpecでは @oneOf デコレータや discriminated union で生成。
@@ -316,8 +321,8 @@ export interface IRDiscriminator {
  *     propertyName: "petType"
  *   },
  *   types: [
- *     { kind: "ref", name: "#/components/schemas/Cat" },
- *     { kind: "ref", name: "#/components/schemas/Dog" }
+ *     { kind: "ref", referencePath: "#/components/schemas/Cat" },
+ *     { kind: "ref", referencePath: "#/components/schemas/Dog" }
  *   ]
  * }
  * ```
@@ -331,14 +336,14 @@ export interface IRDiscriminator {
  * }
  * ```
  */
-export interface IRUnionModel {
+export interface IRUnionSchema {
   /** 型種別 */
   kind: "union";
-  /** モデル名（PascalCase） */
+  /** コンポーネント名（PascalCase） */
   name: string;
   /** 参照パス */
   referencePath: string;
-  /** モデルの説明 */
+  /** コンポーネントの説明 */
   description?: string;
   /** null許容フラグ（oneOf: [{$ref: X}, {type: 'null'}]パターンで自動検出） */
   nullable?: true;

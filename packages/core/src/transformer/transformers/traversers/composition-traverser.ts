@@ -19,7 +19,7 @@ import type { CompositionTraversalResult } from "../types";
 type VisitSchemaFn = (
   schema: SchemaObjectWithNullable | ReferenceObject,
   context: VisitorContext,
-) => { type: unknown; models: unknown[] };
+) => { type: unknown; components: unknown[] };
 
 /**
  * Composition型スキーマ（allOf/oneOf/anyOf）の各サブスキーマを訪問
@@ -76,7 +76,7 @@ export function traverseComposition(
     }
 
     visitedTypes.push(result.type);
-    allChildModels.push(...result.models);
+    allChildModels.push(...result.components);
   });
 
   // 全てのサブスキーマが失敗した場合
@@ -104,8 +104,8 @@ if (import.meta.vitest) {
       const mockVisitSchema = vi
         .fn()
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/components/schemas/Base" },
-          models: [
+          type: { kind: "ref", referencePath: "#/components/schemas/Base" },
+          components: [
             {
               kind: "object",
               name: "Base",
@@ -115,8 +115,8 @@ if (import.meta.vitest) {
           ],
         })
         .mockReturnValueOnce({
-          type: { kind: "ref", name: "#/components/schemas/Extra" },
-          models: [
+          type: { kind: "ref", referencePath: "#/components/schemas/Extra" },
+          components: [
             {
               kind: "object",
               name: "Extra",
@@ -146,11 +146,11 @@ if (import.meta.vitest) {
       expect(result.schemas).toHaveLength(2);
       expect(result.schemas[0]).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Base",
+        referencePath: "#/components/schemas/Base",
       });
       expect(result.schemas[1]).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Extra",
+        referencePath: "#/components/schemas/Extra",
       });
       expect(result.childModels).toHaveLength(2);
     });
@@ -160,11 +160,11 @@ if (import.meta.vitest) {
         .fn()
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: "number",
-          models: [],
+          components: [],
         });
 
       const schemas = [
@@ -214,15 +214,15 @@ if (import.meta.vitest) {
         .fn()
         .mockReturnValueOnce({
           type: "string",
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: null, // 失敗
-          models: [],
+          components: [],
         })
         .mockReturnValueOnce({
           type: "number",
-          models: [],
+          components: [],
         });
 
       const schemas = [
@@ -258,7 +258,7 @@ if (import.meta.vitest) {
       const warnSpy = vi.spyOn(consola, "warn").mockImplementation(() => {});
       const mockVisitSchema = vi.fn().mockReturnValue({
         type: null,
-        models: [],
+        components: [],
       });
 
       const schemas = [

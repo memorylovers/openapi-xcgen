@@ -1,20 +1,20 @@
 /**
  * TypeScript Enum型生成
  *
- * IREnumModelからTypeScriptのenum/union typeを生成する
+ * IREnumSchemaからTypeScriptのenum/union typeを生成する
  */
 
-import type { IREnumModel, IRModel } from "@openapi-xcgen/core";
+import type { IREnumSchema, IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 
 /**
- * IREnumModelからTypeScript enum/union typeを生成
- * @param model - IREnumModel
+ * IREnumSchemaからTypeScript enum/union typeを生成
+ * @param model - IREnumSchema
  * @returns TypeScript enum/union type定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "enum",
  *   name: "Status",
  *   referencePath: "#/components/schemas/Status",
@@ -28,7 +28,7 @@ import { toTypeName } from "../../helpers/naming";
  * // => 'export type Status = "active" | "inactive";'
  * ```
  */
-export function generateEnumType(model: IREnumModel): string {
+export function generateEnumType(model: IREnumSchema): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
 
@@ -65,7 +65,7 @@ if (import.meta.vitest) {
   describe("types-enum", () => {
     describe("generateEnumType", () => {
       it("should generate string enum as union type", () => {
-        const model: IRModel & { kind: "enum" } = {
+        const model: IRComponent & { kind: "enum" } = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",
@@ -85,7 +85,7 @@ if (import.meta.vitest) {
       });
 
       it("should generate number enum", () => {
-        const model: IRModel & { kind: "enum" } = {
+        const model: IRComponent & { kind: "enum" } = {
           kind: "enum",
           name: "Priority",
           referencePath: "#/components/schemas/Priority",
@@ -111,7 +111,7 @@ export enum Priority {
       });
 
       it("should generate enum with description", () => {
-        const model: IRModel & { kind: "enum" } = {
+        const model: IRComponent & { kind: "enum" } = {
           kind: "enum",
           name: "Role",
           referencePath: "#/components/schemas/Role",

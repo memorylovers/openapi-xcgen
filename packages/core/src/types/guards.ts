@@ -12,8 +12,8 @@ import type {
 } from "../transformer/types";
 import type {
   ArraySchemaObject,
-  IRAllOfModel,
-  IRModel,
+  IRAllOfSchema,
+  IRComponent,
   NonArraySchemaObject,
   ReferenceObject,
   SchemaObject,
@@ -32,10 +32,12 @@ export function isReferenceObject(obj: unknown): obj is ReferenceObject {
 }
 
 /**
- * IRModelがIRAllOfModelかどうかを判定
+ * IRComponentがIRAllOfSchemaかどうかを判定
  */
-export function isIRAllOfModel(model: IRModel): model is IRAllOfModel {
-  return model.kind === "allOf";
+export function isIRAllOfComponent(
+  component: IRComponent,
+): component is IRAllOfSchema {
+  return component.kind === "allOf";
 }
 
 /**
@@ -279,34 +281,34 @@ if (import.meta.vitest) {
       });
     });
 
-    describe("isIRAllOfModel", () => {
+    describe("isIRAllOfComponent", () => {
       it("should identify allOf model", () => {
-        const allOfModel: IRModel = {
+        const allOfModel: IRComponent = {
           kind: "allOf",
           name: "Extended",
           referencePath: "#/components/schemas/Extended",
           schemas: [],
         };
-        expect(isIRAllOfModel(allOfModel)).toBe(true);
+        expect(isIRAllOfComponent(allOfModel)).toBe(true);
       });
 
       it("should return false for other model types", () => {
-        const objectModel: IRModel = {
+        const objectModel: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
           properties: [],
         };
-        expect(isIRAllOfModel(objectModel)).toBe(false);
+        expect(isIRAllOfComponent(objectModel)).toBe(false);
 
-        const enumModel: IRModel = {
+        const enumModel: IRComponent = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",
           type: "string",
           values: [],
         };
-        expect(isIRAllOfModel(enumModel)).toBe(false);
+        expect(isIRAllOfComponent(enumModel)).toBe(false);
       });
     });
 

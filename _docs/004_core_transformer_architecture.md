@@ -113,7 +113,7 @@ traverseObjectProperties(schema, context, visitSchema)
 
 ### Transformer層：変換処理
 
-**責務**: OpenAPIスキーマをIR型（IRModel、IRType）に変換。子要素の訪問はTraverserに委譲済みであるため、自身の変換のみに集中
+**責務**: OpenAPIスキーマをIR型（IRComponent、IRType）に変換。子要素の訪問はTraverserに委譲済みであるため、自身の変換のみに集中
 
 **主要関数**:
 
@@ -127,8 +127,8 @@ traverseObjectProperties(schema, context, visitSchema)
 transformObject(schema, context, propertyResult, additionalResult)
   ↓
   ├─ モデル名・参照パス生成
-  ├─ IRObjectModel作成（propertyResultから取得）
-  └─ 返却: { type: ref, models: [objectModel, ...childModels] }
+  ├─ IRObjectSchema作成（propertyResultから取得）
+  └─ 返却: { type: ref, components: [objectModel, ...childModels] }
 ```
 
 **特徴**:

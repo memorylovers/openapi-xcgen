@@ -4,12 +4,24 @@
  * generateParameterProperty() と Hook 機構の統合動作を検証
  */
 
-import type { IREndpoint, IRParameterProperty } from "@openapi-xcgen/core";
+import type {
+  IREndpoint,
+  IRParameterProperty,
+  XcgenIR,
+} from "@openapi-xcgen/core";
 import { describe, expect, it } from "vitest";
+import type { TypeGenerationContext } from "../../../src/generators/types/generation-context";
 import { generateParameterProperty } from "../../../src/generators/types/types-parameter-property";
 import { createHooks } from "../../../src/hooks";
 
 describe("parameter:generate hook", () => {
+  const mockIR: XcgenIR = {
+    metadata: { title: "Test API", version: "1.0.0" },
+    components: [],
+    tags: [],
+    endpoints: [],
+  };
+
   const mockEndpoint: IREndpoint = {
     path: "/users/{id}",
     method: "get",
@@ -63,7 +75,8 @@ describe("parameter:generate hook", () => {
         },
       });
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual(expected);
     });
@@ -87,7 +100,8 @@ describe("parameter:generate hook", () => {
         required: true,
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("xApiKey: string;");
     });
@@ -116,7 +130,8 @@ describe("parameter:generate hook", () => {
         in: "query",
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(calls).toEqual(["hook1", "hook2"]);
       expect(result).toEqual("data?: Type1 | Type2 | undefined;");
@@ -148,7 +163,8 @@ describe("parameter:generate hook", () => {
         extensions: { "x-type": "UserId" },
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("/** Unique user identifier */ userId: UserId;");
     });
@@ -171,7 +187,8 @@ describe("parameter:generate hook", () => {
         in: "query",
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("filter: string;");
     });
@@ -190,7 +207,8 @@ describe("parameter:generate hook", () => {
         required: true,
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("sort: string | null;");
     });
@@ -215,7 +233,8 @@ describe("parameter:generate hook", () => {
         defaultValue: 10,
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       // Note: defaultValue は tsCode に設定されるが、
       // 実際の出力には含まれない（型定義のため）
@@ -238,7 +257,8 @@ describe("parameter:generate hook", () => {
         required: true,
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("/** Custom parameter comment */ id: string;");
     });
@@ -260,7 +280,8 @@ describe("parameter:generate hook", () => {
         description: "User identifier",
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual(
         "/** User identifier (required) */ userId: string;",
@@ -277,7 +298,8 @@ describe("parameter:generate hook", () => {
       };
 
       // hooks なしで呼び出し
-      const result = generateParameterProperty(parameter, mockEndpoint);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks: undefined };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("limit?: number | undefined;");
     });
@@ -301,7 +323,8 @@ describe("parameter:generate hook", () => {
         extensions: { "x-type": "UUID" },
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual("id: UUID;");
     });
@@ -323,7 +346,8 @@ describe("parameter:generate hook", () => {
         required: true,
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual(
         "/** HTTP Header: Authorization */ authorization: string;",
@@ -349,7 +373,8 @@ describe("parameter:generate hook", () => {
         description: "Use newParam instead",
       };
 
-      const result = generateParameterProperty(parameter, mockEndpoint, hooks);
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
+      const result = generateParameterProperty(parameter, mockEndpoint, ctx);
 
       expect(result).toEqual(
         "/** @deprecated Use newParam instead */ oldParam?: string | undefined;",

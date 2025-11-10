@@ -156,11 +156,11 @@ OpenAPIDocument
 transform() エントリポイント
   ├─ transformMetadata() → IRMetadata
   ├─ transformTags() → IRTag[]
-  ├─ transformComponents() → IRModel[]
+  ├─ transformComponents() → IRComponent[]
   │   └─ dispatchSchema() (再帰的)
   │       ├─ traverse*() (子要素訪問)
   │       └─ transform*() (IR変換)
-  ├─ transformPaths() → IREndpoint[] + IRModel[]
+  ├─ transformPaths() → IREndpoint[] + IRComponent[]
   │   └─ dispatchOperation()
   │       ├─ traverseParameters()
   │       ├─ traverseContent() (requestBody)

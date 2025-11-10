@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "API for testing servers configuration"
   },
-  "models": [
+  "components": [
     {
       "kind": "response",
       "name": "GetHealth200Response",
@@ -37,7 +37,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/paths/::health/get/responses/200/content/application::json/schema"
+                "referencePath": "#/paths/::health/get/responses/200/content/application::json/schema"
               }
             }
           ]

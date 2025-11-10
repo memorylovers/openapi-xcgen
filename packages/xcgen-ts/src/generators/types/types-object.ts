@@ -1,24 +1,24 @@
 /**
  * TypeScript Object型生成
  *
- * IRObjectModelからTypeScriptのinterfaceを生成する
+ * IRObjectSchemaからTypeScriptのinterfaceを生成する
  */
 
-import type { IRModel, IRProperty } from "@openapi-xcgen/core";
+import type { IRComponent, IRProperty } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
 import { irTypeToTsType } from "../../helpers/type-mapper";
-import type { HookableInstance } from "../../hooks";
+import type { TypeGenerationContext } from "./generation-context";
 import { generateProperty } from "./types-property";
 
 /**
- * IRObjectModelからTypeScript interfaceを生成
- * @param model - IRObjectModel (properties を持つモデル)
- * @param hooks - Hook instance（オプション）
+ * IRObjectSchemaからTypeScript interfaceを生成
+ * @param model - IRObjectSchema (properties を持つモデル)
+ * @param ctx - Type generation context
  * @returns TypeScript interface定義文字列
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "User",
  *   referencePath: "#/components/schemas/User",
@@ -26,13 +26,13 @@ import { generateProperty } from "./types-property";
  *     { name: "email", type: "string", required: true }
  *   ],
  * };
- * generateObjectType(model);
+ * generateObjectType(model, ctx);
  * // => "export interface User { ... }"
  * ```
  */
 export function generateObjectType(
-  model: IRModel & { properties: IRProperty[] },
-  hooks?: HookableInstance,
+  model: IRComponent & { properties: IRProperty[] },
+  ctx: TypeGenerationContext,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
@@ -49,7 +49,7 @@ export function generateObjectType(
 
   // プロパティ生成
   for (const prop of model.properties) {
-    const propertyCode = generateProperty(prop, model, hooks);
+    const propertyCode = generateProperty(prop, model, ctx);
     lines.push(`  ${propertyCode}`);
   }
 
@@ -66,12 +66,20 @@ export function generateObjectType(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("types-object", () => {
     describe("generateObjectType", () => {
       it("should generate basic object type", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -89,7 +97,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -102,7 +110,7 @@ export interface User {
       });
 
       it("should generate object with description", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -116,7 +124,7 @@ export interface User {
           ],
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -131,7 +139,7 @@ export interface User {
       });
 
       it("should generate object with additionalProperties", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "Config",
           referencePath: "#/components/schemas/Config",
@@ -145,7 +153,7 @@ export interface User {
           additionalProperties: "string",
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -158,7 +166,7 @@ export interface Config {
       });
 
       it("should generate object with optional properties", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "Profile",
           referencePath: "#/components/schemas/Profile",
@@ -175,7 +183,7 @@ export interface Config {
           ],
         };
 
-        const result = generateObjectType(model);
+        const result = generateObjectType(model, mockCtx);
 
         expect(result).toEqual(
           `

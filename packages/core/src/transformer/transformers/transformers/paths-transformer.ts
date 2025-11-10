@@ -9,7 +9,7 @@ import { consola } from "consola";
 import type {
   IREndpoint,
   IRHttpMethod,
-  IRModel,
+  IRComponent,
   ParameterObject,
   PathsObject,
 } from "../../../types";
@@ -23,7 +23,7 @@ export interface PathsTransformResult {
   /** 抽出されたエンドポイントの配列 */
   endpoints: IREndpoint[];
   /** 抽出されたモデルの配列 */
-  models: IRModel[];
+  components: IRComponent[];
 }
 
 /**
@@ -72,7 +72,7 @@ export function transformPaths(
   rootContext: VisitorContext,
 ): PathsTransformResult {
   const endpoints: IREndpoint[] = [];
-  const models: IRModel[] = [];
+  const components: IRComponent[] = [];
 
   // 各パステンプレートを処理
   for (const [pathTemplate, pathItem] of Object.entries(paths)) {
@@ -117,13 +117,13 @@ export function transformPaths(
       if (operationResult.endpoint) {
         endpoints.push(operationResult.endpoint);
       }
-      models.push(...operationResult.models);
+      components.push(...operationResult.components);
     }
   }
 
   return {
     endpoints,
-    models,
+    components,
   };
 }
 
@@ -143,7 +143,7 @@ if (import.meta.vitest) {
       const result = transformPaths(paths, context);
 
       expect(result.endpoints).toEqual([]);
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should iterate over path templates", () => {
@@ -192,8 +192,8 @@ if (import.meta.vitest) {
       expect(result.endpoints[1].path).toBe("/users/{id}");
       expect(result.endpoints[1].method).toBe("get");
       // Parameter model should be generated (GetUsersIdParams)
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("parameter");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("parameter");
     });
 
     it("should handle multiple HTTP methods on same path", () => {
@@ -237,7 +237,7 @@ if (import.meta.vitest) {
       expect(result.endpoints[1].path).toBe("/users");
       expect(result.endpoints[1].method).toBe("post");
       // RequestBody models should be collected (inline object schema + child models)
-      expect(result.models.length).toBeGreaterThan(0);
+      expect(result.components.length).toBeGreaterThan(0);
     });
 
     it("should skip undefined path items", () => {
@@ -260,7 +260,7 @@ if (import.meta.vitest) {
       // undefinedのパスはスキップされ、有効なパスのみ処理される
       expect(result.endpoints).toHaveLength(1);
       expect(result.endpoints[0].path).toBe("/users");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should handle paths with only non-operation fields", () => {
@@ -281,7 +281,7 @@ if (import.meta.vitest) {
 
       // HTTPメソッドがないので、エンドポイントは生成されない
       expect(result.endpoints).toEqual([]);
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
   });
 }

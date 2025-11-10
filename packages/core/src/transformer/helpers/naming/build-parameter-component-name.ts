@@ -5,18 +5,18 @@ import { pathToComponentBase } from "./path-to-component-base";
 import { parseParameterPath } from "../path/parse-document-path";
 
 /**
- * パラメータのモデル名を生成
+ * パラメータのコンポーネント名を生成
  *
  * @param context - ParameterContext
- * @returns モデル名（例: "GetUsersIdParams"）
+ * @returns コンポーネント名（例: "GetUsersIdParams"）
  *
  * @example
  * ```typescript
  * // context = { documentPath: ["paths", "/users/{id}", "get", "parameters"], ... }
- * buildParameterModelName(context)  // => "GetUsersIdParams"
+ * buildParameterComponentName(context)  // => "GetUsersIdParams"
  * ```
  */
-export function buildParameterModelName(context: ParameterContext): string {
+export function buildParameterComponentName(context: ParameterContext): string {
   const parsed = parseParameterPath(context.documentPath);
   if (!parsed) {
     consola.warn(`Invalid parameter path: ${context.documentPath.join("/")}`);
@@ -33,8 +33,8 @@ export function buildParameterModelName(context: ParameterContext): string {
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
-  describe("buildParameterModelName", () => {
-    it("should build model name for path parameter", () => {
+  describe("buildParameterComponentName", () => {
+    it("should build component name for path parameter", () => {
       const context: ParameterContext = {
         kind: "parameter",
         documentPath: ["paths", "/users/{id}", "get", "parameters"],
@@ -42,10 +42,10 @@ if (import.meta.vitest) {
         in: "path",
         rootSegment: "paths",
       };
-      expect(buildParameterModelName(context)).toBe("GetUsersIdParams");
+      expect(buildParameterComponentName(context)).toBe("GetUsersIdParams");
     });
 
-    it("should build model name for query parameter", () => {
+    it("should build component name for query parameter", () => {
       const context: ParameterContext = {
         kind: "parameter",
         documentPath: ["paths", "/users", "get", "parameters"],
@@ -53,7 +53,7 @@ if (import.meta.vitest) {
         in: "query",
         rootSegment: "paths",
       };
-      expect(buildParameterModelName(context)).toBe("GetUsersParams");
+      expect(buildParameterComponentName(context)).toBe("GetUsersParams");
     });
   });
 }

@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "API for testing readOnly and writeOnly properties"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "User",
@@ -180,7 +180,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/UserCreate"
+              "referencePath": "#/components/schemas/UserCreate"
             }
           }
         ]
@@ -195,7 +195,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]
@@ -210,7 +210,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
+        "referencePath": "#/paths/::users::{userId}/get/GetUsersUserIdParams"
       },
       "responses": [
         {
@@ -222,7 +222,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]
@@ -237,7 +237,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::users::{userId}/patch/PatchUsersUserIdParams"
+        "referencePath": "#/paths/::users::{userId}/patch/PatchUsersUserIdParams"
       },
       "requestBody": {
         "kind": "content",
@@ -246,7 +246,7 @@
             "mimeType": "application/json",
             "schema": {
               "kind": "ref",
-              "name": "#/components/schemas/UserUpdate"
+              "referencePath": "#/components/schemas/UserUpdate"
             }
           }
         ]
@@ -261,7 +261,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/User"
+                "referencePath": "#/components/schemas/User"
               }
             }
           ]

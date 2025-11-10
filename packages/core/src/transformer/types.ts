@@ -1,7 +1,7 @@
 import type {
   IRExtensions,
   IRHttpMethod,
-  IRModel,
+  IRComponent,
   IRResponseHeader,
   IRType,
   MimeType,
@@ -331,5 +331,5 @@ export type SchemaVisitor = (
 
 export interface SchemaTransformationResult {
   type: IRType | null;
-  models: IRModel[];
+  components: IRComponent[];
 }

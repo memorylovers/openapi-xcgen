@@ -1,30 +1,31 @@
 /**
- * IRModelからValibotスキーマ定義への変換
+ * IRComponentからValibotスキーマ定義への変換
  *
- * 各IRModel型に応じたValibotスキーマ定義を生成する
+ * 各IRComponent型に応じたValibotスキーマ定義を生成する
  */
 
-import type { IRExtensions, IRModel } from "@openapi-xcgen/core";
+import type { IRExtensions, IRComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
+import type { TypeGenerationContext } from "../types/generation-context";
 import { generateAllOfSchema } from "./schemas-allof";
 import { generateAnyOfSchema } from "./schemas-anyof";
 import { generateArraySchema } from "./schemas-array";
 import { generateEnumSchema } from "./schemas-enum";
+import { generateMapSchema } from "./schemas-map";
 import { generateObjectSchema, type PropertySchema } from "./schemas-object";
 import { irTypeToValibotSchema } from "./schemas-type-mapper";
 import { irTypeToValibotSchemaRef } from "./schemas-type-ref";
 import { generateUnionSchema } from "./schemas-union";
-import type { HookableInstance } from "../../hooks";
 
 /**
- * IRModelをValibotスキーマ定義に変換
- * @param model - IRモデル
- * @param hooks - Hook instance（オプション）
+ * IRComponentをValibotスキーマ定義に変換
+ * @param model - IRコンポーネント
+ * @param ctx - Type generation context
  * @returns Valibotスキーマ定義コード
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "Pet",
  *   referencePath: "#/components/schemas/Pet",
@@ -34,7 +35,7 @@ import type { HookableInstance } from "../../hooks";
  *   ],
  * };
  *
- * const result = generateSchemaModel(model);
+ * const result = generateSchemaModel(model, ctx);
  * // =>
  * // /**
  * //  * Schema for Pet
@@ -46,8 +47,8 @@ import type { HookableInstance } from "../../hooks";
  * ```
  */
 export function generateSchemaModel(
-  model: IRModel,
-  hooks?: HookableInstance,
+  model: IRComponent,
+  ctx: TypeGenerationContext,
 ): string | null {
   // スキーマ名: {ModelName}Schema
   const schemaName = `${toTypeName(model.name)}Schema`;
@@ -67,14 +68,14 @@ export function generateSchemaModel(
     case "object":
     case "requestBody":
     case "response": {
-      // IRObjectModel → PropertySchema[] → v.object()
+      // IRObjectSchema → PropertySchema[] → v.object()
       const propertySchemas: PropertySchema[] = model.properties.map(
         (prop) => ({
           name: prop.name,
           schema: irTypeToValibotSchema(
             prop.type,
             prop.validation,
-            hooks,
+            ctx,
             prop.extensions,
           ),
           optional: !prop.required,
@@ -98,14 +99,14 @@ export function generateSchemaModel(
       const itemSchema = irTypeToValibotSchema(
         model.itemType,
         undefined,
-        hooks,
+        ctx,
         modelExtensions,
       );
-      // IRArrayModelにはvalidationプロパティがないため、undefinedを渡す
+      // IRArraySchema.validation を渡す（minItems/maxItems → minLength/maxLength）
       schemaExpression = generateArraySchema(
         itemSchema,
-        undefined,
-        hooks,
+        model.validation,
+        ctx,
         modelExtensions,
       );
       break;
@@ -119,10 +120,11 @@ export function generateSchemaModel(
       const valueSchema = irTypeToValibotSchema(
         model.valueType,
         undefined,
-        hooks,
+        ctx,
         modelExtensions,
       );
-      schemaExpression = `v.record(v.string(), ${valueSchema})`;
+      // IRMapSchema.validation を渡す（minProperties/maxProperties → minLength/maxLength）
+      schemaExpression = generateMapSchema(valueSchema, model.validation, ctx);
       break;
     }
 
@@ -152,16 +154,17 @@ export function generateSchemaModel(
             if (typeof type !== "string" && type.kind === "ref") {
               // Core packageはreference path全体を保存: "#/components/schemas/Cat"
               // 最後のセグメントを抽出: "Cat"
-              const modelName = type.name.split("/").at(-1) ?? type.name;
+              const modelName =
+                type.referencePath.split("/").at(-1) ?? type.referencePath;
 
               // Phase 2で自動生成されたmappingから正しいdiscriminator値を取得
               let discriminatorValue = modelName;
               if (discriminator.mapping) {
-                // mappingの中からtype.nameに一致するエントリを探す
+                // mappingの中からtype.referencePathに一致するエントリを探す
                 for (const [key, refPath] of Object.entries(
                   discriminator.mapping,
                 )) {
-                  if (refPath === type.name) {
+                  if (refPath === type.referencePath) {
                     discriminatorValue = key;
                     break;
                   }
@@ -216,12 +219,20 @@ export function generateSchemaModel(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("schemas-model", () => {
     describe("generateSchemaModel", () => {
       it("should generate object schema", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "object",
           name: "User",
           referencePath: "#/components/schemas/User",
@@ -234,7 +245,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateSchemaModel(model);
+        const result = generateSchemaModel(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -249,7 +260,7 @@ export const UserSchema = v.object({
       });
 
       it("should generate enum schema", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "enum",
           name: "Status",
           referencePath: "#/components/schemas/Status",
@@ -260,7 +271,7 @@ export const UserSchema = v.object({
           ],
         };
 
-        const result = generateSchemaModel(model);
+        const result = generateSchemaModel(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -273,7 +284,7 @@ export const StatusSchema = v.picklist(["active", "inactive"]);
       });
 
       it("should return null for parameter model", () => {
-        const model: IRModel = {
+        const model: IRComponent = {
           kind: "parameter",
           name: "GetPetData",
           referencePath: "#/paths/~1pets~1{petId}/get/parameters",
@@ -287,7 +298,7 @@ export const StatusSchema = v.picklist(["active", "inactive"]);
           ],
         };
 
-        const result = generateSchemaModel(model);
+        const result = generateSchemaModel(model, mockCtx);
 
         expect(result).toBeNull();
       });

@@ -4,12 +4,20 @@
  * generateValidationPipes() と Hook 機構の統合動作を検証
  */
 
-import type { IRValidation } from "@openapi-xcgen/core";
+import type { IRValidation, XcgenIR } from "@openapi-xcgen/core";
 import { describe, expect, it } from "vitest";
+import type { TypeGenerationContext } from "../../../src/generators/types/generation-context";
 import { generateValidationPipes } from "../../../src/generators/schemas/schemas-validation";
 import { createHooks } from "../../../src/hooks";
 
 describe("validation:transform hook", () => {
+  const mockIR: XcgenIR = {
+    metadata: { title: "Test API", version: "1.0.0" },
+    components: [],
+    tags: [],
+    endpoints: [],
+  };
+
   describe("Custom validation pipes", () => {
     it("should add custom validation pipe", () => {
       const hooks = createHooks({
@@ -23,11 +31,12 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minLength: 1,
       };
 
-      const result = generateValidationPipes(validation, "string", hooks, {
+      const result = generateValidationPipes(validation, "string", ctx, {
         "x-custom-validation": "isUnique",
       });
 
@@ -42,12 +51,13 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minLength: 1,
         maxLength: 100,
       };
 
-      const result = generateValidationPipes(validation, "string", hooks);
+      const result = generateValidationPipes(validation, "string", ctx);
 
       expect(result).toEqual(["v.custom(myValidator)"]);
     });
@@ -62,13 +72,14 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minLength: 1,
         maxLength: 100,
         pattern: "^[a-z]+$",
       };
 
-      const result = generateValidationPipes(validation, "string", hooks);
+      const result = generateValidationPipes(validation, "string", ctx);
 
       expect(result).toEqual(["v.maxLength(100)", "v.regex(/^[a-z]+$/)"]);
     });
@@ -91,11 +102,12 @@ describe("validation:transform hook", () => {
         ],
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minLength: 1,
       };
 
-      const result = generateValidationPipes(validation, "string", hooks);
+      const result = generateValidationPipes(validation, "string", ctx);
 
       expect(calls).toEqual(["hook1", "hook2"]);
       expect(result).toEqual(["v.minLength(1)", "v.hook1()", "v.hook2()"]);
@@ -124,11 +136,12 @@ describe("validation:transform hook", () => {
         ],
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         format: "email",
       };
 
-      const result = generateValidationPipes(validation, "string", hooks, {
+      const result = generateValidationPipes(validation, "string", ctx, {
         "x-validation": "isUnique",
       });
 
@@ -142,18 +155,20 @@ describe("validation:transform hook", () => {
 
   describe("No hooks registered", () => {
     it("should work without hooks", () => {
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks: undefined };
       const validation: IRValidation = {
         minLength: 1,
         maxLength: 100,
       };
 
-      const result = generateValidationPipes(validation, "string");
+      const result = generateValidationPipes(validation, "string", ctx);
 
       expect(result).toEqual(["v.minLength(1)", "v.maxLength(100)"]);
     });
 
     it("should return empty array for undefined validation", () => {
-      const result = generateValidationPipes(undefined, "string");
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks: undefined };
+      const result = generateValidationPipes(undefined, "string", ctx);
 
       expect(result).toEqual([]);
     });
@@ -172,12 +187,13 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minimum: 0,
         maximum: 100,
       };
 
-      const result = generateValidationPipes(validation, "int", hooks, {
+      const result = generateValidationPipes(validation, "int", ctx, {
         "x-precision": 2,
       });
 
@@ -201,11 +217,12 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         format: "uuid",
       };
 
-      const result = generateValidationPipes(validation, "string", hooks);
+      const result = generateValidationPipes(validation, "string", ctx);
 
       expect(result).toEqual(["v.uuid()", "v.custom(isValidUuidVersion)"]);
     });
@@ -225,11 +242,12 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         pattern: "^[A-Z]{2}\\d{6}$",
       };
 
-      const result = generateValidationPipes(validation, "string", hooks, {
+      const result = generateValidationPipes(validation, "string", ctx, {
         "x-pattern-description": "Country code followed by 6 digits",
       });
 
@@ -258,13 +276,14 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minLength: 1,
         maxLength: 100,
         pattern: "^[a-zA-Z0-9]+$",
       };
 
-      const result = generateValidationPipes(validation, "string", hooks, {
+      const result = generateValidationPipes(validation, "string", ctx, {
         "x-sanitize": true,
         "x-deprecated-validation": true,
       });
@@ -288,6 +307,7 @@ describe("validation:transform hook", () => {
         },
       });
 
+      const ctx: TypeGenerationContext = { ir: mockIR, hooks };
       const validation: IRValidation = {
         minLength: 1,
         maxLength: 10,
@@ -295,7 +315,7 @@ describe("validation:transform hook", () => {
 
       const arrayType = { kind: "array" as const, itemType: "string" as const };
 
-      const result = generateValidationPipes(validation, arrayType, hooks);
+      const result = generateValidationPipes(validation, arrayType, ctx);
 
       expect(result).toEqual([
         "v.minLength(1)",

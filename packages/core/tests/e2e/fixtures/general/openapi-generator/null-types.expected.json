@@ -3,7 +3,7 @@
     "title": "Example",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Person",
@@ -25,35 +25,35 @@
           "name": "maidenName",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PersonMaidenName"
+            "referencePath": "#/components/schemas/Person/PersonMaidenName"
           }
         },
         {
           "name": "address",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PersonAddress"
+            "referencePath": "#/components/schemas/Person/PersonAddress"
           }
         },
         {
           "name": "secondHomeAddress",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/Nullable.Address"
+            "referencePath": "#/components/schemas/Nullable.Address"
           }
         },
         {
           "name": "skills",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PersonSkills"
+            "referencePath": "#/components/schemas/Person/PersonSkills"
           }
         },
         {
           "name": "nullableSkillsVariant2",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/PersonNullableSkillsVariant2"
+            "referencePath": "#/components/schemas/Person/PersonNullableSkillsVariant2"
           }
         }
       ]
@@ -61,7 +61,7 @@
     {
       "kind": "union",
       "name": "PersonMaidenName",
-      "referencePath": "#/components/schemas/PersonMaidenName",
+      "referencePath": "#/components/schemas/Person/PersonMaidenName",
       "types": [
         "string"
       ],
@@ -70,7 +70,7 @@
     {
       "kind": "object",
       "name": "PersonAddress",
-      "referencePath": "#/components/schemas/PersonAddress",
+      "referencePath": "#/components/schemas/Person/PersonAddress",
       "properties": [
         {
           "name": "street",
@@ -85,16 +85,16 @@
     {
       "kind": "array",
       "name": "PersonSkills",
-      "referencePath": "#/components/schemas/PersonSkills",
+      "referencePath": "#/components/schemas/Person/PersonSkills",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/PersonSkillsItem"
+        "referencePath": "#/components/schemas/Person/PersonSkillsItem"
       }
     },
     {
       "kind": "object",
       "name": "PersonSkillsItem",
-      "referencePath": "#/components/schemas/PersonSkillsItem",
+      "referencePath": "#/components/schemas/Person/PersonSkillsItem",
       "properties": [
         {
           "name": "name",
@@ -105,11 +105,11 @@
     {
       "kind": "union",
       "name": "PersonNullableSkillsVariant2",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2",
+      "referencePath": "#/components/schemas/Person/PersonNullableSkillsVariant2",
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1"
+          "referencePath": "#/components/schemas/Person/PersonNullableSkillsVariant2OneOf1"
         }
       ],
       "nullable": true
@@ -117,16 +117,16 @@
     {
       "kind": "array",
       "name": "PersonNullableSkillsVariant2OneOf1",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1",
+      "referencePath": "#/components/schemas/Person/PersonNullableSkillsVariant2OneOf1",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item"
+        "referencePath": "#/components/schemas/Person/PersonNullableSkillsVariant2OneOf1Item"
       }
     },
     {
       "kind": "object",
       "name": "PersonNullableSkillsVariant2OneOf1Item",
-      "referencePath": "#/components/schemas/PersonNullableSkillsVariant2OneOf1Item",
+      "referencePath": "#/components/schemas/Person/PersonNullableSkillsVariant2OneOf1Item",
       "properties": [
         {
           "name": "name",
@@ -141,11 +141,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Person"
+          "referencePath": "#/components/schemas/Person"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/AdultAllOf1"
+          "referencePath": "#/components/schemas/AdultAllOf1"
         }
       ],
       "description": "A representation of an adult"
@@ -159,14 +159,14 @@
           "name": "children",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AdultAllOf1Children"
+            "referencePath": "#/components/schemas/AdultAllOf1/AdultAllOf1Children"
           }
         },
         {
           "name": "nullableChildrenVariant2",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2"
+            "referencePath": "#/components/schemas/AdultAllOf1/AdultAllOf1NullableChildrenVariant2"
           }
         }
       ]
@@ -174,20 +174,20 @@
     {
       "kind": "array",
       "name": "AdultAllOf1Children",
-      "referencePath": "#/components/schemas/AdultAllOf1Children",
+      "referencePath": "#/components/schemas/AdultAllOf1/AdultAllOf1Children",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Child"
+        "referencePath": "#/components/schemas/Child"
       }
     },
     {
       "kind": "union",
       "name": "AdultAllOf1NullableChildrenVariant2",
-      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2",
+      "referencePath": "#/components/schemas/AdultAllOf1/AdultAllOf1NullableChildrenVariant2",
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1"
+          "referencePath": "#/components/schemas/AdultAllOf1/AdultAllOf1NullableChildrenVariant2OneOf1"
         }
       ],
       "nullable": true
@@ -195,10 +195,10 @@
     {
       "kind": "array",
       "name": "AdultAllOf1NullableChildrenVariant2OneOf1",
-      "referencePath": "#/components/schemas/AdultAllOf1NullableChildrenVariant2OneOf1",
+      "referencePath": "#/components/schemas/AdultAllOf1/AdultAllOf1NullableChildrenVariant2OneOf1",
       "itemType": {
         "kind": "ref",
-        "name": "#/components/schemas/Child"
+        "referencePath": "#/components/schemas/Child"
       }
     },
     {
@@ -208,11 +208,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/ChildAllOf0"
+          "referencePath": "#/components/schemas/ChildAllOf0"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Person"
+          "referencePath": "#/components/schemas/Person"
         }
       ],
       "description": "A representation of a child"
@@ -272,7 +272,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams"
+        "referencePath": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams"
       },
       "responses": [
         {
@@ -284,7 +284,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Person"
+                "referencePath": "#/components/schemas/Person"
               }
             }
           ]

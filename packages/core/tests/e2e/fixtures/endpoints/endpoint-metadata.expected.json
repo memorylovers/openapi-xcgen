@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test summary and description preservation"
   },
-  "models": [],
+  "components": [],
   "tags": [],
   "endpoints": [
     {

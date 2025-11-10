@@ -3,7 +3,7 @@
     "title": "Example",
     "version": "1.0.0"
   },
-  "models": [
+  "components": [
     {
       "kind": "allOf",
       "name": "SuperBaby",
@@ -11,11 +11,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Human"
+          "referencePath": "#/components/schemas/Human"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperBabyAllOf1"
+          "referencePath": "#/components/schemas/SuperBabyAllOf1"
         }
       ]
     },
@@ -41,11 +41,11 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Human"
+          "referencePath": "#/components/schemas/Human"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperBoyAllOf1"
+          "referencePath": "#/components/schemas/SuperBoyAllOf1"
         }
       ]
     },
@@ -72,15 +72,15 @@
       "schemas": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/Human"
+          "referencePath": "#/components/schemas/Human"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/Hero"
+          "referencePath": "#/components/schemas/Hero"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/SuperManAllOf2"
+          "referencePath": "#/components/schemas/SuperManAllOf2"
         }
       ]
     },
@@ -165,7 +165,7 @@
       "tags": [],
       "parameters": {
         "kind": "ref",
-        "name": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams"
+        "referencePath": "#/paths/::person::display::{personId}/get/GetPersonDisplayPersonIdParams"
       },
       "responses": [
         {
@@ -177,7 +177,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/SuperMan"
+                "referencePath": "#/components/schemas/SuperMan"
               }
             }
           ]

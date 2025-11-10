@@ -8,7 +8,7 @@
 import type {
   IRExtensions,
   IREndpoint,
-  IRModel,
+  IRComponent,
   IRParameter,
   IRProperty,
   IRType,
@@ -44,7 +44,7 @@ export interface PropertyGenerateContext {
   /** IR プロパティ定義 */
   property: IRProperty;
   /** 所属モデル */
-  model: IRModel;
+  model: IRComponent;
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeProperty;
   /** x-extensions（存在する場合） */
@@ -111,7 +111,7 @@ export interface TsCodeParameter {
  */
 export interface ModelGenerateContext {
   /** IR モデル定義 */
-  model: IRModel;
+  model: IRComponent;
   /** 生成される型定義（Hookで変更可能） */
   tsCode: TsCodeModel;
   /** x-extensions（存在する場合） */
@@ -128,8 +128,47 @@ export interface TsCodeModel {
   code: string;
   /** 追加インポート（Hookで追加可能、モデル型ファイル用） */
   imports: string[];
-  /** スキーマファイル用の追加インポート（Hookで追加可能、オプショナル） */
-  schemaImports?: string[];
+  /** コメント（JSDoc） */
+  comment?: string;
+}
+
+/**
+ * スキーマファイル生成Hook の Context
+ *
+ * IRComponent から Valibot スキーマ定義を生成する際に呼び出される。
+ * modelFile:generate とは異なり、スキーマファイル専用のフックです。
+ *
+ * @example Hook実装
+ * ```typescript
+ * hooks: {
+ *   'schemaFile:generate': (ctx) => {
+ *     // カスタムバリデーター関数のインポートを追加
+ *     if (ctx.model.kind === 'object') {
+ *       ctx.tsCode.imports.push("import { validateEmail } from '../validators'");
+ *     }
+ *   }
+ * }
+ * ```
+ */
+export interface SchemaFileGenerateContext {
+  /** IR コンポーネント定義 */
+  model: IRComponent;
+  /** 生成されるスキーマ定義（Hookで変更可能） */
+  tsCode: TsCodeSchema;
+  /** x-extensions（存在する場合） */
+  extensions?: IRExtensions;
+}
+
+/**
+ * スキーマのコード生成モデル
+ */
+export interface TsCodeSchema {
+  /** スキーマ名 */
+  name: string;
+  /** 生成されるスキーマ定義コード */
+  code: string;
+  /** 追加インポート（Hookで追加可能） */
+  imports: string[];
   /** コメント（JSDoc） */
   comment?: string;
 }
@@ -225,6 +264,11 @@ export type ParameterGenerateHandler = HookHandler<ParameterGenerateContext>;
 export type ModelGenerateHandler = HookHandler<ModelGenerateContext>;
 
 /**
+ * スキーマファイル生成Hook の Handler 型
+ */
+export type SchemaGenerateHandler = HookHandler<SchemaFileGenerateContext>;
+
+/**
  * エンドポイント生成Hook の Handler 型
  */
 export type EndpointGenerateHandler = HookHandler<EndpointGenerateContext>;
@@ -278,6 +322,11 @@ export interface Hooks {
    * モデルファイル生成時に呼び出される Hook
    */
   "modelFile:generate"?: ModelGenerateHandler | ModelGenerateHandler[];
+
+  /**
+   * スキーマファイル生成時に呼び出される Hook
+   */
+  "schemaFile:generate"?: SchemaGenerateHandler | SchemaGenerateHandler[];
 
   /**
    * エンドポイント生成時に呼び出される Hook

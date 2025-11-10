@@ -2,19 +2,19 @@
  * レスポンス型取得
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { irTypeToTsType } from "../../helpers/type-mapper";
 import { resolveModelName } from "../../helpers/model-resolver";
 
 /**
  * エンドポイントからレスポンス型を取得
  * @param endpoint - IRエンドポイント
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @returns TypeScript型文字列
  */
 export function getResponseType(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): string {
   // 成功レスポンス（2xx）を探す
   const successResponse = endpoint.responses.find((r) =>
@@ -28,8 +28,8 @@ export function getResponseType(
 
   if (successResponse.kind === "ref") {
     // Core packageはreference path全体を保存: "#/components/schemas/User"
-    // IRモデルリストから正しいモデル名を逆引き
-    return resolveModelName(successResponse.ref.name, models);
+    // IRコンポーネントリストから正しいモデル名を逆引き
+    return resolveModelName(successResponse.ref.referencePath, models);
   }
 
   if (!successResponse.content || successResponse.content.length === 0) {
@@ -45,7 +45,7 @@ export function getResponseType(
 
   // IRRefの場合、モデルリストから正しいモデル名を逆引き
   if (typeof content.schema !== "string" && content.schema.kind === "ref") {
-    return resolveModelName(content.schema.name, models);
+    return resolveModelName(content.schema.referencePath, models);
   }
 
   return irTypeToTsType(content.schema);
@@ -108,7 +108,10 @@ if (import.meta.vitest) {
               content: [
                 {
                   mimeType: "application/json",
-                  schema: { kind: "ref", name: "#/components/schemas/User" },
+                  schema: {
+                    kind: "ref",
+                    referencePath: "#/components/schemas/User",
+                  },
                 },
               ],
             },
@@ -121,13 +124,16 @@ if (import.meta.vitest) {
       });
 
       it("should return type name for array model ref", () => {
-        const models: IRModel[] = [
+        const models: IRComponent[] = [
           {
             kind: "array",
             name: "GetUsers200Response",
             referencePath:
               "#/paths/::users/get/responses/200/content/application::json/schema",
-            itemType: { kind: "ref", name: "#/components/schemas/User" },
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
           },
         ];
 
@@ -147,7 +153,8 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::users/get/responses/200/content/application::json/schema",
+                    referencePath:
+                      "#/paths/::users/get/responses/200/content/application::json/schema",
                   },
                 },
               ],
@@ -157,7 +164,7 @@ if (import.meta.vitest) {
 
         const result = getResponseType(endpoint, models);
 
-        // IRRef to IRArrayModel returns the model name (not "Array<T>")
+        // IRRef to IRArraySchema returns the model name (not "Array<T>")
         // Array formatting should be done at a higher level that has access to models
         expect(result).toBe("GetUsers200Response");
       });

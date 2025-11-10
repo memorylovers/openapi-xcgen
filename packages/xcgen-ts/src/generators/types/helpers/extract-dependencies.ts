@@ -1,32 +1,32 @@
 /**
  * 型依存関係抽出
  *
- * IRModelから参照されている他の型を抽出する
+ * IRComponentから参照されている他の型を抽出する
  */
 
-import type { IRModel, IRType } from "@openapi-xcgen/core";
+import type { IRComponent, IRType } from "@openapi-xcgen/core";
 import { toTypeName } from "../../../helpers/naming";
 
 /**
  * モデルが参照する他の型を抽出
  *
- * @param model - IRModel
+ * @param model - IRComponent
  * @returns 参照されている型名のSet
  *
  * @example
  * ```typescript
- * const model: IRModel = {
+ * const model: IRComponent = {
  *   kind: "object",
  *   name: "Order",
  *   properties: [
- *     { name: "user", type: { kind: "ref", name: "#/components/schemas/User" } }
+ *     { name: "user", type: { kind: "ref", referencePath: "#/components/schemas/User" } }
  *   ]
  * };
  * extractTypeDependencies(model);
  * // => Set { "User" }
  * ```
  */
-export function extractTypeDependencies(model: IRModel): Set<string> {
+export function extractTypeDependencies(model: IRComponent): Set<string> {
   const dependencies = new Set<string>();
 
   function visitType(irType: IRType): void {
@@ -36,7 +36,8 @@ export function extractTypeDependencies(model: IRModel): Set<string> {
 
     switch (irType.kind) {
       case "ref": {
-        const modelName = irType.name.split("/").at(-1) ?? irType.name;
+        const modelName =
+          irType.referencePath.split("/").at(-1) ?? irType.referencePath;
         dependencies.add(toTypeName(modelName));
         break;
       }
@@ -94,19 +95,22 @@ if (import.meta.vitest) {
 
   describe("extractTypeDependencies", () => {
     it("should extract ref dependencies from object properties", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Order",
         referencePath: "#/components/schemas/Order",
         properties: [
           {
             name: "user",
-            type: { kind: "ref", name: "#/components/schemas/User" },
+            type: { kind: "ref", referencePath: "#/components/schemas/User" },
             required: true,
           },
           {
             name: "product",
-            type: { kind: "ref", name: "#/components/schemas/Product" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/Product",
+            },
             required: true,
           },
         ],
@@ -117,12 +121,12 @@ if (import.meta.vitest) {
       expect(result).toEqual(new Set(["User", "Product"]));
     });
 
-    it("should extract dependencies from IRArrayModel itself", () => {
-      const model: IRModel = {
+    it("should extract dependencies from IRArraySchema itself", () => {
+      const model: IRComponent = {
         kind: "array",
         name: "Items",
         referencePath: "#/components/schemas/Items",
-        itemType: { kind: "ref", name: "#/components/schemas/Item" },
+        itemType: { kind: "ref", referencePath: "#/components/schemas/Item" },
       };
 
       const result = extractTypeDependencies(model);
@@ -130,12 +134,12 @@ if (import.meta.vitest) {
       expect(result).toEqual(new Set(["Item"]));
     });
 
-    it("should extract dependencies from IRMapModel itself", () => {
-      const model: IRModel = {
+    it("should extract dependencies from IRMapSchema itself", () => {
+      const model: IRComponent = {
         kind: "map",
         name: "UserMap",
         referencePath: "#/components/schemas/UserMap",
-        valueType: { kind: "ref", name: "#/components/schemas/User" },
+        valueType: { kind: "ref", referencePath: "#/components/schemas/User" },
       };
 
       const result = extractTypeDependencies(model);
@@ -144,14 +148,17 @@ if (import.meta.vitest) {
     });
 
     it("should extract dependencies from object with array ref property", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Cart",
         referencePath: "#/components/schemas/Cart",
         properties: [
           {
             name: "items",
-            type: { kind: "ref", name: "#/components/schemas/CartItems" },
+            type: {
+              kind: "ref",
+              referencePath: "#/components/schemas/CartItems",
+            },
             required: true,
           },
         ],
@@ -163,13 +170,13 @@ if (import.meta.vitest) {
     });
 
     it("should extract dependencies from allOf schemas", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "allOf",
         name: "ExtendedUser",
         referencePath: "#/components/schemas/ExtendedUser",
         schemas: [
-          { kind: "ref", name: "#/components/schemas/BaseUser" },
-          { kind: "ref", name: "#/components/schemas/Profile" },
+          { kind: "ref", referencePath: "#/components/schemas/BaseUser" },
+          { kind: "ref", referencePath: "#/components/schemas/Profile" },
         ],
       };
 
@@ -179,13 +186,13 @@ if (import.meta.vitest) {
     });
 
     it("should extract dependencies from union types", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "union",
         name: "Pet",
         referencePath: "#/components/schemas/Pet",
         types: [
-          { kind: "ref", name: "#/components/schemas/Cat" },
-          { kind: "ref", name: "#/components/schemas/Dog" },
+          { kind: "ref", referencePath: "#/components/schemas/Cat" },
+          { kind: "ref", referencePath: "#/components/schemas/Dog" },
         ],
       };
 
@@ -195,7 +202,7 @@ if (import.meta.vitest) {
     });
 
     it("should return empty set for enums", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "enum",
         name: "Status",
         referencePath: "#/components/schemas/Status",
@@ -212,7 +219,7 @@ if (import.meta.vitest) {
     });
 
     it("should return empty set for models with no dependencies", () => {
-      const model: IRModel = {
+      const model: IRComponent = {
         kind: "object",
         name: "Simple",
         referencePath: "#/components/schemas/Simple",

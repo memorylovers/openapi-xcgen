@@ -51,7 +51,7 @@ export async function generate(
   const ir: XcgenIR = transform(document);
 
   consola.info(
-    `Found ${ir.models.length} models, ${ir.endpoints.length} endpoints`,
+    `Found ${ir.components.length} models, ${ir.endpoints.length} endpoints`,
   );
 
   // 4. Generate code with directory-based structure

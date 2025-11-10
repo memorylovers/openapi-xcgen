@@ -15,7 +15,7 @@ import { toTypeName } from "./naming";
  * @example
  * ```typescript
  * irTypeToTsType("string") // => "string"
- * irTypeToTsType({ kind: "ref", name: "Pet" }) // => "Pet"
+ * irTypeToTsType({ kind: "ref", referencePath: "Pet" }) // => "Pet"
  * irTypeToTsType({ kind: "array", itemType: "string" })
  * // => "Array<string>"
  * ```
@@ -52,7 +52,8 @@ export function irTypeToTsType(irType: IRType): string {
       // $refから型名を抽出してPascalCaseに変換
       // Core packageはreference path全体を保存: "#/components/schemas/Base"
       // 最後のセグメントを抽出: "Base"
-      const modelName = irType.name.split("/").at(-1) ?? irType.name;
+      const modelName =
+        irType.referencePath.split("/").at(-1) ?? irType.referencePath;
       return toTypeName(modelName);
     }
 
@@ -126,10 +127,12 @@ if (import.meta.vitest) {
       });
 
       it("should convert ref types", () => {
-        expect(irTypeToTsType({ kind: "ref", name: "Pet" })).toBe("Pet");
-        expect(irTypeToTsType({ kind: "ref", name: "user_profile" })).toBe(
-          "UserProfile",
+        expect(irTypeToTsType({ kind: "ref", referencePath: "Pet" })).toBe(
+          "Pet",
         );
+        expect(
+          irTypeToTsType({ kind: "ref", referencePath: "user_profile" }),
+        ).toBe("UserProfile");
       });
     });
 

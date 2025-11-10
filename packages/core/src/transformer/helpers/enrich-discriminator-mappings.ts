@@ -1,10 +1,10 @@
 import { consola } from "consola";
-import type { IRUnionModel, XcgenIR } from "../../types/index";
+import type { IRUnionSchema, XcgenIR } from "../../types/index";
 
 /**
  * discriminator.mappingを自動生成（Phase 2 post-processing）
  *
- * IRUnionModelでdiscriminatorがありmappingが無い場合、
+ * IRUnionSchemaでdiscriminatorがありmappingが無い場合、
  * 参照先モデルのconst値からmappingを生成する。
  *
  * @param ir - 変換対象のIR
@@ -16,8 +16,8 @@ import type { IRUnionModel, XcgenIR } from "../../types/index";
  *   kind: "union",
  *   discriminator: { propertyName: "method" },
  *   types: [
- *     { kind: "ref", name: "#/components/schemas/CardPayment" },
- *     { kind: "ref", name: "#/components/schemas/BankTransferPayment" }
+ *     { kind: "ref", referencePath: "#/components/schemas/CardPayment" },
+ *     { kind: "ref", referencePath: "#/components/schemas/BankTransferPayment" }
  *   ]
  * }
  *
@@ -36,7 +36,7 @@ import type { IRUnionModel, XcgenIR } from "../../types/index";
  * ```
  */
 export function enrichDiscriminatorMappings(ir: XcgenIR): void {
-  for (const model of ir.models) {
+  for (const model of ir.components) {
     if (
       model.kind === "union" &&
       model.discriminator &&
@@ -49,7 +49,9 @@ export function enrichDiscriminatorMappings(ir: XcgenIR): void {
       for (const type of model.types) {
         if (typeof type !== "string" && type.kind === "ref") {
           // Find referenced model in IR
-          const refModel = ir.models.find((m) => m.referencePath === type.name);
+          const refModel = ir.components.find(
+            (m) => m.referencePath === type.referencePath,
+          );
 
           if (
             refModel &&
@@ -62,7 +64,7 @@ export function enrichDiscriminatorMappings(ir: XcgenIR): void {
 
             // Extract const value from validation
             if (prop?.validation?.const) {
-              mapping[String(prop.validation.const)] = type.name;
+              mapping[String(prop.validation.const)] = type.referencePath;
             }
           }
         }
@@ -88,7 +90,7 @@ if (import.meta.vitest) {
     it("should auto-generate mapping from const values", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test", version: "1.0.0" },
-        models: [
+        components: [
           {
             kind: "object",
             name: "CardPayment",
@@ -121,8 +123,14 @@ if (import.meta.vitest) {
             referencePath: "#/components/schemas/Payment",
             discriminator: { propertyName: "method" },
             types: [
-              { kind: "ref", name: "#/components/schemas/CardPayment" },
-              { kind: "ref", name: "#/components/schemas/BankTransferPayment" },
+              {
+                kind: "ref",
+                referencePath: "#/components/schemas/CardPayment",
+              },
+              {
+                kind: "ref",
+                referencePath: "#/components/schemas/BankTransferPayment",
+              },
             ],
           },
         ],
@@ -132,9 +140,9 @@ if (import.meta.vitest) {
 
       enrichDiscriminatorMappings(ir);
 
-      const unionModel = ir.models.find(
+      const unionModel = ir.components.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       expect(unionModel.discriminator?.mapping).toEqual({
         card: "#/components/schemas/CardPayment",
@@ -145,7 +153,7 @@ if (import.meta.vitest) {
     it("should not overwrite existing mapping", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test", version: "1.0.0" },
-        models: [
+        components: [
           {
             kind: "union",
             name: "Payment",
@@ -157,7 +165,10 @@ if (import.meta.vitest) {
               },
             },
             types: [
-              { kind: "ref", name: "#/components/schemas/CustomPayment" },
+              {
+                kind: "ref",
+                referencePath: "#/components/schemas/CustomPayment",
+              },
             ],
           },
         ],
@@ -167,9 +178,9 @@ if (import.meta.vitest) {
 
       enrichDiscriminatorMappings(ir);
 
-      const unionModel = ir.models.find(
+      const unionModel = ir.components.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       expect(unionModel.discriminator?.mapping).toEqual({
         custom: "#/components/schemas/CustomPayment",
@@ -179,7 +190,7 @@ if (import.meta.vitest) {
     it("should skip union without discriminator", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test", version: "1.0.0" },
-        models: [
+        components: [
           {
             kind: "union",
             name: "StringOrNumber",
@@ -193,9 +204,9 @@ if (import.meta.vitest) {
 
       enrichDiscriminatorMappings(ir);
 
-      const unionModel = ir.models.find(
+      const unionModel = ir.components.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       expect(unionModel.discriminator).toBeUndefined();
     });
@@ -203,7 +214,7 @@ if (import.meta.vitest) {
     it("should handle missing const values gracefully", () => {
       const ir: XcgenIR = {
         metadata: { title: "Test", version: "1.0.0" },
-        models: [
+        components: [
           {
             kind: "object",
             name: "CardPayment",
@@ -222,7 +233,12 @@ if (import.meta.vitest) {
             name: "Payment",
             referencePath: "#/components/schemas/Payment",
             discriminator: { propertyName: "method" },
-            types: [{ kind: "ref", name: "#/components/schemas/CardPayment" }],
+            types: [
+              {
+                kind: "ref",
+                referencePath: "#/components/schemas/CardPayment",
+              },
+            ],
           },
         ],
         tags: [],
@@ -231,9 +247,9 @@ if (import.meta.vitest) {
 
       enrichDiscriminatorMappings(ir);
 
-      const unionModel = ir.models.find(
+      const unionModel = ir.components.find(
         (m) => m.kind === "union",
-      ) as IRUnionModel;
+      ) as IRUnionSchema;
 
       // mappingは生成されない（const値が無いため）
       expect(unionModel.discriminator?.mapping).toBeUndefined();

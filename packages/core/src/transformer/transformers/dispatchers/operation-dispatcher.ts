@@ -103,7 +103,7 @@ if (import.meta.vitest) {
       expect(result.endpoint?.path).toBe("/test");
       expect(result.endpoint?.method).toBe("get");
       expect(result.endpoint?.summary).toBe("Test operation");
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
     });
 
     it("should process operation with path parameter", () => {
@@ -140,8 +140,8 @@ if (import.meta.vitest) {
       expect(result.endpoint).not.toBeNull();
       expect(result.endpoint?.operationId).toBe("getUserById");
       // Parameter model should be generated (GetUsersIdParams)
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("parameter");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("parameter");
     });
 
     it("should merge pathItem and operation level parameters", () => {
@@ -184,8 +184,8 @@ if (import.meta.vitest) {
 
       expect(result.endpoint).not.toBeNull();
       // Unified parameter model should be generated (GetUsersIdParams)
-      expect(result.models).toHaveLength(1);
-      expect(result.models[0].kind).toBe("parameter");
+      expect(result.components).toHaveLength(1);
+      expect(result.components[0].kind).toBe("parameter");
     });
 
     it("should process operation with requestBody", () => {
@@ -222,7 +222,7 @@ if (import.meta.vitest) {
       expect(result.endpoint).not.toBeNull();
       expect(result.endpoint?.summary).toBe("Create user");
       // RequestBody models should be collected (inline object schema + child models)
-      expect(result.models.length).toBeGreaterThan(0);
+      expect(result.components.length).toBeGreaterThan(0);
     });
 
     it("should process operation with response containing schema", () => {
@@ -259,7 +259,7 @@ if (import.meta.vitest) {
 
       expect(result.endpoint).not.toBeNull();
       // Response models should be collected (inline object schema + child models)
-      expect(result.models.length).toBeGreaterThan(0);
+      expect(result.components.length).toBeGreaterThan(0);
     });
 
     it("should collect all models from complex operation", () => {
@@ -330,7 +330,7 @@ if (import.meta.vitest) {
       // 2. requestBody object
       // 3. response object
       // 4. Child models from nested structures
-      expect(result.models.length).toBeGreaterThan(0);
+      expect(result.components.length).toBeGreaterThan(0);
     });
 
     it("should handle deprecated operation", () => {

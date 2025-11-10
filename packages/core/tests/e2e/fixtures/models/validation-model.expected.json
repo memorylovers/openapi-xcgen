@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Test validation constraints"
   },
-  "models": [
+  "components": [
     {
       "kind": "object",
       "name": "Product",
@@ -72,7 +72,7 @@
           "name": "tags",
           "type": {
             "kind": "ref",
-            "name": "#/components/schemas/ProductTags"
+            "referencePath": "#/components/schemas/Product/ProductTags"
           },
           "validation": {
             "minItems": 1,
@@ -84,8 +84,12 @@
     {
       "kind": "array",
       "name": "ProductTags",
-      "referencePath": "#/components/schemas/ProductTags",
-      "itemType": "string"
+      "referencePath": "#/components/schemas/Product/ProductTags",
+      "itemType": "string",
+      "validation": {
+        "minItems": 1,
+        "maxItems": 5
+      }
     }
   ],
   "tags": [],
@@ -106,7 +110,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/Product"
+                "referencePath": "#/components/schemas/Product"
               }
             }
           ]

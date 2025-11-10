@@ -4,7 +4,7 @@
  * シンプルな同期 Hook システム（純粋関数のみ）
  */
 
-import type { IRModel, IRProperty } from "@openapi-xcgen/core";
+import type { IRComponent, IRProperty } from "@openapi-xcgen/core";
 import type {
   HookableInstance,
   HookContext,
@@ -105,7 +105,7 @@ if (import.meta.vitest) {
     type: "string",
     required: true,
   };
-  const dummyModel: IRModel = {
+  const dummyModel: IRComponent = {
     kind: "object",
     name: "TestModel",
     referencePath: "#/components/schemas/TestModel",

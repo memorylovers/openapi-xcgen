@@ -222,13 +222,12 @@ export default defineConfig({
         ctx.tsCode.validationPipes.push(`v.custom(${customFn})`);
       }
     },
-    "modelFile:generate": (ctx: HookContext<"modelFile:generate">) => {
+    "schemaFile:generate": (ctx: HookContext<"schemaFile:generate">) => {
       const properties = 'properties' in ctx.model ? ctx.model.properties : [];
       const hasValidation = properties.some(prop => prop.extensions?.["x-validation"]);
 
       if (hasValidation) {
-        if (!ctx.tsCode.schemaImports) ctx.tsCode.schemaImports = [];
-        ctx.tsCode.schemaImports.push(
+        ctx.tsCode.imports.push(
           `import * as validators from "../_userdefs"`
         );
       }
@@ -300,7 +299,7 @@ export default defineConfig({
         ctx.tsCode.validationPipes.push("v.transform(transformDayjs)");
       }
     },
-    // 3. Dayjs型とtransform関数のインポート追加
+    // 3. モデルファイル用にDayjs型をインポート
     "modelFile:generate": (ctx: HookContext<"modelFile:generate">) => {
       const properties = 'properties' in ctx.model ? ctx.model.properties : [];
       const hasDayjs = properties.some(prop => prop.extensions?.["x-type"] === "Dayjs");
@@ -310,10 +309,16 @@ export default defineConfig({
         ctx.tsCode.imports.push(
           `import type { Dayjs } from "../_userdefs"`
         );
+      }
+    },
+    // 4. スキーマファイル用にtransform関数をインポート
+    "schemaFile:generate": (ctx: HookContext<"schemaFile:generate">) => {
+      const properties = 'properties' in ctx.model ? ctx.model.properties : [];
+      const hasDayjs = properties.some(prop => prop.extensions?.["x-type"] === "Dayjs");
 
+      if (hasDayjs) {
         // スキーマファイル用にtransform関数をインポート
-        if (!ctx.tsCode.schemaImports) ctx.tsCode.schemaImports = [];
-        ctx.tsCode.schemaImports.push(
+        ctx.tsCode.imports.push(
           `import { transformDayjs } from "../_userdefs"`
         );
       }

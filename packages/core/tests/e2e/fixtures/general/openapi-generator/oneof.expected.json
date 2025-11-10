@@ -3,7 +3,7 @@
     "title": "fruity",
     "version": "0.0.1"
   },
-  "models": [
+  "components": [
     {
       "kind": "union",
       "name": "fruit",
@@ -11,15 +11,15 @@
       "types": [
         {
           "kind": "ref",
-          "name": "#/components/schemas/apple"
+          "referencePath": "#/components/schemas/apple"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/banana"
+          "referencePath": "#/components/schemas/banana"
         },
         {
           "kind": "ref",
-          "name": "#/components/schemas/orange"
+          "referencePath": "#/components/schemas/orange"
         }
       ]
     },
@@ -74,7 +74,7 @@
               "mimeType": "application/json",
               "schema": {
                 "kind": "ref",
-                "name": "#/components/schemas/fruit"
+                "referencePath": "#/components/schemas/fruit"
               }
             }
           ]

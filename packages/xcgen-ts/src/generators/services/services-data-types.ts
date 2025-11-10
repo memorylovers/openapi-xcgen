@@ -2,8 +2,9 @@
  * エンドポイントのデータ型情報を抽出
  */
 
-import type { IREndpoint, IRModel } from "@openapi-xcgen/core";
+import type { IREndpoint, IRComponent } from "@openapi-xcgen/core";
 import { resolveModelName } from "../../helpers/model-resolver";
+import { irTypeToTsType } from "../../helpers/type-mapper";
 
 /**
  * エンドポイントのデータ型情報
@@ -20,17 +21,17 @@ export interface EndpointDataTypes {
 /**
  * IREndpointからデータ型情報を抽出
  * @param endpoint - IRエンドポイント
- * @param models - IRモデルリスト（型名解決用）
+ * @param models - IRコンポーネントリスト（型名解決用）
  * @returns データ型情報
  *
  * @example
  * ```typescript
  * // パラメータのみ
  * const endpoint: IREndpoint = {
- *   parameters: { kind: "ref", name: "#/paths/.../GetPetsParams" },
+ *   parameters: { kind: "ref", referencePath: "#/paths/.../GetPetsParams" },
  *   ...
  * };
- * const models: IRModel[] = [...];
+ * const models: IRComponent[] = [...];
  * const result = getEndpointDataTypes(endpoint, models);
  * // => { parameterType: "GetPetsParams", needsDataType: true }
  *
@@ -45,7 +46,7 @@ export interface EndpointDataTypes {
  */
 export function getEndpointDataTypes(
   endpoint: IREndpoint,
-  models: readonly IRModel[],
+  models: readonly IRComponent[],
 ): EndpointDataTypes {
   let parameterType: string | undefined;
   let requestBodyType: string | undefined;
@@ -57,19 +58,48 @@ export function getEndpointDataTypes(
       typeof endpoint.parameters !== "string" &&
       endpoint.parameters.kind === "ref"
     ) {
-      // IRモデルリストから正しいモデル名を逆引き
-      parameterType = resolveModelName(endpoint.parameters.name, models);
+      // IRコンポーネントリストから正しいモデル名を逆引き
+      parameterType = resolveModelName(
+        endpoint.parameters.referencePath,
+        models,
+      );
     }
   }
 
   // リクエストボディの型名を抽出
-  if (endpoint.requestBody && endpoint.requestBody.kind === "content") {
-    for (const content of endpoint.requestBody.content) {
-      if (typeof content.schema !== "string" && content.schema.kind === "ref") {
-        // IRモデルリストから正しいモデル名を逆引き
-        requestBodyType = resolveModelName(content.schema.name, models);
-        break; // 最初のスキーマのみ使用
+  if (endpoint.requestBody) {
+    if (endpoint.requestBody.kind === "content") {
+      // Phase 1: Prioritize $ref (structured models)
+      for (const content of endpoint.requestBody.content) {
+        if (
+          typeof content.schema !== "string" &&
+          content.schema.kind === "ref"
+        ) {
+          // IRコンポーネントリストから正しいモデル名を逆引き
+          requestBodyType = resolveModelName(
+            content.schema.referencePath,
+            models,
+          );
+          break;
+        }
       }
+
+      // Phase 2: Fallback to scalar types if no $ref found
+      if (!requestBodyType) {
+        for (const content of endpoint.requestBody.content) {
+          if (typeof content.schema === "string") {
+            // スカラー型の場合、TypeScript型名を使用
+            requestBodyType = irTypeToTsType(content.schema);
+            break;
+          }
+        }
+      }
+    } else if (endpoint.requestBody.kind === "ref") {
+      // コンポーネント参照の場合（#/components/requestBodies/*）
+      requestBodyType = resolveModelName(
+        endpoint.requestBody.ref.referencePath,
+        models,
+      );
     }
   }
 
@@ -95,7 +125,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: {
             kind: "ref",
-            name: "#/paths/::pets/get/parameters/GetPetsParams",
+            referencePath: "#/paths/::pets/get/parameters/GetPetsParams",
           },
           responses: [],
         };
@@ -138,7 +168,8 @@ if (import.meta.vitest) {
                 mimeType: "application/json",
                 schema: {
                   kind: "ref",
-                  name: "#/paths/::pets/post/requestBody/.../PostPetsRequestBody",
+                  referencePath:
+                    "#/paths/::pets/post/requestBody/.../PostPetsRequestBody",
                 },
               },
             ],
@@ -161,7 +192,7 @@ if (import.meta.vitest) {
           tags: [],
           parameters: {
             kind: "ref",
-            name: "#/paths/.../PutPetsIdParams",
+            referencePath: "#/paths/.../PutPetsIdParams",
           },
           requestBody: {
             kind: "content",
@@ -171,7 +202,7 @@ if (import.meta.vitest) {
                 mimeType: "application/json",
                 schema: {
                   kind: "ref",
-                  name: "#/paths/.../PutPetsIdRequestBody",
+                  referencePath: "#/paths/.../PutPetsIdRequestBody",
                 },
               },
             ],
@@ -204,9 +235,9 @@ if (import.meta.vitest) {
         });
       });
 
-      it("should handle requestBody without schema ref", () => {
+      it("should handle requestBody with scalar type (string)", () => {
         const endpoint: IREndpoint = {
-          path: "/test",
+          path: "/log",
           method: "post",
           tags: [],
           parameters: [],
@@ -215,8 +246,8 @@ if (import.meta.vitest) {
             required: true,
             content: [
               {
-                mimeType: "application/json",
-                schema: "string", // プリミティブ型は文字列リテラル
+                mimeType: "text/plain",
+                schema: "string", // スカラー型
               },
             ],
           },
@@ -226,7 +257,134 @@ if (import.meta.vitest) {
         const result = getEndpointDataTypes(endpoint, []);
 
         expect(result).toEqual({
-          needsDataType: false,
+          requestBodyType: "string",
+          needsDataType: true,
+        });
+      });
+
+      it("should handle requestBody with scalar type (binary)", () => {
+        const endpoint: IREndpoint = {
+          path: "/upload",
+          method: "post",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "content",
+            required: true,
+            content: [
+              {
+                mimeType: "application/octet-stream",
+                schema: "binary", // スカラー型
+              },
+            ],
+          },
+          responses: [],
+        };
+
+        const result = getEndpointDataTypes(endpoint, []);
+
+        expect(result).toEqual({
+          requestBodyType: "Blob",
+          needsDataType: true,
+        });
+      });
+
+      it("should handle requestBody with scalar type (number)", () => {
+        const endpoint: IREndpoint = {
+          path: "/data",
+          method: "post",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "content",
+            required: true,
+            content: [
+              {
+                mimeType: "application/json",
+                schema: "int", // スカラー型
+              },
+            ],
+          },
+          responses: [],
+        };
+
+        const result = getEndpointDataTypes(endpoint, []);
+
+        expect(result).toEqual({
+          requestBodyType: "number",
+          needsDataType: true,
+        });
+      });
+
+      it("should extract requestBody type from ref (kind: ref)", () => {
+        const endpoint: IREndpoint = {
+          path: "/users/array",
+          method: "post",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "ref",
+            ref: {
+              kind: "ref",
+              referencePath: "#/components/requestBodies/UserArray",
+            },
+          },
+          responses: [],
+        };
+
+        const models: IRComponent[] = [
+          {
+            kind: "array",
+            name: "UserArray",
+            referencePath:
+              "#/components/requestBodies/UserArray/content/application::json/schema",
+            itemType: {
+              kind: "ref",
+              referencePath: "#/components/schemas/User",
+            },
+          },
+        ];
+
+        const result = getEndpointDataTypes(endpoint, models);
+
+        expect(result).toEqual({
+          requestBodyType: "UserArray",
+          needsDataType: true,
+        });
+      });
+
+      it("should prioritize $ref over scalar when both exist in content", () => {
+        const endpoint: IREndpoint = {
+          path: "/users",
+          method: "patch",
+          tags: [],
+          parameters: [],
+          requestBody: {
+            kind: "content",
+            required: true,
+            content: [
+              {
+                mimeType: "text/plain",
+                schema: "string", // スカラー型（先に配置）
+              },
+              {
+                mimeType: "application/json",
+                schema: {
+                  kind: "ref",
+                  referencePath: "#/components/schemas/UserUpdate",
+                }, // $ref（後に配置）
+              },
+            ],
+          },
+          responses: [],
+        };
+
+        const result = getEndpointDataTypes(endpoint, []);
+
+        // $refが優先されるべき
+        expect(result).toEqual({
+          requestBodyType: "UserUpdate",
+          needsDataType: true,
         });
       });
     });

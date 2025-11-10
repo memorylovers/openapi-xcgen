@@ -15,7 +15,7 @@ import type {
   ComponentsObject,
   IREndpoint,
   IRMetadata,
-  IRModel,
+  IRComponent,
   IRRequestBody,
   IRResponse,
   IRSecurityRequirement,
@@ -70,7 +70,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   }
 
   // Components処理（schemas, securitySchemes, responses, requestBodies）
-  let models: IRModel[] = [];
+  let components: IRComponent[] = [];
   let securitySchemes: Record<string, IRSecurityScheme> | undefined;
   let commonResponses: Record<string, IRResponse> | undefined;
   let commonRequestBodies: Record<string, IRRequestBody> | undefined;
@@ -80,7 +80,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
       document.components as ComponentsObject,
       { documentPath: ["components"], rootSegment: "components" },
     );
-    models = componentsResult.models;
+    components = componentsResult.components;
     securitySchemes = componentsResult.securitySchemes;
     commonResponses = componentsResult.responses;
     commonRequestBodies = componentsResult.requestBodies;
@@ -99,7 +99,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
     });
     endpoints = pathsResult.endpoints;
     // インラインスキーマから抽出されたモデルを追加
-    models.push(...pathsResult.models);
+    components.push(...pathsResult.components);
   }
 
   // Servers処理
@@ -110,7 +110,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
   const duplicates = new Set<string>();
 
   // モデルのname + kindをチェック（オブジェクト、列挙型等を統一的に処理）
-  models.forEach((item) => {
+  components.forEach((item) => {
     const modelKey = `${item.kind}:${item.name}`;
     if (modelKeys.has(modelKey)) {
       duplicates.add(item.name);
@@ -143,7 +143,7 @@ export function transform(document: OpenAPIDocument): XcgenIR {
 
   const xcgenIR: XcgenIR = {
     metadata,
-    models,
+    components,
     tags,
     endpoints,
     ...(serversResult.servers && { servers: serversResult.servers }),
@@ -181,7 +181,7 @@ if (import.meta.vitest) {
           title: "Test API",
           version: "1.0.0",
         },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [],
       });
@@ -222,7 +222,7 @@ if (import.meta.vitest) {
           version: "1.0.0",
           description: "A sample API",
         },
-        models: [
+        components: [
           {
             kind: "object",
             name: "Pet",
@@ -319,7 +319,7 @@ if (import.meta.vitest) {
           title: "Pet Store API",
           version: "1.0.0",
         },
-        models: [
+        components: [
           {
             kind: "requestBody",
             name: "PostPetsRequestBody",
@@ -362,7 +362,8 @@ if (import.meta.vitest) {
                   mimeType: "application/json",
                   schema: {
                     kind: "ref",
-                    name: "#/paths/::pets/post/requestBody/content/application::json/schema",
+                    referencePath:
+                      "#/paths/::pets/post/requestBody/content/application::json/schema",
                   },
                 },
               ],
@@ -457,7 +458,7 @@ if (import.meta.vitest) {
           version: "2.0.0",
           description: "A complete example",
         },
-        models: [
+        components: [
           {
             kind: "object",
             name: "Pet",
@@ -475,7 +476,7 @@ if (import.meta.vitest) {
                 name: "status",
                 type: {
                   kind: "ref",
-                  name: "#/components/schemas/PetStatus",
+                  referencePath: "#/components/schemas/Pet/PetStatus",
                 },
               },
             ],
@@ -483,7 +484,7 @@ if (import.meta.vitest) {
           {
             kind: "enum",
             name: "PetStatus",
-            referencePath: "#/components/schemas/PetStatus",
+            referencePath: "#/components/schemas/Pet/PetStatus",
             type: "string",
             values: [
               { value: "available", name: "AVAILABLE" },
@@ -515,7 +516,7 @@ if (import.meta.vitest) {
             tags: ["pets"],
             parameters: {
               kind: "ref",
-              name: "#/paths/::pets::{id}/get/GetPetsIdParams",
+              referencePath: "#/paths/::pets::{id}/get/GetPetsIdParams",
             },
             responses: [
               {
@@ -527,7 +528,7 @@ if (import.meta.vitest) {
                     mimeType: "application/json",
                     schema: {
                       kind: "ref",
-                      name: "#/components/schemas/Pet",
+                      referencePath: "#/components/schemas/Pet",
                     },
                   },
                 ],
@@ -591,7 +592,7 @@ if (import.meta.vitest) {
           title: "Empty API",
           version: "1.0.0",
         },
-        models: [],
+        components: [],
         tags: [],
         endpoints: [],
       });

@@ -1,7 +1,7 @@
 /**
  * Enum Transformer - v2 Transformer Architecture
  *
- * Enum型スキーマをIREnumModelに変換します。
+ * Enum型スキーマをIREnumSchemaに変換します。
  * トラバーサルは不要（リーフノード）のため、純粋な変換処理のみを行います。
  *
  * @bnf-target <schema-object> with enum array
@@ -9,12 +9,12 @@
  */
 
 import { consola } from "consola";
-import type { IREnumModel, IREnumValue, SchemaObject } from "../../../types";
+import type { IREnumSchema, IREnumValue, SchemaObject } from "../../../types";
 import {
   buildReferencePath,
   extractExtensions,
   generateEnumName,
-  getModelName,
+  getComponentName,
   toIRScalarType,
 } from "../../helpers";
 import type { VisitorContext } from "../../types";
@@ -22,7 +22,7 @@ import { createErrorResult } from "../errors";
 import type { TransformResult } from "../types";
 
 /**
- * Enum型スキーマをIREnumModelに変換
+ * Enum型スキーマをIREnumSchemaに変換
  *
  * @bnf <schema-object> - enum配列を持つスキーマオブジェクト
  * @bnf-ref _docs/900_openapi_v3.1_BNF_spec.md:325
@@ -33,7 +33,7 @@ import type { TransformResult } from "../types";
  *
  * @param schema - OpenAPI SchemaObject
  * @param context - Visitor context (Phase 1では既存のVisitorContextを使用)
- * @returns 変換結果（type: ref型, models: [IREnumModel]）
+ * @returns 変換結果（type: ref型, components: [IREnumSchema]）
  *
  * @example OpenAPI YAML
  * ```yaml
@@ -54,15 +54,15 @@ import type { TransformResult } from "../types";
  * ```typescript
  * const result = transformEnum(schema, { documentPath: ["components", "schemas", "Status"] });
  * // result.type.kind === "ref"
- * // result.models[0].kind === "enum"
+ * // result.components[0].kind === "enum"
  * ```
  */
 export function transformEnum(
   schema: SchemaObject,
   context: VisitorContext,
 ): TransformResult {
-  // コンテキストからモデル名を取得
-  const name = getModelName(context);
+  // コンテキストからコンポーネント名を取得
+  const name = getComponentName(context);
 
   // 名前の妥当性チェック
   if (!name.trim()) {
@@ -131,9 +131,9 @@ export function transformEnum(
   // 拡張フィールドを抽出
   const extensions = extractExtensions(schema);
 
-  // IREnumModelを作成
+  // IREnumSchemaを作成
   const referencePath = buildReferencePath(context.documentPath);
-  const enumModel: IREnumModel = {
+  const enumModel: IREnumSchema = {
     kind: "enum",
     name,
     referencePath,
@@ -145,8 +145,8 @@ export function transformEnum(
 
   // 統一インターフェースで返す
   return {
-    type: { kind: "ref", name: referencePath },
-    models: [enumModel],
+    type: { kind: "ref", referencePath: referencePath },
+    components: [enumModel],
   };
 }
 
@@ -169,9 +169,9 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Status",
+        referencePath: "#/components/schemas/Status",
       });
-      expect(result.models).toEqual([
+      expect(result.components).toEqual([
         {
           kind: "enum",
           name: "Status",
@@ -201,9 +201,9 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/Priority",
+        referencePath: "#/components/schemas/Priority",
       });
-      expect(result.models).toEqual([
+      expect(result.components).toEqual([
         {
           kind: "enum",
           name: "Priority",
@@ -232,9 +232,9 @@ if (import.meta.vitest) {
 
       expect(result.type).toEqual({
         kind: "ref",
-        name: "#/components/schemas/TaskStatus",
+        referencePath: "#/components/schemas/TaskStatus",
       });
-      expect(result.models).toEqual([
+      expect(result.components).toEqual([
         {
           kind: "enum",
           name: "TaskStatus",
@@ -263,7 +263,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error).toBeDefined();
       expect(result.error?.code).toBe("MISSING_ENUM_ARRAY");
     });
@@ -282,7 +282,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
       expect(emptyResult.type).toBeNull();
-      expect(emptyResult.models).toEqual([]);
+      expect(emptyResult.components).toEqual([]);
       expect(emptyResult.error?.code).toBe("EMPTY_ENUM_ARRAY");
 
       // enum配列でない場合
@@ -296,7 +296,7 @@ if (import.meta.vitest) {
         rootSegment: "components",
       });
       expect(invalidResult.type).toBeNull();
-      expect(invalidResult.models).toEqual([]);
+      expect(invalidResult.components).toEqual([]);
       expect(invalidResult.error?.code).toBe("INVALID_ENUM_TYPE");
 
       warnSpy.mockRestore();
@@ -316,7 +316,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("INVALID_ENUM_SCHEMA_TYPE");
 
       warnSpy.mockRestore();
@@ -336,7 +336,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("INVALID_ENUM_NAME");
 
       warnSpy.mockRestore();
@@ -356,7 +356,7 @@ if (import.meta.vitest) {
       });
 
       expect(result.type).toBeNull();
-      expect(result.models).toEqual([]);
+      expect(result.components).toEqual([]);
       expect(result.error?.code).toBe("INVALID_ENUM_NAME");
 
       warnSpy.mockRestore();

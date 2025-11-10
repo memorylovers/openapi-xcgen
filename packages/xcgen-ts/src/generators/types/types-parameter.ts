@@ -1,24 +1,24 @@
 /**
  * TypeScript Parameter型生成
  *
- * IRParameterModelからTypeScriptのinterfaceを生成する
+ * IRParameterComponentからTypeScriptのinterfaceを生成する
  * {OperationId}Data形式で、path/query/header/bodyを構造化
  */
 
-import type { IRParameterModel } from "@openapi-xcgen/core";
+import type { IRParameterComponent } from "@openapi-xcgen/core";
 import { toTypeName } from "../../helpers/naming";
-import type { HookableInstance } from "../../hooks";
+import type { TypeGenerationContext } from "./generation-context";
 import { generateParameterProperty } from "./types-parameter-property";
 
 /**
- * IRParameterModelからTypeScript interfaceを生成
- * @param model - IRParameterModel
- * @param hooks - Hook instance（オプション）
+ * IRParameterComponentからTypeScript interfaceを生成
+ * @param model - IRParameterComponent
+ * @param ctx - Type generation context
  * @returns TypeScript interface定義文字列
  *
  * @example
  * ```typescript
- * const model: IRParameterModel = {
+ * const model: IRParameterComponent = {
  *   kind: "parameter",
  *   name: "GetUserData",
  *   referencePath: "#/paths/~1users~1{id}/get/parameters",
@@ -27,13 +27,13 @@ import { generateParameterProperty } from "./types-parameter-property";
  *     { name: "include", type: "string", required: false, in: "query" }
  *   ],
  * };
- * await generateParameterType(model);
+ * await generateParameterType(model, ctx);
  * // => "export interface GetUserData { path: { id: number; }; query: { include?: string; }; }"
  * ```
  */
 export function generateParameterType(
-  model: IRParameterModel,
-  hooks?: HookableInstance,
+  model: IRParameterComponent,
+  ctx: TypeGenerationContext,
 ): string {
   const lines: string[] = [];
   const typeName = toTypeName(model.name);
@@ -60,7 +60,7 @@ export function generateParameterType(
   for (const [inType, params] of Object.entries(grouped)) {
     lines.push(`  ${inType}: {`);
     for (const param of params) {
-      const propertyCode = generateParameterProperty(param, undefined, hooks);
+      const propertyCode = generateParameterProperty(param, undefined, ctx);
       lines.push(`    ${propertyCode}`);
     }
     lines.push(`  };`);
@@ -73,12 +73,20 @@ export function generateParameterType(
 
 // === in-source testing ===
 if (import.meta.vitest) {
+  const mockCtx: TypeGenerationContext = {
+    ir: {
+      metadata: { title: "Test API", version: "1.0.0" },
+      components: [],
+      tags: [],
+      endpoints: [],
+    },
+  };
   const { describe, it, expect } = import.meta.vitest;
 
   describe("types-parameter", () => {
     describe("generateParameterType", () => {
       it("should generate parameter type with path params", () => {
-        const model: IRParameterModel = {
+        const model: IRParameterComponent = {
           kind: "parameter",
           name: "GetUserData",
           referencePath: "#/paths/~1users~1{id}/get/parameters",
@@ -92,7 +100,7 @@ if (import.meta.vitest) {
           ],
         };
 
-        const result = generateParameterType(model);
+        const result = generateParameterType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -106,7 +114,7 @@ export interface GetUserData {
       });
 
       it("should generate parameter type with multiple groups", () => {
-        const model: IRParameterModel = {
+        const model: IRParameterComponent = {
           kind: "parameter",
           name: "SearchData",
           referencePath: "#/paths/~1search/get/parameters",
@@ -125,7 +133,7 @@ export interface GetUserData {
           ],
         };
 
-        const result = generateParameterType(model);
+        const result = generateParameterType(model, mockCtx);
 
         expect(result).toEqual(
           `
@@ -140,7 +148,7 @@ export interface SearchData {
       });
 
       it("should generate parameter type with description", () => {
-        const model: IRParameterModel = {
+        const model: IRParameterComponent = {
           kind: "parameter",
           name: "UpdateUserData",
           referencePath: "#/paths/~1users~1{id}/put/parameters",
@@ -155,7 +163,7 @@ export interface SearchData {
           ],
         };
 
-        const result = generateParameterType(model);
+        const result = generateParameterType(model, mockCtx);
 
         expect(result).toEqual(
           `

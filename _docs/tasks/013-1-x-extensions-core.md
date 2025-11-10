@@ -610,7 +610,7 @@ export interface IRParameter {
 // packages/core/src/types/ir/models/base.ts
 import type { Extensions } from "../common/extensions";
 
-export interface IRObjectModel {
+export interface IRObjectSchema {
   kind: "object";
   name: string;
   referencePath: string;
@@ -620,7 +620,7 @@ export interface IRObjectModel {
   extensions?: Extensions; // ✅ 統一された型
 }
 
-export interface IREnumModel {
+export interface IREnumSchema {
   kind: "enum";
   name: string;
   referencePath: string;
@@ -736,11 +736,11 @@ Core は OpenAPI の `x-*` フィールドを解釈せず、そのまま IR に�
    - API パラメータ定義
    - 使用例: パラメータに `x-format: "uuid-v7"` などを指定
 
-3. **IRObjectModel** (`packages/core/src/types/ir/models/base.ts`)
+3. **IRObjectSchema** (`packages/core/src/types/ir/models/base.ts`)
    - オブジェクト型モデル定義
    - 使用例: モデル全体に `x-type: "UserModel"` などを指定
 
-4. **IREnumModel** (`packages/core/src/types/ir/models/base.ts`)
+4. **IREnumSchema** (`packages/core/src/types/ir/models/base.ts`)
    - 列挙型モデル定義
    - 使用例: Enum に `x-type: "StatusEnum"` などを指定
 
@@ -790,11 +790,11 @@ OpenAPI スキーマから `x-*` フィールドを抽出し、IR の `extension
    - IRPrimitive → IRProperty/IRParameter 生成時に extensions を設定
 
 2. `packages/core/src/transformer/visitors/object-visitor.ts`
-   - IRObjectModel 生成時に extensions を設定
+   - IRObjectSchema 生成時に extensions を設定
    - プロパティ生成時にも extensions を設定
 
 3. `packages/core/src/transformer/visitors/enum-visitor.ts`
-   - IREnumModel 生成時に extensions を設定
+   - IREnumSchema 生成時に extensions を設定
 
 4. `packages/core/src/transformer/visitors/allof-visitor.ts`
    - IRAllOfModel 生成時に extensions を設定
@@ -998,7 +998,7 @@ components:
 
 本タスクで extensions フィールドを追加する対象：
 
-- **Schema Object** → IRObjectModel, IREnumModel, IRAllOfModel, IRAnyOfModel, IRUnionModel
+- **Schema Object** → IRObjectSchema, IREnumSchema, IRAllOfSchema, IRAnyOfSchema, IRUnionSchema
 - **Property（Schema の properties）** → IRProperty
 - **Parameter Object** → IRParameter
 - **Operation Object + Path Item Object** → IREndpoint
